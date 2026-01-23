@@ -173,23 +173,23 @@ Phase mappings for all v1 requirements.
 
 | Requirement | Description | Status |
 |-------------|-------------|--------|
-| AUTH-01 | User can create account with email/password | Pending |
-| AUTH-02 | User can create account with Google OAuth | Pending |
-| AUTH-03 | User can log in and stay logged in across sessions | Pending |
-| AUTH-04 | User can reset password via email | Pending |
-| AUTH-05 | User can log out from any page | Pending |
-| ORG-01 | User can create organization during onboarding | Pending |
-| ORG-02 | Organization data is isolated | Pending |
-| ORG-03 | Organization Owner can update organization details | Pending |
-| ORG-04 | Organization Owner can invite coaches | Pending |
-| ORG-05 | Organization Owner can assign roles | Pending |
-| ORG-06 | Organization Owner can remove coaches | Pending |
-| ORG-07 | User can belong to multiple organizations | Pending |
-| SUB-01 | User must select subscription plan before creating org | Pending |
-| SUB-02 | System enforces feature limits based on plan | Pending |
-| SUB-03 | System enforces athlete limits based on plan | Pending |
-| SUB-04 | User can view current subscription status | Pending |
-| SUB-05 | Plans can be configured by org type | Pending |
+| AUTH-01 | User can create account with email/password | Complete |
+| AUTH-02 | User can create account with Google OAuth | Complete |
+| AUTH-03 | User can log in and stay logged in across sessions | Complete |
+| AUTH-04 | User can reset password via email | Complete |
+| AUTH-05 | User can log out from any page | Complete |
+| ORG-01 | User can create organization during onboarding | Complete |
+| ORG-02 | Organization data is isolated | Complete |
+| ORG-03 | Organization Owner can update organization details | Complete |
+| ORG-04 | Organization Owner can invite coaches | Complete |
+| ORG-05 | Organization Owner can assign roles | Complete |
+| ORG-06 | Organization Owner can remove coaches | Complete |
+| ORG-07 | User can belong to multiple organizations | Complete |
+| SUB-01 | User must select subscription plan before creating org | Complete |
+| SUB-02 | System enforces feature limits based on plan | Complete |
+| SUB-03 | System enforces athlete limits based on plan | Complete |
+| SUB-04 | User can view current subscription status | Complete |
+| SUB-05 | Plans can be configured by org type | Complete |
 
 ### Phase 2: Exercise Library & Athlete Management
 

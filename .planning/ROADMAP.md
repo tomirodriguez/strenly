@@ -10,7 +10,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure
+- [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure
 - [ ] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations
 - [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts
@@ -31,11 +31,11 @@ Strenly delivers a training planning platform where coaches can create programs 
 **Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 01-01-PLAN.md - Database schema + Better-Auth setup (Wave 1)
-- [ ] 01-02-PLAN.md - oRPC procedure hierarchy + Hono app (Wave 1)
-- [ ] 01-03-PLAN.md - Authentication flows (email/password, OAuth, session, logout, password reset) (Wave 2)
-- [ ] 01-04-PLAN.md - Organization management + member invitations (Wave 2)
-- [ ] 01-05-PLAN.md - Subscription plans + limit enforcement (Wave 3)
+- [x] 01-01-PLAN.md - Database schema + Better-Auth setup (Wave 1)
+- [x] 01-02-PLAN.md - oRPC procedure hierarchy + Hono app (Wave 1)
+- [x] 01-03-PLAN.md - Authentication flows (email/password, OAuth, session, logout, password reset) (Wave 2)
+- [x] 01-04-PLAN.md - Organization management + member invitations (Wave 2)
+- [x] 01-05-PLAN.md - Subscription plans + limit enforcement (Wave 3)
 
 ### Phase 2: Exercise Library & Athlete Management
 **Goal**: Coaches can manage athletes and access a comprehensive exercise library
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Multi-Tenancy | 0/5 | Planned | - |
+| 1. Foundation & Multi-Tenancy | 5/5 | ✓ Complete | 2026-01-23 |
 | 2. Exercise Library & Athlete Management | 0/2 | Not started | - |
 | 3. Program Builder | 0/4 | Not started | - |
 | 4. Athlete PWA | 0/3 | Not started | - |
