@@ -1,5 +1,5 @@
-import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { eq } from "@strenly/database";
 import { plans, subscriptions } from "@strenly/database/schema";
 import {
 	organizationTypeSchema,

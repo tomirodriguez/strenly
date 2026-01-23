@@ -4,11 +4,11 @@
  */
 
 import * as schema from "@strenly/database/schemas";
+import { eq } from "@strenly/database";
 import { plans, subscriptions } from "@strenly/database/schemas";
 import { betterAuth } from "better-auth";
 import { type DB, drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
 
 /**
  * Environment bindings required for Better Auth

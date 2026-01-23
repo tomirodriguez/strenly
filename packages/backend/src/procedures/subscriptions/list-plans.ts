@@ -1,11 +1,10 @@
-import { and, eq, type SQL } from "drizzle-orm";
 import { z } from "zod";
+import { and, eq } from "@strenly/database";
 import { plans } from "@strenly/database/schema";
 import {
 	organizationTypeSchema,
 	planFeaturesSchema,
 	planSchema,
-	type OrganizationType,
 } from "@strenly/contracts/subscriptions/plan";
 import { publicProcedure } from "../../lib/orpc";
 
@@ -28,21 +27,23 @@ export const listPlans = publicProcedure
 	.input(listPlansInputSchema)
 	.output(listPlansOutputSchema)
 	.handler(async ({ input, context }) => {
-		const conditions: SQL[] = [eq(plans.isActive, true)];
-
 		// Parse and validate organization type from input
 		const orgTypeResult = organizationTypeSchema.safeParse(
 			input?.organizationType,
 		);
-		if (orgTypeResult.success) {
-			const orgType: OrganizationType = orgTypeResult.data;
-			conditions.push(eq(plans.organizationType, orgType));
-		}
+
+		// Build where clause based on filters
+		const whereClause = orgTypeResult.success
+			? and(
+					eq(plans.isActive, true),
+					eq(plans.organizationType, orgTypeResult.data),
+				)
+			: eq(plans.isActive, true);
 
 		const result = await context.db
 			.select()
 			.from(plans)
-			.where(and(...conditions))
+			.where(whereClause)
 			.orderBy(plans.priceMonthly);
 
 		return {
