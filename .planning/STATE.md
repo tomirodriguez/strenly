@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-23)
 ## Current Position
 
 Phase: 1 of 5 (Foundation & Multi-Tenancy)
-Plan: 4 of 5 in current phase
-Status: In progress
-Last activity: 2026-01-23 - Completed 01-04-PLAN.md
+Plan: 4 of 5 in current phase (01-01 through 01-04 complete)
+Status: Ready for Wave 3 (01-05)
+Last activity: 2026-01-23 - Refactored to use Better-Auth directly
 
-Progress: [====......] 20%
+Progress: [========..] 80%
 
 ## Performance Metrics
 
@@ -42,13 +42,13 @@ Progress: [====......] 20%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- **Use Better-Auth directly** — Auth and org endpoints use Better-Auth at /api/auth/* (no oRPC wrappers)
 - Factory pattern for Better-Auth (createAuth) for Cloudflare Workers compatibility
 - Email/password enabled with CPU limit caveat for Workers free tier
-- Organization plugin auto-creates subscription on org creation
+- Organization hook creates subscription on org creation (afterCreateOrganization)
 - Plain object router pattern for oRPC (not os.router() method)
-- Role validation via Zod safeParse (no type casting)
-- Organization type stored in Better-Auth metadata (not native field)
-- listUserOrganizations fetches full org for each to get member role
+- Role validation via Zod safeParse in authProcedure middleware
+- oRPC reserved for custom business logic (subscriptions, athletes, programs)
 
 ### Pending Todos
 
@@ -58,7 +58,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- Better-Auth forgetPassword API type mismatch (workaround in place)
+None.
 
 ## Session Continuity
 
