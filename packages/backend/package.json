@@ -21,6 +21,7 @@
     "@strenly/auth": "workspace:^",
     "@strenly/contracts": "workspace:^",
     "@strenly/database": "workspace:^",
+    "drizzle-orm": "^0.44.7",
     "hono": "^4.7.5",
     "zod": "^3.24.2"
   },

@@ -48,6 +48,9 @@ importers:
       '@strenly/database':
         specifier: workspace:^
         version: link:../database
+      drizzle-orm:
+        specifier: ^0.44.7
+        version: 0.44.7(@cloudflare/workers-types@4.20260123.0)(@neondatabase/serverless@0.10.4)(@prisma/client@5.22.0)(@types/pg@8.16.0)(better-sqlite3@12.6.2)(kysely@0.28.10)(pg@8.17.2)
       hono:
         specifier: ^4.7.5
         version: 4.11.5
