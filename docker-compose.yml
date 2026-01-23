@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: strenly-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: strenly
+      POSTGRES_PASSWORD: strenly
+      POSTGRES_DB: strenly_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U strenly -d strenly_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neon-proxy:
+    image: ghcr.io/timowilhelm/local-neon-http-proxy:main
+    container_name: strenly-neon-proxy
+    environment:
+      - PG_CONNECTION_STRING=postgres://strenly:strenly@postgres:5432/strenly_dev
+    ports:
+      - "4444:4444"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
