@@ -167,28 +167,129 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Phase mappings for all v1 requirements.
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| AUTH-* | Phase 1 | Pending |
-| ORG-* | Phase 1 | Pending |
-| SUB-* | Phase 1 | Pending |
-| ATH-* | Phase 2 | Pending |
-| EXR-* | Phase 2 | Pending |
-| PRG-* | Phase 3 | Pending |
-| RX-* | Phase 3 | Pending |
-| TPL-* | Phase 3 | Pending |
-| DSH-* | Phase 4 | Pending |
-| EXP-* | Phase 4 | Pending |
-| PWA-* | Phase 5 | Pending |
-| ADM-* | Phase 5 | Pending |
+### Phase 1: Foundation & Multi-Tenancy
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| AUTH-01 | User can create account with email/password | Pending |
+| AUTH-02 | User can create account with Google OAuth | Pending |
+| AUTH-03 | User can log in and stay logged in across sessions | Pending |
+| AUTH-04 | User can reset password via email | Pending |
+| AUTH-05 | User can log out from any page | Pending |
+| ORG-01 | User can create organization during onboarding | Pending |
+| ORG-02 | Organization data is isolated | Pending |
+| ORG-03 | Organization Owner can update organization details | Pending |
+| ORG-04 | Organization Owner can invite coaches | Pending |
+| ORG-05 | Organization Owner can assign roles | Pending |
+| ORG-06 | Organization Owner can remove coaches | Pending |
+| ORG-07 | User can belong to multiple organizations | Pending |
+| SUB-01 | User must select subscription plan before creating org | Pending |
+| SUB-02 | System enforces feature limits based on plan | Pending |
+| SUB-03 | System enforces athlete limits based on plan | Pending |
+| SUB-04 | User can view current subscription status | Pending |
+| SUB-05 | Plans can be configured by org type | Pending |
+
+### Phase 2: Exercise Library & Athlete Management
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| ATH-01 | Coach can create athlete profiles | Pending |
+| ATH-02 | Coach can view list of all athletes | Pending |
+| ATH-03 | Coach can update athlete profile | Pending |
+| ATH-04 | Coach can delete athlete profiles | Pending |
+| ATH-05 | Coach can generate invitation link | Pending |
+| ATH-06 | Athlete can link user account via invitation | Pending |
+| ATH-07 | Coach can operate without athlete accounts | Pending |
+| ATH-08 | Coach can log workouts on behalf of athletes | Pending |
+| EXR-01 | System provides curated exercise database | Pending |
+| EXR-02 | Coach can search and select exercises | Pending |
+| EXR-03 | Coach can create custom exercises | Pending |
+| EXR-04 | Exercises have muscle group mappings | Pending |
+| EXR-05 | Exercises have movement pattern classification | Pending |
+| EXR-06 | Exercises can have demo video links | Pending |
+
+### Phase 3: Program Builder
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| PRG-01 | Coach can create training programs | Pending |
+| PRG-02 | Coach can assign programs to athletes | Pending |
+| PRG-03 | Coach can edit programs using inline editing | Pending |
+| PRG-04 | Coach can navigate grid with keyboard | Pending |
+| PRG-05 | Coach can see full cycle view | Pending |
+| PRG-06 | Coach can view 3+ prescription params | Pending |
+| PRG-07 | Coach can type natural notation | Pending |
+| PRG-08 | Coach can duplicate entire programs | Pending |
+| PRG-09 | Coach can duplicate weeks | Pending |
+| PRG-10 | Coach can add sessions to programs | Pending |
+| PRG-11 | Coach can add exercises to sessions | Pending |
+| PRG-12 | Programs remain editable at any time | Pending |
+| PRG-13 | Changes visible to athletes quickly | Pending |
+| RX-01 | Coach can specify sets | Pending |
+| RX-02 | Coach can specify reps (fixed or range) | Pending |
+| RX-03 | Coach can specify AMRAP sets | Pending |
+| RX-04 | Coach can specify intensity via RIR | Pending |
+| RX-05 | Coach can specify intensity via RPE | Pending |
+| RX-06 | Coach can specify intensity via %1RM or %TM | Pending |
+| RX-07 | Coach can specify absolute weight | Pending |
+| RX-08 | Coach can specify rest periods | Pending |
+| RX-09 | Coach can specify tempo | Pending |
+| RX-10 | Coach can group exercises as supersets | Pending |
+| RX-11 | Coach can add notes/cues per exercise | Pending |
+| TPL-01 | Coach can save programs as templates | Pending |
+| TPL-02 | Coach can create programs from templates | Pending |
+| TPL-03 | Templates can have metadata | Pending |
+| TPL-04 | Templates are private to organization | Pending |
+
+### Phase 4: Athlete PWA
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| PWA-01 | Athlete can view assigned program | Pending |
+| PWA-02 | Athlete can view next/upcoming workout | Pending |
+| PWA-03 | Athlete can log workout execution | Pending |
+| PWA-04 | Workout log pre-filled with plan | Pending |
+| PWA-05 | Athlete can modify logged values | Pending |
+| PWA-06 | Athlete can add comments | Pending |
+| PWA-07 | System maintains plan vs log separation | Pending |
+| PWA-08 | Athlete can view past workout logs | Pending |
+| PWA-09 | Athlete can use rest timer | Pending |
+| PWA-10 | Athlete can view exercise demo videos | Pending |
+
+### Phase 5: Dashboard & Analytics
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| DSH-01 | Coach can view dashboard | Pending |
+| DSH-02 | Dashboard shows athletes needing programs | Pending |
+| DSH-03 | Dashboard shows recent athlete activity | Pending |
+| DSH-04 | Dashboard shows pending items | Pending |
+| DSH-05 | Coach can navigate from dashboard | Pending |
+| DSH-06 | Coach can view Plan vs Log comparison | Pending |
+| EXP-01 | Coach can export program data as CSV | Pending |
+| EXP-02 | Coach can export program data as JSON | Pending |
+| ADM-01 | Platform admin can view metrics | Pending |
+| ADM-02 | Platform admin can create/edit plans | Pending |
+| ADM-03 | Platform admin can modify plan pricing | Pending |
+
+### Coverage Summary
+
+| Phase | Requirements | Count |
+|-------|--------------|-------|
+| Phase 1 | AUTH-01 to AUTH-05, ORG-01 to ORG-07, SUB-01 to SUB-05 | 17 |
+| Phase 2 | ATH-01 to ATH-08, EXR-01 to EXR-06 | 14 |
+| Phase 3 | PRG-01 to PRG-13, RX-01 to RX-11, TPL-01 to TPL-04 | 28 |
+| Phase 4 | PWA-01 to PWA-10 | 10 |
+| Phase 5 | DSH-01 to DSH-06, EXP-01 to EXP-02, ADM-01 to ADM-03 | 11 |
+| **Total** | | **80** |
 
 **Coverage:**
-- v1 requirements: 68 total
-- Mapped to phases: 68
-- Unmapped: 0 ✓
+- v1 requirements: 80 total
+- Mapped to phases: 80
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after initial definition*
+*Last updated: 2026-01-23 after roadmap creation*
