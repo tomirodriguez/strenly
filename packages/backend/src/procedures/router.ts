@@ -1,4 +1,6 @@
-import { health } from './health/health'
+import { authRouter } from "./auth";
+import { health } from "./health/health";
+import { organizationsRouter } from "./organizations";
 
 /**
  * Main oRPC router
@@ -8,12 +10,9 @@ import { health } from './health/health'
  * The RPCHandler handles routing based on the object keys.
  */
 export const router = {
-  health,
-  // Future procedure groups will be added here:
-  // auth: authRouter,
-  // organizations: organizationsRouter,
-  // programs: programsRouter,
-  // etc.
-}
+	health,
+	auth: authRouter,
+	organizations: organizationsRouter,
+};
 
-export type Router = typeof router
+export type Router = typeof router;
