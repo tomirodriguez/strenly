@@ -102,7 +102,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 // Mount oRPC handler
 const rpcHandler = new RPCHandler(router);
 
-app.use("/rpc/*", async (c) => {
+app.use("/rpc/*", async (c, next) => {
 	const db = c.get("db");
 	const auth = c.get("auth");
 
@@ -112,12 +112,16 @@ app.use("/rpc/*", async (c) => {
 		headers: c.req.raw.headers,
 	};
 
-	const response = await rpcHandler.handle(c.req.raw, {
+	const { matched, response } = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",
 		context,
 	});
 
-	return response ?? c.notFound();
+	if (matched) {
+		return c.newResponse(response.body, response);
+	}
+
+	await next();
 });
 
 export { app };
