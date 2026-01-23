@@ -28,12 +28,14 @@ Strenly delivers a training planning platform where coaches can create programs 
   3. Organization data is completely isolated (users cannot access other organizations' data)
   4. User must select subscription plan before creating organization and system enforces plan limits
   5. User can belong to multiple organizations with different roles
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md - Database schema + Better-Auth setup (Wave 1)
+- [ ] 01-02-PLAN.md - oRPC procedure hierarchy + Hono app (Wave 1)
+- [ ] 01-03-PLAN.md - Authentication flows (email/password, OAuth, session, logout, password reset) (Wave 2)
+- [ ] 01-04-PLAN.md - Organization management + member invitations (Wave 2)
+- [ ] 01-05-PLAN.md - Subscription plans + limit enforcement (Wave 3)
 
 ### Phase 2: Exercise Library & Athlete Management
 **Goal**: Coaches can manage athletes and access a comprehensive exercise library
@@ -109,7 +111,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Multi-Tenancy | 0/3 | Not started | - |
+| 1. Foundation & Multi-Tenancy | 0/5 | Planned | - |
 | 2. Exercise Library & Athlete Management | 0/2 | Not started | - |
 | 3. Program Builder | 0/4 | Not started | - |
 | 4. Athlete PWA | 0/3 | Not started | - |
