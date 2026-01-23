@@ -1,14 +1,8 @@
-import { z } from "zod";
+import { organizationTypeSchema, planFeaturesSchema } from "@strenly/contracts/subscriptions/plan";
+import { subscriptionSchema, subscriptionStatusSchema } from "@strenly/contracts/subscriptions/subscription";
 import { eq } from "@strenly/database";
 import { plans, subscriptions } from "@strenly/database/schema";
-import {
-	organizationTypeSchema,
-	planFeaturesSchema,
-} from "@strenly/contracts/subscriptions/plan";
-import {
-	subscriptionSchema,
-	subscriptionStatusSchema,
-} from "@strenly/contracts/subscriptions/subscription";
+import { z } from "zod";
 import { authProcedure } from "../../lib/orpc";
 
 const getSubscriptionOutputSchema = z.object({

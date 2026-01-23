@@ -3,8 +3,8 @@
  * Factory function that creates Better Auth instances on-demand
  */
 
-import * as schema from "@strenly/database/schemas";
 import { eq } from "@strenly/database";
+import * as schema from "@strenly/database/schemas";
 import { plans, subscriptions } from "@strenly/database/schemas";
 import { betterAuth } from "better-auth";
 import { type DB, drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -35,9 +35,7 @@ export type AuthEnv = {
  */
 export function createAuth(env: AuthEnv, db: DB) {
 	if (!env.BETTER_AUTH_SECRET) {
-		throw new Error(
-			"BETTER_AUTH_SECRET environment variable is required. Generate with: openssl rand -base64 32",
-		);
+		throw new Error("BETTER_AUTH_SECRET environment variable is required. Generate with: openssl rand -base64 32");
 	}
 
 	if (!env.BETTER_AUTH_URL) {
@@ -101,19 +99,12 @@ export function createAuth(env: AuthEnv, db: DB) {
 						const planId = metadata?.planId;
 
 						if (!planId) {
-							console.error(
-								"[auth] No planId in organization metadata for org:",
-								org.id,
-							);
+							console.error("[auth] No planId in organization metadata for org:", org.id);
 							return;
 						}
 
 						// Get plan details
-						const [plan] = await db
-							.select()
-							.from(plans)
-							.where(eq(plans.id, planId))
-							.limit(1);
+						const [plan] = await db.select().from(plans).where(eq(plans.id, planId)).limit(1);
 
 						if (!plan) {
 							console.error(`[auth] Plan ${planId} not found for org:`, org.id);

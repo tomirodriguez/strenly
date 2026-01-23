@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./schemas": "./src/schema/index.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./client": "./src/client.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -16,6 +17,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:drop": "drizzle-kit drop",
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate",
     "db:seed:plans": "tsx scripts/seed-plans.ts"

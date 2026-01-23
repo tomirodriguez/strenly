@@ -1,11 +1,4 @@
-import {
-	boolean,
-	index,
-	jsonb,
-	pgTable,
-	text,
-	timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
  * Users table - Better-Auth core table

@@ -1,7 +1,7 @@
-import { ResultAsync, ok, err } from "neverthrow";
-import { eq, sql } from "@strenly/database";
-import { subscriptions, plans } from "@strenly/database/schema";
 import type { DbClient } from "@strenly/database";
+import { eq, sql } from "@strenly/database";
+import { plans, subscriptions } from "@strenly/database/schema";
+import { err, ok, ResultAsync } from "neverthrow";
 
 /**
  * Error types for athlete limit checking
@@ -12,9 +12,7 @@ type AthleteLimitExceededError = {
 	currentCount: number;
 	limit: number;
 };
-type CheckAthleteLimitError =
-	| SubscriptionNotFoundError
-	| AthleteLimitExceededError;
+type CheckAthleteLimitError = SubscriptionNotFoundError | AthleteLimitExceededError;
 
 /**
  * Result type for athlete limit check
@@ -78,10 +76,7 @@ export function checkAthleteLimit(
  * Increment athlete count for organization
  * Call after successfully adding an athlete
  */
-export async function incrementAthleteCount(
-	db: DbClient,
-	organizationId: string,
-): Promise<void> {
+export async function incrementAthleteCount(db: DbClient, organizationId: string): Promise<void> {
 	await db
 		.update(subscriptions)
 		.set({
@@ -96,10 +91,7 @@ export async function incrementAthleteCount(
  * Call after successfully removing an athlete
  * Uses GREATEST to prevent negative counts
  */
-export async function decrementAthleteCount(
-	db: DbClient,
-	organizationId: string,
-): Promise<void> {
+export async function decrementAthleteCount(db: DbClient, organizationId: string): Promise<void> {
 	await db
 		.update(subscriptions)
 		.set({

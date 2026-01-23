@@ -1,11 +1,8 @@
-import { ResultAsync, ok, err } from "neverthrow";
-import { eq } from "@strenly/database";
-import { subscriptions, plans } from "@strenly/database/schema";
+import { type PlanFeatures, planFeaturesSchema } from "@strenly/contracts/subscriptions/plan";
 import type { DbClient } from "@strenly/database";
-import {
-	planFeaturesSchema,
-	type PlanFeatures,
-} from "@strenly/contracts/subscriptions/plan";
+import { eq } from "@strenly/database";
+import { plans, subscriptions } from "@strenly/database/schema";
+import { err, ok, ResultAsync } from "neverthrow";
 
 /**
  * Feature names available in subscription plans
@@ -20,9 +17,7 @@ type FeatureNotAvailableError = {
 	type: "FEATURE_NOT_AVAILABLE";
 	feature: FeatureName;
 };
-type CheckFeatureAccessError =
-	| SubscriptionNotFoundError
-	| FeatureNotAvailableError;
+type CheckFeatureAccessError = SubscriptionNotFoundError | FeatureNotAvailableError;
 
 /**
  * Check if organization has access to a specific feature

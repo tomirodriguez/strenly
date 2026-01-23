@@ -6,3 +6,7 @@
 export { type AppType, app } from "./app";
 export { authProcedure, publicProcedure, sessionProcedure } from "./lib/orpc";
 export { type Router, router } from "./procedures/router";
+
+// Default export for Cloudflare Workers
+import { app } from "./app";
+export default app;

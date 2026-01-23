@@ -1,22 +1,10 @@
-import {
-	boolean,
-	index,
-	integer,
-	jsonb,
-	pgEnum,
-	pgTable,
-	text,
-	timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
  * Organization type enum
  * Distinguishes between solo coaches and gym organizations
  */
-export const organizationTypeEnum = pgEnum("organization_type", [
-	"coach_solo",
-	"gym",
-]);
+export const organizationTypeEnum = pgEnum("organization_type", ["coach_solo", "gym"]);
 
 /**
  * Plans table

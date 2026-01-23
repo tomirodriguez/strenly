@@ -1,11 +1,4 @@
-import {
-	index,
-	integer,
-	pgEnum,
-	pgTable,
-	text,
-	timestamp,
-} from "drizzle-orm/pg-core";
+import { index, integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { organizations } from "./auth";
 import { plans } from "./plans";
 
@@ -13,11 +6,7 @@ import { plans } from "./plans";
  * Subscription status enum
  * Tracks the state of an organization's subscription
  */
-export const subscriptionStatusEnum = pgEnum("subscription_status", [
-	"active",
-	"canceled",
-	"past_due",
-]);
+export const subscriptionStatusEnum = pgEnum("subscription_status", ["active", "canceled", "past_due"]);
 
 /**
  * Subscriptions table

@@ -7,9 +7,7 @@
 
 // Better-Auth schemas (users, sessions, accounts, organizations, members, invitations)
 export * from "./auth";
-
 // Subscription plans
 export * from "./plans";
-
 // Organization subscriptions
 export * from "./subscriptions";

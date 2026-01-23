@@ -1,11 +1,7 @@
-import { z } from "zod";
+import { organizationTypeSchema, planFeaturesSchema, planSchema } from "@strenly/contracts/subscriptions/plan";
 import { and, eq } from "@strenly/database";
 import { plans } from "@strenly/database/schema";
-import {
-	organizationTypeSchema,
-	planFeaturesSchema,
-	planSchema,
-} from "@strenly/contracts/subscriptions/plan";
+import { z } from "zod";
 import { publicProcedure } from "../../lib/orpc";
 
 const listPlansInputSchema = z
@@ -28,23 +24,14 @@ export const listPlans = publicProcedure
 	.output(listPlansOutputSchema)
 	.handler(async ({ input, context }) => {
 		// Parse and validate organization type from input
-		const orgTypeResult = organizationTypeSchema.safeParse(
-			input?.organizationType,
-		);
+		const orgTypeResult = organizationTypeSchema.safeParse(input?.organizationType);
 
 		// Build where clause based on filters
 		const whereClause = orgTypeResult.success
-			? and(
-					eq(plans.isActive, true),
-					eq(plans.organizationType, orgTypeResult.data),
-				)
+			? and(eq(plans.isActive, true), eq(plans.organizationType, orgTypeResult.data))
 			: eq(plans.isActive, true);
 
-		const result = await context.db
-			.select()
-			.from(plans)
-			.where(whereClause)
-			.orderBy(plans.priceMonthly);
+		const result = await context.db.select().from(plans).where(whereClause).orderBy(plans.priceMonthly);
 
 		return {
 			plans: result.map((p) => {

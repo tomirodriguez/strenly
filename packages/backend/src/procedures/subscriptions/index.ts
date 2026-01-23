@@ -1,5 +1,5 @@
-import { listPlans } from "./list-plans";
 import { getSubscription } from "./get-subscription";
+import { listPlans } from "./list-plans";
 
 /**
  * Subscriptions router
