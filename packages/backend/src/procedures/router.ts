@@ -1,4 +1,5 @@
 import { health } from "./health/health";
+import { subscriptions } from "./subscriptions";
 
 /**
  * Main oRPC router
@@ -12,8 +13,7 @@ import { health } from "./health/health";
  */
 export const router = {
 	health,
-	// Future custom procedures:
-	// subscriptions: subscriptionsRouter,
+	subscriptions,
 };
 
 export type Router = typeof router;

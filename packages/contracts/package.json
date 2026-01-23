@@ -7,15 +7,8 @@
     ".": "./src/index.ts",
     "./common/errors": "./src/common/errors.ts",
     "./common/roles": "./src/common/roles.ts",
-    "./auth/sign-up": "./src/auth/sign-up.ts",
-    "./auth/sign-in": "./src/auth/sign-in.ts",
-    "./auth/session": "./src/auth/session.ts",
-    "./auth/password-reset": "./src/auth/password-reset.ts",
-    "./organizations/organization": "./src/organizations/organization.ts",
-    "./organizations/create-organization": "./src/organizations/create-organization.ts",
-    "./organizations/update-organization": "./src/organizations/update-organization.ts",
-    "./organizations/member": "./src/organizations/member.ts",
-    "./organizations/invite-member": "./src/organizations/invite-member.ts"
+    "./subscriptions/plan": "./src/subscriptions/plan.ts",
+    "./subscriptions/subscription": "./src/subscriptions/subscription.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
