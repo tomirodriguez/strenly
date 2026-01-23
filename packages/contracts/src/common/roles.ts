@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 /**
  * Organization member roles
@@ -6,5 +6,5 @@ import { z } from 'zod'
  * - admin: Manage members and settings
  * - member: Basic access to organization resources
  */
-export const memberRoleSchema = z.enum(['owner', 'admin', 'member'])
-export type MemberRole = z.infer<typeof memberRoleSchema>
+export const memberRoleSchema = z.enum(["owner", "admin", "member"]);
+export type MemberRole = z.infer<typeof memberRoleSchema>;

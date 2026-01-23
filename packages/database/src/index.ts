@@ -3,5 +3,5 @@
  * Exports factory functions for Cloudflare Workers compatibility
  */
 
-export type { DbClient } from './client'
-export { createDb } from './client'
+export type { DbClient } from "./client";
+export { createDb } from "./client";

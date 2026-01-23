@@ -10,6 +10,7 @@
     "./auth/sign-up": "./src/auth/sign-up.ts",
     "./auth/sign-in": "./src/auth/sign-in.ts",
     "./auth/session": "./src/auth/session.ts",
+    "./auth/password-reset": "./src/auth/password-reset.ts",
     "./organizations/organization": "./src/organizations/organization.ts",
     "./organizations/create-organization": "./src/organizations/create-organization.ts",
     "./organizations/update-organization": "./src/organizations/update-organization.ts",
