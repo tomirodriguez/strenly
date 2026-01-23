@@ -1,0 +1,32 @@
+{
+  "name": "@strenly/backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./app": "./src/app.ts"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "pnpm biome check src",
+    "lint:fix": "pnpm biome check --write src",
+    "typecheck": "tsc --noEmit",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@orpc/server": "^1.4.3",
+    "@strenly/auth": "workspace:^",
+    "@strenly/contracts": "workspace:^",
+    "@strenly/database": "workspace:^",
+    "hono": "^4.7.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250120.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.1.0"
+  }
+}
