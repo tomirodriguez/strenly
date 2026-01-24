@@ -76,15 +76,18 @@ Plans:
   4. Coach can create, edit, and archive athletes via forms
   5. Coach can generate invitation links and see invitation status
   6. Coach can browse exercise library with filtering by muscle group and movement pattern
-**Plans**: 6 plans in 4 waves
+**Plans**: 9 plans in 5 waves
 
 Plans:
-- [ ] 02.5-01-PLAN.md - App shell, layout, providers, auth guards (Wave 1)
-- [ ] 02.5-02-PLAN.md - DataTable compound component with pagination, search (Wave 1)
-- [ ] 02.5-03-PLAN.md - Auth UI: login, signup, onboarding, org creation (Wave 2)
-- [ ] 02.5-04-PLAN.md - Athletes feature: list, forms, invitations (Wave 3)
-- [ ] 02.5-05-PLAN.md - Exercises feature: browser with filters (Wave 3)
-- [ ] 02.5-06-PLAN.md - Dashboard with stats and quick actions (Wave 4)
+- [x] 02.5-01-PLAN.md - App shell, layout, providers, auth guards (Wave 1)
+- [x] 02.5-02-PLAN.md - DataTable compound component with pagination, search (Wave 1)
+- [x] 02.5-03-PLAN.md - Auth UI: login, signup, onboarding, org creation (Wave 2)
+- [x] 02.5-04-PLAN.md - Athletes feature: list, forms, invitations (Wave 3)
+- [x] 02.5-05-PLAN.md - Exercises feature: browser with filters (Wave 3)
+- [x] 02.5-06-PLAN.md - Dashboard with stats and quick actions (Wave 4)
+- [ ] 02.5-07-PLAN.md - [GAP CLOSURE] Fix organization header sync (Wave 5)
+- [ ] 02.5-08-PLAN.md - [GAP CLOSURE] Fix user menu and DataTable crashes (Wave 5)
+- [ ] 02.5-09-PLAN.md - [GAP CLOSURE] Form polish and Sheet styling (Wave 5)
 
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
@@ -146,7 +149,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Multi-Tenancy (backend) | 7/7 | Complete | 2026-01-24 |
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
-| 2.5. Coach Web Foundation (frontend) | 0/6 | Not started | - |
+| 2.5. Coach Web Foundation (frontend) | 6/9 | Gap closure in progress | - |
 | 3. Program Builder (full-stack) | 0/4 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
