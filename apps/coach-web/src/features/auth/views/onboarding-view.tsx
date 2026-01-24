@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { orpc } from '@/lib/api-client'
 import { authClient, useSession } from '@/lib/auth-client'
 
@@ -124,48 +123,42 @@ export function OnboardingView() {
   const userName = session?.user?.name ?? ''
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Left Panel - Branding (hidden on mobile) */}
-      <div className="hidden flex-col items-center justify-center bg-primary p-12 text-primary-foreground lg:flex">
-        <div className="space-y-6 text-center">
-          <div className="flex justify-center">
-            <Dumbbell className="size-16" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="font-bold text-4xl">Strenly</h1>
-            <p className="text-lg text-primary-foreground/90">
-              Crea programas de entrenamiento tan rapido como en Excel
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="flex min-h-screen flex-col">
+      {/* Header */}
+      <header className="flex items-center justify-center gap-2 border-b py-4">
+        <Dumbbell className="size-6 text-primary" />
+        <span className="font-semibold text-xl">Strenly</span>
+      </header>
 
-      {/* Right Panel - Onboarding Content (wider than auth forms) */}
-      <div className="flex flex-col items-center justify-center p-8 lg:p-12">
-        <div className="w-full max-w-3xl space-y-6">
-          <Card>
-            <CardHeader className="text-center">
-              {userName && (
-                <p className="text-muted-foreground">
-                  Bienvenido, <span className="font-medium text-foreground">{userName}</span>
-                </p>
-              )}
-              <div className="mt-4">
-                <StepIndicator current={stepIndex} total={3} />
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-8">
+        <div className="w-full max-w-4xl space-y-8">
+          {/* Welcome & Step Indicator */}
+          <div className="text-center">
+            {userName && (
+              <p className="mb-2 text-muted-foreground">
+                Bienvenido, <span className="font-medium text-foreground">{userName}</span>
+              </p>
+            )}
+            <StepIndicator current={stepIndex} total={3} />
+          </div>
+
+          {/* Step Content */}
+          <div className="mx-auto w-full">
+            {step === 'coach-type' && <CoachTypeStep onNext={handleCoachTypeNext} />}
+
+            {step === 'plan' && state.coachType && (
+              <PlanSelectionStep organizationType={state.coachType} onNext={handlePlanNext} onBack={handleBack} />
+            )}
+
+            {step === 'org' && (
+              <div className="mx-auto max-w-md">
+                <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />
               </div>
-            </CardHeader>
-            <CardContent>
-              {step === 'coach-type' && <CoachTypeStep onNext={handleCoachTypeNext} />}
-
-              {step === 'plan' && state.coachType && (
-                <PlanSelectionStep organizationType={state.coachType} onNext={handlePlanNext} onBack={handleBack} />
-              )}
-
-              {step === 'org' && <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />}
-            </CardContent>
-          </Card>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

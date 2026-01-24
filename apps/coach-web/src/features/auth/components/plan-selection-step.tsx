@@ -65,8 +65,8 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
 
         <ul className="space-y-2">
           {featureList.map((feature) => (
-            <li key={feature} className="flex items-center gap-2 text-sm">
-              <Check className="h-4 w-4 text-primary" />
+            <li key={feature} className="flex items-start gap-2 text-sm">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               {feature}
             </li>
           ))}
@@ -126,7 +126,7 @@ export function PlanSelectionStep({ organizationType, onNext, onBack }: PlanSele
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-6 pt-4 md:grid-cols-3">
         {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}
