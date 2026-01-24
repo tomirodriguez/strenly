@@ -1,10 +1,10 @@
 import type { OrganizationType, Plan } from '@strenly/contracts/subscriptions/plan'
+import { useQuery } from '@tanstack/react-query'
 import { Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { orpc } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
 
 interface PlanSelectionStepProps {
   organizationType: OrganizationType
@@ -37,33 +37,33 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
   return (
     <Card
       className={cn(
-        'relative flex flex-col',
-        isRecommended && 'border-primary shadow-lg',
+        'relative flex h-full flex-col transition-all duration-200 hover:shadow-md',
+        isRecommended && 'border-primary shadow-lg ring-1 ring-primary/20',
       )}
     >
       {isRecommended && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <span className="rounded-full bg-primary px-3 py-1 font-medium text-primary-foreground text-xs">
+          <span className="rounded-full bg-primary px-4 py-1.5 font-semibold text-primary-foreground text-sm shadow-sm">
             Recomendado
           </span>
         </div>
       )}
 
-      <CardHeader>
-        <CardTitle>{plan.name}</CardTitle>
-        <CardDescription>
+      <CardHeader className={cn(isRecommended && 'pt-8')}>
+        <CardTitle className="text-xl">{plan.name}</CardTitle>
+        <CardDescription className="text-base">
           Hasta {plan.athleteLimit} atletas
           {plan.coachLimit && plan.coachLimit > 1 && ` y ${plan.coachLimit} coaches`}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1">
-        <div className="mb-4">
-          <span className="font-bold text-3xl">{formatPrice(plan.priceMonthly)}</span>
-          <span className="text-muted-foreground">/mes</span>
+        <div className="mb-6 border-b pb-4">
+          <span className="font-bold text-4xl">{formatPrice(plan.priceMonthly)}</span>
+          <span className="ml-1 text-muted-foreground">/mes</span>
         </div>
 
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {featureList.map((feature) => (
             <li key={feature} className="flex items-start gap-2 text-sm">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -73,12 +73,8 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
         </ul>
       </CardContent>
 
-      <CardFooter>
-        <Button
-          className="w-full"
-          variant={isRecommended ? 'default' : 'outline'}
-          onClick={onSelect}
-        >
+      <CardFooter className="pt-4">
+        <Button className="w-full" variant={isRecommended ? 'default' : 'outline'} size="lg" onClick={onSelect}>
           Seleccionar
         </Button>
       </CardFooter>
@@ -118,15 +114,13 @@ export function PlanSelectionStep({ organizationType, onNext, onBack }: PlanSele
   const recommendedIndex = Math.min(1, plans.length - 1)
 
   return (
-    <div className="space-y-6">
+    <div className="fade-in-0 animate-in space-y-8 duration-300">
       <div className="text-center">
-        <h2 className="font-semibold text-xl">Elige tu plan</h2>
-        <p className="mt-2 text-muted-foreground">
-          Selecciona el plan que mejor se adapte a tus necesidades
-        </p>
+        <h2 className="font-bold text-2xl">Elige tu plan</h2>
+        <p className="mt-2 text-base text-muted-foreground">Selecciona el plan que mejor se adapte a tus necesidades</p>
       </div>
 
-      <div className="grid gap-6 pt-4 md:grid-cols-3">
+      <div className="grid gap-6 pt-6 md:grid-cols-3">
         {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}
