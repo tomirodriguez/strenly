@@ -43,23 +43,12 @@ export type Athlete = z.infer<typeof athleteSchema>
  * Used when creating a new athlete
  */
 export const createAthleteInputSchema = z.object({
-  name: z
-    .string()
-    .min(1, { message: 'Name is required' })
-    .max(100, { message: 'Name must be 100 characters or less' }),
-  email: z
-    .string()
-    .email({ message: 'Please enter a valid email address' })
-    .optional()
-    .or(z.literal('')),
+  name: z.string().min(1, { message: 'El nombre es obligatorio' }).max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
+  email: z.string().email({ message: 'Por favor ingresa un correo electronico valido' }).optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   birthdate: z.string().optional().or(z.literal('')),
   gender: genderSchema.optional(),
-  notes: z
-    .string()
-    .max(1000, { message: 'Notes must be 1000 characters or less' })
-    .optional()
-    .or(z.literal('')),
+  notes: z.string().max(1000, { message: 'Las notas no pueden superar los 1000 caracteres' }).optional().or(z.literal('')),
 })
 
 export type CreateAthleteInput = z.infer<typeof createAthleteInputSchema>
@@ -84,13 +73,10 @@ export const listAthletesInputSchema = z.object({
   search: z.string().optional(),
   limit: z
     .number()
-    .min(1, { message: 'Limit must be at least 1' })
-    .max(100, { message: 'Limit cannot exceed 100' })
+    .min(1, { message: 'El limite debe ser al menos 1' })
+    .max(100, { message: 'El limite no puede superar 100' })
     .optional(),
-  offset: z
-    .number()
-    .min(0, { message: 'Offset cannot be negative' })
-    .optional(),
+  offset: z.number().min(0, { message: 'El offset no puede ser negativo' }).optional(),
 })
 
 export type ListAthletesInput = z.infer<typeof listAthletesInputSchema>
