@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 4 of TBD in current phase
+Plan: 5 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-04-PLAN.md (Athlete Repositories)
+Last activity: 2026-01-24 - Completed 02-05-PLAN.md (Exercise Repositories)
 
-Progress: [====------] Phase 2 progressing
+Progress: [=====-----] Phase 2 progressing
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 6 min
-- Total execution time: 72 min
+- Total execution time: 74 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 4/TBD | 6 min | 2 min |
+| 2 | 5/TBD | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (<1 min), 02-02 (3 min), 02-03 (2 min), 02-04 (2 min)
+- Last 5 plans: 02-01 (<1 min), 02-02 (3 min), 02-03 (2 min), 02-04 (2 min), 02-05 (2 min)
 - Trend: Phase 2 domain and infrastructure layers executing quickly with established patterns
 
 *Updated after each plan completion*
@@ -55,6 +55,8 @@ Recent decisions affecting current work:
 - **Cryptographic invitation tokens** - 256-bit random via crypto.randomBytes, base64url encoded (43 chars)
 - **Type guards for enum parsing** - isAthleteStatus/isAthleteGender instead of 'as' casting
 - **Soft delete via status** - archive() sets status to inactive, preserves data
+- **Junction table batch fetching** - Fetch muscle mappings in separate query after main exercise query
+- **Lookup repositories without ports** - Simple read-only repositories (MuscleGroup) don't need core ports
 
 ### Pending Todos
 
@@ -76,8 +78,9 @@ None.
 | 02-02 | Athlete Domain Entity | Complete |
 | 02-03 | Exercise Domain Entity | Complete |
 | 02-04 | Athlete Repositories | Complete |
-| 02-05 | Exercise Use Cases | Pending |
-| 02-06 | Exercise Contracts & Procedures | Pending |
+| 02-05 | Exercise Repositories | Complete |
+| 02-06 | Exercise Use Cases | Pending |
+| 02-07 | Exercise Contracts & Procedures | Pending |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/athletes.ts` - Athletes table schema
@@ -96,12 +99,14 @@ None.
 - `packages/core/src/ports/athlete-invitation-repository.port.ts` - AthleteInvitationRepositoryPort interface
 - `packages/backend/src/infrastructure/repositories/athlete.repository.ts` - Athlete repository implementation
 - `packages/backend/src/infrastructure/repositories/athlete-invitation.repository.ts` - AthleteInvitation repository implementation
+- `packages/backend/src/infrastructure/repositories/exercise.repository.ts` - Exercise repository with filtering
+- `packages/backend/src/infrastructure/repositories/muscle-group.repository.ts` - MuscleGroup lookup repository
 - `packages/backend/src/infrastructure/repositories/index.ts` - Repository exports
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-04-PLAN.md (Athlete Repositories)
+Stopped at: Completed 02-05-PLAN.md (Exercise Repositories)
 Resume file: None
 
-**Next:** Continue Phase 2 - Exercise repository or Athlete use cases
+**Next:** Continue Phase 2 - Exercise use cases (02-06)
