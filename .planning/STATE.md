@@ -2,36 +2,36 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-23)
+See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 1 Gap Closure - Architecture Refactoring
+**Current focus:** Phase 1 Complete - Ready for Phase 2
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation & Multi-Tenancy) - Gap Closure
-Plan: 6 of 7 in current phase (01-07 pending)
-Status: Architecture gap closure in progress
-Last activity: 2026-01-23 - Completed 01-06-PLAN.md (Domain Entities and Ports)
+Phase: 1 of 5 (Foundation & Multi-Tenancy) - COMPLETE
+Plan: 7 of 7 in current phase
+Status: Phase 1 complete
+Last activity: 2026-01-24 - Completed 01-07-PLAN.md (Repository Implementations and Authorization)
 
-Progress: [========..] 86% of Phase 1
+Progress: [==========] 100% of Phase 1
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 9 min
-- Total execution time: 59 min
+- Total execution time: 66 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 6/7 | 59 min | 10 min |
+| 1 | 7/7 | 66 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5 min), 01-03 (5 min), 01-04 (6 min), 01-05 (35 min), 01-06 (4 min)
-- Trend: 01-06 fast execution - domain entities are well-defined patterns
+- Last 5 plans: 01-03 (5 min), 01-04 (6 min), 01-05 (35 min), 01-06 (4 min), 01-07 (7 min)
+- Trend: 01-07 normal execution - repositories and use cases are well-defined patterns
 
 *Updated after each plan completion*
 
@@ -56,6 +56,9 @@ Recent decisions affecting current work:
 - **Factory functions return Result<Entity, Error>** - Domain entities use createEntity() pattern with neverthrow
 - **Domain entities are immutable** - All properties are readonly
 - **Status transitions via state machine** - Subscription status changes validated explicitly
+- **Pure authorization functions** - hasPermission, getPermissions, hasHigherOrEqualRole over service classes
+- **Repository factory functions** - createPlanRepository, createSubscriptionRepository for DI
+- **Exhaustive error switch** - Procedures use switch statements for error-to-HTTP mapping
 
 ### Pending Todos
 
@@ -69,27 +72,31 @@ None.
 
 ## Phase 1 Summary
 
-**Foundation & Multi-Tenancy in progress.** Gap closure for Clean Architecture:
+**Foundation & Multi-Tenancy COMPLETE.** Full Clean Architecture in place:
 
 | Category | Requirements | How Covered |
 |----------|--------------|-------------|
 | Auth | AUTH-01 to AUTH-05 | Better-Auth with email/password + OAuth |
 | Orgs | ORG-01 to ORG-07 | Better-Auth organization plugin |
 | Subs | SUB-01 to SUB-05 | oRPC subscriptions router + use cases |
-| Domain | NEW | Plan & Subscription entities with 100% test coverage |
+| Domain | Plan, Subscription | Entities with 100% test coverage |
+| Ports | PlanRepository, SubscriptionRepository | Defined in core package |
+| Repos | createPlanRepository, createSubscriptionRepository | Implementing ports |
+| Auth | Authorization service | RBAC with 19 permissions |
 
 **Key artifacts:**
 - `packages/auth/` - Better-Auth configuration
-- `packages/backend/src/procedures/` - oRPC procedures
-- `packages/backend/src/application/use-cases/` - neverthrow use cases
+- `packages/backend/src/procedures/` - oRPC procedures (orchestration only)
+- `packages/backend/src/use-cases/` - Authorization-first use cases
+- `packages/backend/src/infrastructure/repositories/` - Repository implementations
 - `packages/contracts/` - Zod schemas
 - `packages/database/` - Drizzle schema + seed scripts
-- `packages/core/` - Domain entities and ports (NEW)
+- `packages/core/` - Domain entities, ports, and authorization service
 
 ## Session Continuity
 
-Last session: 2026-01-23
-Stopped at: Completed 01-06-PLAN.md (Domain Entities and Ports)
+Last session: 2026-01-24
+Stopped at: Completed 01-07-PLAN.md (Repository Implementations and Authorization)
 Resume file: None
 
-**Next:** 01-07-PLAN.md - Repository implementations
+**Next:** Phase 2 planning - Exercise Library & Athlete Management
