@@ -9,29 +9,29 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Platform
 
-- [ ] **AUTH-01**: User can create account with email/password
-- [ ] **AUTH-02**: User can create account with Google OAuth
-- [ ] **AUTH-03**: User can log in and stay logged in across sessions
-- [ ] **AUTH-04**: User can reset password via email
-- [ ] **AUTH-05**: User can log out from any page
+- [x] **AUTH-01**: User can create account with email/password
+- [x] **AUTH-02**: User can create account with Google OAuth
+- [x] **AUTH-03**: User can log in and stay logged in across sessions
+- [x] **AUTH-04**: User can reset password via email
+- [x] **AUTH-05**: User can log out from any page
 
 ### Organization & Multi-Tenancy
 
-- [ ] **ORG-01**: User can create organization during onboarding (Independent Coach or Gym type)
-- [ ] **ORG-02**: Organization data is isolated (cannot access other organizations' data)
-- [ ] **ORG-03**: Organization Owner can update organization details (name)
-- [ ] **ORG-04**: Organization Owner can invite coaches to organization
-- [ ] **ORG-05**: Organization Owner can assign roles (Admin, Coach)
-- [ ] **ORG-06**: Organization Owner can remove coaches from organization
-- [ ] **ORG-07**: User can belong to multiple organizations with different roles
+- [x] **ORG-01**: User can create organization during onboarding (Independent Coach or Gym type)
+- [x] **ORG-02**: Organization data is isolated (cannot access other organizations' data)
+- [x] **ORG-03**: Organization Owner can update organization details (name)
+- [x] **ORG-04**: Organization Owner can invite coaches to organization
+- [x] **ORG-05**: Organization Owner can assign roles (Admin, Coach)
+- [x] **ORG-06**: Organization Owner can remove coaches from organization
+- [x] **ORG-07**: User can belong to multiple organizations with different roles
 
 ### Subscription & Plans
 
-- [ ] **SUB-01**: User must select subscription plan before creating organization
-- [ ] **SUB-02**: System enforces feature limits based on active plan
-- [ ] **SUB-03**: System enforces athlete limits based on active plan
-- [ ] **SUB-04**: User can view current subscription status
-- [ ] **SUB-05**: Plans can be configured differently for Coach vs Gym types
+- [x] **SUB-01**: User must select subscription plan before creating organization
+- [x] **SUB-02**: System enforces feature limits based on active plan
+- [x] **SUB-03**: System enforces athlete limits based on active plan
+- [x] **SUB-04**: User can view current subscription status
+- [x] **SUB-05**: Plans can be configured differently for Coach vs Gym types
 
 ### Athlete Management
 
@@ -292,4 +292,4 @@ Phase mappings for all v1 requirements.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after roadmap creation*
+*Last updated: 2026-01-24 after Phase 1 completion*
