@@ -2,21 +2,19 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { OrganizationProvider } from '@/contexts/organization-context'
 import { setCurrentOrgSlug } from '@/lib/api-client'
-import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/_authenticated/$orgSlug')({
-  beforeLoad: async ({ params }) => {
-    // Validate org slug belongs to user
-    const orgsResult = await authClient.organization.list()
-    const orgs = orgsResult.data ?? []
-    const org = orgs.find((o) => o.slug === params.orgSlug)
+  beforeLoad: async ({ params, context }) => {
+    // Get organizations from parent _authenticated route (already cached)
+    const organizations = context.organizations
+    const org = organizations.find((o) => o.slug === params.orgSlug)
 
     if (!org) {
       throw redirect({ to: '/onboarding' })
     }
 
-    // Set active org (always set to ensure it matches the URL)
-    await authClient.organization.setActive({ organizationId: org.id })
+    // No setActive() call - org context comes from URL slug
+    // The X-Organization-Slug header is set via setCurrentOrgSlug() in the component
 
     return { org }
   },
