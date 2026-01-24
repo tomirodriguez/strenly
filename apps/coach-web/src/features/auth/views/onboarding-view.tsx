@@ -6,8 +6,9 @@ import { toast } from 'sonner'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
+import { useAuth } from '@/contexts/auth-context'
 import { orpc } from '@/lib/api-client'
-import { authClient, useSession } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client'
 
 type OnboardingStep = 'coach-type' | 'plan' | 'org'
 
@@ -42,7 +43,7 @@ export function OnboardingView() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { data: session } = useSession()
+  const { user } = useAuth()
 
   const createSubscriptionMutation = useMutation(orpc.subscriptions.createSubscription.mutationOptions())
 
@@ -120,7 +121,7 @@ export function OnboardingView() {
   }
 
   const stepIndex = step === 'coach-type' ? 0 : step === 'plan' ? 1 : 2
-  const userName = session?.user?.name ?? ''
+  const userName = user.name
 
   return (
     <div className="flex min-h-screen flex-col">

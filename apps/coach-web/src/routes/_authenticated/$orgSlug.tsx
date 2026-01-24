@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
+import { OrganizationProvider } from '@/contexts/organization-context'
 import { setCurrentOrgSlug } from '@/lib/api-client'
 import { authClient } from '@/lib/auth-client'
 
@@ -24,6 +25,7 @@ export const Route = createFileRoute('/_authenticated/$orgSlug')({
 
 function OrgSlugLayout() {
   const { orgSlug } = Route.useParams()
+  const { org } = Route.useRouteContext()
 
   // Sync URL org slug with API client
   useEffect(() => {
@@ -31,5 +33,9 @@ function OrgSlugLayout() {
     return () => setCurrentOrgSlug(null)
   }, [orgSlug])
 
-  return <Outlet />
+  return (
+    <OrganizationProvider value={org}>
+      <Outlet />
+    </OrganizationProvider>
+  )
 }
