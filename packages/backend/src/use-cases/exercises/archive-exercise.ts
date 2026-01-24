@@ -1,11 +1,11 @@
 import {
+	type ExerciseRepositoryPort,
 	hasPermission,
 	isCurated,
-	type ExerciseRepositoryPort,
 	type OrganizationContext,
 	type Role,
 } from "@strenly/core";
-import { errAsync, okAsync, type ResultAsync } from "neverthrow";
+import { errAsync, type ResultAsync } from "neverthrow";
 
 export type ArchiveExerciseInput = OrganizationContext & {
 	memberRole: Role;

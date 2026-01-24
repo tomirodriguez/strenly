@@ -1,9 +1,9 @@
 import {
 	createExercise,
-	hasPermission,
-	isCurated,
 	type Exercise,
 	type ExerciseRepositoryPort,
+	hasPermission,
+	isCurated,
 	type MovementPattern,
 	type MuscleGroup,
 	type OrganizationContext,

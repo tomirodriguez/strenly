@@ -1,7 +1,7 @@
 import {
-	hasPermission,
 	type Exercise,
 	type ExerciseRepositoryPort,
+	hasPermission,
 	type MovementPattern,
 	type MuscleGroup,
 	type OrganizationContext,
@@ -24,9 +24,7 @@ export type ListExercisesResult = {
 	totalCount: number;
 };
 
-export type ListExercisesError =
-	| { type: "forbidden"; message: string }
-	| { type: "repository_error"; message: string };
+export type ListExercisesError = { type: "forbidden"; message: string } | { type: "repository_error"; message: string };
 
 type Dependencies = {
 	exerciseRepository: ExerciseRepositoryPort;

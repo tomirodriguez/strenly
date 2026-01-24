@@ -1,8 +1,8 @@
 import {
 	createExercise,
-	hasPermission,
 	type Exercise,
 	type ExerciseRepositoryPort,
+	hasPermission,
 	type MovementPattern,
 	type MuscleGroup,
 	type OrganizationContext,
