@@ -102,5 +102,34 @@ export function createSubscriptionRepository(db: DbClient): SubscriptionReposito
         wrapDbError,
       )
     },
+
+    create(subscription: Subscription): ResultAsync<Subscription, SubscriptionRepositoryError> {
+      return ResultAsync.fromPromise(
+        db
+          .insert(subscriptions)
+          .values({
+            id: subscription.id,
+            organizationId: subscription.organizationId,
+            planId: subscription.planId,
+            status: subscription.status,
+            athleteCount: subscription.athleteCount,
+            currentPeriodStart: subscription.currentPeriodStart,
+            currentPeriodEnd: subscription.currentPeriodEnd,
+            createdAt: subscription.createdAt,
+          })
+          .returning()
+          .then((rows) => rows[0]),
+        wrapDbError,
+      ).andThen((row) => {
+        if (!row) {
+          return err({ type: 'DATABASE_ERROR', message: 'Failed to create subscription' } as const)
+        }
+        const created = mapToDomain(row)
+        if (!created) {
+          return err({ type: 'DATABASE_ERROR', message: 'Invalid subscription data after insert' } as const)
+        }
+        return ok(created)
+      })
+    },
   }
 }

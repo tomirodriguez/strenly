@@ -10,4 +10,9 @@ export type SubscriptionRepositoryPort = {
 	findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription, SubscriptionRepositoryError>;
 	save(ctx: OrganizationContext, subscription: Subscription): ResultAsync<Subscription, SubscriptionRepositoryError>;
 	updateAthleteCount(ctx: OrganizationContext, count: number): ResultAsync<void, SubscriptionRepositoryError>;
+	/**
+	 * Create a new subscription for an organization.
+	 * Used during onboarding when organizationId is provided directly (no context).
+	 */
+	create(subscription: Subscription): ResultAsync<Subscription, SubscriptionRepositoryError>;
 };
