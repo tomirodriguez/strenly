@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 001: Translate UI and error messages to Spanish
+Last activity: 2026-01-24 - Completed quick task 003: Fix duplicate toasts on login error
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -79,6 +79,7 @@ Recent decisions affecting current work:
 - **Custom Zod error messages** - Use { message: '...' } in validation rules for user-friendly error text
 - **Optional string fields in Zod** - Use .or(z.literal('')) for optional strings that receive empty form values
 - **Sheet form pattern** - Header > SheetBody (scrollable form) > SheetFooter (fixed buttons)
+- **Single Toaster in __root.tsx** - Toaster component placed in __root.tsx (inside providers), not main.tsx
 
 ### Pending Todos
 
@@ -95,6 +96,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Translate UI and error messages to Spanish | 2026-01-24 | 0a9874a | [001-translate-ui-and-error-messages-to-spani](./quick/001-translate-ui-and-error-messages-to-spani/) |
+| 003 | Fix duplicate toasts on login error | 2026-01-24 | 21b88b7 | [003-fix-duplicate-toasts-login-error](./quick/003-fix-duplicate-toasts-login-error/) |
 
 ## Phase 2 Progress
 
@@ -161,7 +163,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Phase 2.5 verified complete (6/6 must-haves)
+Stopped at: Completed quick task 003 - Fix duplicate toasts
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
