@@ -94,8 +94,8 @@ export function createAuth(env: AuthEnv, db: DB) {
         // Roles: owner (full control), admin (manage members), member (basic access)
         organizationHooks: {
           afterCreateOrganization: async ({ organization: org }) => {
-            // Parse planId from organization metadata
-            const metadata = org.metadata ? JSON.parse(org.metadata) : null
+            // Better-Auth passes metadata as an object, not a JSON string
+            const metadata = org.metadata as { planId?: string } | null
             const planId = metadata?.planId
 
             if (!planId) {
