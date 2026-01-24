@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 009: Migrate create athlete drawer to modal
+Last activity: 2026-01-24 - Completed quick task 009: Migrate athlete form from Sheet to Dialog
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -110,7 +110,7 @@ None.
 | 006 | Add AuthProvider and OrganizationProvider for context caching | 2026-01-24 | 33083ce | [006-add-authprovider-and-organizationprovide](./quick/006-add-authprovider-and-organizationprovide/) |
 | 007 | Polish step components visual design | 2026-01-24 | 8885ba2 | - |
 | 008 | Fix session and organization API calls on navigation | 2026-01-24 | 6d28f99 | [008-fix-session-and-organization-api-calls-o](./quick/008-fix-session-and-organization-api-calls-o/) |
-| 009 | Migrate create athlete drawer to modal | 2026-01-24 | 5ac4e1a | [009-migrate-create-athlete-drawer-to-modal-a](./quick/009-migrate-create-athlete-drawer-to-modal-a/) |
+| 009 | Migrate create athlete drawer to modal and add modal vs drawer rules | 2026-01-24 | 5742c7d | [009-migrate-create-athlete-drawer-to-modal-a](./quick/009-migrate-create-athlete-drawer-to-modal-a/) |
 
 ## Phase 2 Progress
 
