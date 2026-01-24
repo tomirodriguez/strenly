@@ -14,16 +14,15 @@ import { DataTableSearch } from '@/components/data-table/data-table-search'
 import { DataTableToolbar } from '@/components/data-table/data-table-toolbar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldLabel } from '@/components/ui/field'
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Field, FieldLabel } from '@/components/ui/field'
 
 /**
  * Athletes list view with search, filtering, pagination, and CRUD operations.
@@ -34,7 +33,7 @@ export function AthletesListView() {
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [showArchived, setShowArchived] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null)
 
   // Fetch athletes with current filters
@@ -58,12 +57,12 @@ export function AthletesListView() {
 
   const handleAddAthlete = () => {
     setEditingAthlete(null)
-    setDrawerOpen(true)
+    setDialogOpen(true)
   }
 
   const handleEdit = (athlete: Athlete) => {
     setEditingAthlete(athlete)
-    setDrawerOpen(true)
+    setDialogOpen(true)
   }
 
   const handleArchive = (athlete: Athlete) => {
@@ -86,7 +85,7 @@ export function AthletesListView() {
         },
         {
           onSuccess: () => {
-            setDrawerOpen(false)
+            setDialogOpen(false)
             setEditingAthlete(null)
           },
         },
@@ -95,14 +94,14 @@ export function AthletesListView() {
       // Create new athlete
       createMutation.mutate(formData, {
         onSuccess: () => {
-          setDrawerOpen(false)
+          setDialogOpen(false)
         },
       })
     }
   }
 
   const handleFormCancel = () => {
-    setDrawerOpen(false)
+    setDialogOpen(false)
     setEditingAthlete(null)
   }
 
@@ -161,44 +160,42 @@ export function AthletesListView() {
         <DataTablePagination />
       </DataTable.Root>
 
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{editingAthlete ? 'Editar atleta' : 'Agregar nuevo atleta'}</SheetTitle>
-            <SheetDescription>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingAthlete ? 'Editar atleta' : 'Agregar nuevo atleta'}</DialogTitle>
+            <DialogDescription>
               {editingAthlete
                 ? 'Actualiza la informacion del atleta y genera invitaciones a la app de atletas.'
                 : 'Crea un nuevo perfil de atleta. Puedes invitarlos a la app de atletas despues.'}
-            </SheetDescription>
-          </SheetHeader>
-          <SheetBody>
-            <AthleteForm
-              id="athlete-form"
-              onSubmit={handleFormSubmit}
-              defaultValues={
-                editingAthlete
-                  ? {
-                      name: editingAthlete.name,
-                      email: editingAthlete.email ?? undefined,
-                      phone: editingAthlete.phone ?? undefined,
-                      birthdate: editingAthlete.birthdate ?? undefined,
-                      gender: editingAthlete.gender ?? undefined,
-                      notes: editingAthlete.notes ?? undefined,
-                    }
-                  : undefined
-              }
-            />
-          </SheetBody>
-          <SheetFooter>
+            </DialogDescription>
+          </DialogHeader>
+          <AthleteForm
+            id="athlete-form"
+            onSubmit={handleFormSubmit}
+            defaultValues={
+              editingAthlete
+                ? {
+                    name: editingAthlete.name,
+                    email: editingAthlete.email ?? undefined,
+                    phone: editingAthlete.phone ?? undefined,
+                    birthdate: editingAthlete.birthdate ?? undefined,
+                    gender: editingAthlete.gender ?? undefined,
+                    notes: editingAthlete.notes ?? undefined,
+                  }
+                : undefined
+            }
+          />
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={handleFormCancel} disabled={isSubmitting}>
               Cancelar
             </Button>
             <Button type="submit" form="athlete-form" disabled={isSubmitting}>
               {isSubmitting ? 'Guardando...' : editingAthlete ? 'Actualizar atleta' : 'Crear atleta'}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
