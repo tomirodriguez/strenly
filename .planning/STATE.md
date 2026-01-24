@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 8 of TBD in current phase
+Plan: 10 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-08-PLAN.md (Exercise Use Cases)
+Last activity: 2026-01-24 - Completed 02-10-PLAN.md (Exercise Contracts & Procedures)
 
-Progress: [========--] Phase 2 progressing
+Progress: [=========.] Phase 2 near completion
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 17
 - Average duration: 5 min
-- Total execution time: 86 min
+- Total execution time: 92 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 8/TBD | 20 min | 2.5 min |
+| 2 | 10/TBD | 26 min | 2.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-04 (2 min), 02-05 (2 min), 02-06 (4 min), 02-07 (4 min), 02-08 (4 min)
-- Trend: Phase 2 use case layers executing efficiently
+- Last 5 plans: 02-06 (4 min), 02-07 (4 min), 02-08 (4 min), 02-09 (3 min), 02-10 (3 min)
+- Trend: Phase 2 API layers executing efficiently
 
 *Updated after each plan completion*
 
@@ -63,6 +63,8 @@ Recent decisions affecting current work:
 - **Token-based public endpoints** - Accept/get-info use token as credential, no OrganizationContext
 - **Clone provenance tracking** - Clone stores clonedFromId to track source exercise
 - **Access control returns not_found** - Unauthorized access returns not_found to prevent information leakage
+- **contracts/package.json exports** - Add explicit exports for module path resolution
+- **crypto.randomUUID()** - Use built-in Web Crypto API instead of nanoid for ID generation
 
 ### Pending Todos
 
@@ -88,7 +90,8 @@ None.
 | 02-06 | Athlete Use Cases | Complete |
 | 02-07 | Athlete Invitation Use Cases | Complete |
 | 02-08 | Exercise Use Cases | Complete |
-| 02-09 | Contracts & Procedures | Pending |
+| 02-09 | Athlete Contracts & Procedures | Complete |
+| 02-10 | Exercise Contracts & Procedures | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/athletes.ts` - Athletes table schema
@@ -125,11 +128,15 @@ None.
 - `packages/backend/src/use-cases/exercises/get-exercise.ts` - Get exercise with access control
 - `packages/backend/src/use-cases/exercises/update-exercise.ts` - Update custom exercises only
 - `packages/backend/src/use-cases/exercises/archive-exercise.ts` - Soft delete via archivedAt
+- `packages/contracts/src/athletes/` - Athlete and invitation contracts
+- `packages/contracts/src/exercises/` - Exercise and muscle group contracts
+- `packages/backend/src/procedures/athletes/` - Athlete CRUD and invitation procedures
+- `packages/backend/src/procedures/exercises/` - Exercise CRUD, clone, and muscle groups procedures
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-08-PLAN.md (Exercise Use Cases)
+Stopped at: Completed 02-10-PLAN.md (Exercise Contracts & Procedures)
 Resume file: None
 
-**Next:** Continue Phase 2 - Contracts & Procedures (02-09)
+**Next:** Phase 2 complete - Ready for Phase 3 (Program Builder)
