@@ -11,3 +11,11 @@ export * from "./auth";
 export * from "./plans";
 // Organization subscriptions
 export * from "./subscriptions";
+// Athletes and invitations
+export * from "./athletes";
+export * from "./athlete-invitations";
+// Exercise library
+export * from "./muscle-groups";
+export * from "./exercises";
+export * from "./exercise-muscles";
+export * from "./exercise-progressions";
