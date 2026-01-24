@@ -2,15 +2,26 @@
 name: architecture
 description: |
   This skill defines the mandatory Clean Architecture development flow for the project.
-  Use this skill BEFORE implementing any backend feature to understand the correct order
-  of layers and which skills to invoke for each layer.
-  This skill should be loaded automatically when creating new entities, use cases, or procedures.
-version: 1.0.0
+  Use this skill DURING PLANNING (before creating any plan) and BEFORE implementing any backend feature.
+  Plans that don't include domain entities and ports for new concepts are INCOMPLETE.
+  This skill should be loaded automatically when planning or implementing backend features.
+version: 1.1.0
 ---
 
 # Architecture - Clean Architecture Development Flow
 
 This skill defines the **mandatory** development flow for any backend feature. The architecture follows **Inside-Out** development: start from the core (domain) and work outward to the API layer.
+
+## CRITICAL: Use During Planning AND Implementation
+
+**When to load this skill:**
+1. **During `/gsd:plan-phase`** — Before creating any plan for backend work
+2. **During `/gsd:execute-phase`** — Before implementing any task
+
+**A plan is INCOMPLETE if it:**
+- Introduces a new domain concept (e.g., subscription, athlete) without domain entity tasks
+- Creates use cases without corresponding port/repository tasks
+- Has procedures without domain entity validation
 
 ## CRITICAL: Why This Matters
 
@@ -19,6 +30,7 @@ Without following this flow:
 - Data gets persisted without domain validation (data integrity issues)
 - Business logic ends up in procedures (unmaintainable code)
 - Pagination breaks (missing totalCount for DataTable)
+- Tech debt accumulates (Phase 1 subscriptions had to be refactored)
 
 ## Mandatory Development Flow
 
@@ -178,11 +190,40 @@ findById: (ctx, id) => {
 ## Checklist Before Declaring Feature Complete
 
 - [ ] Domain entity created with factory function returning Result
+- [ ] **Domain entity has comprehensive tests (90%+ coverage on `packages/core`)**
 - [ ] Port defined with OrganizationContext and pagination types
 - [ ] Repository filters by organizationId, returns totalCount for lists
 - [ ] Use case checks authorization FIRST, validates via domain entity
 - [ ] Contracts have validation messages in Spanish
 - [ ] Procedure only orchestrates, maps ALL error types
+
+## Checklist During Planning (BEFORE creating plans)
+
+For each new domain concept introduced by a phase, the plan MUST include tasks for:
+
+- [ ] **Domain Entity** task — `packages/core/src/domain/entities/{entity}.ts`
+- [ ] **Domain Entity Tests** task — `packages/core/src/domain/entities/{entity}.test.ts` (90%+ coverage required)
+- [ ] **Port** task — `packages/core/src/ports/{entity}-repository.port.ts`
+- [ ] **Repository** task — `packages/backend/src/infrastructure/repositories/{entity}.repository.ts`
+- [ ] **Use Case** tasks — authorization-first, domain validation
+
+**Example:** If Phase 2 introduces "Athlete" concept:
+- Plan must have: Athlete domain entity + tests → AthleteRepositoryPort → AthleteRepository → CreateAthlete use case
+- NOT: CreateAthlete use case with direct DB queries (this is what we did wrong in Phase 1)
+
+**Verification:** After creating/editing `packages/core`, run `pnpm test --coverage` and verify 90%+ on core.
+
+## Domain Concepts Requiring Full Architecture
+
+| Concept | Domain Entity | Port | Repository |
+|---------|---------------|------|------------|
+| Subscription | `subscription.ts` | `subscription-repository.port.ts` | `subscription.repository.ts` |
+| Plan (subscription tier) | `plan.ts` | `plan-repository.port.ts` | `plan.repository.ts` |
+| Athlete | `athlete.ts` | `athlete-repository.port.ts` | `athlete.repository.ts` |
+| Exercise | `exercise.ts` | `exercise-repository.port.ts` | `exercise.repository.ts` |
+| Program | `program.ts` | `program-repository.port.ts` | `program.repository.ts` |
+| Session | `session.ts` | `session-repository.port.ts` | `session.repository.ts` |
+| Workout Log | `workout-log.ts` | `workout-log-repository.port.ts` | `workout-log.repository.ts` |
 
 ## Detailed Examples
 

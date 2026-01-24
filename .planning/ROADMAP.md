@@ -36,6 +36,8 @@ Plans:
 - [x] 01-03-PLAN.md - Authentication flows (email/password, OAuth, session, logout, password reset) (Wave 2)
 - [x] 01-04-PLAN.md - Organization management + member invitations (Wave 2)
 - [x] 01-05-PLAN.md - Subscription plans + limit enforcement (Wave 3)
+- [ ] 01-06-PLAN.md - [GAP CLOSURE] Domain entities + ports for Plan/Subscription (Wave 4)
+- [ ] 01-07-PLAN.md - [GAP CLOSURE] Repositories + refactor use cases to proper architecture (Wave 4)
 
 ### Phase 2: Exercise Library & Athlete Management
 **Goal**: Coaches can manage athletes and access a comprehensive exercise library
@@ -111,7 +113,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Multi-Tenancy | 5/5 | ✓ Complete | 2026-01-23 |
+| 1. Foundation & Multi-Tenancy | 5/7 | Gap closure needed | - |
 | 2. Exercise Library & Athlete Management | 0/2 | Not started | - |
 | 3. Program Builder | 0/4 | Not started | - |
 | 4. Athlete PWA | 0/3 | Not started | - |

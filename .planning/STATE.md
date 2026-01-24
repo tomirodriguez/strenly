@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 1 Complete - Ready for Phase 2
+**Current focus:** Phase 1 Gap Closure - Architecture Refactoring
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation & Multi-Tenancy) - COMPLETE
-Plan: 5 of 5 in current phase (all plans complete)
-Status: Phase 1 complete, ready for Phase 2 planning
-Last activity: 2026-01-23 - Completed 01-05 (Subscription Plans & Limit Enforcement)
+Phase: 1 of 5 (Foundation & Multi-Tenancy) - Gap Closure
+Plan: 5 of 7 in current phase (01-06, 01-07 pending)
+Status: Architecture gap closure needed before Phase 2
+Last activity: 2026-01-23 - Created gap closure plans for Clean Architecture
 
-Progress: [##########] 100% of Phase 1
+Progress: [=======...] 71% of Phase 1
 
 ## Performance Metrics
 
@@ -42,6 +42,8 @@ Progress: [##########] 100% of Phase 1
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- **Architecture-first planning (MANDATORY)** - All plans must include domain entities, ports, repositories for new concepts. Phase 1 subscriptions lacked this, requiring gap closure.
+- **90%+ test coverage on core** - Domain entities and authorization must have comprehensive tests.
 - **Use Better-Auth directly** - Auth and org endpoints use Better-Auth at /api/auth/* (no oRPC wrappers)
 - Factory pattern for Better-Auth (createAuth) for Cloudflare Workers compatibility
 - Email/password enabled with CPU limit caveat for Workers free tier

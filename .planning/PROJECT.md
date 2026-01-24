@@ -82,11 +82,13 @@ Strenly is a training planning and management platform for strength training coa
 - **Multi-tenancy**: Application-level filtering + RLS safety net
 - **Solo developer**: Side project, athlete app ships after coach app is complete
 - **Market**: Argentina-first, metric (kg) as default
+- **Clean Architecture (MANDATORY)**: Every backend feature must follow the inside-out flow: Domain Entity → Port → Repository → Use Case → Contracts → Procedure. See `/architecture` skill. Plans that skip domain entities or ports are incomplete.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
+| Architecture-first planning | Phase 1 subscriptions lacked domain entities/ports, causing tech debt. All plans must include domain layer for new concepts. | Enforced |
 | RIR over RPE as primary intensity metric | More intuitive for athletes to understand "reps left in tank" | — Pending |
 | Separate coach/athlete apps (not one responsive app) | Fundamentally different UX needs: keyboard-dense vs touch-friendly | — Pending |
 | Optional blocks/mesocycles | Some coaches want simple Program > Week > Day, others want full periodization | — Pending |

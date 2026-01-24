@@ -105,6 +105,23 @@ pnpm test           # Unit tests
 
 ## Critical Rules
 
+### ARCHITECTURE-FIRST (HIGHEST PRIORITY)
+
+**BEFORE writing any backend code, you MUST follow the Clean Architecture flow.** This is non-negotiable.
+
+For each domain concept (e.g., subscription, athlete, program), create layers in this order:
+
+1. **Domain Entity** → `packages/core/src/domain/entities/{entity}.ts`
+2. **Port** → `packages/core/src/ports/{entity}-repository.port.ts`
+3. **Repository** → `packages/backend/src/infrastructure/repositories/{entity}.repository.ts`
+4. **Use Case** → `packages/backend/src/use-cases/{domain}/{action}.ts`
+5. **Contracts** → `packages/contracts/src/{domain}/`
+6. **Procedure** → `packages/backend/src/procedures/{domain}/`
+
+**If a plan does not include domain entities and ports for new domain concepts, the plan is incomplete.**
+
+Run `/architecture` skill before planning any backend feature.
+
 ### MUST
 1. Import schemas from `@strenly/contracts` - never define Zod schemas inline
 2. Use `ResultAsync` from neverthrow for all async operations in use cases
@@ -112,6 +129,9 @@ pnpm test           # Unit tests
 4. Check authorization FIRST in use cases (before any other logic)
 5. Validate via domain entity BEFORE persisting
 6. Return `{ items, totalCount }` from list queries (required for pagination)
+7. **Create domain entities for ALL domain concepts before repositories/use cases**
+8. **Create ports (interfaces) before implementing repositories**
+9. **Maintain 90%+ test coverage on `packages/core`** — domain entities must have comprehensive tests
 
 ### MUST NOT
 1. No `as` type casting - fix the actual type issue. Only allowed in tests.
@@ -120,6 +140,8 @@ pnpm test           # Unit tests
 4. No `any` type - use `unknown` and narrow
 5. No business logic in procedures - procedures only orchestrate
 6. No queries without organization scope on tenant tables
+7. **No use cases with direct DB queries - use repositories**
+8. **No procedures without domain entity validation**
 
 ## Clean Architecture Flow
 
