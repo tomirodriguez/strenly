@@ -1,4 +1,4 @@
-import { Link, useMatchRoute } from '@tanstack/react-router'
+import { Link, useMatchRoute, useParams } from '@tanstack/react-router'
 import { DumbbellIcon, HomeIcon, UsersIcon } from 'lucide-react'
 import {
   Sidebar,
@@ -13,17 +13,17 @@ import {
 
 const navItems = [
   {
-    to: '/dashboard',
+    path: 'dashboard',
     label: 'Panel',
     icon: HomeIcon,
   },
   {
-    to: '/athletes',
+    path: 'athletes',
     label: 'Atletas',
     icon: UsersIcon,
   },
   {
-    to: '/exercises',
+    path: 'exercises',
     label: 'Ejercicios',
     icon: DumbbellIcon,
   },
@@ -31,6 +31,8 @@ const navItems = [
 
 export function AppSidebar() {
   const matchRoute = useMatchRoute()
+  const params = useParams({ strict: false })
+  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
 
   return (
     <Sidebar collapsible="offExamples">
@@ -45,13 +47,14 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive = matchRoute({ to: item.to })
+                const to = `/${orgSlug}/${item.path}`
+                const isActive = matchRoute({ to, fuzzy: true })
                 return (
-                  <SidebarMenuItem key={item.to}>
+                  <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       render={
                         <Link
-                          to={item.to}
+                          to={to}
                           className="[&.active]:bg-sidebar-accent [&.active]:text-sidebar-accent-foreground"
                         />
                       }

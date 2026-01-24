@@ -42,7 +42,7 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
       )}
     >
       {isRecommended && (
-        <div className="-translate-x-1/2 absolute top-0 left-1/2 -translate-y-1/2">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <span className="rounded-full bg-primary px-3 py-1 font-medium text-primary-foreground text-xs">
             Recomendado
           </span>

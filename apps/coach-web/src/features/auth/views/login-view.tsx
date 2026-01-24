@@ -35,7 +35,12 @@ export function LoginView() {
       // Check if user has organizations
       const orgs = await authClient.organization.list()
       if (orgs.data?.length) {
-        navigate({ to: '/dashboard' })
+        const firstOrg = orgs.data[0]
+        if (firstOrg?.slug) {
+          navigate({ to: '/$orgSlug/dashboard', params: { orgSlug: firstOrg.slug } })
+        } else {
+          navigate({ to: '/onboarding' })
+        }
       } else {
         navigate({ to: '/onboarding' })
       }

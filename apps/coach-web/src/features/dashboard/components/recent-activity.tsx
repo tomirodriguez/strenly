@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useParams } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton'
  */
 export function RecentActivity() {
   const { data, isLoading } = useAthletes({ limit: 5 })
+  const params = useParams({ strict: false })
+  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
 
   const athletes = data?.items ?? []
 
@@ -19,7 +21,7 @@ export function RecentActivity() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Atletas recientes</CardTitle>
-          <Link to="/athletes" className="text-muted-foreground text-sm hover:underline">
+          <Link to="/$orgSlug/athletes" params={{ orgSlug }} className="text-muted-foreground text-sm hover:underline">
             Ver todos
           </Link>
         </div>

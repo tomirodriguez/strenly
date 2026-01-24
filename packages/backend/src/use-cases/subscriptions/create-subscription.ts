@@ -4,7 +4,7 @@ import {
   type Subscription,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
-import { type ResultAsync, errAsync } from 'neverthrow'
+import { errAsync, type ResultAsync } from 'neverthrow'
 
 type CreateSubscriptionInput = {
   organizationId: string
@@ -30,37 +30,41 @@ type Dependencies = {
 export function makeCreateSubscription(deps: Dependencies) {
   return (input: CreateSubscriptionInput): ResultAsync<Subscription, CreateSubscriptionError> => {
     // 1. Validate plan exists
-    return deps.planRepository.findById(input.planId).mapErr((error) => {
-      if (error.type === 'NOT_FOUND') {
-        return { type: 'plan_not_found', planId: input.planId } as const
-      }
-      return { type: 'repository_error', message: error.message } as const
-    }).andThen((plan) => {
-      // 2. Create subscription entity with 30-day period
-      const now = new Date()
-      const periodEnd = new Date(now)
-      periodEnd.setDate(periodEnd.getDate() + 30)
-
-      const subscriptionResult = createSubscriptionEntity({
-        id: crypto.randomUUID(),
-        organizationId: input.organizationId,
-        planId: plan.id,
-        status: 'active',
-        athleteCount: 0,
-        currentPeriodStart: now,
-        currentPeriodEnd: periodEnd,
-        createdAt: now,
+    return deps.planRepository
+      .findById(input.planId)
+      .mapErr((error) => {
+        if (error.type === 'NOT_FOUND') {
+          return { type: 'plan_not_found', planId: input.planId } as const
+        }
+        return { type: 'repository_error', message: error.message } as const
       })
+      .andThen((plan) => {
+        // 2. Create subscription entity with 30-day period
+        const now = new Date()
+        const periodEnd = new Date(now)
+        periodEnd.setDate(periodEnd.getDate() + 30)
 
-      if (subscriptionResult.isErr()) {
-        return errAsync({ type: 'validation_error', message: subscriptionResult.error.message } as const)
-      }
+        const subscriptionResult = createSubscriptionEntity({
+          id: crypto.randomUUID(),
+          organizationId: input.organizationId,
+          planId: plan.id,
+          status: 'active',
+          athleteCount: 0,
+          currentPeriodStart: now,
+          currentPeriodEnd: periodEnd,
+          createdAt: now,
+        })
 
-      // 3. Persist via repository
-      return deps.subscriptionRepository.create(subscriptionResult.value).mapErr((error) => {
-        const message = error.type === 'DATABASE_ERROR' ? error.message : `Organization ${error.organizationId} not found`
-        return { type: 'repository_error', message } as const
+        if (subscriptionResult.isErr()) {
+          return errAsync({ type: 'validation_error', message: subscriptionResult.error.message } as const)
+        }
+
+        // 3. Persist via repository
+        return deps.subscriptionRepository.create(subscriptionResult.value).mapErr((error) => {
+          const message =
+            error.type === 'DATABASE_ERROR' ? error.message : `Organization ${error.organizationId} not found`
+          return { type: 'repository_error', message } as const
+        })
       })
-    })
   }
 }

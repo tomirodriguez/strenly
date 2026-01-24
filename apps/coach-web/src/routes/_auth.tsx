@@ -5,7 +5,16 @@ export const Route = createFileRoute('/_auth')({
   beforeLoad: async () => {
     const session = await authClient.getSession()
     if (session.data) {
-      throw redirect({ to: '/dashboard' })
+      // Check if user has organizations
+      const orgs = await authClient.organization.list()
+      if (orgs.data?.length) {
+        const firstOrg = orgs.data[0]
+        if (firstOrg?.slug) {
+          throw redirect({ to: '/$orgSlug/dashboard', params: { orgSlug: firstOrg.slug } })
+        }
+      }
+      // If no orgs, redirect to onboarding
+      throw redirect({ to: '/onboarding' })
     }
   },
   component: AuthLayout,

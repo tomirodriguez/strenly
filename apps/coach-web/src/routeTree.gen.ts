@@ -12,12 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedExercisesRouteImport } from './routes/_authenticated/exercises'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAthletesRouteImport } from './routes/_authenticated/athletes'
+import { Route as AuthenticatedOrgSlugRouteImport } from './routes/_authenticated/$orgSlug'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthOnboardingRouteImport } from './routes/_auth/onboarding'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthenticatedOrgSlugExercisesRouteImport } from './routes/_authenticated/$orgSlug/exercises'
+import { Route as AuthenticatedOrgSlugDashboardRouteImport } from './routes/_authenticated/$orgSlug/dashboard'
+import { Route as AuthenticatedOrgSlugAthletesRouteImport } from './routes/_authenticated/$orgSlug/athletes'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -32,19 +33,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedExercisesRoute = AuthenticatedExercisesRouteImport.update({
-  id: '/exercises',
-  path: '/exercises',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAthletesRoute = AuthenticatedAthletesRouteImport.update({
-  id: '/athletes',
-  path: '/athletes',
+const AuthenticatedOrgSlugRoute = AuthenticatedOrgSlugRouteImport.update({
+  id: '/$orgSlug',
+  path: '/$orgSlug',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -62,24 +53,44 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedOrgSlugExercisesRoute =
+  AuthenticatedOrgSlugExercisesRouteImport.update({
+    id: '/exercises',
+    path: '/exercises',
+    getParentRoute: () => AuthenticatedOrgSlugRoute,
+  } as any)
+const AuthenticatedOrgSlugDashboardRoute =
+  AuthenticatedOrgSlugDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedOrgSlugRoute,
+  } as any)
+const AuthenticatedOrgSlugAthletesRoute =
+  AuthenticatedOrgSlugAthletesRouteImport.update({
+    id: '/athletes',
+    path: '/athletes',
+    getParentRoute: () => AuthenticatedOrgSlugRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/onboarding': typeof AuthOnboardingRoute
   '/signup': typeof AuthSignupRoute
-  '/athletes': typeof AuthenticatedAthletesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/exercises': typeof AuthenticatedExercisesRoute
+  '/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
+  '/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
+  '/$orgSlug/dashboard': typeof AuthenticatedOrgSlugDashboardRoute
+  '/$orgSlug/exercises': typeof AuthenticatedOrgSlugExercisesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/onboarding': typeof AuthOnboardingRoute
   '/signup': typeof AuthSignupRoute
-  '/athletes': typeof AuthenticatedAthletesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/exercises': typeof AuthenticatedExercisesRoute
+  '/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
+  '/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
+  '/$orgSlug/dashboard': typeof AuthenticatedOrgSlugDashboardRoute
+  '/$orgSlug/exercises': typeof AuthenticatedOrgSlugExercisesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,9 +100,10 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/onboarding': typeof AuthOnboardingRoute
   '/_auth/signup': typeof AuthSignupRoute
-  '/_authenticated/athletes': typeof AuthenticatedAthletesRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/exercises': typeof AuthenticatedExercisesRoute
+  '/_authenticated/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
+  '/_authenticated/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
+  '/_authenticated/$orgSlug/dashboard': typeof AuthenticatedOrgSlugDashboardRoute
+  '/_authenticated/$orgSlug/exercises': typeof AuthenticatedOrgSlugExercisesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,18 +112,20 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
-    | '/athletes'
-    | '/dashboard'
-    | '/exercises'
+    | '/$orgSlug'
+    | '/$orgSlug/athletes'
+    | '/$orgSlug/dashboard'
+    | '/$orgSlug/exercises'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/onboarding'
     | '/signup'
-    | '/athletes'
-    | '/dashboard'
-    | '/exercises'
+    | '/$orgSlug'
+    | '/$orgSlug/athletes'
+    | '/$orgSlug/dashboard'
+    | '/$orgSlug/exercises'
   id:
     | '__root__'
     | '/'
@@ -120,9 +134,10 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/onboarding'
     | '/_auth/signup'
-    | '/_authenticated/athletes'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/exercises'
+    | '/_authenticated/$orgSlug'
+    | '/_authenticated/$orgSlug/athletes'
+    | '/_authenticated/$orgSlug/dashboard'
+    | '/_authenticated/$orgSlug/exercises'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,25 +169,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/exercises': {
-      id: '/_authenticated/exercises'
-      path: '/exercises'
-      fullPath: '/exercises'
-      preLoaderRoute: typeof AuthenticatedExercisesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/athletes': {
-      id: '/_authenticated/athletes'
-      path: '/athletes'
-      fullPath: '/athletes'
-      preLoaderRoute: typeof AuthenticatedAthletesRouteImport
+    '/_authenticated/$orgSlug': {
+      id: '/_authenticated/$orgSlug'
+      path: '/$orgSlug'
+      fullPath: '/$orgSlug'
+      preLoaderRoute: typeof AuthenticatedOrgSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_auth/signup': {
@@ -196,6 +197,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/$orgSlug/exercises': {
+      id: '/_authenticated/$orgSlug/exercises'
+      path: '/exercises'
+      fullPath: '/$orgSlug/exercises'
+      preLoaderRoute: typeof AuthenticatedOrgSlugExercisesRouteImport
+      parentRoute: typeof AuthenticatedOrgSlugRoute
+    }
+    '/_authenticated/$orgSlug/dashboard': {
+      id: '/_authenticated/$orgSlug/dashboard'
+      path: '/dashboard'
+      fullPath: '/$orgSlug/dashboard'
+      preLoaderRoute: typeof AuthenticatedOrgSlugDashboardRouteImport
+      parentRoute: typeof AuthenticatedOrgSlugRoute
+    }
+    '/_authenticated/$orgSlug/athletes': {
+      id: '/_authenticated/$orgSlug/athletes'
+      path: '/athletes'
+      fullPath: '/$orgSlug/athletes'
+      preLoaderRoute: typeof AuthenticatedOrgSlugAthletesRouteImport
+      parentRoute: typeof AuthenticatedOrgSlugRoute
+    }
   }
 }
 
@@ -213,16 +235,27 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface AuthenticatedOrgSlugRouteChildren {
+  AuthenticatedOrgSlugAthletesRoute: typeof AuthenticatedOrgSlugAthletesRoute
+  AuthenticatedOrgSlugDashboardRoute: typeof AuthenticatedOrgSlugDashboardRoute
+  AuthenticatedOrgSlugExercisesRoute: typeof AuthenticatedOrgSlugExercisesRoute
+}
+
+const AuthenticatedOrgSlugRouteChildren: AuthenticatedOrgSlugRouteChildren = {
+  AuthenticatedOrgSlugAthletesRoute: AuthenticatedOrgSlugAthletesRoute,
+  AuthenticatedOrgSlugDashboardRoute: AuthenticatedOrgSlugDashboardRoute,
+  AuthenticatedOrgSlugExercisesRoute: AuthenticatedOrgSlugExercisesRoute,
+}
+
+const AuthenticatedOrgSlugRouteWithChildren =
+  AuthenticatedOrgSlugRoute._addFileChildren(AuthenticatedOrgSlugRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedAthletesRoute: typeof AuthenticatedAthletesRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedExercisesRoute: typeof AuthenticatedExercisesRoute
+  AuthenticatedOrgSlugRoute: typeof AuthenticatedOrgSlugRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAthletesRoute: AuthenticatedAthletesRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedExercisesRoute: AuthenticatedExercisesRoute,
+  AuthenticatedOrgSlugRoute: AuthenticatedOrgSlugRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
