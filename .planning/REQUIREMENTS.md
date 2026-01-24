@@ -35,23 +35,23 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Athlete Management
 
-- [ ] **ATH-01**: Coach can create athlete profiles within organization
-- [ ] **ATH-02**: Coach can view list of all athletes in organization
-- [ ] **ATH-03**: Coach can update athlete profile (name, notes, injuries, goals)
-- [ ] **ATH-04**: Coach can delete athlete profiles
-- [ ] **ATH-05**: Coach can generate invitation link for athlete
-- [ ] **ATH-06**: Athlete can link user account to profile via invitation
-- [ ] **ATH-07**: Coach can operate fully without athletes having linked accounts
+- [x] **ATH-01**: Coach can create athlete profiles within organization
+- [x] **ATH-02**: Coach can view list of all athletes in organization
+- [x] **ATH-03**: Coach can update athlete profile (name, notes, injuries, goals)
+- [x] **ATH-04**: Coach can delete athlete profiles
+- [x] **ATH-05**: Coach can generate invitation link for athlete
+- [x] **ATH-06**: Athlete can link user account to profile via invitation
+- [x] **ATH-07**: Coach can operate fully without athletes having linked accounts
 - [ ] **ATH-08**: Coach can log workouts on behalf of athletes
 
 ### Exercise Library
 
-- [ ] **EXR-01**: System provides curated exercise database (150-200 exercises)
-- [ ] **EXR-02**: Coach can search and select exercises from database
-- [ ] **EXR-03**: Coach can create custom exercises (name, muscles, pattern)
-- [ ] **EXR-04**: Exercises have muscle group mappings (primary, secondary)
-- [ ] **EXR-05**: Exercises have movement pattern classification
-- [ ] **EXR-06**: Exercises can have demo video links
+- [x] **EXR-01**: System provides curated exercise database (150-200 exercises)
+- [x] **EXR-02**: Coach can search and select exercises from database
+- [x] **EXR-03**: Coach can create custom exercises (name, muscles, pattern)
+- [x] **EXR-04**: Exercises have muscle group mappings (primary, secondary)
+- [x] **EXR-05**: Exercises have movement pattern classification
+- [x] **EXR-06**: Exercises can have demo video links
 
 ### Program Creation (Excel-Like Experience)
 
@@ -195,19 +195,19 @@ Phase mappings for all v1 requirements.
 
 | Requirement | Description | Status |
 |-------------|-------------|--------|
-| ATH-01 | Coach can create athlete profiles | Pending |
-| ATH-02 | Coach can view list of all athletes | Pending |
-| ATH-03 | Coach can update athlete profile | Pending |
-| ATH-04 | Coach can delete athlete profiles | Pending |
-| ATH-05 | Coach can generate invitation link | Pending |
-| ATH-06 | Athlete can link user account via invitation | Pending |
-| ATH-07 | Coach can operate without athlete accounts | Pending |
-| EXR-01 | System provides curated exercise database | Pending |
-| EXR-02 | Coach can search and select exercises | Pending |
-| EXR-03 | Coach can create custom exercises | Pending |
-| EXR-04 | Exercises have muscle group mappings | Pending |
-| EXR-05 | Exercises have movement pattern classification | Pending |
-| EXR-06 | Exercises can have demo video links | Pending |
+| ATH-01 | Coach can create athlete profiles | Complete |
+| ATH-02 | Coach can view list of all athletes | Complete |
+| ATH-03 | Coach can update athlete profile | Complete |
+| ATH-04 | Coach can delete athlete profiles | Complete |
+| ATH-05 | Coach can generate invitation link | Complete |
+| ATH-06 | Athlete can link user account via invitation | Complete |
+| ATH-07 | Coach can operate without athlete accounts | Complete |
+| EXR-01 | System provides curated exercise database | Complete |
+| EXR-02 | Coach can search and select exercises | Complete |
+| EXR-03 | Coach can create custom exercises | Complete |
+| EXR-04 | Exercises have muscle group mappings | Complete |
+| EXR-05 | Exercises have movement pattern classification | Complete |
+| EXR-06 | Exercises can have demo video links | Complete |
 
 ### Phase 3: Program Builder
 

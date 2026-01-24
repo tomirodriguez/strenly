@@ -11,7 +11,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure
-- [ ] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations
+- [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations
 - [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export
@@ -52,17 +52,17 @@ Plans:
 **Plans**: 11 plans in 5 waves
 
 Plans:
-- [ ] 02-01-PLAN.md - Database schema for athletes, exercises, muscle groups (Wave 1)
-- [ ] 02-02-PLAN.md - Athlete and AthleteInvitation domain entities + ports (Wave 1, TDD)
-- [ ] 02-03-PLAN.md - Exercise domain entity + MuscleGroup/MovementPattern value objects (Wave 1, TDD)
-- [ ] 02-04-PLAN.md - Athlete and AthleteInvitation repositories (Wave 2)
-- [ ] 02-05-PLAN.md - Exercise and MuscleGroup repositories (Wave 2)
-- [ ] 02-06-PLAN.md - Athlete CRUD use cases (Wave 3)
-- [ ] 02-07-PLAN.md - Athlete invitation flow use cases (Wave 3)
-- [ ] 02-08-PLAN.md - Exercise CRUD and clone use cases (Wave 3)
-- [ ] 02-09-PLAN.md - Athletes contracts and procedures (Wave 4)
-- [ ] 02-10-PLAN.md - Exercises contracts and procedures (Wave 4)
-- [ ] 02-11-PLAN.md - Seed muscle groups and curated exercises (Wave 5)
+- [x] 02-01-PLAN.md - Database schema for athletes, exercises, muscle groups (Wave 1)
+- [x] 02-02-PLAN.md - Athlete and AthleteInvitation domain entities + ports (Wave 1, TDD)
+- [x] 02-03-PLAN.md - Exercise domain entity + MuscleGroup/MovementPattern value objects (Wave 1, TDD)
+- [x] 02-04-PLAN.md - Athlete and AthleteInvitation repositories (Wave 2)
+- [x] 02-05-PLAN.md - Exercise and MuscleGroup repositories (Wave 2)
+- [x] 02-06-PLAN.md - Athlete CRUD use cases (Wave 3)
+- [x] 02-07-PLAN.md - Athlete invitation flow use cases (Wave 3)
+- [x] 02-08-PLAN.md - Exercise CRUD and clone use cases (Wave 3)
+- [x] 02-09-PLAN.md - Athletes contracts and procedures (Wave 4)
+- [x] 02-10-PLAN.md - Exercises contracts and procedures (Wave 4)
+- [x] 02-11-PLAN.md - Seed muscle groups and curated exercises (Wave 5)
 
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Multi-Tenancy | 7/7 | Complete | 2026-01-24 |
-| 2. Exercise Library & Athlete Management | 0/11 | Not started | - |
+| 2. Exercise Library & Athlete Management | 11/11 | Complete | 2026-01-24 |
 | 3. Program Builder | 0/4 | Not started | - |
 | 4. Athlete PWA | 0/3 | Not started | - |
 | 5. Dashboard & Analytics | 0/2 | Not started | - |
