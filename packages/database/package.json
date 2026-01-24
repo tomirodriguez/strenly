@@ -21,6 +21,7 @@
     "db:drop": "drizzle-kit drop",
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx scripts/seed.ts",
     "db:seed:plans": "tsx scripts/seed-plans.ts"
   },
   "dependencies": {
