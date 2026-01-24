@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { OnboardingView } from '@/features/auth/views/onboarding-view'
+import { AuthProvider } from '@/contexts/auth-context'
 import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/onboarding')({
@@ -17,6 +18,18 @@ export const Route = createFileRoute('/onboarding')({
         throw redirect({ to: '/$orgSlug/dashboard', params: { orgSlug: firstOrg.slug } })
       }
     }
+
+    return { authData: session.data }
   },
-  component: OnboardingView,
+  component: OnboardingLayout,
 })
+
+function OnboardingLayout() {
+  const { authData } = Route.useRouteContext()
+
+  return (
+    <AuthProvider value={authData}>
+      <OnboardingView />
+    </AuthProvider>
+  )
+}
