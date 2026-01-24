@@ -1,11 +1,11 @@
 import type { OrganizationType } from '@strenly/contracts/subscriptions/plan'
 import { useMutation } from '@tanstack/react-query'
+import { Dumbbell } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { orpc } from '@/lib/api-client'
 import { authClient, useSession } from '@/lib/auth-client'
-import { AuthLayout } from '../components/auth-layout'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
@@ -126,34 +126,54 @@ export function OnboardingView() {
   const userName = session?.user?.name ?? ''
 
   return (
-    <AuthLayout>
-      <Card>
-        <CardHeader className="text-center">
-          {userName && (
-            <p className="text-muted-foreground">
-              Bienvenido, <span className="font-medium text-foreground">{userName}</span>
-            </p>
-          )}
-          <div className="mt-4">
-            <StepIndicator current={stepIndex} total={3} />
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Left Panel - Branding (hidden on mobile) */}
+      <div className="hidden flex-col items-center justify-center bg-primary p-12 text-primary-foreground lg:flex">
+        <div className="space-y-6 text-center">
+          <div className="flex justify-center">
+            <Dumbbell className="size-16" />
           </div>
-        </CardHeader>
-        <CardContent>
-          {step === 'coach-type' && <CoachTypeStep onNext={handleCoachTypeNext} />}
+          <div className="space-y-2">
+            <h1 className="font-bold text-4xl">Strenly</h1>
+            <p className="text-lg text-primary-foreground/90">
+              Crea programas de entrenamiento tan rapido como en Excel
+            </p>
+          </div>
+        </div>
+      </div>
 
-          {step === 'plan' && state.coachType && (
-            <PlanSelectionStep
-              organizationType={state.coachType}
-              onNext={handlePlanNext}
-              onBack={handleBack}
-            />
-          )}
+      {/* Right Panel - Onboarding Content (wider than auth forms) */}
+      <div className="flex flex-col items-center justify-center p-8 lg:p-12">
+        <div className="w-full max-w-3xl space-y-6">
+          <Card>
+            <CardHeader className="text-center">
+              {userName && (
+                <p className="text-muted-foreground">
+                  Bienvenido, <span className="font-medium text-foreground">{userName}</span>
+                </p>
+              )}
+              <div className="mt-4">
+                <StepIndicator current={stepIndex} total={3} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {step === 'coach-type' && <CoachTypeStep onNext={handleCoachTypeNext} />}
 
-          {step === 'org' && (
-            <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />
-          )}
-        </CardContent>
-      </Card>
-    </AuthLayout>
+              {step === 'plan' && state.coachType && (
+                <PlanSelectionStep
+                  organizationType={state.coachType}
+                  onNext={handlePlanNext}
+                  onBack={handleBack}
+                />
+              )}
+
+              {step === 'org' && (
+                <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   )
 }
