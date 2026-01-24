@@ -65,6 +65,9 @@ Recent decisions affecting current work:
 - **Access control returns not_found** - Unauthorized access returns not_found to prevent information leakage
 - **contracts/package.json exports** - Add explicit exports for module path resolution
 - **crypto.randomUUID()** - Use built-in Web Crypto API instead of nanoid for ID generation
+- **Session auth for acceptInvitation** - Athlete accepting has auth but no org context, use sessionProcedure
+- **Public endpoint for invitationInfo** - Invitation display accessible without login via publicProcedure
+- **Direct DB queries for org lookup** - Better-Auth API requires headers, public endpoints query DB directly
 
 ### Pending Todos
 
