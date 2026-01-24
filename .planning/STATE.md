@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 005: Fix onboarding org creation, layout, and slug generation
+Last activity: 2026-01-24 - Completed quick task 006: Add AuthProvider and OrganizationProvider
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -86,6 +86,7 @@ Recent decisions affecting current work:
 - **Better-Auth metadata is already parsed** - org.metadata in hooks is an object, not a JSON string
 - **Onboarding uses standalone full-width layout** - Not inside AuthLayout, uses header + centered content pattern
 - **Slug auto-generation via onChange** - Use onChange callbacks instead of useEffect for derived input values
+- **Context providers for route data caching** - AuthProvider at _authenticated, OrganizationProvider at $orgSlug, use hooks instead of Better-Auth hooks in components
 
 ### Pending Todos
 
@@ -106,6 +107,7 @@ None.
 | 003 | Fix duplicate toasts on login error | 2026-01-24 | 21b88b7 | [003-fix-duplicate-toasts-login-error](./quick/003-fix-duplicate-toasts-login-error/) |
 | 004 | Fix onboarding infinite loop after sign-in | 2026-01-24 | a909deb | [004-fix-onboarding-infinite-loop](./quick/004-fix-onboarding-infinite-loop/) |
 | 005 | Fix onboarding org creation, layout, slug generation | 2026-01-24 | 47c7b9a | [005-fix-onboarding-org-creation-error-form-l](./quick/005-fix-onboarding-org-creation-error-form-l/) |
+| 006 | Add AuthProvider and OrganizationProvider for context caching | 2026-01-24 | 33083ce | [006-add-authprovider-and-organizationprovide](./quick/006-add-authprovider-and-organizationprovide/) |
 
 ## Phase 2 Progress
 
@@ -172,7 +174,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed quick task 005 - Fix onboarding org creation, layout, and slug generation
+Stopped at: Completed quick task 006 - Add AuthProvider and OrganizationProvider
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
