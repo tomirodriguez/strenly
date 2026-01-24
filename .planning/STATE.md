@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 6 of TBD in current phase
+Plan: 7 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-06-PLAN.md (Athlete Use Cases)
+Last activity: 2026-01-24 - Completed 02-07-PLAN.md (Athlete Invitation Use Cases)
 
-Progress: [======----] Phase 2 progressing
+Progress: [=======---] Phase 2 progressing
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 6 min
-- Total execution time: 78 min
+- Total execution time: 82 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 6/TBD | 12 min | 2 min |
+| 2 | 7/TBD | 16 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (3 min), 02-03 (2 min), 02-04 (2 min), 02-05 (2 min), 02-06 (4 min)
-- Trend: Phase 2 layers executing efficiently with established patterns
+- Last 5 plans: 02-03 (2 min), 02-04 (2 min), 02-05 (2 min), 02-06 (4 min), 02-07 (4 min)
+- Trend: Phase 2 use case layers executing efficiently
 
 *Updated after each plan completion*
 
@@ -59,6 +59,8 @@ Recent decisions affecting current work:
 - **Lookup repositories without ports** - Simple read-only repositories (MuscleGroup) don't need core ports
 - **Authorization-first in use cases** - Always check hasPermission() before any business logic
 - **Update merges with existing** - Update use cases merge input with existing entity before validation
+- **OrganizationLookup interface** - Simplified interface for name resolution in public endpoints
+- **Token-based public endpoints** - Accept/get-info use token as credential, no OrganizationContext
 
 ### Pending Todos
 
@@ -82,7 +84,8 @@ None.
 | 02-04 | Athlete Repositories | Complete |
 | 02-05 | Exercise Repositories | Complete |
 | 02-06 | Athlete Use Cases | Complete |
-| 02-07 | Exercise Contracts & Procedures | Pending |
+| 02-07 | Athlete Invitation Use Cases | Complete |
+| 02-08 | Contracts & Procedures | Pending |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/athletes.ts` - Athletes table schema
@@ -109,11 +112,15 @@ None.
 - `packages/backend/src/use-cases/athletes/get-athlete.ts` - Get athlete by ID
 - `packages/backend/src/use-cases/athletes/update-athlete.ts` - Update athlete with merge
 - `packages/backend/src/use-cases/athletes/archive-athlete.ts` - Archive (soft delete) athlete
+- `packages/backend/src/use-cases/athletes/generate-invitation.ts` - Generate invitation with URL
+- `packages/backend/src/use-cases/athletes/accept-invitation.ts` - Accept invitation, link user
+- `packages/backend/src/use-cases/athletes/get-invitation-info.ts` - Public invite info lookup
+- `packages/backend/src/use-cases/athletes/revoke-invitation.ts` - Manual invitation revocation
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-06-PLAN.md (Athlete Use Cases)
+Stopped at: Completed 02-07-PLAN.md (Athlete Invitation Use Cases)
 Resume file: None
 
-**Next:** Continue Phase 2 - Athlete Contracts & Procedures (02-07)
+**Next:** Continue Phase 2 - Contracts & Procedures (02-08)
