@@ -32,7 +32,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <Field>
-        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
         <FieldContent>
           <Input
             id="email"
@@ -46,7 +46,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="password">Password</FieldLabel>
+        <FieldLabel htmlFor="password">Contrasena</FieldLabel>
         <FieldContent>
           <Input
             id="password"
@@ -66,7 +66,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
             checked={rememberMe}
             onCheckedChange={(checked) => setValue('rememberMe', checked === true)}
           />
-          <span className="text-sm">Remember me</span>
+          <span className="text-sm">Recordarme</span>
         </FieldLabel>
       </Field>
 
@@ -74,10 +74,10 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
         {isLoading ? (
           <span className="inline-flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            Signing in...
+            Iniciando sesion...
           </span>
         ) : (
-          'Sign in'
+          'Iniciar sesion'
         )}
       </Button>
     </form>

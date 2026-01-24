@@ -27,7 +27,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <Field>
-        <FieldLabel htmlFor="name">Name</FieldLabel>
+        <FieldLabel htmlFor="name">Nombre</FieldLabel>
         <FieldContent>
           <Input
             id="name"
@@ -41,7 +41,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
         <FieldContent>
           <Input
             id="email"
@@ -55,7 +55,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="password">Password</FieldLabel>
+        <FieldLabel htmlFor="password">Contrasena</FieldLabel>
         <FieldContent>
           <Input
             id="password"
@@ -72,10 +72,10 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
         {isLoading ? (
           <span className="inline-flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            Creating account...
+            Creando cuenta...
           </span>
         ) : (
-          'Sign up'
+          'Registrarse'
         )}
       </Button>
     </form>
