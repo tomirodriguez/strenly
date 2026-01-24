@@ -140,8 +140,10 @@ describe("transitionStatus", () => {
 		expect(result.isErr()).toBe(true);
 		if (result.isErr()) {
 			expect(result.error.type).toBe("INVALID_STATUS_TRANSITION");
-			expect(result.error.from).toBe("canceled");
-			expect(result.error.to).toBe("past_due");
+			if (result.error.type === "INVALID_STATUS_TRANSITION") {
+				expect(result.error.from).toBe("canceled");
+				expect(result.error.to).toBe("past_due");
+			}
 		}
 	});
 });
