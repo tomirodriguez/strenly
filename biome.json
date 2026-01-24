@@ -11,27 +11,37 @@
     "includes": [
       "**",
       "!!**/node_modules",
+      "!!**/.next",
       "!!**/.turbo",
       "!!**/.wrangler",
       "!!**/dist",
       "!!**/build",
       "!!**/coverage",
+      "!!**/.vercel",
+      "!!**/out",
+      "!!docs",
+      "!!.github",
+      "!!_bmad",
+      "!!_bmad-output",
+      "!!claude",
+      "!!**/routeTree.gen.ts",
       "!**/drizzle",
+      "!**/next-env.d.ts",
       "!**/worker-configuration.d.ts"
     ]
   },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
-    "indentStyle": "tab",
+    "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 120,
     "lineEnding": "lf"
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double",
-      "semicolons": "always",
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
       "trailingCommas": "all",
       "arrowParentheses": "always"
     }
@@ -39,6 +49,11 @@
   "json": {
     "formatter": {
       "trailingCommas": "none"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "linter": {
@@ -56,6 +71,20 @@
       },
       "suspicious": {
         "noExplicitAny": "warn"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe",
+          "options": {
+            "attributes": [
+              "className"
+            ],
+            "functions": [
+              "cn"
+            ]
+          }
+        }
       }
     }
   },
@@ -68,17 +97,56 @@
             "groups": [
               ":BUN:",
               ":NODE:",
-              ["npm:*", "npm:*/**"],
+              [
+                "npm:*",
+                "npm:*/**"
+              ],
               ":PACKAGE_WITH_PROTOCOL:",
               ":URL:",
               ":PACKAGE:",
-              ["/**"],
-              ["#*", "#*/**"],
+              [
+                "/**"
+              ],
+              [
+                "#*",
+                "#*/**"
+              ],
               ":PATH:"
             ]
           }
         }
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "**/components/ui/**"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noLabelWithoutControl": "off",
+            "useSemanticElements": "off",
+            "useKeyWithClickEvents": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/features/planning/components/**"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off"
+          }
+        }
+      }
+    }
+  ]
 }

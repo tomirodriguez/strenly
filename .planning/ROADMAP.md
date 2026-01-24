@@ -10,11 +10,12 @@ Strenly delivers a training planning platform where coaches can create programs 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure
-- [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations
-- [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates
-- [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts
-- [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export
+- [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure (backend)
+- [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations (backend)
+- [ ] **Phase 2.5: Coach Web Foundation** - Auth UI, athlete management UI, exercise browser (frontend catch-up)
+- [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
+- [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
+- [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
 ## Phase Details
 
@@ -64,9 +65,28 @@ Plans:
 - [x] 02-10-PLAN.md - Exercises contracts and procedures (Wave 4)
 - [x] 02-11-PLAN.md - Seed muscle groups and curated exercises (Wave 5)
 
+### Phase 2.5: Coach Web Foundation
+**Goal**: Coaches can use the web app to authenticate, manage athletes, and browse exercises
+**Depends on**: Phase 2
+**Requirements**: AUTH-01, AUTH-02, ATH-01, ATH-02, ATH-03, ATH-05, EXR-01, EXR-02
+**Success Criteria** (what must be TRUE):
+  1. Coach can sign up, log in, and log out using the web UI
+  2. Coach can create an organization during onboarding flow
+  3. Coach can view athlete list with search and pagination
+  4. Coach can create, edit, and archive athletes via forms
+  5. Coach can generate invitation links and see invitation status
+  6. Coach can browse exercise library with filtering by muscle group and movement pattern
+**Plans**: TBD
+
+Plans:
+- [ ] 02.5-01: TBD
+- [ ] 02.5-02: TBD
+- [ ] 02.5-03: TBD
+- [ ] 02.5-04: TBD
+
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
-**Depends on**: Phase 2
+**Depends on**: Phase 2.5
 **Requirements**: PRG-01, PRG-02, PRG-03, PRG-04, PRG-05, PRG-06, PRG-07, PRG-08, PRG-09, PRG-10, PRG-11, PRG-12, PRG-13, RX-01, RX-02, RX-03, RX-04, RX-05, RX-06, RX-07, RX-08, RX-09, RX-10, RX-11, TPL-01, TPL-02, TPL-03, TPL-04
 **Success Criteria** (what must be TRUE):
   1. Coach can create programs and navigate the grid using keyboard (arrow keys, tab, enter) without using mouse
@@ -118,15 +138,16 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Multi-Tenancy | 7/7 | Complete | 2026-01-24 |
-| 2. Exercise Library & Athlete Management | 11/11 | Complete | 2026-01-24 |
-| 3. Program Builder | 0/4 | Not started | - |
-| 4. Athlete PWA | 0/3 | Not started | - |
-| 5. Dashboard & Analytics | 0/2 | Not started | - |
+| 1. Foundation & Multi-Tenancy (backend) | 7/7 | Complete | 2026-01-24 |
+| 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
+| 2.5. Coach Web Foundation (frontend) | 0/4 | Not started | - |
+| 3. Program Builder (full-stack) | 0/4 | Not started | - |
+| 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
+| 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*

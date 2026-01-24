@@ -20,7 +20,8 @@ export const listMuscleGroups = authProcedure
 
 		if (result.isErr()) {
 			const error = result.error;
-			const errorMessage = error.type === "DATABASE_ERROR" ? error.message : `Muscle group not found: ${error.muscleGroupId}`;
+			const errorMessage =
+				error.type === "DATABASE_ERROR" ? error.message : `Muscle group not found: ${error.muscleGroupId}`;
 			console.error("Muscle group repository error:", errorMessage);
 			throw errors.INTERNAL_ERROR({ message: errorMessage });
 		}

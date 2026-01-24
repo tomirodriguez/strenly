@@ -6,7 +6,8 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "turbo run dev",
-    "dev:api": "./scripts/dev-server.sh",
+    "dev:coach": "./scripts/dev-coach.sh",
+    "dev:server": "./scripts/dev-server.sh",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",

@@ -1,5 +1,4 @@
 import {
-	athleteSchema,
 	athleteStatusSchema,
 	listAthletesInputSchema,
 	listAthletesOutputSchema,

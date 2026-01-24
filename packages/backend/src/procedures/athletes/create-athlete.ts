@@ -1,5 +1,4 @@
 import { athleteSchema, createAthleteInputSchema, genderSchema } from "@strenly/contracts/athletes/athlete";
-import { z } from "zod";
 import { createAthleteRepository } from "../../infrastructure/repositories/athlete.repository";
 import { authProcedure } from "../../lib/orpc";
 import { makeCreateAthlete } from "../../use-cases/athletes/create-athlete";

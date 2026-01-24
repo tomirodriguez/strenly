@@ -2,7 +2,17 @@ import type { DbClient } from "../client";
 import { exerciseMuscles } from "../schema/exercise-muscles";
 import { exercises } from "../schema/exercises";
 
-type MuscleGroup = "chest" | "back" | "shoulders" | "biceps" | "triceps" | "quads" | "hamstrings" | "glutes" | "core" | "calves";
+type MuscleGroup =
+	| "chest"
+	| "back"
+	| "shoulders"
+	| "biceps"
+	| "triceps"
+	| "quads"
+	| "hamstrings"
+	| "glutes"
+	| "core"
+	| "calves";
 type MovementPattern = "push" | "pull" | "hinge" | "squat" | "carry" | "core";
 
 interface ExerciseSeedData {

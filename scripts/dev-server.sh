@@ -15,4 +15,4 @@ if [ -f ".env" ]; then
 fi
 
 # Run API server
-pnpm --filter backend dev
+pnpm --filter api dev

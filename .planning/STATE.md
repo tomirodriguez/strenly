@@ -5,16 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3 - Program Builder
+**Current focus:** Phase 2.5 - Coach Web Foundation (frontend catch-up)
 
 ## Current Position
 
-Phase: 3 of 5 (Program Builder)
+Phase: 2.5 of 5 (Coach Web Foundation)
 Plan: 0 of 4 in current phase
 Status: Ready for planning
-Last activity: 2026-01-24 - Completed Phase 2 (Exercise Library & Athlete Management)
+Last activity: 2026-01-24 - Inserted Phase 2.5 for frontend catch-up
 
-Progress: [          ] Phase 3 not started
+Progress: [████████████████████░░░░░░░░░░] Backend complete, frontend starting
+
+**Note:** Phases 1-2 built backend only. Phase 2.5 adds the frontend UI for those features.
 
 ## Performance Metrics
 
@@ -146,7 +148,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed Phase 2 verification
+Stopped at: Inserted Phase 2.5 for frontend catch-up
 Resume file: None
 
-**Next:** Begin Phase 3 planning with /gsd:plan-phase 3
+**Next:** Begin Phase 2.5 planning with /gsd:discuss-phase 2.5 or /gsd:plan-phase 2.5

@@ -1,4 +1,9 @@
-import { athleteSchema, athleteStatusSchema, genderSchema, updateAthleteInputSchema } from "@strenly/contracts/athletes/athlete";
+import {
+	athleteSchema,
+	athleteStatusSchema,
+	genderSchema,
+	updateAthleteInputSchema,
+} from "@strenly/contracts/athletes/athlete";
 import { createAthleteRepository } from "../../infrastructure/repositories/athlete.repository";
 import { authProcedure } from "../../lib/orpc";
 import { makeUpdateAthlete } from "../../use-cases/athletes/update-athlete";

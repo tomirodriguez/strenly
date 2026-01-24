@@ -1,7 +1,7 @@
 import { generateInvitationOutputSchema } from "@strenly/contracts/athletes/invitation";
 import { z } from "zod";
-import { createAthleteInvitationRepository } from "../../infrastructure/repositories/athlete-invitation.repository";
 import { createAthleteRepository } from "../../infrastructure/repositories/athlete.repository";
+import { createAthleteInvitationRepository } from "../../infrastructure/repositories/athlete-invitation.repository";
 import { authProcedure } from "../../lib/orpc";
 import { makeGenerateInvitation } from "../../use-cases/athletes/generate-invitation";
 
