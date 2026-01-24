@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 006: Add AuthProvider and OrganizationProvider
+Last activity: 2026-01-24 - Completed quick task 008: Fix session and organization API calls on navigation
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -82,7 +82,7 @@ Recent decisions affecting current work:
 - **Single Toaster in __root.tsx** - Toaster component placed in __root.tsx (inside providers), not main.tsx
 - **sessionProcedure for createSubscription** - User is authenticated during onboarding but has no org context yet
 - **URL-based org routing** - All authenticated routes use `/:orgSlug/*` pattern, org slug synced to X-Organization-Slug header
-- **Always set active org in $orgSlug beforeLoad** - Simpler than checking current active org, ensures consistency
+- **No setActive() needed - URL slug is source of truth** - Organization context from URL, X-Organization-Slug header via setCurrentOrgSlug(), no database calls for active org
 - **Better-Auth metadata is already parsed** - org.metadata in hooks is an object, not a JSON string
 - **Onboarding uses standalone full-width layout** - Not inside AuthLayout, uses header + centered content pattern
 - **Slug auto-generation via onChange** - Use onChange callbacks instead of useEffect for derived input values
@@ -108,6 +108,8 @@ None.
 | 004 | Fix onboarding infinite loop after sign-in | 2026-01-24 | a909deb | [004-fix-onboarding-infinite-loop](./quick/004-fix-onboarding-infinite-loop/) |
 | 005 | Fix onboarding org creation, layout, slug generation | 2026-01-24 | 47c7b9a | [005-fix-onboarding-org-creation-error-form-l](./quick/005-fix-onboarding-org-creation-error-form-l/) |
 | 006 | Add AuthProvider and OrganizationProvider for context caching | 2026-01-24 | 33083ce | [006-add-authprovider-and-organizationprovide](./quick/006-add-authprovider-and-organizationprovide/) |
+| 007 | Polish step components visual design | 2026-01-24 | 8885ba2 | - |
+| 008 | Fix session and organization API calls on navigation | 2026-01-24 | 6d28f99 | [008-fix-session-and-organization-api-calls-o](./quick/008-fix-session-and-organization-api-calls-o/) |
 
 ## Phase 2 Progress
 
@@ -174,7 +176,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed quick task 006 - Add AuthProvider and OrganizationProvider
+Stopped at: Completed quick task 008 - Fix session and organization API calls on navigation
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
