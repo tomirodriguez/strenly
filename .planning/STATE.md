@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 004: Fix onboarding infinite loop after sign-in
+Last activity: 2026-01-24 - Completed quick task 005: Fix onboarding org creation, layout, and slug generation
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -83,6 +83,9 @@ Recent decisions affecting current work:
 - **sessionProcedure for createSubscription** - User is authenticated during onboarding but has no org context yet
 - **URL-based org routing** - All authenticated routes use `/:orgSlug/*` pattern, org slug synced to X-Organization-Slug header
 - **Always set active org in $orgSlug beforeLoad** - Simpler than checking current active org, ensures consistency
+- **Better-Auth metadata is already parsed** - org.metadata in hooks is an object, not a JSON string
+- **Onboarding uses wider layout than auth** - max-w-3xl for plan grid vs max-w-md for auth forms
+- **Slug auto-generation via onChange** - Use onChange callbacks instead of useEffect for derived input values
 
 ### Pending Todos
 
@@ -102,6 +105,7 @@ None.
 | 002 | Fix onboarding flow: coach type, plan selection, org routing | 2026-01-24 | 59944c2 | [002-fix-onboarding-flow-coach-type-plan-org-routing](./quick/002-fix-onboarding-flow-coach-type-plan-org-routing/) |
 | 003 | Fix duplicate toasts on login error | 2026-01-24 | 21b88b7 | [003-fix-duplicate-toasts-login-error](./quick/003-fix-duplicate-toasts-login-error/) |
 | 004 | Fix onboarding infinite loop after sign-in | 2026-01-24 | a909deb | [004-fix-onboarding-infinite-loop](./quick/004-fix-onboarding-infinite-loop/) |
+| 005 | Fix onboarding org creation, layout, slug generation | 2026-01-24 | 5dcd734 | [005-fix-onboarding-org-creation-error-form-l](./quick/005-fix-onboarding-org-creation-error-form-l/) |
 
 ## Phase 2 Progress
 
@@ -168,7 +172,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed quick task 002 - Onboarding flow with multi-step wizard and URL-based org routing
+Stopped at: Completed quick task 005 - Fix onboarding org creation, layout, and slug generation
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
