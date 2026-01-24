@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 003: Fix duplicate toasts on login error
+Last activity: 2026-01-24 - Completed quick task 002: Fix onboarding flow with coach type, plan selection, org routing
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -80,6 +80,9 @@ Recent decisions affecting current work:
 - **Optional string fields in Zod** - Use .or(z.literal('')) for optional strings that receive empty form values
 - **Sheet form pattern** - Header > SheetBody (scrollable form) > SheetFooter (fixed buttons)
 - **Single Toaster in __root.tsx** - Toaster component placed in __root.tsx (inside providers), not main.tsx
+- **sessionProcedure for createSubscription** - User is authenticated during onboarding but has no org context yet
+- **URL-based org routing** - All authenticated routes use `/:orgSlug/*` pattern, org slug synced to X-Organization-Slug header
+- **Always set active org in $orgSlug beforeLoad** - Simpler than checking current active org, ensures consistency
 
 ### Pending Todos
 
@@ -96,6 +99,7 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Translate UI and error messages to Spanish | 2026-01-24 | 0a9874a | [001-translate-ui-and-error-messages-to-spani](./quick/001-translate-ui-and-error-messages-to-spani/) |
+| 002 | Fix onboarding flow: coach type, plan selection, org routing | 2026-01-24 | 59944c2 | [002-fix-onboarding-flow-coach-type-plan-org-routing](./quick/002-fix-onboarding-flow-coach-type-plan-org-routing/) |
 | 003 | Fix duplicate toasts on login error | 2026-01-24 | 21b88b7 | [003-fix-duplicate-toasts-login-error](./quick/003-fix-duplicate-toasts-login-error/) |
 
 ## Phase 2 Progress
@@ -163,7 +167,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed quick task 003 - Fix duplicate toasts
+Stopped at: Completed quick task 002 - Onboarding flow with multi-step wizard and URL-based org routing
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
