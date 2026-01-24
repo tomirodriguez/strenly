@@ -96,6 +96,24 @@ export function AthleteForm() {
 }
 ```
 
+### Modal vs Drawer
+
+**Use Modal (Dialog) for:**
+- Create/edit forms that need focused attention
+- Confirmation dialogs
+- Short workflows (1-3 fields)
+- Actions that don't require seeing the page behind
+
+**Use Drawer (Sheet) for:**
+- Contextual information panels (detail views, settings)
+- Complex multi-step forms where page context helps
+- Navigation menus on mobile
+- Panels that users may want to reference alongside page content
+
+**Pattern:**
+- **Centered modal**: User focus shifts entirely to the dialog
+- **Side drawer**: User maintains awareness of underlying page
+
 ## Critical Rules
 
 - **Import schemas from `@strenly/contracts`** - Never define Zod schemas inline
