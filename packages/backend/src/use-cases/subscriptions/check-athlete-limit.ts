@@ -1,12 +1,12 @@
-import { ResultAsync, errAsync } from "neverthrow";
 import {
-	hasPermission,
 	canAddAthlete,
-	type Role,
+	hasPermission,
 	type OrganizationContext,
 	type PlanRepositoryPort,
+	type Role,
 	type SubscriptionRepositoryPort,
 } from "@strenly/core";
+import { errAsync, type ResultAsync } from "neverthrow";
 
 export type CheckAthleteLimitInput = OrganizationContext & {
 	memberRole: Role;

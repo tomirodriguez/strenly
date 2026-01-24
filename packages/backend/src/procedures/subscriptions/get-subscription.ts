@@ -1,9 +1,9 @@
 import { planSchema } from "@strenly/contracts/subscriptions/plan";
 import { subscriptionSchema } from "@strenly/contracts/subscriptions/subscription";
 import { z } from "zod";
-import { authProcedure } from "../../lib/orpc";
 import { createPlanRepository } from "../../infrastructure/repositories/plan.repository";
 import { createSubscriptionRepository } from "../../infrastructure/repositories/subscription.repository";
+import { authProcedure } from "../../lib/orpc";
 import { makeGetSubscription } from "../../use-cases/subscriptions/get-subscription";
 
 const getSubscriptionOutputSchema = z.object({

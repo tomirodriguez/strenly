@@ -1,7 +1,7 @@
 import { organizationTypeSchema, planSchema } from "@strenly/contracts/subscriptions/plan";
 import { z } from "zod";
-import { publicProcedure } from "../../lib/orpc";
 import { createPlanRepository } from "../../infrastructure/repositories/plan.repository";
+import { publicProcedure } from "../../lib/orpc";
 
 const listPlansInputSchema = z
 	.object({
