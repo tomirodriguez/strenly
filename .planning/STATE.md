@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2 of 5 (Exercise Library & Athlete Management)
 Plan: 3 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-03-PLAN.md (Exercise Domain Entity)
+Last activity: 2026-01-24 - Completed 02-02-PLAN.md (Athlete Domain Entities)
 
 Progress: [===-------] Phase 2 started
 
@@ -31,7 +31,7 @@ Progress: [===-------] Phase 2 started
 | 2 | 3/TBD | 4 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-06 (4 min), 01-07 (7 min), 02-01 (<1 min), 02-02 (<1 min), 02-03 (2 min)
+- Last 5 plans: 01-07 (7 min), 02-01 (<1 min), 02-02 (3 min), 02-03 (2 min)
 - Trend: Phase 2 domain layers executing quickly with established patterns
 
 *Updated after each plan completion*
@@ -51,6 +51,8 @@ Recent decisions affecting current work:
 - **Repository factory functions** - createPlanRepository, createSubscriptionRepository for DI
 - **Value objects as const arrays** - MuscleGroup and MovementPattern use const arrays with type guards
 - **Curated vs Custom via nullable organizationId** - organizationId: null for curated, string for custom
+- **Public invitation token lookup** - findByToken/markAccepted have no OrganizationContext for acceptance flow
+- **Cryptographic invitation tokens** - 256-bit random via crypto.randomBytes, base64url encoded (43 chars)
 
 ### Pending Todos
 
@@ -86,13 +88,15 @@ None.
 - `packages/core/src/domain/entities/muscle-group.ts` - MuscleGroup value object
 - `packages/core/src/domain/entities/movement-pattern.ts` - MovementPattern value object
 - `packages/core/src/ports/exercise-repository.port.ts` - Repository interface
-- `packages/core/src/domain/entities/athlete.ts` - Athlete entity
-- `packages/core/src/domain/entities/athlete-invitation.ts` - AthleteInvitation entity
+- `packages/core/src/domain/entities/athlete.ts` - Athlete entity with validation
+- `packages/core/src/domain/entities/athlete-invitation.ts` - AthleteInvitation with secure tokens
+- `packages/core/src/ports/athlete-repository.port.ts` - AthleteRepositoryPort interface
+- `packages/core/src/ports/athlete-invitation-repository.port.ts` - AthleteInvitationRepositoryPort interface
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-03-PLAN.md (Exercise Domain Entity)
+Stopped at: Completed 02-02-PLAN.md (Athlete Domain Entities)
 Resume file: None
 
-**Next:** Continue Phase 2 - Exercise repository implementation
+**Next:** Continue Phase 2 - Exercise or Athlete repository implementation
