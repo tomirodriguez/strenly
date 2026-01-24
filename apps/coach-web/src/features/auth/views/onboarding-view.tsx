@@ -3,12 +3,12 @@ import { useMutation } from '@tanstack/react-query'
 import { Dumbbell } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { orpc } from '@/lib/api-client'
-import { authClient, useSession } from '@/lib/auth-client'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { orpc } from '@/lib/api-client'
+import { authClient, useSession } from '@/lib/auth-client'
 
 type OnboardingStep = 'coach-type' | 'plan' | 'org'
 
@@ -45,9 +45,7 @@ export function OnboardingView() {
 
   const { data: session } = useSession()
 
-  const createSubscriptionMutation = useMutation(
-    orpc.subscriptions.createSubscription.mutationOptions(),
-  )
+  const createSubscriptionMutation = useMutation(orpc.subscriptions.createSubscription.mutationOptions())
 
   const handleCoachTypeNext = (type: OrganizationType) => {
     setState((prev) => ({ ...prev, coachType: type }))
@@ -160,16 +158,10 @@ export function OnboardingView() {
               {step === 'coach-type' && <CoachTypeStep onNext={handleCoachTypeNext} />}
 
               {step === 'plan' && state.coachType && (
-                <PlanSelectionStep
-                  organizationType={state.coachType}
-                  onNext={handlePlanNext}
-                  onBack={handleBack}
-                />
+                <PlanSelectionStep organizationType={state.coachType} onNext={handlePlanNext} onBack={handleBack} />
               )}
 
-              {step === 'org' && (
-                <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />
-              )}
+              {step === 'org' && <OrgFormStep onNext={handleOrgSubmit} onBack={handleBack} isLoading={isSubmitting} />}
             </CardContent>
           </Card>
         </div>

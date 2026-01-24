@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -22,11 +22,12 @@ function generateSlug(name: string): string {
 }
 
 export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
+  const userEditedSlug = useRef(false)
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
   } = useForm<OrgFormData>({
     defaultValues: {
@@ -35,15 +36,17 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
     },
   })
 
-  const name = watch('name')
-  const slug = watch('slug')
-
-  // Auto-generate slug from name if user hasn't manually edited slug
-  useEffect(() => {
-    if (name && !slug) {
-      setValue('slug', generateSlug(name))
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value
+    // Auto-generate slug if user hasn't manually edited it
+    if (!userEditedSlug.current) {
+      setValue('slug', generateSlug(newName))
     }
-  }, [name, slug, setValue])
+  }
+
+  const handleSlugChange = () => {
+    userEditedSlug.current = true
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -65,6 +68,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
                 value: 50,
                 message: 'El nombre no puede superar los 50 caracteres',
               },
+              onChange: handleNameChange,
             })}
           />
           <FieldError errors={[errors.name]} />
@@ -89,6 +93,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
                 value: 2,
                 message: 'La URL debe tener al menos 2 caracteres',
               },
+              onChange: handleSlugChange,
             })}
           />
           <FieldDescription>
