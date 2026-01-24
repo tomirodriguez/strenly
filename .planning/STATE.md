@@ -84,7 +84,7 @@ Recent decisions affecting current work:
 - **URL-based org routing** - All authenticated routes use `/:orgSlug/*` pattern, org slug synced to X-Organization-Slug header
 - **Always set active org in $orgSlug beforeLoad** - Simpler than checking current active org, ensures consistency
 - **Better-Auth metadata is already parsed** - org.metadata in hooks is an object, not a JSON string
-- **Onboarding uses wider layout than auth** - max-w-3xl for plan grid vs max-w-md for auth forms
+- **Onboarding uses standalone full-width layout** - Not inside AuthLayout, uses header + centered content pattern
 - **Slug auto-generation via onChange** - Use onChange callbacks instead of useEffect for derived input values
 
 ### Pending Todos
@@ -105,7 +105,7 @@ None.
 | 002 | Fix onboarding flow: coach type, plan selection, org routing | 2026-01-24 | 59944c2 | [002-fix-onboarding-flow-coach-type-plan-org-routing](./quick/002-fix-onboarding-flow-coach-type-plan-org-routing/) |
 | 003 | Fix duplicate toasts on login error | 2026-01-24 | 21b88b7 | [003-fix-duplicate-toasts-login-error](./quick/003-fix-duplicate-toasts-login-error/) |
 | 004 | Fix onboarding infinite loop after sign-in | 2026-01-24 | a909deb | [004-fix-onboarding-infinite-loop](./quick/004-fix-onboarding-infinite-loop/) |
-| 005 | Fix onboarding org creation, layout, slug generation | 2026-01-24 | 5dcd734 | [005-fix-onboarding-org-creation-error-form-l](./quick/005-fix-onboarding-org-creation-error-form-l/) |
+| 005 | Fix onboarding org creation, layout, slug generation | 2026-01-24 | 47c7b9a | [005-fix-onboarding-org-creation-error-form-l](./quick/005-fix-onboarding-org-creation-error-form-l/) |
 
 ## Phase 2 Progress
 

@@ -44,18 +44,21 @@ Each task was committed atomically:
 1. **Task 1: Fix JSON.parse error on organization metadata** - `f05a76b` (fix)
 2. **Task 2: Fix onboarding layout for plan selection grid** - `30022e6` (fix)
 3. **Task 3: Fix slug auto-generation using callbacks** - `5dcd734` (fix)
+4. **Task 4: Complete layout redesign** - `47c7b9a` (fix) - Removed split branding layout and Card wrapper entirely
 
 ## Files Modified
 
 - `packages/auth/src/auth.ts` - Removed JSON.parse on org.metadata (already an object)
-- `apps/coach-web/src/features/auth/views/onboarding-view.tsx` - Custom wider layout for onboarding (max-w-3xl)
+- `apps/coach-web/src/features/auth/views/onboarding-view.tsx` - Standalone full-width layout (header + centered content)
 - `apps/coach-web/src/features/auth/components/org-form.tsx` - Replaced useEffect with onChange callbacks for slug generation
+- `apps/coach-web/src/features/auth/components/plan-selection-step.tsx` - Fixed overflow for "Recomendado" badge
 
 ## Decisions Made
 
 - **Better-Auth metadata handling:** The `org.metadata` in `afterCreateOrganization` hook is already a parsed object, not a JSON string. Cast to typed object instead of parsing.
-- **Custom onboarding layout:** AuthLayout uses max-w-md (448px) which is too narrow for 3-column plan grid. Onboarding now uses custom layout with max-w-3xl.
+- **Standalone onboarding layout:** Onboarding doesn't belong in AuthLayout. Uses its own full-width layout with simple header + centered content.
 - **Callback-based slug generation:** Replaced useEffect with onChange callbacks. Added `userEditedSlug` ref to track if user manually edited the slug field.
+- **Plan card overflow:** Added pt-4 to grid container for "Recomendado" badge visibility, shrink-0 on check icons.
 
 ## Deviations from Plan
 
