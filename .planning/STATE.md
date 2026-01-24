@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2.5 of 5 (Coach Web Foundation)
-Plan: 8 of 9 in current phase (gap closure plans)
-Status: In progress
-Last activity: 2026-01-24 - Completed 02.5-08-PLAN.md (UI crash fixes)
+Plan: 9 of 9 in current phase (gap closure plans)
+Status: Phase complete
+Last activity: 2026-01-24 - Completed 02.5-09-PLAN.md (Form UX polish)
 
-Progress: [█████████████████████████░░░░░] Backend complete, frontend gap closure in progress
+Progress: [██████████████████████████████] Backend complete, frontend gap closure complete
 
-**Note:** Phases 1-2 built backend only. Phase 2.5 adds the frontend UI. Plans 07-09 are gap closure fixes.
+**Note:** Phases 1-2 built backend only. Phase 2.5 adds the frontend UI. All gap closure plans complete.
 
 ## Performance Metrics
 
@@ -75,6 +75,9 @@ Recent decisions affecting current work:
 - **Organization sync in AuthenticatedLayout** - useActiveOrganization + setCurrentOrgSlug in layout for API header sync
 - **DropdownMenuLabel requires DropdownMenuGroup** - Base UI MenuGroupRootContext is only provided by MenuPrimitive.Group wrapper
 - **DataTable compound component children** - DataTable.Content and DataTablePagination must be descendants of DataTable.Root for context access
+- **Custom Zod error messages** - Use { message: '...' } in validation rules for user-friendly error text
+- **Optional string fields in Zod** - Use .or(z.literal('')) for optional strings that receive empty form values
+- **Sheet form pattern** - Header > SheetBody (scrollable form) > SheetFooter (fixed buttons)
 
 ### Pending Todos
 
@@ -151,7 +154,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02.5-08-PLAN.md (UI crash fixes)
+Stopped at: Completed 02.5-09-PLAN.md (Form UX polish)
 Resume file: None
 
-**Next:** Continue with 02.5-09-PLAN.md (Athletes form fix)
+**Next:** Phase 2.5 complete. Ready for Phase 3 (Training Programs) or continued feature development.
