@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 3 of TBD in current phase
+Plan: 4 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-02-PLAN.md (Athlete Domain Entities)
+Last activity: 2026-01-24 - Completed 02-04-PLAN.md (Athlete Repositories)
 
-Progress: [===-------] Phase 2 started
+Progress: [====------] Phase 2 progressing
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 7 min
-- Total execution time: 70 min
+- Total plans completed: 11
+- Average duration: 6 min
+- Total execution time: 72 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 3/TBD | 4 min | 1 min |
+| 2 | 4/TBD | 6 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-07 (7 min), 02-01 (<1 min), 02-02 (3 min), 02-03 (2 min)
-- Trend: Phase 2 domain layers executing quickly with established patterns
+- Last 5 plans: 02-01 (<1 min), 02-02 (3 min), 02-03 (2 min), 02-04 (2 min)
+- Trend: Phase 2 domain and infrastructure layers executing quickly with established patterns
 
 *Updated after each plan completion*
 
@@ -48,11 +48,13 @@ Recent decisions affecting current work:
 - **neverthrow for use cases** - Use cases return ResultAsync<Success, Error> with discriminated unions
 - **Factory functions return Result<Entity, Error>** - Domain entities use createEntity() pattern with neverthrow
 - **Domain entities are immutable** - All properties are readonly
-- **Repository factory functions** - createPlanRepository, createSubscriptionRepository for DI
+- **Repository factory functions** - createPlanRepository, createSubscriptionRepository, createAthleteRepository for DI
 - **Value objects as const arrays** - MuscleGroup and MovementPattern use const arrays with type guards
 - **Curated vs Custom via nullable organizationId** - organizationId: null for curated, string for custom
 - **Public invitation token lookup** - findByToken/markAccepted have no OrganizationContext for acceptance flow
 - **Cryptographic invitation tokens** - 256-bit random via crypto.randomBytes, base64url encoded (43 chars)
+- **Type guards for enum parsing** - isAthleteStatus/isAthleteGender instead of 'as' casting
+- **Soft delete via status** - archive() sets status to inactive, preserves data
 
 ### Pending Todos
 
@@ -73,7 +75,7 @@ None.
 | 02-01 | Database Schema | Complete |
 | 02-02 | Athlete Domain Entity | Complete |
 | 02-03 | Exercise Domain Entity | Complete |
-| 02-04 | Exercise Repository | Pending |
+| 02-04 | Athlete Repositories | Complete |
 | 02-05 | Exercise Use Cases | Pending |
 | 02-06 | Exercise Contracts & Procedures | Pending |
 
@@ -92,11 +94,14 @@ None.
 - `packages/core/src/domain/entities/athlete-invitation.ts` - AthleteInvitation with secure tokens
 - `packages/core/src/ports/athlete-repository.port.ts` - AthleteRepositoryPort interface
 - `packages/core/src/ports/athlete-invitation-repository.port.ts` - AthleteInvitationRepositoryPort interface
+- `packages/backend/src/infrastructure/repositories/athlete.repository.ts` - Athlete repository implementation
+- `packages/backend/src/infrastructure/repositories/athlete-invitation.repository.ts` - AthleteInvitation repository implementation
+- `packages/backend/src/infrastructure/repositories/index.ts` - Repository exports
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-02-PLAN.md (Athlete Domain Entities)
+Stopped at: Completed 02-04-PLAN.md (Athlete Repositories)
 Resume file: None
 
-**Next:** Continue Phase 2 - Exercise or Athlete repository implementation
+**Next:** Continue Phase 2 - Exercise repository or Athlete use cases
