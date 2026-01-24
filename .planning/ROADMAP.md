@@ -76,13 +76,15 @@ Plans:
   4. Coach can create, edit, and archive athletes via forms
   5. Coach can generate invitation links and see invitation status
   6. Coach can browse exercise library with filtering by muscle group and movement pattern
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
 
 Plans:
-- [ ] 02.5-01: TBD
-- [ ] 02.5-02: TBD
-- [ ] 02.5-03: TBD
-- [ ] 02.5-04: TBD
+- [ ] 02.5-01-PLAN.md - App shell, layout, providers, auth guards (Wave 1)
+- [ ] 02.5-02-PLAN.md - DataTable compound component with pagination, search (Wave 1)
+- [ ] 02.5-03-PLAN.md - Auth UI: login, signup, onboarding, org creation (Wave 2)
+- [ ] 02.5-04-PLAN.md - Athletes feature: list, forms, invitations (Wave 3)
+- [ ] 02.5-05-PLAN.md - Exercises feature: browser with filters (Wave 3)
+- [ ] 02.5-06-PLAN.md - Dashboard with stats and quick actions (Wave 4)
 
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
@@ -144,11 +146,11 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Multi-Tenancy (backend) | 7/7 | Complete | 2026-01-24 |
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
-| 2.5. Coach Web Foundation (frontend) | 0/4 | Not started | - |
+| 2.5. Coach Web Foundation (frontend) | 0/6 | Not started | - |
 | 3. Program Builder (full-stack) | 0/4 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23*
+*Last updated: 2026-01-24*
