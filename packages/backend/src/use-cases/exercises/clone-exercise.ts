@@ -44,7 +44,7 @@ export const makeCloneExercise =
 				(e): CloneExerciseError =>
 					e.type === "NOT_FOUND"
 						? { type: "source_not_found", exerciseId: input.sourceExerciseId }
-						: { type: "repository_error", message: e.message },
+						: { type: "repository_error", message: e.type === "DATABASE_ERROR" ? e.message : `Unknown error` },
 			)
 			.andThen((source) => {
 				// 3. Verify access - can only clone curated or own custom exercises
