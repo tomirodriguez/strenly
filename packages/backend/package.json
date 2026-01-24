@@ -20,6 +20,7 @@
     "@orpc/server": "^1.4.3",
     "@strenly/auth": "workspace:^",
     "@strenly/contracts": "workspace:^",
+    "@strenly/core": "workspace:^",
     "@strenly/database": "workspace:^",
     "drizzle-orm": "^0.44.7",
     "hono": "^4.7.5",
