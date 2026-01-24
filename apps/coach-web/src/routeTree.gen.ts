@@ -9,17 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOrgSlugRouteImport } from './routes/_authenticated/$orgSlug'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
-import { Route as AuthOnboardingRouteImport } from './routes/_auth/onboarding'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthenticatedOrgSlugExercisesRouteImport } from './routes/_authenticated/$orgSlug/exercises'
 import { Route as AuthenticatedOrgSlugDashboardRouteImport } from './routes/_authenticated/$orgSlug/dashboard'
 import { Route as AuthenticatedOrgSlugAthletesRouteImport } from './routes/_authenticated/$orgSlug/athletes'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -41,11 +46,6 @@ const AuthenticatedOrgSlugRoute = AuthenticatedOrgSlugRouteImport.update({
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthOnboardingRoute = AuthOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -74,8 +74,8 @@ const AuthenticatedOrgSlugAthletesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRoute
   '/login': typeof AuthLoginRoute
-  '/onboarding': typeof AuthOnboardingRoute
   '/signup': typeof AuthSignupRoute
   '/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
   '/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
@@ -84,8 +84,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRoute
   '/login': typeof AuthLoginRoute
-  '/onboarding': typeof AuthOnboardingRoute
   '/signup': typeof AuthSignupRoute
   '/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
   '/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
@@ -97,8 +97,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/onboarding': typeof AuthOnboardingRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/_authenticated/$orgSlug': typeof AuthenticatedOrgSlugRouteWithChildren
   '/_authenticated/$orgSlug/athletes': typeof AuthenticatedOrgSlugAthletesRoute
@@ -109,8 +109,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
     | '/onboarding'
+    | '/login'
     | '/signup'
     | '/$orgSlug'
     | '/$orgSlug/athletes'
@@ -119,8 +119,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
     | '/onboarding'
+    | '/login'
     | '/signup'
     | '/$orgSlug'
     | '/$orgSlug/athletes'
@@ -131,8 +131,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_authenticated'
+    | '/onboarding'
     | '/_auth/login'
-    | '/_auth/onboarding'
     | '/_auth/signup'
     | '/_authenticated/$orgSlug'
     | '/_authenticated/$orgSlug/athletes'
@@ -144,10 +144,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -183,13 +191,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/onboarding': {
-      id: '/_auth/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthOnboardingRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -223,13 +224,11 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthOnboardingRoute: typeof AuthOnboardingRoute
   AuthSignupRoute: typeof AuthSignupRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
-  AuthOnboardingRoute: AuthOnboardingRoute,
   AuthSignupRoute: AuthSignupRoute,
 }
 
@@ -266,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
