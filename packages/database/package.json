@@ -25,12 +25,11 @@
     "db:seed:plans": "tsx scripts/seed-plans.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.10.4",
-    "drizzle-orm": "^0.44.7"
+    "drizzle-orm": "^0.44.7",
+    "postgres": "^3.4.8"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.2",
-    "postgres": "^3.4.8",
     "tsx": "^4.21.0",
     "typescript": "^5.7.3"
   }
