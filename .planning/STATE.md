@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 7 of TBD in current phase
+Plan: 8 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-07-PLAN.md (Athlete Invitation Use Cases)
+Last activity: 2026-01-24 - Completed 02-08-PLAN.md (Exercise Use Cases)
 
-Progress: [=======---] Phase 2 progressing
+Progress: [========--] Phase 2 progressing
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 6 min
-- Total execution time: 82 min
+- Total plans completed: 15
+- Average duration: 5 min
+- Total execution time: 86 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 7/TBD | 16 min | 2 min |
+| 2 | 8/TBD | 20 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (2 min), 02-04 (2 min), 02-05 (2 min), 02-06 (4 min), 02-07 (4 min)
+- Last 5 plans: 02-04 (2 min), 02-05 (2 min), 02-06 (4 min), 02-07 (4 min), 02-08 (4 min)
 - Trend: Phase 2 use case layers executing efficiently
 
 *Updated after each plan completion*
@@ -61,6 +61,8 @@ Recent decisions affecting current work:
 - **Update merges with existing** - Update use cases merge input with existing entity before validation
 - **OrganizationLookup interface** - Simplified interface for name resolution in public endpoints
 - **Token-based public endpoints** - Accept/get-info use token as credential, no OrganizationContext
+- **Clone provenance tracking** - Clone stores clonedFromId to track source exercise
+- **Access control returns not_found** - Unauthorized access returns not_found to prevent information leakage
 
 ### Pending Todos
 
@@ -85,7 +87,8 @@ None.
 | 02-05 | Exercise Repositories | Complete |
 | 02-06 | Athlete Use Cases | Complete |
 | 02-07 | Athlete Invitation Use Cases | Complete |
-| 02-08 | Contracts & Procedures | Pending |
+| 02-08 | Exercise Use Cases | Complete |
+| 02-09 | Contracts & Procedures | Pending |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/athletes.ts` - Athletes table schema
@@ -116,11 +119,17 @@ None.
 - `packages/backend/src/use-cases/athletes/accept-invitation.ts` - Accept invitation, link user
 - `packages/backend/src/use-cases/athletes/get-invitation-info.ts` - Public invite info lookup
 - `packages/backend/src/use-cases/athletes/revoke-invitation.ts` - Manual invitation revocation
+- `packages/backend/src/use-cases/exercises/create-exercise.ts` - Create custom exercise
+- `packages/backend/src/use-cases/exercises/clone-exercise.ts` - Clone exercise with provenance
+- `packages/backend/src/use-cases/exercises/list-exercises.ts` - List curated + custom exercises
+- `packages/backend/src/use-cases/exercises/get-exercise.ts` - Get exercise with access control
+- `packages/backend/src/use-cases/exercises/update-exercise.ts` - Update custom exercises only
+- `packages/backend/src/use-cases/exercises/archive-exercise.ts` - Soft delete via archivedAt
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-07-PLAN.md (Athlete Invitation Use Cases)
+Stopped at: Completed 02-08-PLAN.md (Exercise Use Cases)
 Resume file: None
 
-**Next:** Continue Phase 2 - Contracts & Procedures (02-08)
+**Next:** Continue Phase 2 - Contracts & Procedures (02-09)
