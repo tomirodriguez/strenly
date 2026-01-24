@@ -8,7 +8,13 @@
     "./common/errors": "./src/common/errors.ts",
     "./common/roles": "./src/common/roles.ts",
     "./subscriptions/plan": "./src/subscriptions/plan.ts",
-    "./subscriptions/subscription": "./src/subscriptions/subscription.ts"
+    "./subscriptions/subscription": "./src/subscriptions/subscription.ts",
+    "./exercises": "./src/exercises/index.ts",
+    "./exercises/exercise": "./src/exercises/exercise.ts",
+    "./exercises/muscle-group": "./src/exercises/muscle-group.ts",
+    "./athletes": "./src/athletes/index.ts",
+    "./athletes/athlete": "./src/athletes/athlete.ts",
+    "./athletes/invitation": "./src/athletes/invitation.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
