@@ -4,11 +4,11 @@
  */
 
 // Export RouterClient type for frontend consumption
-export type { RouterClient } from "@orpc/server";
-export { type AppType, app } from "./app";
-export { authProcedure, publicProcedure, sessionProcedure } from "./lib/orpc";
-export { type Router, router } from "./procedures/router";
+export type { RouterClient } from '@orpc/server'
+export { type AppType, app } from './app'
+export { authProcedure, publicProcedure, sessionProcedure } from './lib/orpc'
+export { type Router, router } from './procedures/router'
 
 // Default export for Cloudflare Workers
-import { app } from "./app";
-export default app;
+import { app } from './app'
+export default app

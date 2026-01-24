@@ -1,128 +1,87 @@
-import { RPCHandler } from "@orpc/server/fetch";
-import { createAuth } from "@strenly/auth";
-import { createDb } from "@strenly/database";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import type { BaseContext } from "./lib/context";
-import { router } from "./procedures/router";
+import { RPCHandler } from '@orpc/server/fetch'
+import { createAuth } from '@strenly/auth'
+import { createDb } from '@strenly/database'
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+import type { BaseContext } from './lib/context'
+import { router } from './procedures/router'
 
 type Env = {
-	DATABASE_URL: string;
-	BETTER_AUTH_SECRET: string;
-	BETTER_AUTH_URL: string;
-	GOOGLE_CLIENT_ID: string;
-	GOOGLE_CLIENT_SECRET: string;
-};
+  DATABASE_URL: string
+  BETTER_AUTH_SECRET: string
+  BETTER_AUTH_URL: string
+  GOOGLE_CLIENT_ID: string
+  GOOGLE_CLIENT_SECRET: string
+}
 
-type Variables = {
-	db: ReturnType<typeof createDb>;
-	auth: ReturnType<typeof createAuth>;
-};
+const app = new Hono<{ Bindings: Env }>()
 
-const app = new Hono<{ Bindings: Env; Variables: Variables }>();
+// Trusted origins for CORS
+const TRUSTED_ORIGINS = ['http://localhost:5173', 'http://localhost:5174']
 
-// CORS must be first - allows credentials for cookie-based auth
+// Single CORS middleware for all routes
 app.use(
-	"/api/*",
-	cors({
-		origin: (origin) => {
-			// Allow localhost for development
-			if (origin.includes("localhost")) return origin;
-			// Allow production domains
-			if (origin.endsWith(".strenly.com.ar")) return origin;
-			return null;
-		},
-		credentials: true,
-		allowHeaders: ["Content-Type", "Authorization", "X-Organization-Slug"],
-		allowMethods: ["POST", "GET", "OPTIONS"],
-	}),
-);
+  '*',
+  cors({
+    origin: TRUSTED_ORIGINS,
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Organization-Slug'],
+    allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  }),
+)
 
-// CORS for RPC endpoints
-app.use(
-	"/rpc/*",
-	cors({
-		origin: (origin) => {
-			// Allow localhost for development
-			if (origin.includes("localhost")) return origin;
-			// Allow production domains
-			if (origin.endsWith(".strenly.com.ar")) return origin;
-			return null;
-		},
-		credentials: true,
-		allowHeaders: ["Content-Type", "Authorization", "X-Organization-Slug"],
-		allowMethods: ["POST", "GET", "OPTIONS"],
-	}),
-);
+// Health check endpoint
+app.get('/health', (c) => {
+  return c.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
 
-// Infrastructure middleware - creates db and auth per request
-app.use("/api/*", async (c, next) => {
-	const db = createDb(c.env.DATABASE_URL);
-	c.set("db", db);
+// Better Auth handler - creates db/auth inline per request
+app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
+  const db = createDb(c.env.DATABASE_URL)
+  const auth = createAuth(
+    {
+      BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET,
+      BETTER_AUTH_URL: c.env.BETTER_AUTH_URL,
+      GOOGLE_CLIENT_ID: c.env.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: c.env.GOOGLE_CLIENT_SECRET,
+    },
+    db,
+  )
+  return auth.handler(c.req.raw)
+})
 
-	const auth = createAuth(
-		{
-			BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET,
-			BETTER_AUTH_URL: c.env.BETTER_AUTH_URL,
-			GOOGLE_CLIENT_ID: c.env.GOOGLE_CLIENT_ID,
-			GOOGLE_CLIENT_SECRET: c.env.GOOGLE_CLIENT_SECRET,
-		},
-		db,
-	);
-	c.set("auth", auth);
+// oRPC handler
+const rpcHandler = new RPCHandler(router)
 
-	await next();
-});
+app.use('/rpc/*', async (c, next) => {
+  const db = createDb(c.env.DATABASE_URL)
+  const auth = createAuth(
+    {
+      BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET,
+      BETTER_AUTH_URL: c.env.BETTER_AUTH_URL,
+      GOOGLE_CLIENT_ID: c.env.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: c.env.GOOGLE_CLIENT_SECRET,
+    },
+    db,
+  )
 
-// Infrastructure middleware for RPC endpoints
-app.use("/rpc/*", async (c, next) => {
-	const db = createDb(c.env.DATABASE_URL);
-	c.set("db", db);
+  const context: BaseContext = {
+    db,
+    auth,
+    headers: c.req.raw.headers,
+  }
 
-	const auth = createAuth(
-		{
-			BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET,
-			BETTER_AUTH_URL: c.env.BETTER_AUTH_URL,
-			GOOGLE_CLIENT_ID: c.env.GOOGLE_CLIENT_ID,
-			GOOGLE_CLIENT_SECRET: c.env.GOOGLE_CLIENT_SECRET,
-		},
-		db,
-	);
-	c.set("auth", auth);
+  const { matched, response } = await rpcHandler.handle(c.req.raw, {
+    prefix: '/rpc',
+    context,
+  })
 
-	await next();
-});
+  if (matched) {
+    return c.newResponse(response.body, response)
+  }
 
-// Mount Better-Auth handler
-app.on(["POST", "GET"], "/api/auth/*", (c) => {
-	const auth = c.get("auth");
-	return auth.handler(c.req.raw);
-});
+  await next()
+})
 
-// Mount oRPC handler
-const rpcHandler = new RPCHandler(router);
-
-app.use("/rpc/*", async (c, next) => {
-	const db = c.get("db");
-	const auth = c.get("auth");
-
-	const context: BaseContext = {
-		db,
-		auth,
-		headers: c.req.raw.headers,
-	};
-
-	const { matched, response } = await rpcHandler.handle(c.req.raw, {
-		prefix: "/rpc",
-		context,
-	});
-
-	if (matched) {
-		return c.newResponse(response.body, response);
-	}
-
-	await next();
-});
-
-export { app };
-export type AppType = typeof app;
+export { app }
+export type AppType = typeof app

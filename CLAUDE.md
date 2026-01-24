@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Strenly is a training planning platform for strength coaches. It provides:
-- **Coach Web App**: Desktop-first SPA with Excel-like inline editing, keyboard navigation, dark mode
+- **Coach Web App**: Desktop-first SPA with Excel-like inline editing, keyboard navigation
 - **Athlete PWA**: Mobile-first PWA for viewing programs and logging workouts, light mode
 - **API**: Hono + oRPC on Cloudflare Workers
 - **Database**: Neon PostgreSQL with Drizzle ORM

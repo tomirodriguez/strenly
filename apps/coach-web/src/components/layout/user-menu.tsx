@@ -53,7 +53,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
-              <p className="font-medium text-sm leading-none">{user.name ?? 'User'}</p>
+              <p className="font-medium text-sm leading-none">{user.name ?? 'Usuario'}</p>
               <p className="text-muted-foreground text-xs leading-none">{user.email}</p>
             </div>
           </DropdownMenuLabel>
@@ -62,27 +62,27 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <SettingsIcon className="mr-2 size-4" />
-            <span>Settings</span>
+            <span>Configuracion</span>
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <MonitorIcon className="mr-2 size-4" />
-              <span>Theme</span>
+              <span>Tema</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme('light')}>
                 <SunIcon className="mr-2 size-4" />
-                <span>Light</span>
+                <span>Claro</span>
                 {theme === 'light' && <span className="ml-auto">✓</span>}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('dark')}>
                 <MoonIcon className="mr-2 size-4" />
-                <span>Dark</span>
+                <span>Oscuro</span>
                 {theme === 'dark' && <span className="ml-auto">✓</span>}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('system')}>
                 <MonitorIcon className="mr-2 size-4" />
-                <span>System</span>
+                <span>Sistema</span>
                 {theme === 'system' && <span className="ml-auto">✓</span>}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
@@ -91,7 +91,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <LogOutIcon className="mr-2 size-4" />
-          <span>Log out</span>
+          <span>Cerrar sesion</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

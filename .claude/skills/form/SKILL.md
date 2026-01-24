@@ -1,30 +1,39 @@
 ---
 name: form
 description: |
-  This skill provides patterns for creating forms with React Hook Form + shadcn/ui Field component.
+  Provides patterns for creating forms with React Hook Form + shadcn/ui Field component.
   Use this skill when creating forms with validation, refactoring existing forms to use the Field pattern,
   or working with controlled components (Select, Checkbox) and field arrays.
   Do NOT load for general React questions, state management, or non-form UI components.
 version: 1.0.0
 ---
 
-# Form Skill
+<objective>
+Creates forms using React Hook Form + shadcn/ui Field component following best practices. Forms are pure UI components that receive callbacks from parents - they never contain mutations.
+</objective>
 
-Creates forms using React Hook Form + shadcn/ui Field component following best practices.
+<quick_start>
+```tsx
+import { useForm } from 'react-hook-form'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Field, FieldLabel } from '@/components/ui/field'
 
----
+const { register, handleSubmit, formState: { errors } } = useForm({
+  resolver: standardSchemaResolver(schema),
+  defaultValues: { name: '', email: '' },
+})
 
-## When to Use
+<form onSubmit={handleSubmit(onSubmit)}>
+  <Field errors={errors.name?.message ? [errors.name.message] : []}>
+    <FieldLabel>Nombre</FieldLabel>
+    <Input {...register('name')} />
+  </Field>
+</form>
+```
+</quick_start>
 
-- Creating any form with validation
-- User asks to build a form component
-- Refactoring existing forms
-
----
-
-## Core Rules
-
-### 1. Forms Are Pure UI
+<core_rules>
+**1. Forms Are Pure UI**
 
 Forms NEVER contain mutations. They receive callbacks from parent.
 
@@ -47,7 +56,7 @@ function BadForm() {
 }
 ```
 
-### 2. Use standardSchemaResolver (Zod 4)
+**2. Use standardSchemaResolver (Zod 4)**
 
 ```tsx
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -58,7 +67,7 @@ const { register, handleSubmit, formState: { errors } } = useForm({
 })
 ```
 
-### 3. Use Field Component (NOT Form wrapper)
+**3. Use Field Component (NOT Form wrapper)**
 
 shadcn/ui deprecated the old `Form` wrapper. Use `Field` component:
 
@@ -71,11 +80,9 @@ import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
   <FieldDescription>Optional help text</FieldDescription>
 </Field>
 ```
+</core_rules>
 
----
-
-## Template
-
+<template>
 ```tsx
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -143,11 +150,9 @@ export function MyForm({
   )
 }
 ```
+</template>
 
----
-
-## Usage with Mutation
-
+<mutation_usage>
 Parent component owns the mutation:
 
 ```tsx
@@ -173,13 +178,10 @@ function CreateUserDialog({ open, onOpenChange }: Props) {
   )
 }
 ```
+</mutation_usage>
 
----
-
-## Anti-Patterns
-
-### DON'T: useEffect for field sync
-
+<anti_patterns>
+**DON'T: useEffect for field sync**
 ```tsx
 // BAD
 useEffect(() => {
@@ -192,8 +194,7 @@ useEffect(() => {
 }, [data, reset])
 ```
 
-### DON'T: Abuse watch()
-
+**DON'T: Abuse watch()**
 ```tsx
 // BAD - re-renders on ANY change
 const allData = watch()
@@ -205,16 +206,12 @@ const type = watch('type')
 const type = useWatch({ control, name: 'type' })
 ```
 
-### DON'T: Mutations inside forms
-
+**DON'T: Mutations inside forms**
 Forms receive `onSubmit` and `isSubmitting` from parent.
+</anti_patterns>
 
----
-
-## Common Field Types
-
-### Select (with Controller)
-
+<controlled_components>
+**Select (with Controller)**
 ```tsx
 import { Controller } from 'react-hook-form'
 
@@ -238,8 +235,7 @@ import { Controller } from 'react-hook-form'
 </Field>
 ```
 
-### Checkbox (with Controller)
-
+**Checkbox (with Controller)**
 ```tsx
 <Field errors={errors.terms?.message ? [errors.terms.message] : []}>
   <div className="flex items-center gap-2">
@@ -255,19 +251,16 @@ import { Controller } from 'react-hook-form'
 </Field>
 ```
 
-### Textarea
-
+**Textarea**
 ```tsx
 <Field errors={errors.description?.message ? [errors.description.message] : []}>
   <FieldLabel>Descripción</FieldLabel>
   <Textarea rows={4} {...register('description')} />
 </Field>
 ```
+</controlled_components>
 
----
-
-## Conditional Fields
-
+<conditional_fields>
 ```tsx
 const type = watch('type')
 
@@ -278,11 +271,9 @@ const type = watch('type')
   </Field>
 )}
 ```
+</conditional_fields>
 
----
-
-## Dynamic Arrays
-
+<field_arrays>
 ```tsx
 import { useFieldArray } from 'react-hook-form'
 
@@ -307,11 +298,9 @@ const { fields, append, remove } = useFieldArray({
   Agregar
 </Button>
 ```
+</field_arrays>
 
----
-
-## FieldSet for Grouping
-
+<fieldset_grouping>
 ```tsx
 import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 
@@ -329,11 +318,21 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
   </FieldGroup>
 </FieldSet>
 ```
+</fieldset_grouping>
 
----
+<success_criteria>
+When creating a form:
 
-## See Also
+- [ ] Form receives `onSubmit`, `onCancel`, `isSubmitting`, `defaultValues` as props
+- [ ] Uses `standardSchemaResolver` with Zod schema
+- [ ] Uses `Field` component (not deprecated Form wrapper)
+- [ ] No mutations inside the form component
+- [ ] Controlled components use `Controller` from react-hook-form
+- [ ] Error messages display correctly for each field
+</success_criteria>
 
+<resources>
 - `references/react-hook-form-guide.md` - Complete documentation
 - `/contracts` skill - Zod schema patterns
 - `/mutation-errors` skill - Error handling
+</resources>

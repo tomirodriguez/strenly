@@ -43,12 +43,19 @@ export type Athlete = z.infer<typeof athleteSchema>
  * Used when creating a new athlete
  */
 export const createAthleteInputSchema = z.object({
-  name: z.string().min(1, { message: 'El nombre es obligatorio' }).max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
+  name: z
+    .string()
+    .min(1, { message: 'El nombre es obligatorio' })
+    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
   email: z.string().email({ message: 'Por favor ingresa un correo electronico valido' }).optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   birthdate: z.string().optional().or(z.literal('')),
   gender: genderSchema.optional(),
-  notes: z.string().max(1000, { message: 'Las notas no pueden superar los 1000 caracteres' }).optional().or(z.literal('')),
+  notes: z
+    .string()
+    .max(1000, { message: 'Las notas no pueden superar los 1000 caracteres' })
+    .optional()
+    .or(z.literal('')),
 })
 
 export type CreateAthleteInput = z.infer<typeof createAthleteInputSchema>

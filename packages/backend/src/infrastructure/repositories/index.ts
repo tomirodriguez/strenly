@@ -5,14 +5,14 @@
  * as it aggregates repository factories for dependency injection.
  */
 
-export { createAthleteRepository } from "./athlete.repository";
-export { createAthleteInvitationRepository } from "./athlete-invitation.repository";
-export { createExerciseRepository } from "./exercise.repository";
+export { createAthleteRepository } from './athlete.repository'
+export { createAthleteInvitationRepository } from './athlete-invitation.repository'
+export { createExerciseRepository } from './exercise.repository'
 export {
-	createMuscleGroupRepository,
-	type MuscleGroupData,
-	type MuscleGroupRepository,
-	type MuscleGroupRepositoryError,
-} from "./muscle-group.repository";
-export { createPlanRepository } from "./plan.repository";
-export { createSubscriptionRepository } from "./subscription.repository";
+  createMuscleGroupRepository,
+  type MuscleGroupData,
+  type MuscleGroupRepository,
+  type MuscleGroupRepositoryError,
+} from './muscle-group.repository'
+export { createPlanRepository } from './plan.repository'
+export { createSubscriptionRepository } from './subscription.repository'

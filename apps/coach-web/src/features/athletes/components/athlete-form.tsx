@@ -35,25 +35,25 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <Field>
         <FieldLabel htmlFor="name">
-          Name <span className="text-destructive">*</span>
+          Nombre <span className="text-destructive">*</span>
         </FieldLabel>
         <FieldContent>
-          <Input id="name" {...register('name')} placeholder="Enter athlete name" />
+          <Input id="name" {...register('name')} placeholder="Ingresa el nombre del atleta" />
           <FieldError errors={[errors.name]} />
         </FieldContent>
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
         <FieldContent>
-          <Input id="email" type="email" {...register('email')} placeholder="athlete@example.com" />
-          <FieldDescription>Optional. Used for sending invitations to the athlete app.</FieldDescription>
+          <Input id="email" type="email" {...register('email')} placeholder="atleta@ejemplo.com" />
+          <FieldDescription>Opcional. Se usa para enviar invitaciones a la app de atletas.</FieldDescription>
           <FieldError errors={[errors.email]} />
         </FieldContent>
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="phone">Phone</FieldLabel>
+        <FieldLabel htmlFor="phone">Telefono</FieldLabel>
         <FieldContent>
           <Input id="phone" {...register('phone')} placeholder="+1 (555) 000-0000" />
           <FieldError errors={[errors.phone]} />
@@ -61,7 +61,7 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="birthdate">Birthdate</FieldLabel>
+        <FieldLabel htmlFor="birthdate">Fecha de nacimiento</FieldLabel>
         <FieldContent>
           <Input id="birthdate" type="date" {...register('birthdate')} />
           <FieldError errors={[errors.birthdate]} />
@@ -69,19 +69,19 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="gender">Gender</FieldLabel>
+        <FieldLabel htmlFor="gender">Genero</FieldLabel>
         <FieldContent>
           <Select
             value={genderValue ?? ''}
             onValueChange={(value) => setValue('gender', value as 'male' | 'female' | 'other')}
           >
             <SelectTrigger id="gender">
-              <SelectValue placeholder="Select gender" />
+              <SelectValue placeholder="Seleccionar genero" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="male">Masculino</SelectItem>
+              <SelectItem value="female">Femenino</SelectItem>
+              <SelectItem value="other">Otro</SelectItem>
             </SelectContent>
           </Select>
           <FieldError errors={[errors.gender]} />
@@ -89,12 +89,12 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="notes">Notes</FieldLabel>
+        <FieldLabel htmlFor="notes">Notas</FieldLabel>
         <FieldContent>
           <Textarea
             id="notes"
             {...register('notes')}
-            placeholder="Any additional notes about the athlete..."
+            placeholder="Notas adicionales sobre el atleta..."
             rows={4}
           />
           <FieldError errors={[errors.notes]} />

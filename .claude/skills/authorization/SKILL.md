@@ -1,40 +1,42 @@
 ---
 name: authorization
 description: |
-  This skill provides guidance for implementing role-based access control (RBAC).
+  Provides guidance for implementing role-based access control (RBAC).
   Use this skill when adding permission checks to use cases, restricting actions by role,
   checking if a user can perform an action, or adding new permissions to the system.
   Do NOT load for authentication flows, login/logout, session management, or JWT/token handling.
 version: 1.0.0
 ---
 
-# Authorization
+<objective>
+Implements role-based access control using pure functions from the core services layer. Defines roles, permissions, and the hasPermission check pattern for use cases.
+</objective>
 
-Role-based access control using pure functions from the core services layer.
+<quick_start>
+1. Import `hasPermission` from authorization service
+2. Add `memberRole: Role` to use case input type
+3. Check permission FIRST in the use case (before any logic)
+4. Add `FORBIDDEN` error to procedure and map it
 
-## When to Use
+```typescript
+import { hasPermission, type Role } from '@/core/services/authorization'
 
-- Adding permission checks to a use case
-- Restricting actions by user role
-- Checking if a role can perform an action
-- Adding new permissions to the system
-- Understanding which roles have which permissions
+if (!hasPermission(input.memberRole, 'users:write')) {
+  return errAsync({ type: 'forbidden', message: 'No permission' })
+}
+```
+</quick_start>
 
-## Location
-
-Authorization logic lives in `src/core/services/authorization.ts` as pure functions (no interface injection needed).
-
-## Roles Hierarchy Example
-
+<roles_hierarchy>
 | Role | Level | Description |
 |------|-------|-------------|
 | `owner` | 100 | Full access including billing and org deletion |
 | `admin` | 80 | Manage members and resources, no billing |
 | `member` | 40 | Standard access to resources |
 | `viewer` | 20 | Read-only access |
+</roles_hierarchy>
 
-## Using Authorization in Use Cases
-
+<use_case_pattern>
 Import the `hasPermission` function directly (not injected):
 
 ```typescript
@@ -70,9 +72,9 @@ export const makeMyUseCase =
     return deps.repository.find(...)
   }
 ```
+</use_case_pattern>
 
-## Passing Member Info from Procedure
-
+<procedure_pattern>
 The procedure passes member info from the authenticated context:
 
 ```typescript
@@ -85,8 +87,6 @@ const result = await makeMyUseCase({
   // ... other input
 })
 ```
-
-## Handling Forbidden in Procedure
 
 Add `FORBIDDEN` to the procedure's error definitions:
 
@@ -114,18 +114,18 @@ export const myProcedure = authProcedure
     return result.value
   })
 ```
+</procedure_pattern>
 
-## Available Permissions Example
-
+<permissions_reference>
 | Resource | Permissions |
 |----------|-------------|
 | Users | `users:read`, `users:write`, `users:delete` |
 | Organization | `organization:read`, `organization:manage`, `organization:delete` |
 | Members | `members:read`, `members:invite`, `members:remove` |
 | Billing | `billing:read`, `billing:manage` |
+</permissions_reference>
 
-## Adding New Permissions
-
+<adding_permissions>
 1. Add to `Permission` type in `src/core/services/authorization.ts`:
    ```typescript
    export type Permission =
@@ -162,13 +162,9 @@ export const myProcedure = authProcedure
      return errAsync({ type: 'forbidden', message: '...' })
    }
    ```
+</adding_permissions>
 
-## Implementation Example
-
-For full implementation code, see `references/implementation-example.md`.
-
-Core functions:
-
+<core_functions>
 ```typescript
 // src/core/services/authorization.ts
 export type Role = 'owner' | 'admin' | 'member' | 'viewer'
@@ -178,16 +174,16 @@ export const hasPermission = (role: Role, permission: Permission): boolean
 export const getPermissions = (role: Role): readonly Permission[]
 export const hasHigherOrEqualRole = (role: Role, targetRole: Role): boolean
 ```
+</core_functions>
 
-## Key Patterns
-
+<key_patterns>
 1. **Authorization first**: Check permission before any business logic
 2. **Pure functions**: No dependency injection needed for authorization
 3. **Principle of least privilege**: Unknown roles default to lowest permissions
 4. **User-friendly messages**: Error messages should be clear
+</key_patterns>
 
-## Checklist
-
+<success_criteria>
 When adding authorization to a use case:
 
 - [ ] Import `hasPermission` from authorization service
@@ -196,3 +192,8 @@ When adding authorization to a use case:
 - [ ] Check permission FIRST in the use case
 - [ ] Add `FORBIDDEN` error to procedure
 - [ ] Map `forbidden` error to `errors.FORBIDDEN()` in procedure
+</success_criteria>
+
+<resources>
+For full implementation code, see `references/implementation-example.md`.
+</resources>

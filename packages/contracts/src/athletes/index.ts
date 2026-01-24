@@ -4,26 +4,26 @@
  */
 
 export {
-	type Athlete,
-	type AthleteGender,
-	type AthleteStatus,
-	athleteSchema,
-	athleteStatusSchema,
-	type CreateAthleteInput,
-	createAthleteInputSchema,
-	genderSchema,
-	type ListAthletesInput,
-	type ListAthletesOutput,
-	listAthletesInputSchema,
-	listAthletesOutputSchema,
-	type UpdateAthleteInput,
-	updateAthleteInputSchema,
-} from "./athlete";
+  type Athlete,
+  type AthleteGender,
+  type AthleteStatus,
+  athleteSchema,
+  athleteStatusSchema,
+  type CreateAthleteInput,
+  createAthleteInputSchema,
+  genderSchema,
+  type ListAthletesInput,
+  type ListAthletesOutput,
+  listAthletesInputSchema,
+  listAthletesOutputSchema,
+  type UpdateAthleteInput,
+  updateAthleteInputSchema,
+} from './athlete'
 export {
-	type AcceptInvitationOutput,
-	acceptInvitationOutputSchema,
-	type GenerateInvitationOutput,
-	generateInvitationOutputSchema,
-	type InvitationInfo,
-	invitationInfoSchema,
-} from "./invitation";
+  type AcceptInvitationOutput,
+  acceptInvitationOutputSchema,
+  type GenerateInvitationOutput,
+  generateInvitationOutputSchema,
+  type InvitationInfo,
+  invitationInfoSchema,
+} from './invitation'

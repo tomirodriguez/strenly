@@ -1,10 +1,10 @@
-import { archiveExercise } from "./archive-exercise";
-import { cloneExercise } from "./clone-exercise";
-import { createExercise } from "./create-exercise";
-import { getExercise } from "./get-exercise";
-import { listExercises } from "./list-exercises";
-import { listMuscleGroups } from "./list-muscle-groups";
-import { updateExercise } from "./update-exercise";
+import { archiveExercise } from './archive-exercise'
+import { cloneExercise } from './clone-exercise'
+import { createExercise } from './create-exercise'
+import { getExercise } from './get-exercise'
+import { listExercises } from './list-exercises'
+import { listMuscleGroups } from './list-muscle-groups'
+import { updateExercise } from './update-exercise'
 
 /**
  * Exercises router
@@ -20,11 +20,11 @@ import { updateExercise } from "./update-exercise";
  * - muscleGroups: List all muscle groups
  */
 export const exercises = {
-	create: createExercise,
-	list: listExercises,
-	get: getExercise,
-	update: updateExercise,
-	archive: archiveExercise,
-	clone: cloneExercise,
-	muscleGroups: listMuscleGroups,
-};
+  create: createExercise,
+  list: listExercises,
+  get: getExercise,
+  update: updateExercise,
+  archive: archiveExercise,
+  clone: cloneExercise,
+  muscleGroups: listMuscleGroups,
+}

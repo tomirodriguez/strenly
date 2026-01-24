@@ -1,18 +1,30 @@
 ---
 name: create-auth-skill
-description: Skill for creating auth layers in TypeScript/JavaScript apps using Better Auth.
+description: Guides Better Auth integration for TypeScript/JavaScript applications. Use when adding authentication to new projects, migrating from other auth systems, or configuring advanced features like OAuth, 2FA, and organization support.
 ---
 
-# Create Auth Skill
+<objective>
+Guides integration of Better Auth authentication into TypeScript/JavaScript applications. Handles new project setup, adding auth to existing projects, and migration from other auth systems. Provides database adapter configuration, plugin integration, and security best practices.
+</objective>
 
-Guide for adding authentication to TypeScript/JavaScript applications using Better Auth.
+<quick_start>
+1. Install: `npm install better-auth`
+2. Set environment variables:
+   ```env
+   BETTER_AUTH_SECRET=<32+ chars, generate with: openssl rand -base64 32>
+   BETTER_AUTH_URL=http://localhost:3000
+   DATABASE_URL=<your database connection string>
+   ```
+3. Create `lib/auth.ts` with database + `emailAndPassword: { enabled: true }`
+4. Create `lib/auth-client.ts` with framework-specific import
+5. Set up route handler (framework-specific)
+6. Run: `npx @better-auth/cli@latest migrate`
+7. Implement sign-in UI with `signIn.email()`
 
-**For code examples and syntax, see [better-auth.com/docs](https://better-auth.com/docs).**
+See [better-auth.com/docs](https://better-auth.com/docs) for code examples.
+</quick_start>
 
----
-
-## Decision Tree
-
+<routing>
 ```
 Is this a new/empty project?
 ├─ YES → New project setup
@@ -38,11 +50,9 @@ Is this a new/empty project?
         5. Run schema migrations
         6. Integrate into existing pages
 ```
+</routing>
 
----
-
-## Installation
-
+<installation>
 **Core:** `npm install better-auth`
 
 **Scoped packages (as needed):**
@@ -54,22 +64,10 @@ Is this a new/empty project?
 | `@better-auth/scim` | SCIM user provisioning |
 | `@better-auth/expo` | React Native/Expo |
 
----
-
-## Environment Variables
-
-```env
-BETTER_AUTH_SECRET=<32+ chars, generate with: openssl rand -base64 32>
-BETTER_AUTH_URL=http://localhost:3000
-DATABASE_URL=<your database connection string>
-```
-
 Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, etc.
+</installation>
 
----
-
-## Server Config (auth.ts)
-
+<server_config>
 **Location:** `lib/auth.ts` or `src/lib/auth.ts`
 
 **Minimal config needs:**
@@ -88,11 +86,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 - `rateLimit` - Rate limiting config
 
 **Export types:** `export type Session = typeof auth.$Infer.Session`
+</server_config>
 
----
-
-## Client Config (auth-client.ts)
-
+<client_config>
 **Import by framework:**
 | Framework | Import |
 |-----------|--------|
@@ -105,11 +101,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 **Client plugins** go in `createAuthClient({ plugins: [...] })`.
 
 **Common exports:** `signIn`, `signUp`, `signOut`, `useSession`, `getSession`
+</client_config>
 
----
-
-## Route Handler Setup
-
+<route_handlers>
 | Framework | File | Handler |
 |-----------|------|---------|
 | Next.js App Router | `app/api/auth/[...all]/route.ts` | `toNextJsHandler(auth)` → export `{ GET, POST }` |
@@ -120,11 +114,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 | Hono | Route file | `auth.handler(c.req.raw)` |
 
 **Next.js Server Components:** Add `nextCookies()` plugin to auth config.
+</route_handlers>
 
----
-
-## Database Migrations
-
+<database_migrations>
 | Adapter | Command |
 |---------|---------|
 | Built-in Kysely | `npx @better-auth/cli@latest migrate` (applies directly) |
@@ -132,11 +124,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 | Drizzle | `npx @better-auth/cli@latest generate --output src/db/auth-schema.ts` then `npx drizzle-kit push` |
 
 **Re-run after adding plugins.**
+</database_migrations>
 
----
-
-## Database Adapters
-
+<database_adapters>
 | Database | Setup |
 |----------|-------|
 | SQLite | Pass `better-sqlite3` or `bun:sqlite` instance directly |
@@ -145,11 +135,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 | Prisma | `prismaAdapter(prisma, { provider: "postgresql" })` from `better-auth/adapters/prisma` |
 | Drizzle | `drizzleAdapter(db, { provider: "pg" })` from `better-auth/adapters/drizzle` |
 | MongoDB | `mongodbAdapter(db)` from `better-auth/adapters/mongodb` |
+</database_adapters>
 
----
-
-## Common Plugins
-
+<plugins>
 | Plugin | Server Import | Client Import | Purpose |
 |--------|---------------|---------------|---------|
 | `twoFactor` | `better-auth/plugins` | `twoFactorClient` | 2FA with TOTP/OTP |
@@ -161,11 +149,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 | `sso` | `@better-auth/sso` | - | Enterprise SSO |
 
 **Plugin pattern:** Server plugin + client plugin + run migrations.
+</plugins>
 
----
-
-## Auth UI Implementation
-
+<auth_ui>
 **Sign in flow:**
 1. `signIn.email({ email, password })` or `signIn.social({ provider, callbackURL })`
 2. Handle `error` in response
@@ -176,11 +162,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 **Session check (server):** `auth.api.getSession({ headers: await headers() })`
 
 **Protected routes:** Check session, redirect to `/sign-in` if null.
+</auth_ui>
 
----
-
-## Security Checklist
-
+<security_checklist>
 - [ ] `BETTER_AUTH_SECRET` set (32+ chars)
 - [ ] `advanced.useSecureCookies: true` in production
 - [ ] `trustedOrigins` configured
@@ -190,11 +174,9 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 - [ ] 2FA for sensitive apps
 - [ ] CSRF protection NOT disabled
 - [ ] `account.accountLinking` reviewed
+</security_checklist>
 
----
-
-## Troubleshooting
-
+<error_handling>
 | Issue | Fix |
 |-------|-----|
 | "Secret not set" | Add `BETTER_AUTH_SECRET` env var |
@@ -202,13 +184,23 @@ Add OAuth secrets as needed: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE
 | Cookies not setting | Check `baseURL` matches domain; enable secure cookies in prod |
 | OAuth callback errors | Verify redirect URIs in provider dashboard |
 | Type errors after adding plugin | Re-run CLI generate/migrate |
+</error_handling>
 
----
+<success_criteria>
+- [ ] `auth.ts` exports configured `betterAuth()` instance
+- [ ] `auth-client.ts` exports framework-specific client
+- [ ] Route handler responds at `/api/auth/*`
+- [ ] Database tables created (user, session, account, verification)
+- [ ] Environment variables set (BETTER_AUTH_SECRET, BETTER_AUTH_URL, DATABASE_URL)
+- [ ] Sign-in flow completes successfully
+- [ ] `useSession()` returns session data after authentication
+- [ ] Security checklist items addressed
+</success_criteria>
 
-## Resources
-
+<resources>
 - [Docs](https://better-auth.com/docs)
 - [Examples](https://github.com/better-auth/examples)
 - [Plugins](https://better-auth.com/docs/concepts/plugins)
 - [CLI](https://better-auth.com/docs/concepts/cli)
 - [Migration Guides](https://better-auth.com/docs/guides)
+</resources>

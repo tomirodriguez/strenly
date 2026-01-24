@@ -1,26 +1,28 @@
 ---
 name: port
 description: |
-  This skill provides guidance for creating repository ports (interfaces) in Clean Architecture.
+  Provides guidance for creating repository ports (interfaces) in Clean Architecture.
   Use this skill when defining data access contracts, creating repository interfaces,
   or working with OrganizationContext for multi-tenancy.
   Do NOT load for repository implementations (use /repository), use case logic, or API contracts.
 version: 1.0.0
 ---
 
-# Port
+<objective>
+Defines repository contracts (interfaces) that implementations must follow. Ports are the core layer interfaces that ensure proper multi-tenancy, error handling, and pagination support.
+</objective>
 
-Ports define contracts (interfaces) that repositories must implement. They are the core layer interfaces.
+<quick_start>
+1. Create file at `packages/core/src/ports/{entity}-repository.port.ts`
+2. Define entity type with all fields
+3. Define `Create{Entity}Data` and `Update{Entity}Data` types
+4. Define `List{Entities}Options` with **limit and offset (REQUIRED)**
+5. Define `List{Entities}Result` with **totalCount (REQUIRED)**
+6. All methods receive `OrganizationContext` (for tenant-scoped entities)
+7. All methods return `ResultAsync<T, RepositoryError>`
+</quick_start>
 
-## When to Use
-
-- Defining a new repository interface
-- Adding methods to an existing repository port
-- Understanding multi-tenancy with OrganizationContext
-- Working with RepositoryError and ResultAsync types
-
-## Location
-
+<location>
 ```
 {project_root}/
 ├── src/core/ports/              # or packages/core/src/ports/
@@ -29,9 +31,9 @@ Ports define contracts (interfaces) that repositories must implement. They are t
 │   ├── organization-repository.ts
 │   └── ...
 ```
+</location>
 
-## Base Types
-
+<base_types>
 Located at `src/core/ports/types.ts`:
 
 ```typescript
@@ -86,9 +88,9 @@ export type PaginatedResult<T> = {
  */
 export type RepositoryResult<T> = ResultAsync<T, RepositoryError>
 ```
+</base_types>
 
-## Repository Port Structure
-
+<port_template>
 ```typescript
 // src/core/ports/user-repository.ts
 import type { ResultAsync } from 'neverthrow'
@@ -186,26 +188,9 @@ export type UserRepository = {
   existsByEmail: (ctx: OrganizationContext, email: string, excludeId?: string) => ResultAsync<boolean, RepositoryError>
 }
 ```
+</port_template>
 
-## Key Patterns
-
-1. **Data types are exported**: Use cases import these types
-2. **Return `null` for not found**: Don't throw or return error for missing items
-3. **All methods receive `OrganizationContext`**: Multi-tenancy enforcement
-4. **Use `ResultAsync<T, RepositoryError>`**: Consistent error handling
-5. **JSDoc comments**: Explain what each method returns and when
-6. **Separate input types**: `CreateUserData`, `UpdateUserData` are distinct
-
-## Import Pattern
-
-```typescript
-// In use cases
-import type { User, UserRepository } from '@/core/ports/user-repository'
-import type { OrganizationContext, RepositoryError, Pagination } from '@/core/ports/types'
-```
-
-## Method Naming Conventions
-
+<method_naming>
 | Pattern | Example | Returns |
 |---------|---------|---------|
 | `findById` | `findById(ctx, id)` | `T \| null` |
@@ -215,17 +200,17 @@ import type { OrganizationContext, RepositoryError, Pagination } from '@/core/po
 | `update` | `update(ctx, id, data)` | `T \| null` |
 | `softDelete` | `softDelete(ctx, id)` | `void` |
 | `existsBy{X}` | `existsByEmail(ctx, email)` | `boolean` |
+</method_naming>
 
-## Pagination Requirements (CRITICAL)
-
+<pagination_requirements>
 **ALL `findAll` methods MUST support pagination and return `totalCount`.**
 
-### Why This Is Required
+**Why This Is Required:**
 - The frontend uses `DataTable.Pagination` which REQUIRES `totalCount`
 - Without pagination, the API loads ALL records (performance disaster)
 - Without `totalCount`, pagination controls cannot render
 
-### Required Types Pattern
+**Required Types Pattern:**
 ```typescript
 // Options type with REQUIRED pagination
 export type List{Entities}Options = {
@@ -244,16 +229,16 @@ export type List{Entities}Result = {
 }
 ```
 
-### Method Signature
+**Method Signature:**
 ```typescript
 findAll: (ctx: OrganizationContext, options: List{Entities}Options)
   => ResultAsync<List{Entities}Result, RepositoryError>
 ```
 
 **NEVER return just `T[]` from findAll.** Always return `{ items, totalCount }`.
+</pagination_requirements>
 
-## Global vs Tenant-Scoped Entities
-
+<tenant_scoping>
 **Tenant-Scoped** (require OrganizationContext):
 - Users, Members, Invitations
 - Project-specific data
@@ -275,9 +260,26 @@ type PlanRepository = {
   findById: (id: string) => ResultAsync<Plan | null, RepositoryError>
 }
 ```
+</tenant_scoping>
 
-## Checklist
+<key_patterns>
+1. **Data types are exported**: Use cases import these types
+2. **Return `null` for not found**: Don't throw or return error for missing items
+3. **All methods receive `OrganizationContext`**: Multi-tenancy enforcement
+4. **Use `ResultAsync<T, RepositoryError>`**: Consistent error handling
+5. **JSDoc comments**: Explain what each method returns and when
+6. **Separate input types**: `CreateUserData`, `UpdateUserData` are distinct
+</key_patterns>
 
+<imports_pattern>
+```typescript
+// In use cases
+import type { User, UserRepository } from '@/core/ports/user-repository'
+import type { OrganizationContext, RepositoryError, Pagination } from '@/core/ports/types'
+```
+</imports_pattern>
+
+<success_criteria>
 When creating a new port:
 
 - [ ] Define entity type with all fields
@@ -290,3 +292,4 @@ When creating a new port:
 - [ ] Add JSDoc comments explaining return values
 - [ ] Use `T | null` for single-item queries
 - [ ] **PAGINATION: `findAll` returns `{ items, totalCount }`, NOT `T[]`**
+</success_criteria>

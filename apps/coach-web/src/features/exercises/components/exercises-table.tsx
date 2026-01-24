@@ -22,12 +22,12 @@ function capitalize(str: string): string {
 const columns: ColumnDef<Exercise>[] = [
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: 'Nombre',
     cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
   },
   {
     id: 'muscles',
-    header: 'Muscles',
+    header: 'Musculos',
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
         <MuscleBadges muscles={row.original.primaryMuscles} variant="primary" />
@@ -37,7 +37,7 @@ const columns: ColumnDef<Exercise>[] = [
   },
   {
     accessorKey: 'movementPattern',
-    header: 'Pattern',
+    header: 'Patron',
     cell: ({ row }) =>
       row.original.movementPattern ? (
         capitalize(row.original.movementPattern)
@@ -47,10 +47,10 @@ const columns: ColumnDef<Exercise>[] = [
   },
   {
     id: 'type',
-    header: 'Type',
+    header: 'Tipo',
     cell: ({ row }) => (
       <Badge variant={row.original.isCurated ? 'default' : 'secondary'}>
-        {row.original.isCurated ? 'Curated' : 'Custom'}
+        {row.original.isCurated ? 'Curado' : 'Personalizado'}
       </Badge>
     ),
   },

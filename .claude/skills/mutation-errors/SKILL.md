@@ -8,12 +8,19 @@ description: |
 version: 1.0.0
 ---
 
-# Mutation Error Handling
+<objective>
+Defines the error handling pattern for mutations using oRPC/tRPC + TanStack Query. Provides consistent handling for UNAUTHORIZED redirects, typed error messages, and fallbacks.
+</objective>
 
-This skill defines the error handling pattern for mutations using oRPC/tRPC + TanStack Query.
+<quick_start>
+1. Create utility at `src/lib/api-errors.ts`
+2. Import `handleMutationError` in mutation hooks
+3. Add `onError` handler with `handleMutationError`
+4. For specific errors, check `isDefinedError` BEFORE `handleMutationError`
+5. Remove `onError` from component call-sites (hook handles errors)
+</quick_start>
 
-## Core Utility
-
+<core_utility>
 Create a utility at `src/lib/api-errors.ts`:
 
 ```typescript
@@ -56,10 +63,10 @@ export function handleMutationError(
 - `UNAUTHORIZED` → Shows "Session expired" toast and redirects to login
 - Other oRPC errors → Shows the error message from the procedure definition
 - Unknown errors → Shows the fallback message
+</core_utility>
 
-## Mutation Hook Pattern
-
-### Simple Case (most hooks)
+<mutation_hook_pattern>
+**Simple Case (most hooks):**
 
 ```typescript
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -81,7 +88,7 @@ export function useCreateUser() {
 }
 ```
 
-### With Procedure-Specific Error Handling
+**With Procedure-Specific Error Handling:**
 
 When you need to handle specific error codes differently (e.g., show upgrade modal for `LIMIT_EXCEEDED`):
 
@@ -118,9 +125,9 @@ export function useCreateUser() {
   })
 }
 ```
+</mutation_hook_pattern>
 
-## isDefinedError vs handleMutationError
-
+<function_comparison>
 | Function | Purpose | Type Safety |
 |----------|---------|-------------|
 | `isDefinedError(error)` | Check for procedure-specific typed errors | Yes - knows exact error codes |
@@ -131,9 +138,9 @@ export function useCreateUser() {
 **Pattern:**
 1. First check `isDefinedError` in the hook for procedure-specific handling
 2. Then call `handleMutationError` for common errors (UNAUTHORIZED, etc.)
+</function_comparison>
 
-## Component Usage
-
+<component_usage>
 Components only need `onSuccess` for component-specific behavior. Errors are handled by the hook:
 
 ```typescript
@@ -146,9 +153,9 @@ createUser(data, {
   // No onError needed - hook handles it
 })
 ```
+</component_usage>
 
-## handleMutationError Options
-
+<options_reference>
 ```typescript
 interface HandleMutationErrorOptions {
   /** Fallback message when error is not a defined oRPC error */
@@ -170,9 +177,9 @@ handleMutationError(error, {
   },
 })
 ```
+</options_reference>
 
-## Error Messages
-
+<backend_error_messages>
 Backend procedure errors should have user-friendly messages:
 
 ```typescript
@@ -186,9 +193,9 @@ export const createUser = authProcedure
 ```
 
 These messages are automatically shown by `handleMutationError`.
+</backend_error_messages>
 
-## Checklist
-
+<success_criteria>
 When creating a new mutation hook:
 
 - [ ] Import `handleMutationError` from `@/lib/api-errors`
@@ -197,3 +204,4 @@ When creating a new mutation hook:
 - [ ] If needed, check `isDefinedError` BEFORE `handleMutationError` for specific error handling
 - [ ] Remove any `onError` handlers from component call-sites (hook handles errors)
 - [ ] Keep `onSuccess` at call-site for component-specific behavior (toasts, close dialogs, etc.)
+</success_criteria>

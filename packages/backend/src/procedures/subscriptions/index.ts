@@ -1,5 +1,5 @@
-import { getSubscription } from "./get-subscription";
-import { listPlans } from "./list-plans";
+import { getSubscription } from './get-subscription'
+import { listPlans } from './list-plans'
 
 /**
  * Subscriptions router
@@ -10,6 +10,6 @@ import { listPlans } from "./list-plans";
  * - getSubscription: Auth endpoint to view current subscription
  */
 export const subscriptions = {
-	listPlans,
-	getSubscription,
-};
+  listPlans,
+  getSubscription,
+}

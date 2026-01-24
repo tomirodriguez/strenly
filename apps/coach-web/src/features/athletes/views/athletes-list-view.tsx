@@ -67,7 +67,7 @@ export function AthletesListView() {
   }
 
   const handleArchive = (athlete: Athlete) => {
-    if (window.confirm(`Are you sure you want to archive ${athlete.name}?`)) {
+    if (window.confirm(`Estas seguro de que quieres archivar a ${athlete.name}?`)) {
       archiveMutation.mutate({ athleteId: athlete.id })
     }
   }
@@ -114,12 +114,12 @@ export function AthletesListView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-2xl">Athletes</h1>
-          <p className="text-muted-foreground text-sm">Manage your athletes and send invitations</p>
+          <h1 className="font-bold text-2xl">Atletas</h1>
+          <p className="text-muted-foreground text-sm">Gestiona tus atletas y envia invitaciones</p>
         </div>
         <Button onClick={handleAddAthlete}>
           <Plus className="h-4 w-4" />
-          Add athlete
+          Agregar atleta
         </Button>
       </div>
 
@@ -133,7 +133,7 @@ export function AthletesListView() {
         isLoading={isLoading}
       >
         <DataTableToolbar>
-          <DataTableSearch value={search} onValueChange={setSearch} placeholder="Search athletes..." />
+          <DataTableSearch value={search} onValueChange={setSearch} placeholder="Buscar atletas..." />
           <Field orientation="horizontal" className="gap-2">
             <Checkbox
               id="show-archived"
@@ -141,7 +141,7 @@ export function AthletesListView() {
               onCheckedChange={(checked) => setShowArchived(checked === true)}
             />
             <FieldLabel htmlFor="show-archived" className="font-normal text-sm">
-              Show archived
+              Mostrar archivados
             </FieldLabel>
           </Field>
         </DataTableToolbar>
@@ -164,11 +164,11 @@ export function AthletesListView() {
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{editingAthlete ? 'Edit athlete' : 'Add new athlete'}</SheetTitle>
+            <SheetTitle>{editingAthlete ? 'Editar atleta' : 'Agregar nuevo atleta'}</SheetTitle>
             <SheetDescription>
               {editingAthlete
-                ? 'Update athlete information and generate invitations to the athlete app.'
-                : 'Create a new athlete profile. You can invite them to the athlete app later.'}
+                ? 'Actualiza la informacion del atleta y genera invitaciones a la app de atletas.'
+                : 'Crea un nuevo perfil de atleta. Puedes invitarlos a la app de atletas despues.'}
             </SheetDescription>
           </SheetHeader>
           <SheetBody>
@@ -191,10 +191,10 @@ export function AthletesListView() {
           </SheetBody>
           <SheetFooter>
             <Button type="button" variant="outline" onClick={handleFormCancel} disabled={isSubmitting}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" form="athlete-form" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : editingAthlete ? 'Update athlete' : 'Create athlete'}
+              {isSubmitting ? 'Guardando...' : editingAthlete ? 'Actualizar atleta' : 'Crear atleta'}
             </Button>
           </SheetFooter>
         </SheetContent>

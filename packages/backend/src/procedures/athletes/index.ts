@@ -1,11 +1,11 @@
-import { acceptInvitation } from "./accept-invitation";
-import { archiveAthlete } from "./archive-athlete";
-import { createAthlete } from "./create-athlete";
-import { generateInvitation } from "./generate-invitation";
-import { getAthlete } from "./get-athlete";
-import { getInvitationInfo } from "./get-invitation-info";
-import { listAthletes } from "./list-athletes";
-import { updateAthlete } from "./update-athlete";
+import { acceptInvitation } from './accept-invitation'
+import { archiveAthlete } from './archive-athlete'
+import { createAthlete } from './create-athlete'
+import { generateInvitation } from './generate-invitation'
+import { getAthlete } from './get-athlete'
+import { getInvitationInfo } from './get-invitation-info'
+import { listAthletes } from './list-athletes'
+import { updateAthlete } from './update-athlete'
 
 /**
  * Athletes router
@@ -22,12 +22,12 @@ import { updateAthlete } from "./update-athlete";
  * - invitationInfo: Get invitation info (public)
  */
 export const athletes = {
-	create: createAthlete,
-	list: listAthletes,
-	get: getAthlete,
-	update: updateAthlete,
-	archive: archiveAthlete,
-	generateInvitation,
-	acceptInvitation,
-	invitationInfo: getInvitationInfo,
-};
+  create: createAthlete,
+  list: listAthletes,
+  get: getAthlete,
+  update: updateAthlete,
+  archive: archiveAthlete,
+  generateInvitation,
+  acceptInvitation,
+  invitationInfo: getInvitationInfo,
+}

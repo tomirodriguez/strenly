@@ -1,19 +1,29 @@
 ---
 name: architecture
 description: |
-  This skill defines the mandatory Clean Architecture development flow for the project.
+  Defines the mandatory Clean Architecture development flow for the project.
   Use this skill DURING PLANNING (before creating any plan) and BEFORE implementing any backend feature.
   Plans that don't include domain entities and ports for new concepts are INCOMPLETE.
   This skill should be loaded automatically when planning or implementing backend features.
 version: 1.1.0
 ---
 
-# Architecture - Clean Architecture Development Flow
+<objective>
+Defines the mandatory inside-out development flow for backend features in Clean Architecture. Start from the core (domain) and work outward to the API layer. Ensures authorization, domain validation, and proper layer separation.
+</objective>
 
-This skill defines the **mandatory** development flow for any backend feature. The architecture follows **Inside-Out** development: start from the core (domain) and work outward to the API layer.
+<quick_start>
+For ANY backend feature, follow this order and invoke the corresponding skill:
 
-## CRITICAL: Use During Planning AND Implementation
+1. **Domain Entity** (`/domain-entity`) → `packages/core/src/domain/entities/`
+2. **Port** (`/port`) → `packages/core/src/ports/`
+3. **Repository** (`/repository`) → `packages/backend/src/infrastructure/repositories/`
+4. **Use Case** (`/use-case` + `/authorization`) → `packages/backend/src/use-cases/`
+5. **Contracts** (`/contracts`) → `packages/contracts/src/`
+6. **Procedure** (`/procedure`) → `packages/backend/src/procedures/`
+</quick_start>
 
+<critical_context>
 **When to load this skill:**
 1. **During `/gsd:plan-phase`** — Before creating any plan for backend work
 2. **During `/gsd:execute-phase`** — Before implementing any task
@@ -23,19 +33,14 @@ This skill defines the **mandatory** development flow for any backend feature. T
 - Creates use cases without corresponding port/repository tasks
 - Has procedures without domain entity validation
 
-## CRITICAL: Why This Matters
-
-Without following this flow:
+**Without following this flow:**
 - Authorization gets skipped (security vulnerability)
 - Data gets persisted without domain validation (data integrity issues)
 - Business logic ends up in procedures (unmaintainable code)
 - Pagination breaks (missing totalCount for DataTable)
-- Tech debt accumulates (Phase 1 subscriptions had to be refactored)
+</critical_context>
 
-## Mandatory Development Flow
-
-For ANY backend feature, follow this order. **Invoke the corresponding skill BEFORE writing each layer.**
-
+<development_flow>
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 1. DOMAIN ENTITY (/domain-entity)                                   │
@@ -85,10 +90,10 @@ For ANY backend feature, follow this order. **Invoke the corresponding skill BEF
 │    - Map ALL error types with exhaustive switch                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+</development_flow>
 
-## Rules That Are Most Often Violated
-
-### 1. Authorization Must Be FIRST in Use Cases
+<common_violations>
+**1. Authorization Must Be FIRST in Use Cases**
 
 ```typescript
 // WRONG - No authorization
@@ -105,7 +110,7 @@ export const makeCreateAthlete = (deps) => (input) => {
 }
 ```
 
-### 2. Domain Entity Validation Before Persisting
+**2. Domain Entity Validation Before Persisting**
 
 ```typescript
 // WRONG - Persist without domain validation
@@ -120,7 +125,7 @@ if (entityResult.isErr()) {
 return deps.repository.create(ctx, entityResult.value)
 ```
 
-### 3. No Business Logic in Procedures
+**3. No Business Logic in Procedures**
 
 ```typescript
 // WRONG - Logic in procedure
@@ -140,7 +145,7 @@ return deps.repository.create(ctx, entityResult.value)
 })
 ```
 
-### 4. Always Return totalCount in Lists
+**4. Always Return totalCount in Lists**
 
 ```typescript
 // WRONG - Only return items
@@ -156,7 +161,7 @@ findAll: (ctx, options) => {
 }
 ```
 
-### 5. Always Filter by OrganizationContext
+**5. Always Filter by OrganizationContext**
 
 ```typescript
 // WRONG - No organization filter
@@ -174,9 +179,9 @@ findById: (ctx, id) => {
   )
 }
 ```
+</common_violations>
 
-## Quick Reference: What Goes Where
-
+<layer_reference>
 | What | Layer | Skill |
 |------|-------|-------|
 | Business validation rules | Domain Entity | `/domain-entity` |
@@ -186,19 +191,9 @@ findById: (ctx, id) => {
 | Permission checks (RBAC) | Use Case | `/authorization` |
 | API input/output schemas | Contracts | `/contracts` |
 | API endpoints | Procedure | `/procedure` |
+</layer_reference>
 
-## Checklist Before Declaring Feature Complete
-
-- [ ] Domain entity created with factory function returning Result
-- [ ] **Domain entity has comprehensive tests (90%+ coverage on `packages/core`)**
-- [ ] Port defined with OrganizationContext and pagination types
-- [ ] Repository filters by organizationId, returns totalCount for lists
-- [ ] Use case checks authorization FIRST, validates via domain entity
-- [ ] Contracts have validation messages in Spanish
-- [ ] Procedure only orchestrates, maps ALL error types
-
-## Checklist During Planning (BEFORE creating plans)
-
+<planning_checklist>
 For each new domain concept introduced by a phase, the plan MUST include tasks for:
 
 - [ ] **Domain Entity** task — `packages/core/src/domain/entities/{entity}.ts` — skill: `/domain-entity`
@@ -218,24 +213,20 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
   <files>packages/core/src/domain/entities/athlete.ts</files>
   <action>...</action>
 </task>
-
-<task type="auto">
-  <name>Create Athlete Repository</name>
-  <skills>/repository</skills>
-  <files>packages/backend/src/infrastructure/repositories/athlete.repository.ts</files>
-  <action>...</action>
-</task>
 ```
+</planning_checklist>
 
-**Example:** If Phase 2 introduces "Athlete" concept:
-- Plan must have: Athlete domain entity + tests → AthleteRepositoryPort → AthleteRepository → CreateAthlete use case
-- Each task references its skill: `/domain-entity`, `/port`, `/repository`, `/use-case`, `/authorization`
-- NOT: CreateAthlete use case with direct DB queries (this is what we did wrong in Phase 1)
+<success_criteria>
+- [ ] Domain entity created with factory function returning Result
+- [ ] Domain entity has comprehensive tests (90%+ coverage on `packages/core`)
+- [ ] Port defined with OrganizationContext and pagination types
+- [ ] Repository filters by organizationId, returns totalCount for lists
+- [ ] Use case checks authorization FIRST, validates via domain entity
+- [ ] Contracts have validation messages in Spanish
+- [ ] Procedure only orchestrates, maps ALL error types
+</success_criteria>
 
-**Verification:** After creating/editing `packages/core`, run `pnpm test --coverage` and verify 90%+ on core.
-
-## Skill Reference (Quick Lookup)
-
+<skill_reference>
 | Layer | Skill | When Required |
 |-------|-------|---------------|
 | Domain | `/domain-entity` | Creating entities with business rules |
@@ -250,9 +241,9 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 | Frontend | `/form` | Forms with React Hook Form |
 | Frontend | `/data-table` | Tables with pagination |
 | Validation | `/test-runner` | Before committing code |
+</skill_reference>
 
-## Domain Concepts Requiring Full Architecture
-
+<domain_concepts>
 | Concept | Domain Entity | Port | Repository |
 |---------|---------------|------|------------|
 | Subscription | `subscription.ts` | `subscription-repository.port.ts` | `subscription.repository.ts` |
@@ -262,7 +253,8 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 | Program | `program.ts` | `program-repository.port.ts` | `program.repository.ts` |
 | Session | `session.ts` | `session-repository.port.ts` | `session.repository.ts` |
 | Workout Log | `workout-log.ts` | `workout-log-repository.port.ts` | `workout-log.repository.ts` |
+</domain_concepts>
 
-## Detailed Examples
-
+<resources>
 For complete code examples of each layer, see `references/layer-examples.md`.
+</resources>

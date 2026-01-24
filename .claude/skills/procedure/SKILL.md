@@ -1,26 +1,47 @@
 ---
 name: procedure
 description: |
-  This skill provides guidance for creating API procedures (handlers) in Clean Architecture.
+  Provides guidance for creating API procedures (handlers) in Clean Architecture.
   Use this skill when creating API endpoints, implementing thin handlers,
   or mapping use case results to HTTP responses.
   Do NOT load for business logic (use /use-case), database queries, or frontend API calls.
 version: 1.0.0
 ---
 
-# Procedure
+<objective>
+Creates thin orchestration layers that call use cases. Procedures are the API layer - they only orchestrate (create repos, call use case, map errors) with no business logic.
+</objective>
 
-Procedures are thin orchestration layers that call use cases. They are the API layer.
+<quick_start>
+A procedure has only 4 responsibilities:
+1. Create repositories
+2. Create use case with dependencies
+3. Execute use case with member info from context
+4. Map errors and return result
 
-## When to Use
+```typescript
+.handler(async ({ input, context, errors }) => {
+  // 1. Create repositories
+  const repo = createRepository(context.db)
 
-- Creating a new API endpoint
-- Implementing a thin handler that calls a use case
-- Mapping use case errors to API errors
-- Understanding context (db, user, organization)
+  // 2. Create use case
+  const useCase = makeUseCase({ repo, generateId: () => crypto.randomUUID() })
 
-## Location
+  // 3. Execute with member info
+  const result = await useCase({
+    organizationId: context.organization.id,
+    memberRole: context.organization.role,
+    ...input,
+  })
 
+  // 4. Map errors and return
+  if (result.isErr()) { /* switch on error.type */ }
+  return result.value
+})
+```
+</quick_start>
+
+<location>
 ```
 {project_root}/
 ├── src/server/
@@ -37,9 +58,9 @@ Procedures are thin orchestration layers that call use cases. They are the API l
 │   └── lib/
 │       └── orpc.ts            # oRPC/tRPC setup and base procedures
 ```
+</location>
 
-## Procedure Structure
-
+<procedure_template>
 ```typescript
 // src/server/procedures/users/create-user.ts
 import { userSchema, createUserInputSchema } from '@/contracts/users/user'
@@ -92,37 +113,9 @@ export const createUser = authProcedure
     return result.value
   })
 ```
+</procedure_template>
 
-## Key Patterns
-
-### 1. Thin Handler
-
-Only 4 responsibilities:
-
-```typescript
-.handler(async ({ input, context, errors }) => {
-  // 1. Create repositories
-  const repo = createRepository(context.db)
-
-  // 2. Create use case with dependencies
-  const useCase = makeUseCase({ repo, generateId: () => crypto.randomUUID() })
-
-  // 3. Execute with member info
-  const result = await useCase({
-    organizationId: context.organization.id,
-    memberId: context.organization.memberId,
-    memberRole: context.organization.role,
-    ...input,
-  })
-
-  // 4. Map errors and return
-  if (result.isErr()) { ... }
-  return result.value
-})
-```
-
-### 2. Error Mapping with Switch
-
+<error_mapping>
 Use `isErr()` pattern with exhaustive switch:
 
 ```typescript
@@ -143,9 +136,9 @@ if (result.isErr()) {
 
 return result.value
 ```
+</error_mapping>
 
-### 3. Context Usage
-
+<context_usage>
 ```typescript
 context.db                    // Request-scoped database client
 context.user                  // Authenticated user
@@ -156,11 +149,10 @@ context.organization.slug     // Organization slug
 context.organization.memberId // Member ID (for use cases)
 context.organization.role     // User's role in this organization
 ```
+</context_usage>
 
-### 4. Input/Output Schemas
-
-Use contracts from `@/contracts`:
-
+<schemas_and_errors>
+**Input/Output Schemas:**
 ```typescript
 import { userSchema, createUserInputSchema } from '@/contracts/users/user'
 
@@ -169,10 +161,7 @@ export const createUser = authProcedure
   .output(userSchema)
 ```
 
-### 5. Error Definitions
-
-Define expected errors with user-friendly messages:
-
+**Error Definitions:**
 ```typescript
 .errors({
   FORBIDDEN: { message: 'No permission to perform this action' },
@@ -180,16 +169,16 @@ Define expected errors with user-friendly messages:
   DUPLICATE_EMAIL: { message: 'A record with this email already exists' },
 })
 ```
+</schemas_and_errors>
 
-## What NOT to Do
-
+<what_not_to_do>
 - **NO business logic** in procedures
 - **NO direct DB queries** (use repositories via use cases)
 - **NO domain calculations**
 - **NO complex conditionals** (logic belongs in use cases)
+</what_not_to_do>
 
-## Adding to Router
-
+<router_integration>
 After creating a procedure, add it to the router:
 
 ```typescript
@@ -202,9 +191,9 @@ export const router = {
   },
 }
 ```
+</router_integration>
 
-## Imports Pattern
-
+<imports_pattern>
 ```typescript
 // Contracts (shared schemas)
 import { userSchema, createUserInputSchema } from '@/contracts/users/user'
@@ -218,36 +207,9 @@ import { createUserRepository } from '@/server/repositories/user.repository'
 // oRPC/tRPC
 import { authProcedure } from '@/server/lib/orpc'
 ```
+</imports_pattern>
 
-## Procedure Without Input
-
-```typescript
-export const getUser = authProcedure
-  .errors({
-    NOT_FOUND: { message: 'User not found' },
-  })
-  .output(userOutputSchema)
-  .handler(async ({ context, errors }) => {
-    const result = await makeGetUser({
-      userRepository: createUserRepository(context.db),
-    })({
-      organizationId: context.organization.id,
-    })
-
-    if (result.isErr()) {
-      if (result.error.type === 'not_found') {
-        throw errors.NOT_FOUND()
-      }
-      console.error('Repository error:', result.error.cause)
-      throw new Error('Internal error')
-    }
-
-    return result.value
-  })
-```
-
-## List Procedure with Pagination (REQUIRED)
-
+<list_procedure_pagination>
 **ALL list procedures MUST pass pagination params and return `totalCount`.**
 
 ```typescript
@@ -299,9 +261,9 @@ export const listUsers = authProcedure
 2. Output schema has `totalCount` (from `/contracts` skill)
 3. Pass pagination params through to use case
 4. Return `totalCount` from use case result
+</list_procedure_pagination>
 
-## Checklist
-
+<success_criteria>
 When creating a new procedure:
 
 - [ ] Define error types with `.errors({...})`
@@ -315,3 +277,4 @@ When creating a new procedure:
 - [ ] NO business logic in the handler
 - [ ] **PAGINATION: List procedures pass `limit`/`offset` to use case**
 - [ ] **PAGINATION: List procedures return `totalCount` from use case**
+</success_criteria>

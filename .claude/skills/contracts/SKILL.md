@@ -1,20 +1,27 @@
 ---
 name: contracts
 description: |
-  This skill provides guidelines for creating shared Zod 4 schemas (contracts) in src/contracts.
+  Provides guidelines for creating shared Zod 4 schemas (contracts) in src/contracts.
   Contracts define the API boundary between frontend and backend, ensuring type safety and validation.
   Use this skill when creating new procedures, forms, or API endpoints that need input/output schemas.
   Do NOT load for runtime validation, frontend-only local state, or database schema definitions.
 version: 1.0.0
 ---
 
-# Contracts
+<objective>
+Creates shared Zod 4 schemas that define the data structures exchanged between frontend and backend. Follows a 3-layer architecture: Entity Schema → Input Schemas → Output Schemas.
+</objective>
 
-Contracts are shared Zod 4 schemas that define the data structures exchanged between frontend and backend.
-They live in `src/contracts/{domain}/{resource}.ts`.
+<quick_start>
+1. Create file at `src/contracts/{domain}/{resource}.ts`
+2. Define entity schema first (source of truth, no validation)
+3. Extract input validation object with Spanish messages
+4. Define input schemas (create, update, get/delete)
+5. Derive output schemas from entity using `.pick()`/`.omit()`
+6. **ALWAYS include `limit`/`offset` in list input and `totalCount` in list output**
+</quick_start>
 
-## 3-Layer Architecture
-
+<architecture>
 ```
 ┌─────────────────────────────────────┐
 │   {resource}Schema (entity)         │  ← Source of truth
@@ -30,9 +37,9 @@ They live in `src/contracts/{domain}/{resource}.ts`.
 1. **Entity Schema** - Complete resource representation (source of truth, no validation)
 2. **Input Schemas** - Derived conceptually from entity, with Spanish validation messages
 3. **Output Schemas** - Derived via `.pick()`/`.omit()` from entity for API responses
+</architecture>
 
-## File Structure
-
+<file_structure>
 ```
 src/contracts/
 ├── common/             # Reusable schemas (pagination, timestamps, etc.)
@@ -50,9 +57,9 @@ src/contracts/
 └── {domain}/
     └── {resource}.ts
 ```
+</file_structure>
 
-## Schema Types & Naming
-
+<naming_conventions>
 | Type | Naming | Purpose |
 |------|--------|---------|
 | Enum | `{name}Schema` | Fixed values (roles, status) |
@@ -64,11 +71,9 @@ src/contracts/
 | List Item | `{resource}ListItemSchema` | Lighter version for lists |
 | List Query | `list{Resources}QuerySchema` | Paginated list params |
 | List Output | `list{Resources}OutputSchema` | Paginated list response |
+</naming_conventions>
 
-## Contract Structure
-
-Every contract file follows this order:
-
+<contract_template>
 ```typescript
 import { z } from 'zod'
 import { idInputSchema } from '@contracts/common/id'
@@ -166,9 +171,9 @@ export const listTaxpayersOutputSchema = z.object({
 })
 export type ListTaxpayersOutput = z.infer<typeof listTaxpayersOutputSchema>
 ```
+</contract_template>
 
-## Error Messages
-
+<error_messages>
 All validation messages in **Spanish** using **string format** (not object):
 
 ```typescript
@@ -179,17 +184,17 @@ z.string().email('Email inválido')
 // Incorrect - objeto
 z.string().min(1, { error: 'El nombre es requerido' })
 ```
+</error_messages>
 
-## Nullability Guidelines
-
+<nullability_guidelines>
 | Context | Modifier | Example |
 |---------|----------|---------|
 | Entity fields | `.nullable()` | `description: z.string().nullable()` |
 | Input optional | `.nullish()` | `description: z.string().nullish()` |
 | Output from entity | `.nullable()` (inherited) | via `.pick()`/`.omit()` |
+</nullability_guidelines>
 
-## Date Fields
-
+<date_fields>
 Use the appropriate schema based on the field type:
 
 ```typescript
@@ -203,76 +208,17 @@ export const taxpayerSchema = z.object({
 })
 ```
 
-**Schema types:**
 | Schema | Type | Use case |
 |--------|------|----------|
 | `timestampsSchema` | `Date` | createdAt, updatedAt (auto-serialized by JSON) |
 | `datetimeSchema` | `Date` | Scheduled events, appointments |
 | `dateOnlySchema` | `string` | Birthdays, expiration dates (no time component) |
+</date_fields>
 
-**Why `z.coerce.date()` for timestamps:**
-- Backend returns `Date` objects from database
-- JSON.stringify() auto-converts to ISO string
-- No manual serialization needed in procedures
-- Timezones preserved (UTC with Z suffix)
-
-See `/date-management` skill for full date handling strategy.
-
-## Output Schemas via Pick/Omit
-
-Derive outputs from the entity schema:
-
-```typescript
-// Full output = entity
-export const taxpayerOutputSchema = taxpayerSchema
-export type TaxpayerOutput = z.infer<typeof taxpayerOutputSchema>
-
-// List item = entity minus heavy fields
-export const taxpayerListItemSchema = taxpayerSchema.omit({ notes: true, description: true })
-export type TaxpayerListItem = z.infer<typeof taxpayerListItemSchema>
-
-// Summary = only specific fields
-export const taxpayerSummarySchema = taxpayerSchema.pick({ id: true, name: true })
-export type TaxpayerSummary = z.infer<typeof taxpayerSummarySchema>
-```
-
-## Common Schemas
-
-Import reusable schemas from `common/`:
-
-```typescript
-import { paginationQuerySchema, PAGINATION_DEFAULTS } from '@contracts/common/pagination'
-import { idInputSchema } from '@contracts/common/id'
-import { timestampsSchema, datetimeSchema } from '@contracts/common/dates'
-import { optionalEmailSchema } from '@contracts/common/email'
-
-// ID input para get/delete
-export const getTaxpayerInputSchema = idInputSchema('contribuyente')
-
-// Query con paginación
-export const listTaxpayersQuerySchema = paginationQuerySchema.extend({
-  search: z.string().optional(),
-})
-```
-
-## Imports
-
-Always import from the specific file path:
-
-```typescript
-// Correct
-import { createTaxpayerInputSchema } from '@contracts/taxpayer/taxpayer'
-import { paginationQuerySchema } from '@contracts/common/pagination'
-
-// Incorrect - barrel imports
-import { createTaxpayerInputSchema } from '@contracts'
-```
-
-## Pagination Requirements (CRITICAL)
-
+<pagination_requirements>
 **ALL list endpoints MUST support pagination.** This is non-negotiable.
 
-### Input Schema Pattern
+**Input Schema Pattern:**
 ```typescript
 export const list{Resources}InputSchema = z.object({
   // Your filters here...
@@ -285,7 +231,7 @@ export const list{Resources}InputSchema = z.object({
 })
 ```
 
-### Output Schema Pattern
+**Output Schema Pattern:**
 ```typescript
 export const list{Resources}OutputSchema = z.object({
   {resources}: z.array({resource}ListItemSchema),
@@ -293,18 +239,26 @@ export const list{Resources}OutputSchema = z.object({
 })
 ```
 
-### Why This Matters
+**Why This Matters:**
 - Without `totalCount`, the frontend cannot render pagination controls
 - Without `limit`/`offset`, the API loads ALL records (performance disaster)
 - The DataTable component REQUIRES `totalCount` for `DataTable.Pagination`
+</pagination_requirements>
 
-## References
+<imports_pattern>
+Always import from the specific file path:
 
-- `references/contract-example.md` - Complete well-structured contract example with 3-layer pattern
-- `common/` schemas - See the actual common directory for reusable patterns
+```typescript
+// Correct
+import { createTaxpayerInputSchema } from '@contracts/taxpayer/taxpayer'
+import { paginationQuerySchema } from '@contracts/common/pagination'
 
-## Checklist
+// Incorrect - barrel imports
+import { createTaxpayerInputSchema } from '@contracts'
+```
+</imports_pattern>
 
+<success_criteria>
 When creating a new contract:
 
 - [ ] Create file at `src/contracts/{domain}/{resource}.ts`
@@ -322,3 +276,9 @@ When creating a new contract:
 - [ ] Export TypeScript types for all schemas
 - [ ] **PAGINATION: List input has `limit` (default 10) and `offset` (default 0)**
 - [ ] **PAGINATION: List output has `totalCount` for DataTable.Pagination**
+</success_criteria>
+
+<resources>
+- `references/contract-example.md` - Complete well-structured contract example with 3-layer pattern
+- `common/` schemas - See the actual common directory for reusable patterns
+</resources>

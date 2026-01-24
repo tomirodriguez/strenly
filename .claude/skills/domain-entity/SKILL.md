@@ -1,33 +1,35 @@
 ---
 name: domain-entity
 description: |
-  This skill provides guidance for creating domain entities in Clean Architecture.
+  Provides guidance for creating domain entities in Clean Architecture.
   Use this skill when creating business entities, adding validation logic, implementing state machines,
   or working with domain types in the core layer.
   Do NOT load for DTOs, API response types, database models, or simple data structures without business rules.
 version: 1.0.0
 ---
 
-# Domain Entity
+<objective>
+Creates domain entities that encapsulate business logic, validation, and state transitions. Domain entities are the source of truth for business rules in Clean Architecture.
+</objective>
 
-Domain entities encapsulate business logic, validation, and state transitions. They are the source of truth for business rules.
+<quick_start>
+1. Create file at `packages/core/src/domain/entities/{entity}.ts`
+2. Define entity type with `readonly` properties
+3. Create private validation functions per field
+4. Create factory function returning `Result<Entity, DomainError>`
+5. Add query helpers using `Pick<>` for minimal data requirements
+6. Write unit tests (90%+ coverage required on `packages/core`)
 
-## CRITICAL: Domain Entities Are Mandatory
+**ID comes from use case, not generated in domain.**
+</quick_start>
 
+<critical_context>
 **Every entity that can be created or modified MUST have a domain entity.**
 
 Domain entities are the source of truth for business validation. Use cases MUST call the domain factory function before persisting data. Without domain entities, there's no validation of business rules.
+</critical_context>
 
-## When to Use
-
-- Creating a new business entity
-- Adding validation logic to an entity
-- Implementing state machines or state transitions
-- Working with domain types (like Result, ValidationError)
-- Adding query helpers (pure functions that derive state)
-
-## Location
-
+<location>
 ```
 {project_root}/
 ├── src/core/
@@ -40,9 +42,9 @@ Domain entities are the source of truth for business validation. Use cases MUST 
 │   └── errors/
 │       └── index.ts              # Domain error types
 ```
+</location>
 
-## Entity Structure
-
+<entity_structure>
 A domain entity file contains:
 
 1. **Types** - Entity type and input types
@@ -50,13 +52,9 @@ A domain entity file contains:
 3. **Factory function** - Creates validated instances (receives ID from use case)
 4. **Mutation helpers** - Immutable state transitions
 5. **Query helpers** - Pure functions to derive state
+</entity_structure>
 
-## Full Example
-
-For complete implementation with all sections, see `references/full-example.md`.
-
-Quick reference structure:
-
+<quick_reference>
 ```typescript
 // src/core/domain/entities/user.ts
 import { err, ok, type Result } from 'neverthrow'
@@ -77,9 +75,9 @@ export const createUser = (input: CreateUserInput): Result<User, DomainError> =>
 // Query helpers using Pick<>
 export const isAdmin = (user: Pick<User, 'role'>): boolean => { /* ... */ }
 ```
+</quick_reference>
 
-## ID Generation Strategy
-
+<id_generation>
 **The domain entity receives the ID as input.** It does NOT generate IDs.
 
 Why? Because ID generation is an infrastructure concern:
@@ -102,18 +100,9 @@ const userResult = createUser({
   email: input.user.email,
 })
 ```
+</id_generation>
 
-## State Machine Pattern
-
-For entities with state transitions, see `references/full-example.md#state-machine-pattern`.
-
-Key concepts:
-- Define state types (`SubscriptionState = 'trial' | 'active' | ...`)
-- State query functions receive `now` as parameter for testability
-- Mutation helpers return new immutable instance
-
-## Error Types
-
+<error_types>
 Located at `src/core/errors/index.ts`:
 
 ```typescript
@@ -133,9 +122,9 @@ export const validationError = (entity: string, field: string, message: string):
   message,
 })
 ```
+</error_types>
 
-## Usage in Use Cases
-
+<use_case_usage>
 ```typescript
 import { createUser } from '@/core/domain/entities/user'
 
@@ -158,9 +147,9 @@ if (userResult.isErr()) {
 // Only persist after domain validation passes
 return deps.userRepository.create(ctx, userResult.value)
 ```
+</use_case_usage>
 
-## Key Patterns
-
+<key_patterns>
 1. **Immutable types**: Use `readonly` on all entity properties
 2. **Result type**: Factory returns `Result<Entity, DomainError>`, never throws
 3. **Validation isolation**: Each field has its own validation function
@@ -169,8 +158,10 @@ return deps.userRepository.create(ctx, userResult.value)
 6. **Pure functions**: No side effects, state queries receive `now` as parameter
 7. **Immutable mutations**: Return new object with spread operator
 8. **ID as input**: Domain receives ID from use case, doesn't generate it
+</key_patterns>
 
-## Checklist Before Creating a Domain Entity
+<success_criteria>
+Before creating a domain entity:
 
 - [ ] Is the entity type using `readonly` on all properties?
 - [ ] Does the factory receive ID as input (not generate it)?
@@ -178,3 +169,10 @@ return deps.userRepository.create(ctx, userResult.value)
 - [ ] Does each field have its own validation function?
 - [ ] Are there unit tests for all validation rules?
 - [ ] Are query helpers using `Pick<>` to minimize required data?
+</success_criteria>
+
+<resources>
+For complete implementation with all sections, see `references/full-example.md`.
+
+For state machine pattern (entities with state transitions), see `references/full-example.md#state-machine-pattern`.
+</resources>

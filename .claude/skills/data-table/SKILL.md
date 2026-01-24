@@ -1,28 +1,53 @@
 ---
 name: data-table
 description: |
-  Guide for building tables with the DataTable compound component. This skill should be used when creating new tables, migrating existing tables to the DataTable pattern, or needing reference for DataTable APIs (columns, pagination, filtering, row actions). Covers imports, compound structure, column helpers, state handling, and server-side pagination.
+  Guide for building tables with the DataTable compound component. Use when creating new tables,
+  migrating existing tables to the DataTable pattern, or needing reference for DataTable APIs
+  (columns, pagination, filtering, row actions). Covers imports, compound structure, column helpers,
+  state handling, and server-side pagination.
   Do NOT load for simple lists, card grids, or non-tabular data displays.
 version: 1.0.0
 ---
 
-# DataTable Component Guide
+<objective>
+Builds tables using the DataTable compound component with TanStack Table, supporting server-side pagination, sorting, filtering, and row selection. Provides patterns for column definitions, state handling, and backend integration.
+</objective>
 
-A compound component for building tables with TanStack Table, supporting server-side pagination, sorting, filtering, and row selection.
-
-## Import
-
+<quick_start>
 ```tsx
 import {
   DataTable,
   DataTableColumnHeader,
   createDataTableColumns,
-  type SortingState,  // For controlled sorting
+  type SortingState,
 } from '@strenly/ui/components/data-table'
+
+const columns = createDataTableColumns<MyType>((helper) => [
+  helper.accessor('name', {
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
+    enableSorting: true,
+  }),
+  helper.actions({
+    actions: (row) => [
+      { label: 'Editar', icon: PencilIcon, onClick: () => onEdit(row) },
+    ],
+  }),
+])
+
+<DataTable data={items} columns={columns} isLoading={isLoading}>
+  <DataTable.Header title="Título" />
+  <DataTable.Content />
+  <DataTable.Pagination
+    pageIndex={page}
+    pageSize={10}
+    totalCount={total}
+    onPageChange={setPage}
+  />
+</DataTable>
 ```
+</quick_start>
 
-## Basic Structure
-
+<basic_structure>
 ```tsx
 <DataTable
   data={items}
@@ -61,10 +86,10 @@ import {
   />
 </DataTable>
 ```
+</basic_structure>
 
-## Column Definitions
-
-Use `createDataTableColumns` for type-safe column definitions with built-in helpers:
+<column_definitions>
+Use `createDataTableColumns` for type-safe column definitions:
 
 ```tsx
 const columns = createDataTableColumns<MyType>((helper) => [
@@ -75,14 +100,14 @@ const columns = createDataTableColumns<MyType>((helper) => [
   helper.accessor('name', {
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
     cell: ({ getValue }) => <span className="font-medium">{getValue()}</span>,
-    enableSorting: true, // Enable sorting for this column
+    enableSorting: true,
   }),
 
-  // Non-sortable column (explicit)
+  // Non-sortable column
   helper.accessor('email', {
     header: 'Email',
     cell: ({ getValue }) => getValue(),
-    enableSorting: false, // Disable sorting
+    enableSorting: false,
   }),
 
   // Sortable column with descending first (for dates)
@@ -90,7 +115,7 @@ const columns = createDataTableColumns<MyType>((helper) => [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Creado" />,
     cell: ({ getValue }) => formatDate(getValue()),
     enableSorting: true,
-    sortDescFirst: true, // Start with newest first
+    sortDescFirst: true,
   }),
 
   // Actions column with dropdown menu
@@ -102,15 +127,12 @@ const columns = createDataTableColumns<MyType>((helper) => [
   }),
 ])
 ```
+</column_definitions>
 
-## Server-Side Pagination (REQUIRED)
-
+<server_side_pagination>
 **ALL DataTables with list data MUST have pagination.** This requires backend support.
 
-### Backend Requirements (See Related Skills)
-
-For `DataTable.Pagination` to work, your backend MUST return `totalCount`:
-
+**Backend Requirements:**
 | Layer | Skill | What to Add |
 |-------|-------|-------------|
 | Contract | `/contracts` | `limit`, `offset` in input; `totalCount` in output |
@@ -118,13 +140,11 @@ For `DataTable.Pagination` to work, your backend MUST return `totalCount`:
 | Repository | `/repository` | Count query + paginated items query |
 | Procedure | `/procedure` | Pass pagination params, return `totalCount` |
 
-### Frontend Implementation
-
+**Frontend Implementation:**
 ```tsx
 const [pageIndex, setPageIndex] = useState(0)
-const pageSize = 10  // Match your API default
+const pageSize = 10
 
-// Query with pagination params
 const { data, isLoading } = useQuery({
   queryKey: ['users', { page: pageIndex, pageSize, search }],
   queryFn: () => api.users.list({
@@ -146,7 +166,6 @@ const handleSearchChange = (value: string) => {
   isLoading={isLoading}
   pageCount={Math.ceil((data?.totalCount ?? 0) / pageSize)}
 >
-  {/* ... */}
   <DataTable.Pagination
     pageIndex={pageIndex}
     pageSize={pageSize}
@@ -156,20 +175,14 @@ const handleSearchChange = (value: string) => {
 </DataTable>
 ```
 
-### Common Mistakes to Avoid
-
+**Common Mistakes:**
 1. **Missing `totalCount` from backend** - Pagination won't render
 2. **Not resetting page on filter change** - User sees empty page
 3. **Using client-side pagination** - Performance disaster with large datasets
+</server_side_pagination>
 
-## Sorting (Server-Side)
-
-Sorting is triggered by clicking sortable column headers. The header shows sort direction icons (ascending/descending).
-
-### Column Setup
-
-Use `DataTableColumnHeader` for sortable columns and set `enableSorting: true`:
-
+<sorting>
+**Column Setup:**
 ```tsx
 helper.accessor('name', {
   header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
@@ -177,16 +190,11 @@ helper.accessor('name', {
 })
 ```
 
-### Controlled State
-
-For server-side sorting, control the sorting state externally:
-
+**Controlled State (for server-side sorting):**
 ```tsx
 import type { SortingState } from '@tanstack/react-table'
 
 const [sorting, setSorting] = useState<SortingState>([])
-
-// Use sorting in your query
 const sortField = sorting[0]?.id
 const sortOrder = sorting[0]?.desc ? 'desc' : 'asc'
 
@@ -196,23 +204,18 @@ const sortOrder = sorting[0]?.desc ? 'desc' : 'asc'
   sorting={sorting}
   onSortingChange={setSorting}
 >
-  {/* ... */}
-</DataTable>
 ```
 
-### Column Options
-
+**Column Options:**
 | Option | Type | Description |
 |--------|------|-------------|
 | `enableSorting` | `boolean` | Enable/disable sorting for the column |
 | `sortDescFirst` | `boolean` | Start with descending order (useful for dates) |
 | `sortingFn` | `string \| function` | Custom sorting function |
 | `invertSorting` | `boolean` | Invert order (for rankings where lower is better) |
+</sorting>
 
-## Row Selection
-
-Enable row selection for bulk actions:
-
+<row_selection>
 ```tsx
 const [selected, setSelected] = useState<RowSelectionState>({})
 
@@ -223,15 +226,13 @@ const [selected, setSelected] = useState<RowSelectionState>({})
   onRowSelectionChange={setSelected}
   getRowId={(row) => row.id}
 >
-  {/* ... */}
-</DataTable>
 
 // Access selected rows
 const selectedIds = Object.keys(selected)
 ```
+</row_selection>
 
-## State Handling
-
+<state_handling>
 States are handled automatically based on props:
 
 | Prop | State Rendered |
@@ -239,9 +240,9 @@ States are handled automatically based on props:
 | `isLoading={true}` | Skeleton loading |
 | `error={{ message: "...", retry: fn }}` | Error with retry button |
 | `data={[]}` (empty) | Empty state from `emptyState` prop |
+</state_handling>
 
-## Compound Components Reference
-
+<compound_components>
 | Component | Purpose |
 |-----------|---------|
 | `DataTable.Header` | Title, description, action buttons |
@@ -251,23 +252,33 @@ States are handled automatically based on props:
 | `DataTable.Content` | Table body, handles all states |
 | `DataTable.Pagination` | Page navigation controls |
 | `DataTable.ColumnHeader` | Sortable column header |
+</compound_components>
 
-## Visual Styling
-
+<visual_styling>
 The DataTable uses a **minimal, borderless design**:
-
 - **No outer border** - Table sits cleanly in its container
 - **Soft row dividers** - 40% opacity borders between rows
 - **Clean headers** - Muted text that highlights on sort
 - **Sorting via headers** - Click column headers to sort (no separate dropdown)
 
 The Toolbar is for **search and filters only** - sorting is handled through column headers using `DataTableColumnHeader`.
+</visual_styling>
 
-For detailed prop types and advanced patterns, see `references/api_reference.md`.
+<success_criteria>
+When creating a DataTable:
 
-## Backend Skills for Pagination
+- [ ] Import from `@strenly/ui/components/data-table`
+- [ ] Define columns with `createDataTableColumns`
+- [ ] Use `DataTableColumnHeader` for sortable columns
+- [ ] Implement server-side pagination with `totalCount`
+- [ ] Reset pageIndex when filters change
+- [ ] Handle loading and error states
+- [ ] Provide meaningful empty state
+- [ ] Backend returns `{ items, totalCount }` structure
+</success_criteria>
 
-When creating a new DataTable with server-side pagination, you need to update:
+<backend_skills>
+When creating a new DataTable with server-side pagination, update:
 
 1. **`/contracts`** - Add `limit`/`offset` input, `totalCount` output
 2. **`/port`** - Define `List{X}Result` type with `totalCount`
@@ -275,3 +286,8 @@ When creating a new DataTable with server-side pagination, you need to update:
 4. **`/procedure`** - Pass pagination params, return `totalCount`
 
 **Without these backend changes, `DataTable.Pagination` will not work.**
+</backend_skills>
+
+<resources>
+For detailed prop types and advanced patterns, see `references/api_reference.md`.
+</resources>

@@ -3,14 +3,6 @@
  * Exports error schemas, role definitions, and API contracts
  */
 
-// Auth
-export {
-  type LoginInput,
-  loginInputSchema,
-  type SignupInput,
-  signupInputSchema,
-} from './auth/auth'
-
 // Athletes
 export {
   type Athlete,
@@ -36,5 +28,12 @@ export {
   type InvitationInfo,
   invitationInfoSchema,
 } from './athletes/invitation'
+// Auth
+export {
+  type LoginInput,
+  loginInputSchema,
+  type SignupInput,
+  signupInputSchema,
+} from './auth/auth'
 export { authErrors, commonErrors } from './common/errors'
 export { type MemberRole, memberRoleSchema } from './common/roles'

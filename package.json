@@ -20,14 +20,14 @@
     "db:studio": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:studio",
     "db:migrate": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:migrate",
     "db:seed": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:seed",
-    "db:seed:plans": "dotenv -e .env -- tsx scripts/seed-plans.ts",
-    "db:start": "docker-compose up -d",
+    "db:start": "docker-compose up",
     "db:down": "docker-compose down",
     "db:reset": "docker-compose down -v && docker-compose up -d && sleep 3 && npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:push"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.6",
     "@types/node": "^25.0.10",
+    "concurrently": "^9.2.1",
     "dotenv-cli": "^8.0.0",
     "turbo": "^2.5.4",
     "typescript": "^5.7.3"

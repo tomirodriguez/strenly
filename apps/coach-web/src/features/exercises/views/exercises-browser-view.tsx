@@ -39,15 +39,15 @@ export function ExercisesBrowserView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-3xl tracking-tight">Exercises</h1>
-          <p className="text-muted-foreground text-sm">Browse and manage your exercise library</p>
+          <h1 className="font-semibold text-3xl tracking-tight">Ejercicios</h1>
+          <p className="text-muted-foreground text-sm">Explora y gestiona tu biblioteca de ejercicios</p>
         </div>
       </div>
 
       <div className="space-y-4">
         <DataTableToolbar>
           <div className="flex flex-1 items-center gap-4">
-            <DataTableSearch value={search} onValueChange={setSearch} placeholder="Search exercises..." />
+            <DataTableSearch value={search} onValueChange={setSearch} placeholder="Buscar ejercicios..." />
             <ExerciseFilters
               muscleGroup={muscleGroup}
               movementPattern={movementPattern}

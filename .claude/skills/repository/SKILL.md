@@ -1,26 +1,27 @@
 ---
 name: repository
 description: |
-  This skill provides guidance for implementing repositories in Clean Architecture.
+  Provides guidance for implementing repositories in Clean Architecture.
   Use this skill when implementing a port interface with Drizzle ORM, writing database queries,
   or working with ResultAsync.fromPromise for error handling.
   Do NOT load for port definitions (use /port), business logic, or raw SQL without Drizzle.
 version: 1.0.0
 ---
 
-# Repository
+<objective>
+Implements port interfaces using Drizzle ORM with proper error handling, multi-tenancy enforcement, and pagination support. All methods return `ResultAsync<T, RepositoryError>`.
+</objective>
 
-Repositories implement port interfaces using Drizzle ORM. They handle data access with proper error handling.
+<quick_start>
+1. Create file at `packages/backend/src/infrastructure/repositories/{entity}.repository.ts`
+2. Define `wrapError` helper at top
+3. Create factory function that receives `DbClient`
+4. All methods receive `OrganizationContext` and filter by `organizationId`
+5. All methods return `ResultAsync<T, RepositoryError>`
+6. `findAll` returns `{ items, totalCount }` (REQUIRED for pagination)
+</quick_start>
 
-## When to Use
-
-- Implementing a new repository from a port interface
-- Adding methods to an existing repository
-- Writing Drizzle queries with proper error handling
-- Understanding the wrapError and ResultAsync patterns
-
-## Location
-
+<location>
 ```
 {project_root}/
 ├── src/server/repositories/     # or src/infra/db/repositories/
@@ -28,9 +29,9 @@ Repositories implement port interfaces using Drizzle ORM. They handle data acces
 │   ├── organization.repository.ts
 │   └── ...
 ```
+</location>
 
-## Repository Structure
-
+<repository_template>
 ```typescript
 // src/server/repositories/user.repository.ts
 import type { User, UserRepository, CreateUserData } from '@/core/ports/user-repository'
@@ -99,21 +100,17 @@ export const createUserRepository = (db: DbClient): UserRepository => ({
   // ... other methods
 })
 ```
+</repository_template>
 
-## Key Patterns
-
-### 1. Factory Function
-
+<key_patterns>
+**1. Factory Function**
 ```typescript
 export const createRepository = (db: DbClient): RepositoryInterface => ({
   // methods...
 })
 ```
 
-### 2. wrapError Helper
-
-Always define at the top of the file:
-
+**2. wrapError Helper**
 ```typescript
 const wrapError =
   (operation: string) =>
@@ -124,10 +121,7 @@ const wrapError =
   })
 ```
 
-### 3. ResultAsync.fromPromise
-
-Wrap all async operations:
-
+**3. ResultAsync.fromPromise**
 ```typescript
 findById: (ctx, id) =>
   ResultAsync.fromPromise(
@@ -136,16 +130,12 @@ findById: (ctx, id) =>
   ),
 ```
 
-### 4. Return null for Not Found
-
+**4. Return null for Not Found**
 ```typescript
 .then((rows): User | null => rows[0] ?? null)
 ```
 
-### 5. Complex Queries with IIFE
-
-For queries requiring multiple steps:
-
+**5. Complex Queries with IIFE**
 ```typescript
 create: (ctx, data) =>
   ResultAsync.fromPromise(
@@ -160,28 +150,7 @@ create: (ctx, data) =>
   ),
 ```
 
-### 6. Mapper Functions
-
-For complex joins:
-
-```typescript
-const mapToUser = (row: {
-  id: string
-  organizationId: string
-  name: string
-  // ...
-}): User => ({
-  id: row.id,
-  organizationId: row.organizationId,
-  name: row.name,
-  // ...
-})
-```
-
-### 7. Multi-tenancy Enforcement
-
-Always filter by `ctx.organizationId` for tenant-scoped entities:
-
+**6. Multi-tenancy Enforcement**
 ```typescript
 .where(
   and(
@@ -191,9 +160,9 @@ Always filter by `ctx.organizationId` for tenant-scoped entities:
   ),
 )
 ```
+</key_patterns>
 
-## Imports Pattern
-
+<imports_pattern>
 ```typescript
 // Port types
 import type { User, UserRepository, CreateUserData } from '@/core/ports/user-repository'
@@ -207,11 +176,9 @@ import { and, eq, desc, asc, count, ilike, inArray, type SQL } from 'drizzle-orm
 // neverthrow
 import { ResultAsync } from 'neverthrow'
 ```
+</imports_pattern>
 
-## Common Query Patterns
-
-### Paginated List with totalCount (REQUIRED Pattern)
-
+<paginated_list_pattern>
 **ALL `findAll` methods MUST return `{ items, totalCount }`** for DataTable.Pagination to work.
 
 ```typescript
@@ -268,9 +235,9 @@ findAll: (ctx, options: ListUsersOptions) =>
 1. Query count BEFORE applying limit/offset (to get total matching items)
 2. Use same `whereClause` for both count and items queries
 3. ALWAYS return `{ items, totalCount }` structure
+</paginated_list_pattern>
 
-### Sorting
-
+<sorting_pattern>
 ```typescript
 const sortOrder = filters?.sortOrder === 'desc' ? desc : asc
 let orderBy: SQL
@@ -283,26 +250,27 @@ switch (filters?.sortBy) {
 }
 query.orderBy(orderBy)
 ```
+</sorting_pattern>
 
-### Standalone Count (for non-list operations)
-
-Use this pattern only for standalone count needs (e.g., dashboard stats).
-For list operations, always use the paginated pattern above.
+<mapper_functions>
+For complex joins:
 
 ```typescript
-count: (ctx) =>
-  ResultAsync.fromPromise(
-    db
-      .select({ count: count() })
-      .from(usersTable)
-      .where(and(eq(usersTable.organizationId, ctx.organizationId), eq(usersTable.isDeleted, false)))
-      .then((rows) => rows[0]?.count ?? 0),
-    wrapError('count'),
-  ),
+const mapToUser = (row: {
+  id: string
+  organizationId: string
+  name: string
+  // ...
+}): User => ({
+  id: row.id,
+  organizationId: row.organizationId,
+  name: row.name,
+  // ...
+})
 ```
+</mapper_functions>
 
-## Checklist
-
+<success_criteria>
 When creating a new repository:
 
 - [ ] Create factory function that receives `DbClient`
@@ -315,3 +283,4 @@ When creating a new repository:
 - [ ] **PAGINATION: `findAll` queries count FIRST, then items**
 - [ ] **PAGINATION: `findAll` returns `{ items, totalCount }`, NOT just `items[]`**
 - [ ] **PAGINATION: Count query uses same `whereClause` as items query**
+</success_criteria>

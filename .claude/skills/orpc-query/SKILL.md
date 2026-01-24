@@ -1,23 +1,38 @@
 ---
 name: orpc-query
 description: |
-  This skill provides patterns for creating query and mutation hooks with oRPC + TanStack Query.
+  Provides patterns for creating query and mutation hooks with oRPC + TanStack Query.
   Use this skill when creating API hooks for fetching data, creating mutations with cache invalidation,
   setting up infinite queries for pagination, or configuring the oRPC client.
   Do NOT load for backend procedure definitions, Zod contracts, or non-oRPC API calls.
 ---
 
-# oRPC Query Hooks
+<objective>
+Implements type-safe API hooks using oRPC with TanStack Query (React Query). Covers query hooks, mutations, infinite queries, query key management, and client configuration.
+</objective>
 
-## Overview
+<quick_start>
+```typescript
+// src/lib/api-client.ts
+import { createORPCClient } from '@orpc/client'
+import { RPCLink } from '@orpc/client/fetch'
+import { createORPCReactQueryUtils } from '@orpc/react-query'
 
-This skill provides patterns for implementing type-safe API hooks using oRPC with TanStack Query (React Query). It covers query hooks, mutations, infinite queries, and query key management.
+const link = new RPCLink({
+  url: `${API_URL}/rpc`,
+  fetch: (input, init) => fetch(input, { ...init, credentials: 'include' }),
+})
 
-## API Client Configuration
+export const client = createORPCClient(link)
+export const orpc = createORPCReactQueryUtils(client)
 
-### Standard Setup
+// Usage
+const { data } = useQuery(orpc.athletes.get.queryOptions({ input: { athleteId } }))
+```
+</quick_start>
 
-The oRPC client must be configured with `@orpc/client` and `@orpc/react-query`:
+<client_configuration>
+**Standard Setup:**
 
 ```typescript
 // src/lib/api-client.ts
@@ -39,12 +54,9 @@ export const client: RouterClient<Router> = createORPCClient(link)
 export const orpc = createORPCReactQueryUtils(client)
 ```
 
-### With Custom Headers (Multi-Tenancy)
-
-When organization context is needed via headers:
+**With Custom Headers (Multi-Tenancy):**
 
 ```typescript
-// src/lib/api-client.ts
 let currentOrgSlug: string | null = null
 
 export function setCurrentOrgSlug(slug: string | null): void {
@@ -63,19 +75,13 @@ const link = new RPCLink({
     return fetch(input, { ...init, headers, credentials: 'include' })
   },
 })
-
-export const client: RouterClient<Router> = createORPCClient(link)
-export const orpc = createORPCReactQueryUtils(client)
 ```
+</client_configuration>
 
-## Query Hooks
-
-### Pattern 1: Using queryOptions (Preferred)
-
-The simplest approach using oRPC's built-in `queryOptions()`:
+<query_patterns>
+**Pattern 1: Using queryOptions (Preferred)**
 
 ```typescript
-// src/features/dashboard/hooks/use-dashboard.ts
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
@@ -86,11 +92,7 @@ export function useDashboard() {
     }),
   )
 }
-```
 
-With input parameters:
-
-```typescript
 export function useAthlete(athleteId: string) {
   return useQuery(
     orpc.athletes.get.queryOptions({
@@ -100,15 +102,9 @@ export function useAthlete(athleteId: string) {
 }
 ```
 
-### Pattern 2: Manual Query with Custom Configuration
-
-When custom query keys, staleTime, or conditional fetching is needed:
+**Pattern 2: Manual Query with Custom Configuration**
 
 ```typescript
-// src/features/workout/api/today-workout-api.ts
-import { useQuery } from '@tanstack/react-query'
-import { orpc } from '@/lib/api-client'
-
 export const todayWorkoutKeys = {
   all: ['today-workout'] as const,
   today: () => [...todayWorkoutKeys.all, 'today'] as const,
@@ -124,9 +120,7 @@ export function useTodayWorkout() {
 }
 ```
 
-### Pattern 3: Conditional Queries
-
-Use `enabled` for queries that depend on other data:
+**Pattern 3: Conditional Queries**
 
 ```typescript
 export function useAthleteProgram(athleteId: string | undefined) {
@@ -138,11 +132,9 @@ export function useAthleteProgram(athleteId: string | undefined) {
   })
 }
 ```
+</query_patterns>
 
-## Query Key Factories
-
-Organize query keys for easy invalidation:
-
+<query_key_factories>
 ```typescript
 // src/features/athletes/api/athletes-keys.ts
 export const athleteKeys = {
@@ -153,11 +145,8 @@ export const athleteKeys = {
   details: () => [...athleteKeys.all, 'detail'] as const,
   detail: (id: string) => [...athleteKeys.details(), id] as const,
 }
-```
 
-Usage with queries:
-
-```typescript
+// Usage
 export function useAthletes(filters: { status?: string; search?: string }) {
   return useQuery({
     queryKey: athleteKeys.list(filters),
@@ -167,22 +156,13 @@ export function useAthletes(filters: { status?: string; search?: string }) {
     }),
   })
 }
-
-export function useAthlete(athleteId: string) {
-  return useQuery({
-    queryKey: athleteKeys.detail(athleteId),
-    queryFn: () => orpc.athletes.get.call({ athleteId }),
-    enabled: !!athleteId,
-  })
-}
 ```
+</query_key_factories>
 
-## Mutations
-
-### Standard Mutation with Cache Invalidation
+<mutations>
+**Standard Mutation with Cache Invalidation:**
 
 ```typescript
-// src/features/athletes/api/athletes-mutations.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { orpc } from '@/lib/api-client'
@@ -206,7 +186,7 @@ export function useCreateAthlete() {
 }
 ```
 
-### Mutation with Optimistic Updates
+**Mutation with Optimistic Updates:**
 
 ```typescript
 export function useUpdateAthlete() {
@@ -248,13 +228,12 @@ export function useUpdateAthlete() {
   })
 }
 ```
+</mutations>
 
-## Infinite Queries (Pagination)
-
+<infinite_queries>
 For paginated lists with "load more" functionality:
 
 ```typescript
-// src/features/history/api/history-api.ts
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
@@ -284,30 +263,17 @@ export function useWorkoutHistory(filters?: { status?: string }) {
     gcTime: 1000 * 60 * 30,
   })
 }
-```
 
-Usage in component:
-
-```typescript
+// Usage
 function HistoryList() {
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage
-  } = useWorkoutHistory()
-
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useWorkoutHistory()
   const allItems = data?.pages.flatMap(page => page.items) ?? []
 
   return (
     <div>
       {allItems.map(item => <HistoryItem key={item.id} item={item} />)}
-
       {hasNextPage && (
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={isFetchingNextPage}
-        >
+        <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
           {isFetchingNextPage ? 'Cargando...' : 'Cargar más'}
         </Button>
       )}
@@ -315,11 +281,9 @@ function HistoryList() {
   )
 }
 ```
+</infinite_queries>
 
-## File Organization
-
-Organize API-related files by feature:
-
+<file_organization>
 ```
 src/features/athletes/
 ├── api/
@@ -332,13 +296,11 @@ src/features/athletes/
 └── hooks/
     └── use-athletes.ts       # Composite hooks (optional)
 ```
+</file_organization>
 
-## Anti-Patterns to Avoid
-
-### WRONG: Creating custom fetch wrappers
-
+<anti_patterns>
+**WRONG: Creating custom fetch wrappers**
 ```typescript
-// WRONG - Don't create custom API functions
 export async function fetchAthletes() {
   const response = await fetch(`${API_URL}/api/athletes`, {
     credentials: 'include',
@@ -347,10 +309,8 @@ export async function fetchAthletes() {
 }
 ```
 
-### CORRECT: Use oRPC client
-
+**CORRECT: Use oRPC client**
 ```typescript
-// CORRECT - Use oRPC with TanStack Query
 export function useAthletes() {
   return useQuery({
     queryKey: ['athletes'],
@@ -359,28 +319,24 @@ export function useAthletes() {
 }
 ```
 
-### WRONG: Calling oRPC outside React Query
-
+**WRONG: Calling oRPC outside React Query**
 ```typescript
-// WRONG - Direct calls lose caching benefits
 async function loadData() {
   const athletes = await orpc.athletes.list.call({})
   setAthletes(athletes)
 }
 ```
 
-### CORRECT: Always use hooks
-
+**CORRECT: Always use hooks**
 ```typescript
-// CORRECT - Data is cached and reactive
 function AthletesList() {
   const { data: athletes } = useAthletes()
   return <List items={athletes} />
 }
 ```
+</anti_patterns>
 
-## Summary
-
+<success_criteria>
 | Pattern | When to Use | Example |
 |---------|-------------|---------|
 | `queryOptions()` | Simple queries, no custom config | `orpc.dashboard.get.queryOptions({})` |
@@ -388,3 +344,4 @@ function AthletesList() {
 | Query Key Factory | Multiple related queries | `athleteKeys.list(filters)` |
 | `useMutation` | Create/Update/Delete operations | With `invalidateQueries` on success |
 | `useInfiniteQuery` | Paginated "load more" lists | With `getNextPageParam` |
+</success_criteria>
