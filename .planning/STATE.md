@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-24 - Completed quick task 008: Fix session and organization API calls on navigation
+Last activity: 2026-01-24 - Completed quick task 009: Migrate create athlete drawer to modal
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -78,7 +78,7 @@ Recent decisions affecting current work:
 - **DataTable compound component children** - DataTable.Content and DataTablePagination must be descendants of DataTable.Root for context access
 - **Custom Zod error messages** - Use { message: '...' } in validation rules for user-friendly error text
 - **Optional string fields in Zod** - Use .or(z.literal('')) for optional strings that receive empty form values
-- **Sheet form pattern** - Header > SheetBody (scrollable form) > SheetFooter (fixed buttons)
+- **Modal for forms, drawer for context** - Use Dialog for focused forms, Sheet for contextual panels where page awareness matters
 - **Single Toaster in __root.tsx** - Toaster component placed in __root.tsx (inside providers), not main.tsx
 - **sessionProcedure for createSubscription** - User is authenticated during onboarding but has no org context yet
 - **URL-based org routing** - All authenticated routes use `/:orgSlug/*` pattern, org slug synced to X-Organization-Slug header
@@ -110,6 +110,7 @@ None.
 | 006 | Add AuthProvider and OrganizationProvider for context caching | 2026-01-24 | 33083ce | [006-add-authprovider-and-organizationprovide](./quick/006-add-authprovider-and-organizationprovide/) |
 | 007 | Polish step components visual design | 2026-01-24 | 8885ba2 | - |
 | 008 | Fix session and organization API calls on navigation | 2026-01-24 | 6d28f99 | [008-fix-session-and-organization-api-calls-o](./quick/008-fix-session-and-organization-api-calls-o/) |
+| 009 | Migrate create athlete drawer to modal | 2026-01-24 | 5ac4e1a | [009-migrate-create-athlete-drawer-to-modal-a](./quick/009-migrate-create-athlete-drawer-to-modal-a/) |
 
 ## Phase 2 Progress
 
@@ -176,7 +177,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed quick task 008 - Fix session and organization API calls on navigation
+Stopped at: Completed quick task 009 - Migrate create athlete drawer to modal
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
