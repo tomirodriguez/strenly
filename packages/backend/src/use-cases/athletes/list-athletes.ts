@@ -2,11 +2,11 @@ import {
 	type Athlete,
 	type AthleteRepositoryPort,
 	type AthleteStatus,
+	hasPermission,
 	type OrganizationContext,
 	type Role,
-	hasPermission,
 } from "@strenly/core";
-import { type ResultAsync, errAsync } from "neverthrow";
+import { errAsync, type ResultAsync } from "neverthrow";
 
 export type ListAthletesInput = OrganizationContext & {
 	memberRole: Role;
@@ -21,9 +21,7 @@ export type ListAthletesResult = {
 	totalCount: number;
 };
 
-export type ListAthletesError =
-	| { type: "forbidden"; message: string }
-	| { type: "repository_error"; message: string };
+export type ListAthletesError = { type: "forbidden"; message: string } | { type: "repository_error"; message: string };
 
 type Dependencies = {
 	athleteRepository: AthleteRepositoryPort;
@@ -51,8 +49,10 @@ export const makeListAthletes =
 					offset: input.offset,
 				},
 			)
-			.mapErr((e): ListAthletesError => ({
-				type: "repository_error",
-				message: e.type === "DATABASE_ERROR" ? e.message : `Athlete not found: ${e.athleteId}`,
-			}));
+			.mapErr(
+				(e): ListAthletesError => ({
+					type: "repository_error",
+					message: e.type === "DATABASE_ERROR" ? e.message : `Athlete not found: ${e.athleteId}`,
+				}),
+			);
 	};

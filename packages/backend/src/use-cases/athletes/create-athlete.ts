@@ -1,15 +1,13 @@
 import {
 	type Athlete,
-	type AthleteError,
 	type AthleteGender,
-	type AthleteRepositoryError,
 	type AthleteRepositoryPort,
-	type OrganizationContext,
-	type Role,
 	createAthlete,
 	hasPermission,
+	type OrganizationContext,
+	type Role,
 } from "@strenly/core";
-import { type ResultAsync, errAsync, okAsync } from "neverthrow";
+import { errAsync, type ResultAsync } from "neverthrow";
 
 export type CreateAthleteInput = OrganizationContext & {
 	memberRole: Role;
@@ -66,8 +64,10 @@ export const makeCreateAthlete =
 		// 3. Persist
 		return deps.athleteRepository
 			.create({ organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole }, athlete)
-			.mapErr((e): CreateAthleteError => ({
-				type: "repository_error",
-				message: e.type === "DATABASE_ERROR" ? e.message : `Athlete not found: ${e.athleteId}`,
-			}));
+			.mapErr(
+				(e): CreateAthleteError => ({
+					type: "repository_error",
+					message: e.type === "DATABASE_ERROR" ? e.message : `Athlete not found: ${e.athleteId}`,
+				}),
+			);
 	};

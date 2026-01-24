@@ -5,14 +5,7 @@ import { organizations } from "./auth";
  * Movement pattern enum
  * Classifies exercises by fundamental movement pattern
  */
-export const movementPatternEnum = pgEnum("movement_pattern", [
-	"push",
-	"pull",
-	"hinge",
-	"squat",
-	"carry",
-	"core",
-]);
+export const movementPatternEnum = pgEnum("movement_pattern", ["push", "pull", "hinge", "squat", "carry", "core"]);
 
 /**
  * Exercises table

@@ -202,7 +202,6 @@ Phase mappings for all v1 requirements.
 | ATH-05 | Coach can generate invitation link | Pending |
 | ATH-06 | Athlete can link user account via invitation | Pending |
 | ATH-07 | Coach can operate without athlete accounts | Pending |
-| ATH-08 | Coach can log workouts on behalf of athletes | Pending |
 | EXR-01 | System provides curated exercise database | Pending |
 | EXR-02 | Coach can search and select exercises | Pending |
 | EXR-03 | Coach can create custom exercises | Pending |
@@ -257,6 +256,7 @@ Phase mappings for all v1 requirements.
 | PWA-08 | Athlete can view past workout logs | Pending |
 | PWA-09 | Athlete can use rest timer | Pending |
 | PWA-10 | Athlete can view exercise demo videos | Pending |
+| ATH-08 | Coach can log workouts on behalf of athletes | Pending |
 
 ### Phase 5: Dashboard & Analytics
 
@@ -279,9 +279,9 @@ Phase mappings for all v1 requirements.
 | Phase | Requirements | Count |
 |-------|--------------|-------|
 | Phase 1 | AUTH-01 to AUTH-05, ORG-01 to ORG-07, SUB-01 to SUB-05 | 17 |
-| Phase 2 | ATH-01 to ATH-08, EXR-01 to EXR-06 | 14 |
+| Phase 2 | ATH-01 to ATH-07, EXR-01 to EXR-06 | 13 |
 | Phase 3 | PRG-01 to PRG-13, RX-01 to RX-11, TPL-01 to TPL-04 | 28 |
-| Phase 4 | PWA-01 to PWA-10 | 10 |
+| Phase 4 | PWA-01 to PWA-10, ATH-08 | 11 |
 | Phase 5 | DSH-01 to DSH-06, EXP-01 to EXP-02, ADM-01 to ADM-03 | 11 |
 | **Total** | | **80** |
 

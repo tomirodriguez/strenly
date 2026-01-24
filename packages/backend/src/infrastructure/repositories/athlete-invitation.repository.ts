@@ -7,8 +7,7 @@ import type {
 import type { DbClient } from "@strenly/database";
 import { athleteInvitations, athletes } from "@strenly/database/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { type ResultAsync, err, ok } from "neverthrow";
-import { ResultAsync as RA } from "neverthrow";
+import { err, ok, ResultAsync as RA, type ResultAsync } from "neverthrow";
 
 function wrapDbError(error: unknown): AthleteInvitationRepositoryError {
 	console.error("AthleteInvitation repository error:", error);
@@ -126,10 +125,7 @@ export function createAthleteInvitationRepository(db: DbClient): AthleteInvitati
 			return RA.fromPromise(
 				(async () => {
 					// First find the invitation to get the athleteId
-					const invitationRows = await db
-						.select()
-						.from(athleteInvitations)
-						.where(eq(athleteInvitations.token, token));
+					const invitationRows = await db.select().from(athleteInvitations).where(eq(athleteInvitations.token, token));
 
 					const invitation = invitationRows[0];
 					if (!invitation) {
@@ -171,10 +167,7 @@ export function createAthleteInvitationRepository(db: DbClient): AthleteInvitati
 					.update(athleteInvitations)
 					.set({ revokedAt: new Date() })
 					.where(
-						and(
-							eq(athleteInvitations.id, invitationId),
-							eq(athleteInvitations.organizationId, ctx.organizationId),
-						),
+						and(eq(athleteInvitations.id, invitationId), eq(athleteInvitations.organizationId, ctx.organizationId)),
 					)
 					.returning()
 					.then((rows) => rows[0]),

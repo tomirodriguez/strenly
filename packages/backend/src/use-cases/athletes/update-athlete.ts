@@ -3,12 +3,12 @@ import {
 	type AthleteGender,
 	type AthleteRepositoryPort,
 	type AthleteStatus,
-	type OrganizationContext,
-	type Role,
 	createAthlete,
 	hasPermission,
+	type OrganizationContext,
+	type Role,
 } from "@strenly/core";
-import { type ResultAsync, errAsync } from "neverthrow";
+import { errAsync, type ResultAsync } from "neverthrow";
 
 export type UpdateAthleteInput = OrganizationContext & {
 	memberRole: Role;

@@ -2,11 +2,11 @@ import {
 	type AthleteInvitation,
 	type AthleteInvitationRepositoryPort,
 	type AthleteRepositoryPort,
-	type OrganizationContext,
 	createAthleteInvitation,
 	hasPermission,
+	type OrganizationContext,
 } from "@strenly/core";
-import { type ResultAsync, errAsync, okAsync } from "neverthrow";
+import { errAsync, okAsync, type ResultAsync } from "neverthrow";
 
 export type GenerateInvitationInput = OrganizationContext & {
 	athleteId: string;
@@ -41,7 +41,11 @@ export const makeGenerateInvitation =
 			});
 		}
 
-		const ctx: OrganizationContext = { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole };
+		const ctx: OrganizationContext = {
+			organizationId: input.organizationId,
+			userId: input.userId,
+			memberRole: input.memberRole,
+		};
 
 		// 2. Fetch athlete
 		return deps.athleteRepository
@@ -65,12 +69,20 @@ export const makeGenerateInvitation =
 				// 4. Revoke existing invitations if any
 				return deps.invitationRepository
 					.findByAthleteId(ctx, input.athleteId)
-					.mapErr((e): GenerateInvitationError => ({ type: "repository_error", message: e.type === "DATABASE_ERROR" ? e.message : `Invitation error` }))
+					.mapErr(
+						(e): GenerateInvitationError => ({
+							type: "repository_error",
+							message: e.type === "DATABASE_ERROR" ? e.message : `Invitation error`,
+						}),
+					)
 					.andThen((existingInvitation) => {
 						if (existingInvitation !== null) {
-							return deps.invitationRepository
-								.revoke(ctx, existingInvitation.id)
-								.mapErr((e): GenerateInvitationError => ({ type: "repository_error", message: e.type === "DATABASE_ERROR" ? e.message : `Failed to revoke invitation` }));
+							return deps.invitationRepository.revoke(ctx, existingInvitation.id).mapErr(
+								(e): GenerateInvitationError => ({
+									type: "repository_error",
+									message: e.type === "DATABASE_ERROR" ? e.message : `Failed to revoke invitation`,
+								}),
+							);
 						}
 						return okAsync(undefined);
 					})
@@ -84,9 +96,12 @@ export const makeGenerateInvitation =
 						});
 
 						// 6. Persist
-						return deps.invitationRepository
-							.create(ctx, invitation)
-							.mapErr((e): GenerateInvitationError => ({ type: "repository_error", message: e.type === "DATABASE_ERROR" ? e.message : `Failed to create invitation` }));
+						return deps.invitationRepository.create(ctx, invitation).mapErr(
+							(e): GenerateInvitationError => ({
+								type: "repository_error",
+								message: e.type === "DATABASE_ERROR" ? e.message : `Failed to create invitation`,
+							}),
+						);
 					});
 			})
 			.map((invitation) => ({

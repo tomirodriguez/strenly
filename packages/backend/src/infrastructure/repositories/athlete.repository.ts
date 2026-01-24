@@ -11,8 +11,7 @@ import { createAthlete } from "@strenly/core";
 import type { DbClient } from "@strenly/database";
 import { athletes } from "@strenly/database/schema";
 import { and, count, eq, ilike } from "drizzle-orm";
-import { type ResultAsync, err, ok } from "neverthrow";
-import { ResultAsync as RA } from "neverthrow";
+import { err, ok, ResultAsync as RA, type ResultAsync } from "neverthrow";
 
 function wrapDbError(error: unknown): AthleteRepositoryError {
 	console.error("Athlete repository error:", error);
@@ -152,10 +151,7 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
 			);
 		},
 
-		findByLinkedUserId(
-			ctx: OrganizationContext,
-			userId: string,
-		): ResultAsync<Athlete | null, AthleteRepositoryError> {
+		findByLinkedUserId(ctx: OrganizationContext, userId: string): ResultAsync<Athlete | null, AthleteRepositoryError> {
 			return RA.fromPromise(
 				db
 					.select()

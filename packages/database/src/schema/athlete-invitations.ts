@@ -1,6 +1,6 @@
 import { index, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
-import { organizations, users } from "./auth";
 import { athletes } from "./athletes";
+import { organizations, users } from "./auth";
 
 /**
  * Athlete Invitations table

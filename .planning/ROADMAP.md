@@ -42,12 +42,12 @@ Plans:
 ### Phase 2: Exercise Library & Athlete Management
 **Goal**: Coaches can manage athletes and access a comprehensive exercise library
 **Depends on**: Phase 1
-**Requirements**: ATH-01, ATH-02, ATH-03, ATH-04, ATH-05, ATH-06, ATH-07, ATH-08, EXR-01, EXR-02, EXR-03, EXR-04, EXR-05, EXR-06
+**Requirements**: ATH-01, ATH-02, ATH-03, ATH-04, ATH-05, ATH-06, ATH-07, EXR-01, EXR-02, EXR-03, EXR-04, EXR-05, EXR-06
 **Success Criteria** (what must be TRUE):
   1. Coach can create, view, update, and delete athlete profiles within their organization
   2. Coach can generate invitation link and athlete can link their user account to their profile
   3. Coach can search curated exercise database and create custom exercises with muscle/pattern mappings
-  4. Coach can operate fully without athletes having linked accounts (log workouts on their behalf)
+  4. Coach can operate fully without athletes having linked accounts
   5. Exercises have muscle group mappings and movement pattern classification for future analytics
 **Plans**: 11 plans in 5 waves
 
@@ -85,7 +85,7 @@ Plans:
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
 **Depends on**: Phase 3
-**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10
+**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10, ATH-08
 **Success Criteria** (what must be TRUE):
   1. Athlete can view assigned program and see next/upcoming workout on mobile device
   2. Athlete can log workout execution with pre-filled planned values (one-tap if matching plan)

@@ -1,8 +1,14 @@
 import type { ExerciseRepositoryError, ExerciseRepositoryPort, ListExercisesOptions } from "@strenly/core";
-import { createExercise, type Exercise, isValidMovementPattern, type MuscleGroup, isValidMuscleGroup } from "@strenly/core";
+import {
+	createExercise,
+	type Exercise,
+	isValidMovementPattern,
+	isValidMuscleGroup,
+	type MuscleGroup,
+} from "@strenly/core";
 import type { DbClient } from "@strenly/database";
-import { exerciseMuscles, exercises, muscleGroups } from "@strenly/database/schema";
-import { and, count, eq, ilike, isNotNull, isNull, or, sql } from "drizzle-orm";
+import { exerciseMuscles, exercises } from "@strenly/database/schema";
+import { and, count, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { err, ok, ResultAsync } from "neverthrow";
 
 function wrapDbError(error: unknown): ExerciseRepositoryError {
@@ -107,7 +113,9 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
 			});
 		},
 
-		findAll(options?: ListExercisesOptions): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError> {
+		findAll(
+			options?: ListExercisesOptions,
+		): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError> {
 			return ResultAsync.fromPromise(
 				(async () => {
 					const conditions = [];
@@ -121,9 +129,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
 						conditions.push(isNull(exercises.organizationId));
 					} else if (options?.organizationId !== undefined) {
 						// Curated OR org-specific
-						conditions.push(
-							or(isNull(exercises.organizationId), eq(exercises.organizationId, options.organizationId)),
-						);
+						conditions.push(or(isNull(exercises.organizationId), eq(exercises.organizationId, options.organizationId)));
 					}
 
 					// Filter by movement pattern
