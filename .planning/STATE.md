@@ -76,6 +76,12 @@ None.
 | 02-06 | Exercise Contracts & Procedures | Pending |
 
 **Key artifacts so far:**
+- `packages/database/src/schema/athletes.ts` - Athletes table schema
+- `packages/database/src/schema/athlete-invitations.ts` - Athlete invitations schema
+- `packages/database/src/schema/exercises.ts` - Exercises table schema
+- `packages/database/src/schema/muscle-groups.ts` - Muscle groups lookup table
+- `packages/database/src/schema/exercise-muscles.ts` - Exercise-muscle junction
+- `packages/database/src/schema/exercise-progressions.ts` - Exercise progressions
 - `packages/core/src/domain/entities/exercise.ts` - Exercise entity with validation
 - `packages/core/src/domain/entities/muscle-group.ts` - MuscleGroup value object
 - `packages/core/src/domain/entities/movement-pattern.ts` - MovementPattern value object
