@@ -1,12 +1,14 @@
-import { organizationTypeSchema, planFeaturesSchema } from "@strenly/contracts/subscriptions/plan";
-import { subscriptionSchema, subscriptionStatusSchema } from "@strenly/contracts/subscriptions/subscription";
-import { eq } from "@strenly/database";
-import { plans, subscriptions } from "@strenly/database/schema";
+import { planSchema } from "@strenly/contracts/subscriptions/plan";
+import { subscriptionSchema } from "@strenly/contracts/subscriptions/subscription";
 import { z } from "zod";
 import { authProcedure } from "../../lib/orpc";
+import { createPlanRepository } from "../../infrastructure/repositories/plan.repository";
+import { createSubscriptionRepository } from "../../infrastructure/repositories/subscription.repository";
+import { makeGetSubscription } from "../../use-cases/subscriptions/get-subscription";
 
 const getSubscriptionOutputSchema = z.object({
 	subscription: subscriptionSchema,
+	plan: planSchema,
 });
 
 /**
@@ -16,50 +18,39 @@ const getSubscriptionOutputSchema = z.object({
  */
 export const getSubscription = authProcedure
 	.errors({
+		FORBIDDEN: { message: "No permission to view subscription" },
 		SUBSCRIPTION_NOT_FOUND: { message: "Subscription not found" },
+		PLAN_NOT_FOUND: { message: "Plan not found" },
 	})
 	.output(getSubscriptionOutputSchema)
 	.handler(async ({ context, errors }) => {
-		const [result] = await context.db
-			.select({
-				subscription: subscriptions,
-				plan: plans,
-			})
-			.from(subscriptions)
-			.innerJoin(plans, eq(subscriptions.planId, plans.id))
-			.where(eq(subscriptions.organizationId, context.organization.id));
+		const getSubscriptionUseCase = makeGetSubscription({
+			subscriptionRepository: createSubscriptionRepository(context.db),
+			planRepository: createPlanRepository(context.db),
+		});
 
-		if (!result) {
-			throw errors.SUBSCRIPTION_NOT_FOUND();
+		const result = await getSubscriptionUseCase({
+			organizationId: context.organization.id,
+			userId: context.user.id,
+			memberRole: context.membership.role,
+		});
+
+		if (result.isErr()) {
+			// Exhaustive error mapping
+			switch (result.error.type) {
+				case "forbidden":
+					throw errors.FORBIDDEN();
+				case "subscription_not_found":
+					throw errors.SUBSCRIPTION_NOT_FOUND();
+				case "plan_not_found":
+					throw errors.PLAN_NOT_FOUND();
+				case "repository_error":
+					console.error("Repository error:", result.error.message);
+					throw new Error("Internal error");
+			}
 		}
 
-		const { subscription, plan } = result;
-
-		// Safely parse all enum/complex types using Zod safeParse (no 'as' casting)
-		const typeResult = organizationTypeSchema.safeParse(plan.organizationType);
-		const orgType = typeResult.success ? typeResult.data : "coach_solo";
-
-		const featuresResult = planFeaturesSchema.safeParse(plan.features);
-		const features = featuresResult.success
-			? featuresResult.data
-			: {
-					templates: false,
-					analytics: false,
-					exportData: false,
-					customExercises: false,
-					multipleCoaches: false,
-				};
-
-		const statusResult = subscriptionStatusSchema.safeParse(subscription.status);
-		const status = statusResult.success ? statusResult.data : "active";
-
-		// Handle nullable period dates
-		const currentPeriodStart = subscription.currentPeriodStart
-			? subscription.currentPeriodStart.toISOString()
-			: new Date().toISOString();
-		const currentPeriodEnd = subscription.currentPeriodEnd
-			? subscription.currentPeriodEnd.toISOString()
-			: new Date().toISOString();
+		const { subscription, plan } = result.value;
 
 		return {
 			subscription: {
@@ -69,20 +60,32 @@ export const getSubscription = authProcedure
 					id: plan.id,
 					name: plan.name,
 					slug: plan.slug,
-					organizationType: orgType,
+					organizationType: plan.organizationType,
 					athleteLimit: plan.athleteLimit,
 					coachLimit: plan.coachLimit,
-					features,
+					features: plan.features,
 					priceMonthly: plan.priceMonthly,
 					priceYearly: plan.priceYearly,
 					isActive: plan.isActive,
 				},
-				status,
+				status: subscription.status,
 				athleteCount: subscription.athleteCount,
 				athleteLimit: plan.athleteLimit,
-				currentPeriodStart,
-				currentPeriodEnd,
+				currentPeriodStart: subscription.currentPeriodStart.toISOString(),
+				currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
 				createdAt: subscription.createdAt.toISOString(),
+			},
+			plan: {
+				id: plan.id,
+				name: plan.name,
+				slug: plan.slug,
+				organizationType: plan.organizationType,
+				athleteLimit: plan.athleteLimit,
+				coachLimit: plan.coachLimit,
+				features: plan.features,
+				priceMonthly: plan.priceMonthly,
+				priceYearly: plan.priceYearly,
+				isActive: plan.isActive,
 			},
 		};
 	});
