@@ -1,14 +1,16 @@
 import type { OrganizationType } from '@strenly/contracts/subscriptions/plan'
 import { useMutation } from '@tanstack/react-query'
-import { Dumbbell } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { Check, Dumbbell, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
 import { orpc } from '@/lib/api-client'
-import { authClient } from '@/lib/auth-client'
+import { authClient, signOut } from '@/lib/auth-client'
 
 type OnboardingStep = 'coach-type' | 'plan' | 'org'
 
@@ -17,20 +19,46 @@ interface OnboardingState {
   planId: string | null
 }
 
-function StepIndicator({ current, total }: { current: number; total: number }) {
+const STEP_LABELS = ['Tipo', 'Plan', 'Organizacion'] as const
+
+function StepIndicator({ current }: { current: number; total: number }) {
   return (
-    <div className="flex items-center justify-center gap-2">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          className={`h-2 w-2 rounded-full transition-colors ${
-            i < current ? 'bg-primary' : i === current ? 'bg-primary' : 'bg-muted'
-          }`}
-        />
-      ))}
-      <span className="ml-2 text-muted-foreground text-sm">
-        Paso {current + 1} de {total}
-      </span>
+    <div className="flex items-center justify-center">
+      {STEP_LABELS.map((label, i) => {
+        const isCompleted = i < current
+        const isCurrent = i === current
+
+        return (
+          <div key={label} className="flex items-center">
+            {/* Step circle and label */}
+            <div className="flex flex-col items-center">
+              <div
+                className={`flex size-10 items-center justify-center rounded-full border-2 font-semibold text-sm transition-all ${
+                  isCompleted
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : isCurrent
+                      ? 'border-primary bg-background text-primary'
+                      : 'border-muted bg-muted/30 text-muted-foreground'
+                }`}
+              >
+                {isCompleted ? <Check className="size-5" /> : i + 1}
+              </div>
+              <span
+                className={`mt-2 font-medium text-xs ${
+                  isCompleted || isCurrent ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+
+            {/* Connector line */}
+            {i < STEP_LABELS.length - 1 && (
+              <div className={`mx-3 h-0.5 w-12 transition-colors ${isCompleted ? 'bg-primary' : 'bg-muted'}`} />
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -42,8 +70,14 @@ export function OnboardingView() {
     planId: null,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
 
   const { user } = useAuth()
+
+  const handleLogout = async () => {
+    await signOut()
+    navigate({ to: '/' })
+  }
 
   const createSubscriptionMutation = useMutation(orpc.subscriptions.createSubscription.mutationOptions())
 
@@ -126,21 +160,37 @@ export function OnboardingView() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="flex items-center justify-center gap-2 border-b py-4">
-        <Dumbbell className="size-6 text-primary" />
-        <span className="font-semibold text-xl">Strenly</span>
+      <header className="relative flex items-center justify-between border-b px-6 py-4">
+        {/* Spacer for centering logo */}
+        <div className="w-24" />
+
+        {/* Logo centered */}
+        <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
+          <Dumbbell className="size-6 text-primary" />
+          <span className="font-semibold text-xl">Strenly</span>
+        </div>
+
+        {/* Logout button */}
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
+          <LogOut className="mr-2 size-4" />
+          Salir
+        </Button>
       </header>
 
       {/* Main Content */}
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-4xl space-y-8">
           {/* Welcome & Step Indicator */}
-          <div className="text-center">
-            {userName && (
-              <p className="mb-2 text-muted-foreground">
-                Bienvenido, <span className="font-medium text-foreground">{userName}</span>
-              </p>
-            )}
+          <div className="space-y-6 text-center">
+            <div>
+              {userName && (
+                <p className="mb-1 text-muted-foreground">
+                  Bienvenido, <span className="font-medium text-foreground">{userName}</span>
+                </p>
+              )}
+              <h1 className="font-bold text-2xl tracking-tight">Configura tu cuenta</h1>
+              <p className="mt-1 text-muted-foreground">Completa estos 3 simples pasos para comenzar</p>
+            </div>
             <StepIndicator current={stepIndex} total={3} />
           </div>
 
