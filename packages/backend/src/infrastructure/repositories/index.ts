@@ -9,3 +9,5 @@ export { createPlanRepository } from "./plan.repository";
 export { createSubscriptionRepository } from "./subscription.repository";
 export { createAthleteRepository } from "./athlete.repository";
 export { createAthleteInvitationRepository } from "./athlete-invitation.repository";
+export { createExerciseRepository } from "./exercise.repository";
+export { createMuscleGroupRepository, type MuscleGroupData, type MuscleGroupRepository, type MuscleGroupRepositoryError } from "./muscle-group.repository";
