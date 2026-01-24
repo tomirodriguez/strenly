@@ -1,0 +1,25 @@
+{
+	"name": "@strenly/core",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./domain/entities/*": "./src/domain/entities/*.ts",
+		"./ports/*": "./src/ports/*.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage"
+	},
+	"dependencies": {
+		"neverthrow": "^8.2.0"
+	},
+	"devDependencies": {
+		"@vitest/coverage-v8": "^3.0.0",
+		"typescript": "^5.7.3",
+		"vitest": "^3.0.0"
+	}
+}
