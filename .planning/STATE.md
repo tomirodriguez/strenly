@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2 of 5 (Exercise Library & Athlete Management)
-Plan: 10 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-24 - Completed 02-10-PLAN.md (Exercise Contracts & Procedures)
+Plan: 11 of 11 in current phase
+Status: Phase 2 Complete
+Last activity: 2026-01-24 - Completed 02-11-PLAN.md (Database Seed)
 
-Progress: [=========.] Phase 2 near completion
+Progress: [==========] Phase 2 complete
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 5 min
-- Total execution time: 92 min
+- Total execution time: 96 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
-| 2 | 10/TBD | 26 min | 2.6 min |
+| 2 | 11/11 | 30 min | 2.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-06 (4 min), 02-07 (4 min), 02-08 (4 min), 02-09 (3 min), 02-10 (3 min)
-- Trend: Phase 2 API layers executing efficiently
+- Last 5 plans: 02-07 (4 min), 02-08 (4 min), 02-09 (3 min), 02-10 (3 min), 02-11 (4 min)
+- Trend: Phase 2 complete with consistent execution velocity
 
 *Updated after each plan completion*
 
@@ -68,6 +68,8 @@ Recent decisions affecting current work:
 - **Session auth for acceptInvitation** - Athlete accepting has auth but no org context, use sessionProcedure
 - **Public endpoint for invitationInfo** - Invitation display accessible without login via publicProcedure
 - **Direct DB queries for org lookup** - Better-Auth API requires headers, public endpoints query DB directly
+- **Static exercise IDs** - Descriptive IDs like ex-barbell-bench-press for referential stability
+- **Seed orchestrator pattern** - index.ts orchestrates individual seed modules in dependency order
 
 ### Pending Todos
 
@@ -95,6 +97,7 @@ None.
 | 02-08 | Exercise Use Cases | Complete |
 | 02-09 | Athlete Contracts & Procedures | Complete |
 | 02-10 | Exercise Contracts & Procedures | Complete |
+| 02-11 | Database Seed | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/athletes.ts` - Athletes table schema
@@ -135,11 +138,15 @@ None.
 - `packages/contracts/src/exercises/` - Exercise and muscle group contracts
 - `packages/backend/src/procedures/athletes/` - Athlete CRUD and invitation procedures
 - `packages/backend/src/procedures/exercises/` - Exercise CRUD, clone, and muscle groups procedures
+- `packages/database/src/seed/muscle-groups.ts` - 10 muscle groups seed data
+- `packages/database/src/seed/exercises.ts` - 60 curated exercises seed data
+- `packages/database/src/seed/index.ts` - Seed orchestrator
+- `packages/database/scripts/seed.ts` - CLI seed runner
 
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 02-10-PLAN.md (Exercise Contracts & Procedures)
+Stopped at: Completed 02-11-PLAN.md (Database Seed)
 Resume file: None
 
-**Next:** Phase 2 complete - Ready for Phase 3 (Program Builder)
+**Next:** Phase 2 COMPLETE - Ready for Phase 3 (Program Builder)
