@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { signupInputSchema, type SignupInput } from '@strenly/contracts'
+import { type SignupInput, signupInputSchema } from '@strenly/contracts'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
@@ -29,13 +29,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
       <Field>
         <FieldLabel htmlFor="name">Nombre</FieldLabel>
         <FieldContent>
-          <Input
-            id="name"
-            type="text"
-            autoComplete="name"
-            aria-invalid={!!errors.name}
-            {...register('name')}
-          />
+          <Input id="name" type="text" autoComplete="name" aria-invalid={!!errors.name} {...register('name')} />
           <FieldError errors={[errors.name]} />
         </FieldContent>
       </Field>
@@ -43,13 +37,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
       <Field>
         <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
         <FieldContent>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            {...register('email')}
-          />
+          <Input id="email" type="email" autoComplete="email" aria-invalid={!!errors.email} {...register('email')} />
           <FieldError errors={[errors.email]} />
         </FieldContent>
       </Field>

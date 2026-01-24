@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react'
 import { OrgForm } from './org-form'
 import { Button } from '@/components/ui/button'
 
@@ -15,19 +14,17 @@ interface OrgFormStepProps {
 
 export function OrgFormStep({ onNext, onBack, isLoading }: OrgFormStepProps) {
   return (
-    <div className="fade-in-0 animate-in space-y-8 duration-300">
-      <div className="text-center">
-        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
-          <Sparkles className="size-8 text-primary" />
-        </div>
-        <h2 className="font-bold text-2xl">Crea tu organizacion</h2>
-        <p className="mt-2 text-base text-muted-foreground">Aqui es donde gestionaras tus atletas y programas</p>
+    <div className="space-y-6">
+      <div className="space-y-2 text-center">
+        <h2 className="font-semibold text-xl">Crea tu organización</h2>
+        <p className="text-muted-foreground text-sm">Este será el espacio donde gestionarás tus atletas y programas</p>
       </div>
 
-      <OrgForm onSubmit={onNext} isLoading={isLoading} />
+      <div className="rounded-xl border bg-background p-6">
+        <OrgForm onSubmit={onNext} isLoading={isLoading} />
+      </div>
 
-      <div className="space-y-3 text-center">
-        <p className="text-muted-foreground text-sm">Ya casi terminas! Solo un paso mas para comenzar.</p>
+      <div className="text-center">
         <Button variant="ghost" onClick={onBack} disabled={isLoading}>
           Volver
         </Button>

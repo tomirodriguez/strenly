@@ -1,9 +1,9 @@
 import { Link, useParams } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
-import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 
 /**
  * Recent activity component for the dashboard.
@@ -30,6 +30,7 @@ export function RecentActivity() {
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
               <div key={i} className="flex items-center justify-between">
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-32" />

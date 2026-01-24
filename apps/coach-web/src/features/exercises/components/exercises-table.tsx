@@ -1,6 +1,6 @@
 import type { Exercise } from '@strenly/contracts/exercises/exercise'
-import type React from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
+import type React from 'react'
 import { MuscleBadges } from './muscle-badges'
 import { DataTable } from '@/components/data-table/data-table'
 import { Badge } from '@/components/ui/badge'

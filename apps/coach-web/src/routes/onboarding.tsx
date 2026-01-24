@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { OnboardingView } from '@/features/auth/views/onboarding-view'
 import { AuthProvider } from '@/contexts/auth-context'
+import { OnboardingView } from '@/features/auth/views/onboarding-view'
 import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/onboarding')({

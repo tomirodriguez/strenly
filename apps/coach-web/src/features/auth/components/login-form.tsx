@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginInputSchema, type LoginInput } from '@strenly/contracts'
+import { type LoginInput, loginInputSchema } from '@strenly/contracts'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -34,13 +34,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
       <Field>
         <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
         <FieldContent>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            {...register('email')}
-          />
+          <Input id="email" type="email" autoComplete="email" aria-invalid={!!errors.email} {...register('email')} />
           <FieldError errors={[errors.email]} />
         </FieldContent>
       </Field>

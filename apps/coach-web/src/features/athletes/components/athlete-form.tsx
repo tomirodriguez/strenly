@@ -91,12 +91,7 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
       <Field>
         <FieldLabel htmlFor="notes">Notas</FieldLabel>
         <FieldContent>
-          <Textarea
-            id="notes"
-            {...register('notes')}
-            placeholder="Notas adicionales sobre el atleta..."
-            rows={4}
-          />
+          <Textarea id="notes" {...register('notes')} placeholder="Notas adicionales sobre el atleta..." rows={4} />
           <FieldError errors={[errors.notes]} />
         </FieldContent>
       </Field>
