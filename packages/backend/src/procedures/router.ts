@@ -1,3 +1,4 @@
+import { athletes } from "./athletes";
 import { exercises } from "./exercises";
 import { health } from "./health/health";
 import { subscriptions } from "./subscriptions";
@@ -13,6 +14,7 @@ import { subscriptions } from "./subscriptions";
  * The RPCHandler handles routing based on the object keys.
  */
 export const router = {
+	athletes,
 	exercises,
 	health,
 	subscriptions,
