@@ -37,7 +37,7 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
   return (
     <div
       className={cn(
-        'relative flex h-full w-72 flex-col rounded-xl border bg-background',
+        'relative flex h-full flex-col rounded-xl border bg-background',
         'transition-all hover:shadow-md',
         isRecommended && 'border-primary shadow-md',
       )}
@@ -126,7 +126,7 @@ export function PlanSelectionStep({ organizationType, onNext, onBack }: PlanSele
         <p className="text-muted-foreground text-sm">Puedes cambiar de plan en cualquier momento</p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 pt-6">
+      <div className="mx-auto grid w-fit gap-6 pt-6" style={{ gridTemplateColumns: `repeat(${plans.length}, 288px)` }}>
         {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}

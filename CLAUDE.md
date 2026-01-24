@@ -162,6 +162,7 @@ Run `/orpc-query` skill for API hooks, `/form` skill for forms, `/data-table` sk
 6. No queries without organization scope on tenant tables
 7. **No use cases with direct DB queries - use repositories**
 8. **No procedures without domain entity validation**
+9. **Avoid `useEffect`** - prefer callback functions, event handlers, or derived state
 
 ## Clean Architecture Flow
 
