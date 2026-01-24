@@ -154,6 +154,53 @@ When implementing backend features, follow this order and invoke the correspondi
 5. **Contracts** (`/contracts`) - `packages/contracts/src/`
 6. **Procedure** (`/procedure`) - `packages/backend/src/procedures/`
 
+## Mandatory Skills Reference
+
+**IMPORTANT:** Load the corresponding skill BEFORE writing code for each layer. Plans MUST reference required skills for each task.
+
+### Backend Skills (Load in Order)
+
+| Skill | When to Load | Location |
+|-------|--------------|----------|
+| `/architecture` | **ALWAYS FIRST** - Before planning or implementing any backend feature | Understanding flow |
+| `/domain-entity` | Creating entities with business validation rules | `packages/core/src/domain/entities/` |
+| `/port` | Defining repository interfaces | `packages/core/src/ports/` |
+| `/repository` | Implementing ports with Drizzle ORM | `packages/backend/src/infrastructure/repositories/` |
+| `/authorization` | Adding permission checks to use cases | `packages/core/src/services/authorization.ts` |
+| `/use-case` | Implementing business logic orchestration | `packages/backend/src/use-cases/` |
+| `/contracts` | Creating Zod schemas for API input/output | `packages/contracts/src/` |
+| `/procedure` | Creating thin API handlers | `packages/backend/src/procedures/` |
+
+### Frontend Skills
+
+| Skill | When to Load | Location |
+|-------|--------------|----------|
+| `/orpc-query` | Creating query/mutation hooks with TanStack Query | `apps/*/src/lib/api/` |
+| `/mutation-errors` | Handling errors in mutation hooks | Components using mutations |
+| `/form` | Creating forms with React Hook Form + shadcn Field | Form components |
+| `/data-table` | Building tables with pagination, filtering | Table components |
+
+### Validation Skills
+
+| Skill | When to Load |
+|-------|--------------|
+| `/test-runner` | After completing code, before committing |
+
+### Planning Enforcement
+
+When creating plans, each task MUST specify which skills to load:
+
+```markdown
+<task type="auto">
+  <name>Create Athlete Domain Entity</name>
+  <skills>/domain-entity</skills>  <!-- Required for this task -->
+  <files>packages/core/src/domain/entities/athlete.ts</files>
+  ...
+</task>
+```
+
+**Plans are INCOMPLETE if they don't reference appropriate skills for each task.**
+
 ## Reference Implementation
 
 The project at `/Users/tomiardz/Projects/strenly` serves as a reference for:

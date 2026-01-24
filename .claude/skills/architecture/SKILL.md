@@ -201,17 +201,55 @@ findById: (ctx, id) => {
 
 For each new domain concept introduced by a phase, the plan MUST include tasks for:
 
-- [ ] **Domain Entity** task — `packages/core/src/domain/entities/{entity}.ts`
+- [ ] **Domain Entity** task — `packages/core/src/domain/entities/{entity}.ts` — skill: `/domain-entity`
 - [ ] **Domain Entity Tests** task — `packages/core/src/domain/entities/{entity}.test.ts` (90%+ coverage required)
-- [ ] **Port** task — `packages/core/src/ports/{entity}-repository.port.ts`
-- [ ] **Repository** task — `packages/backend/src/infrastructure/repositories/{entity}.repository.ts`
-- [ ] **Use Case** tasks — authorization-first, domain validation
+- [ ] **Port** task — `packages/core/src/ports/{entity}-repository.port.ts` — skill: `/port`
+- [ ] **Repository** task — `packages/backend/src/infrastructure/repositories/{entity}.repository.ts` — skill: `/repository`
+- [ ] **Use Case** tasks — authorization-first, domain validation — skills: `/use-case`, `/authorization`
+- [ ] **Contracts** task — Zod schemas for API — skill: `/contracts`
+- [ ] **Procedure** task — thin API handler — skill: `/procedure`
+
+**Each task MUST specify which skill to load.** Example:
+
+```markdown
+<task type="auto">
+  <name>Create Athlete Domain Entity</name>
+  <skills>/domain-entity</skills>
+  <files>packages/core/src/domain/entities/athlete.ts</files>
+  <action>...</action>
+</task>
+
+<task type="auto">
+  <name>Create Athlete Repository</name>
+  <skills>/repository</skills>
+  <files>packages/backend/src/infrastructure/repositories/athlete.repository.ts</files>
+  <action>...</action>
+</task>
+```
 
 **Example:** If Phase 2 introduces "Athlete" concept:
 - Plan must have: Athlete domain entity + tests → AthleteRepositoryPort → AthleteRepository → CreateAthlete use case
+- Each task references its skill: `/domain-entity`, `/port`, `/repository`, `/use-case`, `/authorization`
 - NOT: CreateAthlete use case with direct DB queries (this is what we did wrong in Phase 1)
 
 **Verification:** After creating/editing `packages/core`, run `pnpm test --coverage` and verify 90%+ on core.
+
+## Skill Reference (Quick Lookup)
+
+| Layer | Skill | When Required |
+|-------|-------|---------------|
+| Domain | `/domain-entity` | Creating entities with business rules |
+| Domain | `/port` | Defining repository interfaces |
+| Infrastructure | `/repository` | Implementing ports with Drizzle |
+| Application | `/use-case` | Business logic orchestration |
+| Application | `/authorization` | Permission checks in use cases |
+| API | `/contracts` | Zod schemas for input/output |
+| API | `/procedure` | Thin API handlers |
+| Frontend | `/orpc-query` | Query/mutation hooks |
+| Frontend | `/mutation-errors` | Error handling in mutations |
+| Frontend | `/form` | Forms with React Hook Form |
+| Frontend | `/data-table` | Tables with pagination |
+| Validation | `/test-runner` | Before committing code |
 
 ## Domain Concepts Requiring Full Architecture
 
