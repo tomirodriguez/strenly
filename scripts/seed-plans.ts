@@ -127,9 +127,7 @@ async function seedPlans() {
 
 	console.log(`Seeded ${defaultPlans.length} subscription plans:`);
 	for (const plan of defaultPlans) {
-		console.log(
-			`  - ${plan.name} (${plan.organizationType}): ${plan.athleteLimit} athletes`,
-		);
+		console.log(`  - ${plan.name} (${plan.organizationType}): ${plan.athleteLimit} athletes`);
 	}
 
 	await sql.end();

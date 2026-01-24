@@ -28,7 +28,7 @@ Strenly delivers a training planning platform where coaches can create programs 
   3. Organization data is completely isolated (users cannot access other organizations' data)
   4. User must select subscription plan before creating organization and system enforces plan limits
   5. User can belong to multiple organizations with different roles
-**Plans**: 5 plans in 3 waves
+**Plans**: 7 plans in 4 waves
 
 Plans:
 - [x] 01-01-PLAN.md - Database schema + Better-Auth setup (Wave 1)
@@ -49,11 +49,20 @@ Plans:
   3. Coach can search curated exercise database and create custom exercises with muscle/pattern mappings
   4. Coach can operate fully without athletes having linked accounts (log workouts on their behalf)
   5. Exercises have muscle group mappings and movement pattern classification for future analytics
-**Plans**: TBD
+**Plans**: 11 plans in 5 waves
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md - Database schema for athletes, exercises, muscle groups (Wave 1)
+- [ ] 02-02-PLAN.md - Athlete and AthleteInvitation domain entities + ports (Wave 1, TDD)
+- [ ] 02-03-PLAN.md - Exercise domain entity + MuscleGroup/MovementPattern value objects (Wave 1, TDD)
+- [ ] 02-04-PLAN.md - Athlete and AthleteInvitation repositories (Wave 2)
+- [ ] 02-05-PLAN.md - Exercise and MuscleGroup repositories (Wave 2)
+- [ ] 02-06-PLAN.md - Athlete CRUD use cases (Wave 3)
+- [ ] 02-07-PLAN.md - Athlete invitation flow use cases (Wave 3)
+- [ ] 02-08-PLAN.md - Exercise CRUD and clone use cases (Wave 3)
+- [ ] 02-09-PLAN.md - Athletes contracts and procedures (Wave 4)
+- [ ] 02-10-PLAN.md - Exercises contracts and procedures (Wave 4)
+- [ ] 02-11-PLAN.md - Seed muscle groups and curated exercises (Wave 5)
 
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
@@ -113,12 +122,12 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Multi-Tenancy | 7/7 | ✓ Complete | 2026-01-24 |
-| 2. Exercise Library & Athlete Management | 0/2 | Not started | - |
+| 1. Foundation & Multi-Tenancy | 7/7 | Complete | 2026-01-24 |
+| 2. Exercise Library & Athlete Management | 0/11 | Not started | - |
 | 3. Program Builder | 0/4 | Not started | - |
 | 4. Athlete PWA | 0/3 | Not started | - |
 | 5. Dashboard & Analytics | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-24*
+*Last updated: 2026-01-23*

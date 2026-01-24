@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "turbo run dev",
-    "dev:api": "pnpm --filter @strenly/backend dev",
+    "dev:api": "./scripts/dev-server.sh",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
@@ -18,7 +18,7 @@
     "db:drop": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:drop",
     "db:studio": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:studio",
     "db:migrate": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:migrate",
-    "db:seed:plans": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:seed:plans",
+    "db:seed:plans": "dotenv -e .env -- tsx scripts/seed-plans.ts",
     "db:start": "docker-compose up -d",
     "db:down": "docker-compose down",
     "db:reset": "docker-compose down -v && docker-compose up -d && sleep 3 && npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:push"

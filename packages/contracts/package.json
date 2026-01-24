@@ -13,8 +13,9 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "lint": "pnpm biome check src",
-    "lint:fix": "pnpm biome check --write src",
+    "format": "pnpm biome format --write src",
+    "lint": "pnpm biome check --write src",
+    "lint:fix": "pnpm biome check --write --unsafe src",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
