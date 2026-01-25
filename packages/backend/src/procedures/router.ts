@@ -1,6 +1,7 @@
 import { athletes } from './athletes'
 import { exercises } from './exercises'
 import { health } from './health/health'
+import { programs } from './programs'
 import { subscriptions } from './subscriptions'
 
 /**
@@ -17,6 +18,7 @@ export const router = {
   athletes,
   exercises,
   health,
+  programs,
   subscriptions,
 }
 

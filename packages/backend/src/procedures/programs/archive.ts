@@ -1,0 +1,57 @@
+import { archiveProgramInputSchema, programSchema } from '@strenly/contracts/programs'
+import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { authProcedure } from '../../lib/orpc'
+import { makeArchiveProgram } from '../../use-cases/programs/archive-program'
+
+/**
+ * Archive a program (soft delete via status transition)
+ * Requires authentication and programs:delete permission
+ */
+export const archiveProgram = authProcedure
+  .errors({
+    FORBIDDEN: { message: 'No permission to archive programs' },
+    NOT_FOUND: { message: 'Program not found' },
+    INVALID_TRANSITION: { message: 'Cannot archive program' },
+  })
+  .input(archiveProgramInputSchema)
+  .output(programSchema)
+  .handler(async ({ input, context, errors }) => {
+    const archiveProgramUseCase = makeArchiveProgram({
+      programRepository: createProgramRepository(context.db),
+    })
+
+    const result = await archiveProgramUseCase({
+      organizationId: context.organization.id,
+      userId: context.user.id,
+      memberRole: context.membership.role,
+      programId: input.programId,
+    })
+
+    if (result.isErr()) {
+      switch (result.error.type) {
+        case 'forbidden':
+          throw errors.FORBIDDEN({ message: result.error.message })
+        case 'not_found':
+          throw errors.NOT_FOUND({ message: `Program ${result.error.programId} not found` })
+        case 'invalid_transition':
+          throw errors.INVALID_TRANSITION({ message: result.error.message })
+        case 'repository_error':
+          console.error('Repository error:', result.error.message)
+          throw new Error('Internal error')
+      }
+    }
+
+    const program = result.value
+
+    return {
+      id: program.id,
+      organizationId: program.organizationId,
+      name: program.name,
+      description: program.description,
+      athleteId: program.athleteId,
+      isTemplate: program.isTemplate,
+      status: program.status,
+      createdAt: program.createdAt.toISOString(),
+      updatedAt: program.updatedAt.toISOString(),
+    }
+  })
