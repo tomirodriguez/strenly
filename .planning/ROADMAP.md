@@ -141,6 +141,38 @@ Plans:
 - [ ] 03-15-PLAN.md - Template system: save as template, create from template (Wave 7)
 - [ ] 03-16-PLAN.md - Navigation, polish, and final UAT (Wave 8)
 
+### Phase 3.1: Custom Program Grid (INSERTED)
+**Goal**: Replace react-datasheet-grid with custom grid component that matches our design system
+**Depends on**: Phase 3 (backend complete, frontend grid needs reimplementation)
+**Requirements**: PRG-01, PRG-02, PRG-03, PRG-04, PRG-05, PRG-06, PRG-07 (same as Phase 3 grid requirements)
+**Success Criteria** (what must be TRUE):
+  1. Program grid uses native HTML table with dark slate theme and blue accents
+  2. Keyboard navigation works (arrow keys, tab, enter, escape) without mouse
+  3. Inline cell editing uses our Input components with prescription notation parsing
+  4. Exercise column uses our Combobox component with search
+  5. Week column headers have DropdownMenu for actions (rename, duplicate, delete)
+  6. Session grouping displays as visual sections in the grid
+  7. All existing mutation hooks (use-grid-mutations.ts) work with new grid
+  8. Programs list uses DataTable instead of cards
+  9. Create program form has weeks selector (default 4) and improved athlete combobox
+**Plans**: 7 plans in 5 waves
+
+**Context:**
+- Backend API (procedures, use cases, contracts) is complete and unchanged
+- react-datasheet-grid failed UAT - doesn't match design system
+- Reference: `.planning/phases/03-program-builder/03-UAT.md` (full issue details)
+- Reference: `.planning/phases/03-program-builder/ui-ux-specifications/` (design target)
+- Existing hooks: `apps/coach-web/src/features/programs/hooks/mutations/use-grid-mutations.ts`
+
+Plans:
+- [ ] 03.1-01-PLAN.md - Programs list with DataTable (Wave 1)
+- [ ] 03.1-02-PLAN.md - Program form improvements (weeks selector, athlete combobox) (Wave 1)
+- [ ] 03.1-03-PLAN.md - Grid foundation (types, hooks, data transform) (Wave 2)
+- [ ] 03.1-04-PLAN.md - Grid structural components (header, session rows, superset) (Wave 3)
+- [ ] 03.1-05-PLAN.md - Exercise cell with combobox (Wave 3)
+- [ ] 03.1-06-PLAN.md - Prescription cells and grid body (Wave 4)
+- [ ] 03.1-07-PLAN.md - Grid integration and program editor (Wave 5)
+
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
 **Depends on**: Phase 3
@@ -177,7 +209,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -185,7 +217,8 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
-| 3. Program Builder (full-stack) | 0/16 | Not started | - |
+| 3. Program Builder (full-stack) | 15/16 | In progress | - |
+| 3.1. Custom Program Grid (frontend) | 0/7 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
