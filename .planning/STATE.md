@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.1 - Custom Program Grid (COMPLETE + VERIFIED v4)
+**Current focus:** Phase 3.2 - Prescription Data Structure Refactor (PLANNED)
 
 ## Current Position
 
-Phase: 3.1 of 5 (Custom Program Grid - COMPLETE)
-Plan: 17/17 - All gap closure plans complete
-Status: Phase 3.1 fully complete with UAT v4 gap closure
-Last activity: 2026-01-25 - Gap closure plan 17 executed (superset row positioning fixes)
+Phase: 3.2 of 5 (Prescription Data Structure Refactor)
+Plan: 1/8 - Database Schema complete
+Status: In progress
+Last activity: 2026-01-25 - Completed 03.2-01-PLAN.md (database schema)
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plan 01 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -154,6 +154,7 @@ Recent decisions affecting current work:
 
 - Phase 3.1 inserted after Phase 3: Custom Program Grid (URGENT) - UAT revealed react-datasheet-grid doesn't match design system, need custom implementation
 - Phase 3.1 COMPLETE - Custom grid now matches design system
+- Phase 3.2 inserted after Phase 3.1: Prescription Data Structure Refactor (URGENT) - Current data model stores sets as single number, making variations complex; refactor to series-as-array model with exercise groups and client-side editing
 
 ### Blockers/Concerns
 
@@ -270,7 +271,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 3.1 COMPLETE + VERIFIED v5 (17/17 plans, 9/9 must-haves)
+Stopped at: Completed 03.2-01-PLAN.md (database schema)
 Resume file: None
 
-**Next:** Phase 4 (Athlete PWA). Note: Phase 3 has remaining plan 03-16 (Navigation/UAT) but Phase 3.1 superseded the frontend grid.
+**Next:** Phase 3.2 Plan 02 (Domain Entities). ExerciseGroup and updated Prescription domain entities.
