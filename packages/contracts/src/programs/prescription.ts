@@ -257,6 +257,18 @@ export function parsePrescriptionNotation(input: string): ParsedPrescription | n
  * @param prescription - The parsed prescription or null
  * @returns Notation string (em dash for null)
  */
+/**
+ * Update prescription input schema
+ * Used to update a single cell in the program grid
+ */
+export const updatePrescriptionSchema = z.object({
+  exerciseRowId: z.string(),
+  weekId: z.string(),
+  notation: z.string().max(50), // e.g., "3x8@120kg (31X0)"
+})
+
+export type UpdatePrescriptionInput = z.infer<typeof updatePrescriptionSchema>
+
 export function formatPrescription(prescription: ParsedPrescription | null): string {
   if (prescription === null) {
     return '—' // Skip notation
