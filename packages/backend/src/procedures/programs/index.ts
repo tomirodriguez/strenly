@@ -1,27 +1,68 @@
 import { archiveProgram } from './archive'
 import { createProgram } from './create'
 import { duplicateProgram } from './duplicate'
+import {
+  addExerciseRowProcedure,
+  addSplitRowProcedure,
+  deleteExerciseRowProcedure,
+  reorderExerciseRowsProcedure,
+  toggleSupersetProcedure,
+  updateExerciseRowProcedure,
+} from './exercise-rows'
 import { getProgram } from './get'
 import { listPrograms } from './list'
+import { updatePrescriptionProcedure } from './prescriptions'
+import { addSessionProcedure, deleteSessionProcedure, updateSessionProcedure } from './sessions'
 import { updateProgram } from './update'
+import { addWeekProcedure, deleteWeekProcedure, duplicateWeekProcedure, updateWeekProcedure } from './weeks'
 
 /**
  * Programs router
- * Handles program CRUD and duplication operations
+ * Handles program CRUD and grid manipulation operations
  *
- * Procedures:
- * - create: Create a new program (with default week and session)
- * - list: List programs with optional filters
- * - get: Get program with full details for grid view
- * - update: Update program name/description
- * - archive: Archive a program (soft delete via status transition)
- * - duplicate: Deep copy a program with all nested data
+ * Structure:
+ * - Root level: program CRUD (create, get, list, update, archive, duplicate)
+ * - weeks: week management (add, update, delete, duplicate)
+ * - sessions: session management (add, update, delete)
+ * - exerciseRows: exercise row management (add, update, delete, reorder, split, superset)
+ * - prescriptions: prescription cell updates
  */
 export const programs = {
+  // Program CRUD
   create: createProgram,
   list: listPrograms,
   get: getProgram,
   update: updateProgram,
   archive: archiveProgram,
   duplicate: duplicateProgram,
+
+  // Week operations
+  weeks: {
+    add: addWeekProcedure,
+    update: updateWeekProcedure,
+    delete: deleteWeekProcedure,
+    duplicate: duplicateWeekProcedure,
+  },
+
+  // Session operations
+  sessions: {
+    add: addSessionProcedure,
+    update: updateSessionProcedure,
+    delete: deleteSessionProcedure,
+  },
+
+  // Exercise row operations
+  exerciseRows: {
+    add: addExerciseRowProcedure,
+    update: updateExerciseRowProcedure,
+    delete: deleteExerciseRowProcedure,
+    reorder: reorderExerciseRowsProcedure,
+    addSplit: addSplitRowProcedure,
+    toggleSuperset: toggleSupersetProcedure,
+  },
+
+  // Prescription operations
+  prescriptions: {
+    update: updatePrescriptionProcedure,
+  },
 }
