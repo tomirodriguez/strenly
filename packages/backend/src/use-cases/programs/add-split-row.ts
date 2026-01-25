@@ -67,8 +67,13 @@ export const makeAddSplitRow =
           exerciseId: parentRow.exerciseId,
           // Place it right after parent (will be normalized later if needed)
           orderIndex: parentRow.orderIndex + 0.5,
+          // New group-based fields (inherit from parent)
+          groupId: parentRow.groupId,
+          orderWithinGroup: parentRow.orderWithinGroup,
+          // Legacy superset fields
           supersetGroup: parentRow.supersetGroup,
           supersetOrder: parentRow.supersetOrder,
+          // Other fields
           setTypeLabel: input.setTypeLabel,
           isSubRow: true,
           parentRowId: parentRow.id,

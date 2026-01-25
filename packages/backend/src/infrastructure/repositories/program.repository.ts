@@ -1,7 +1,9 @@
 import type {
+  ExerciseGroupData,
   ExerciseRowWithPrescriptions,
   OrganizationContext,
   Prescription,
+  PrescriptionSeriesData,
   ProgramExerciseRow,
   ProgramFilters,
   ProgramRepositoryError,
@@ -9,11 +11,13 @@ import type {
   ProgramSession,
   ProgramWeek,
   ProgramWithDetails,
+  SaveDraftInput,
   SessionWithRows,
 } from '@strenly/core'
 import { createPrescription, createProgram, isProgramStatus, type Program } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import {
+  exerciseGroups,
   exercises,
   type ParsedPrescription,
   prescriptions,
@@ -35,7 +39,7 @@ function wrapDbError(error: unknown): ProgramRepositoryError {
 }
 
 function notFoundError(
-  entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription',
+  entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group',
   id: string,
 ): ProgramRepositoryError {
   return { type: 'NOT_FOUND', entityType, id }
@@ -54,6 +58,7 @@ type WeekRow = typeof programWeeks.$inferSelect
 type SessionRow = typeof programSessions.$inferSelect
 type ExerciseRowDb = typeof programExercises.$inferSelect
 type PrescriptionRow = typeof prescriptions.$inferSelect
+type ExerciseGroupRow = typeof exerciseGroups.$inferSelect
 
 // ============================================================================
 // Domain Mappers
@@ -105,13 +110,29 @@ function mapExerciseRowToDomain(row: ExerciseRowDb): ProgramExerciseRow {
     sessionId: row.sessionId,
     exerciseId: row.exerciseId,
     orderIndex: row.orderIndex,
+    // New group-based fields
+    groupId: row.groupId,
+    orderWithinGroup: row.orderWithinGroup,
+    // Legacy superset fields
     supersetGroup: row.supersetGroup,
     supersetOrder: row.supersetOrder,
+    // Other fields
     setTypeLabel: row.setTypeLabel,
     isSubRow: row.isSubRow,
     parentRowId: row.parentRowId,
     notes: row.notes,
     restSeconds: row.restSeconds,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }
+}
+
+function mapExerciseGroupToDomain(row: ExerciseGroupRow): ExerciseGroupData {
+  return {
+    id: row.id,
+    sessionId: row.sessionId,
+    orderIndex: row.orderIndex,
+    name: row.name,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }
@@ -217,6 +238,20 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       .where(and(eq(programExercises.id, rowId), eq(programs.organizationId, ctx.organizationId)))
 
     return rows[0]?.row ?? null
+  }
+
+  /**
+   * Helper to verify an exercise group exists and belongs to the organization.
+   */
+  async function verifyGroupAccess(ctx: OrganizationContext, groupId: string): Promise<ExerciseGroupRow | null> {
+    const rows = await db
+      .select({ group: exerciseGroups, program: programs })
+      .from(exerciseGroups)
+      .innerJoin(programSessions, eq(exerciseGroups.sessionId, programSessions.id))
+      .innerJoin(programs, eq(programSessions.programId, programs.id))
+      .where(and(eq(exerciseGroups.id, groupId), eq(programs.organizationId, ctx.organizationId)))
+
+    return rows[0]?.group ?? null
   }
 
   return {
@@ -386,6 +421,34 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             .where(eq(programSessions.programId, id))
             .orderBy(asc(programSessions.orderIndex))
 
+          // 3.5. Fetch exercise groups for all sessions
+          const sessionIds = sessionRows.map((s) => s.id)
+          let groupRows: ExerciseGroupRow[] = []
+          if (sessionIds.length > 0) {
+            groupRows = await db
+              .select()
+              .from(exerciseGroups)
+              .where(
+                sql`${exerciseGroups.sessionId} IN (${sql.join(
+                  sessionIds.map((sId) => sql`${sId}`),
+                  sql`, `,
+                )})`,
+              )
+              .orderBy(asc(exerciseGroups.orderIndex))
+          }
+
+          // Group exercise groups by session ID
+          const groupsBySessionId = new Map<string, ExerciseGroupData[]>()
+          for (const groupRow of groupRows) {
+            const group = mapExerciseGroupToDomain(groupRow)
+            let sessionGroupList = groupsBySessionId.get(groupRow.sessionId)
+            if (!sessionGroupList) {
+              sessionGroupList = []
+              groupsBySessionId.set(groupRow.sessionId, sessionGroupList)
+            }
+            sessionGroupList.push(group)
+          }
+
           // 4. Fetch exercise rows with exercise names
           const exerciseRowResults = await db
             .select({
@@ -482,10 +545,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             sessionExerciseRows.push(row)
           }
 
-          // 9. Build sessions with rows
+          // 9. Build sessions with rows and exercise groups
           const sessions: SessionWithRows[] = sessionRows.map((sessionRow) => ({
             ...mapSessionToDomain(sessionRow),
             rows: rowsBySessionId.get(sessionRow.id) ?? [],
+            exerciseGroups: groupsBySessionId.get(sessionRow.id) ?? [],
           }))
 
           return {
@@ -728,6 +792,143 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     },
 
     // -------------------------------------------------------------------------
+    // Exercise Group Operations
+    // -------------------------------------------------------------------------
+
+    createGroup(
+      ctx: OrganizationContext,
+      sessionId: string,
+      name?: string | null,
+    ): ResultAsync<ExerciseGroupData, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: ExerciseGroupRow } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify session access
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          // Get next order index
+          const maxOrderResult = await db
+            .select({ maxOrder: sql<number>`COALESCE(MAX(${exerciseGroups.orderIndex}), -1)` })
+            .from(exerciseGroups)
+            .where(eq(exerciseGroups.sessionId, sessionId))
+
+          const nextOrder = (maxOrderResult[0]?.maxOrder ?? -1) + 1
+
+          // Insert new group
+          const rows = await db
+            .insert(exerciseGroups)
+            .values({
+              id: `eg-${crypto.randomUUID()}`,
+              sessionId,
+              orderIndex: nextOrder,
+              name: name ?? null,
+            })
+            .returning()
+
+          const row = rows[0]
+          if (!row) {
+            return { ok: false, error: dbError('Failed to create exercise group') }
+          }
+
+          return { ok: true, data: row }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(mapExerciseGroupToDomain(result.data))
+      })
+    },
+
+    updateGroup(
+      ctx: OrganizationContext,
+      groupId: string,
+      updates: { name?: string | null; orderIndex?: number },
+    ): ResultAsync<void, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify group access
+          const existingGroup = await verifyGroupAccess(ctx, groupId)
+          if (!existingGroup) {
+            return { ok: false, error: notFoundError('group', groupId) }
+          }
+
+          // Build update object
+          const updateData: Partial<{ name: string | null; orderIndex: number; updatedAt: Date }> = {
+            updatedAt: new Date(),
+          }
+          if (updates.name !== undefined) {
+            updateData.name = updates.name
+          }
+          if (updates.orderIndex !== undefined) {
+            updateData.orderIndex = updates.orderIndex
+          }
+
+          await db.update(exerciseGroups).set(updateData).where(eq(exerciseGroups.id, groupId))
+
+          return { ok: true }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(undefined)
+      })
+    },
+
+    deleteGroup(ctx: OrganizationContext, groupId: string): ResultAsync<void, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify group access
+          const existingGroup = await verifyGroupAccess(ctx, groupId)
+          if (!existingGroup) {
+            return { ok: false, error: notFoundError('group', groupId) }
+          }
+
+          // Note: exercises with this groupId will have their groupId set to NULL due to onDelete: setNull
+          await db.delete(exerciseGroups).where(eq(exerciseGroups.id, groupId))
+
+          return { ok: true }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(undefined)
+      })
+    },
+
+    getMaxGroupOrderIndex(ctx: OrganizationContext, sessionId: string): ResultAsync<number, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: number } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify session access
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          const result = await db
+            .select({ maxOrder: sql<number>`COALESCE(MAX(${exerciseGroups.orderIndex}), -1)` })
+            .from(exerciseGroups)
+            .where(eq(exerciseGroups.sessionId, sessionId))
+
+          return { ok: true, data: result[0]?.maxOrder ?? -1 }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
+
+    // -------------------------------------------------------------------------
     // Exercise Row Operations
     // -------------------------------------------------------------------------
 
@@ -817,8 +1018,13 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               sessionId,
               exerciseId: row.exerciseId,
               orderIndex: row.orderIndex,
+              // New group-based fields
+              groupId: row.groupId,
+              orderWithinGroup: row.orderWithinGroup,
+              // Legacy superset fields
               supersetGroup: row.supersetGroup,
               supersetOrder: row.supersetOrder,
+              // Other fields
               setTypeLabel: row.setTypeLabel,
               isSubRow: row.isSubRow,
               parentRowId: row.parentRowId,
@@ -861,8 +1067,13 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             .set({
               exerciseId: row.exerciseId,
               orderIndex: row.orderIndex,
+              // New group-based fields
+              groupId: row.groupId,
+              orderWithinGroup: row.orderWithinGroup,
+              // Legacy superset fields
               supersetGroup: row.supersetGroup,
               supersetOrder: row.supersetOrder,
+              // Other fields
               setTypeLabel: row.setTypeLabel,
               isSubRow: row.isSubRow,
               parentRowId: row.parentRowId,
@@ -1000,9 +1211,199 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
+    updatePrescriptionSeries(
+      ctx: OrganizationContext,
+      exerciseRowId: string,
+      weekId: string,
+      series: PrescriptionSeriesData[],
+    ): ResultAsync<void, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify exercise row access
+          const existingRow = await verifyExerciseRowAccess(ctx, exerciseRowId)
+          if (!existingRow) {
+            return { ok: false, error: notFoundError('exercise_row', exerciseRowId) }
+          }
+
+          // Verify week access
+          const existingWeek = await verifyWeekAccess(ctx, weekId)
+          if (!existingWeek) {
+            return { ok: false, error: notFoundError('week', weekId) }
+          }
+
+          if (series.length === 0) {
+            // Delete the prescription if series is empty
+            await db
+              .delete(prescriptions)
+              .where(and(eq(prescriptions.programExerciseId, exerciseRowId), eq(prescriptions.weekId, weekId)))
+          } else {
+            // Convert series to legacy prescription format for backward compatibility
+            // Calculate sets from series count, use first series for other values
+            const firstSeries = series[0]
+            const prescriptionData: ParsedPrescription = {
+              sets: series.length,
+              repsMin: firstSeries?.reps ?? 0,
+              repsMax: firstSeries?.repsMax ?? null,
+              isAmrap: firstSeries?.isAmrap ?? false,
+              isUnilateral: false, // Not used in series model
+              unilateralUnit: null,
+              intensityType: firstSeries?.intensityType ?? null,
+              intensityValue: firstSeries?.intensityValue ?? null,
+              intensityUnit: firstSeries?.intensityUnit ?? null,
+              tempo: firstSeries?.tempo ?? null,
+            }
+
+            await db
+              .insert(prescriptions)
+              .values({
+                id: `rx-${crypto.randomUUID()}`,
+                programExerciseId: exerciseRowId,
+                weekId,
+                prescription: prescriptionData,
+                // series: series, // TODO: Add series JSONB column in future
+              })
+              .onConflictDoUpdate({
+                target: [prescriptions.programExerciseId, prescriptions.weekId],
+                set: {
+                  prescription: prescriptionData,
+                  // series: series, // TODO: Add series JSONB column in future
+                  updatedAt: new Date(),
+                },
+              })
+          }
+
+          return { ok: true }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(undefined)
+      })
+    },
+
     // -------------------------------------------------------------------------
     // Bulk Operations
     // -------------------------------------------------------------------------
+
+    saveDraft(
+      ctx: OrganizationContext,
+      input: SaveDraftInput,
+    ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: { updatedAt: Date } } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify program access
+          const existingProgram = await verifyProgramAccess(ctx, input.programId)
+          if (!existingProgram) {
+            return { ok: false, error: notFoundError('program', input.programId) }
+          }
+
+          const updatedAt = new Date()
+
+          await db.transaction(async (tx) => {
+            // Update prescriptions with series
+            if (input.prescriptionUpdates && input.prescriptionUpdates.length > 0) {
+              for (const update of input.prescriptionUpdates) {
+                if (update.series.length === 0) {
+                  // Delete the prescription if series is empty
+                  await tx
+                    .delete(prescriptions)
+                    .where(
+                      and(
+                        eq(prescriptions.programExerciseId, update.exerciseRowId),
+                        eq(prescriptions.weekId, update.weekId),
+                      ),
+                    )
+                } else {
+                  // Convert series to legacy prescription format
+                  const firstSeries = update.series[0]
+                  const prescriptionData: ParsedPrescription = {
+                    sets: update.series.length,
+                    repsMin: firstSeries?.reps ?? 0,
+                    repsMax: firstSeries?.repsMax ?? null,
+                    isAmrap: firstSeries?.isAmrap ?? false,
+                    isUnilateral: false,
+                    unilateralUnit: null,
+                    intensityType: firstSeries?.intensityType ?? null,
+                    intensityValue: firstSeries?.intensityValue ?? null,
+                    intensityUnit: firstSeries?.intensityUnit ?? null,
+                    tempo: firstSeries?.tempo ?? null,
+                  }
+
+                  await tx
+                    .insert(prescriptions)
+                    .values({
+                      id: `rx-${crypto.randomUUID()}`,
+                      programExerciseId: update.exerciseRowId,
+                      weekId: update.weekId,
+                      prescription: prescriptionData,
+                    })
+                    .onConflictDoUpdate({
+                      target: [prescriptions.programExerciseId, prescriptions.weekId],
+                      set: {
+                        prescription: prescriptionData,
+                        updatedAt,
+                      },
+                    })
+                }
+              }
+            }
+
+            // Update exercise rows
+            if (input.exerciseRowUpdates && input.exerciseRowUpdates.length > 0) {
+              for (const update of input.exerciseRowUpdates) {
+                const updateData: Partial<{
+                  exerciseId: string
+                  groupId: string | null
+                  orderWithinGroup: number | null
+                  updatedAt: Date
+                }> = { updatedAt }
+
+                if (update.exerciseId !== undefined) {
+                  updateData.exerciseId = update.exerciseId
+                }
+                if (update.groupId !== undefined) {
+                  updateData.groupId = update.groupId
+                }
+                if (update.orderWithinGroup !== undefined) {
+                  updateData.orderWithinGroup = update.orderWithinGroup
+                }
+
+                await tx.update(programExercises).set(updateData).where(eq(programExercises.id, update.rowId))
+              }
+            }
+
+            // Update groups
+            if (input.groupUpdates && input.groupUpdates.length > 0) {
+              for (const update of input.groupUpdates) {
+                const updateData: Partial<{ name: string | null; orderIndex: number; updatedAt: Date }> = { updatedAt }
+
+                if (update.name !== undefined) {
+                  updateData.name = update.name
+                }
+                if (update.orderIndex !== undefined) {
+                  updateData.orderIndex = update.orderIndex
+                }
+
+                await tx.update(exerciseGroups).set(updateData).where(eq(exerciseGroups.id, update.groupId))
+              }
+            }
+
+            // Update program.updatedAt
+            await tx.update(programs).set({ updatedAt }).where(eq(programs.id, input.programId))
+          })
+
+          return { ok: true, data: { updatedAt } }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
 
     reorderExerciseRows(
       ctx: OrganizationContext,

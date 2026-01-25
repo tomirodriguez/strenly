@@ -56,8 +56,13 @@ export const makeUpdateExerciseRow =
           sessionId: existing.sessionId,
           exerciseId: input.exerciseId ?? existing.exerciseId,
           orderIndex: existing.orderIndex,
+          // New group-based fields (preserve existing)
+          groupId: existing.groupId,
+          orderWithinGroup: existing.orderWithinGroup,
+          // Legacy superset fields
           supersetGroup: input.supersetGroup !== undefined ? input.supersetGroup : existing.supersetGroup,
           supersetOrder: input.supersetOrder !== undefined ? input.supersetOrder : existing.supersetOrder,
+          // Other fields
           setTypeLabel: input.setTypeLabel !== undefined ? input.setTypeLabel : existing.setTypeLabel,
           isSubRow: existing.isSubRow,
           parentRowId: existing.parentRowId,

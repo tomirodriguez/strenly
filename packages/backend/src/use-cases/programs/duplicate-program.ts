@@ -185,8 +185,13 @@ export const makeDuplicateProgram =
                         id: newRowId,
                         exerciseId: row.exerciseId,
                         orderIndex: row.orderIndex,
+                        // New group-based fields
+                        groupId: row.groupId,
+                        orderWithinGroup: row.orderWithinGroup,
+                        // Legacy superset fields
                         supersetGroup: row.supersetGroup,
                         supersetOrder: row.supersetOrder,
+                        // Other fields
                         setTypeLabel: row.setTypeLabel,
                         isSubRow: false,
                         parentRowId: null,
@@ -236,8 +241,13 @@ export const makeDuplicateProgram =
                           id: newSubRowId,
                           exerciseId: subRow.exerciseId,
                           orderIndex: subRow.orderIndex,
+                          // New group-based fields
+                          groupId: subRow.groupId,
+                          orderWithinGroup: subRow.orderWithinGroup,
+                          // Legacy superset fields
                           supersetGroup: subRow.supersetGroup,
                           supersetOrder: subRow.supersetOrder,
+                          // Other fields
                           setTypeLabel: subRow.setTypeLabel,
                           isSubRow: true,
                           parentRowId: newRowId, // Link to new parent

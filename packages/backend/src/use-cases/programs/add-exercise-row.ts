@@ -54,8 +54,13 @@ export const makeAddExerciseRow =
           id: deps.generateId(),
           exerciseId: input.exerciseId,
           orderIndex: maxOrder + 1,
+          // New group-based fields
+          groupId: null, // null for legacy superset-based creation
+          orderWithinGroup: null,
+          // Legacy superset fields
           supersetGroup: input.supersetGroup ?? null,
           supersetOrder: input.supersetOrder ?? null,
+          // Other fields
           setTypeLabel: null,
           isSubRow: false,
           parentRowId: null,

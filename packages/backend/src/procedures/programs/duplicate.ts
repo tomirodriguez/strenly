@@ -73,6 +73,12 @@ export const duplicateProgram = authProcedure
         createdAt: session.createdAt.toISOString(),
         updatedAt: session.updatedAt.toISOString(),
         rows: session.rows.map((row) => mapExerciseRow(row)),
+        exerciseGroups: session.exerciseGroups?.map((group) => ({
+          id: group.id,
+          sessionId: group.sessionId,
+          orderIndex: group.orderIndex,
+          name: group.name,
+        })),
       })),
     }
   })
@@ -86,6 +92,8 @@ function mapExerciseRow(row: {
   exerciseId: string
   exerciseName: string
   orderIndex: number
+  groupId: string | null
+  orderWithinGroup: number | null
   supersetGroup: string | null
   supersetOrder: number | null
   setTypeLabel: string | null
@@ -117,6 +125,8 @@ function mapExerciseRow(row: {
   exerciseId: string
   exerciseName: string
   orderIndex: number
+  groupId: string | null
+  orderWithinGroup: number | null
   supersetGroup: string | null
   supersetOrder: number | null
   setTypeLabel: string | null
@@ -149,6 +159,8 @@ function mapExerciseRow(row: {
     exerciseId: row.exerciseId,
     exerciseName: row.exerciseName,
     orderIndex: row.orderIndex,
+    groupId: row.groupId,
+    orderWithinGroup: row.orderWithinGroup,
     supersetGroup: row.supersetGroup,
     supersetOrder: row.supersetOrder,
     setTypeLabel: row.setTypeLabel,

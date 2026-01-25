@@ -8,7 +8,7 @@ import type { OrganizationContext } from '../types/organization-context'
 // ============================================================================
 
 export type ProgramRepositoryError =
-  | { type: 'NOT_FOUND'; entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription'; id: string }
+  | { type: 'NOT_FOUND'; entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group'; id: string }
   | { type: 'DATABASE_ERROR'; message: string }
 
 // ============================================================================
@@ -51,8 +51,13 @@ export type ProgramExerciseRow = {
   readonly sessionId: string
   readonly exerciseId: string
   readonly orderIndex: number
+  // New group-based fields
+  readonly groupId: string | null // null during migration
+  readonly orderWithinGroup: number | null // null during migration
+  // Legacy superset fields (deprecated)
   readonly supersetGroup: string | null
   readonly supersetOrder: number | null
+  // Other existing fields
   readonly setTypeLabel: string | null
   readonly isSubRow: boolean
   readonly parentRowId: string | null
@@ -60,6 +65,56 @@ export type ProgramExerciseRow = {
   readonly restSeconds: number | null
   readonly createdAt: Date
   readonly updatedAt: Date
+}
+
+/**
+ * Exercise group data (for grid operations)
+ */
+export type ExerciseGroupData = {
+  readonly id: string
+  readonly sessionId: string
+  readonly orderIndex: number
+  readonly name: string | null
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+/**
+ * Prescription series data (individual set within a prescription)
+ */
+export type PrescriptionSeriesData = {
+  readonly orderIndex: number
+  readonly reps: number | null
+  readonly repsMax: number | null
+  readonly isAmrap: boolean
+  readonly intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  readonly intensityValue: number | null
+  readonly intensityUnit: 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null
+  readonly tempo: string | null
+  readonly restSeconds: number | null
+}
+
+/**
+ * Input for saveDraft bulk save operation
+ */
+export type SaveDraftInput = {
+  readonly programId: string
+  readonly prescriptionUpdates?: ReadonlyArray<{
+    readonly exerciseRowId: string
+    readonly weekId: string
+    readonly series: PrescriptionSeriesData[]
+  }>
+  readonly exerciseRowUpdates?: ReadonlyArray<{
+    readonly rowId: string
+    readonly exerciseId?: string
+    readonly groupId?: string | null
+    readonly orderWithinGroup?: number | null
+  }>
+  readonly groupUpdates?: ReadonlyArray<{
+    readonly groupId: string
+    readonly name?: string | null
+    readonly orderIndex?: number
+  }>
 }
 
 export type PrescriptionCell = {
@@ -85,10 +140,11 @@ export type ExerciseRowWithPrescriptions = ProgramExerciseRow & {
 }
 
 /**
- * Session with exercise rows
+ * Session with exercise rows and exercise groups
  */
 export type SessionWithRows = ProgramSession & {
   readonly rows: ExerciseRowWithPrescriptions[]
+  readonly exerciseGroups?: ExerciseGroupData[]
 }
 
 /**
@@ -193,6 +249,39 @@ export type ProgramRepositoryPort = {
   deleteSession(ctx: OrganizationContext, sessionId: string): ResultAsync<void, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
+  // Exercise Group Operations (new)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create an exercise group for a session
+   */
+  createGroup(
+    ctx: OrganizationContext,
+    sessionId: string,
+    name?: string | null,
+  ): ResultAsync<ExerciseGroupData, ProgramRepositoryError>
+
+  /**
+   * Update an exercise group
+   */
+  updateGroup(
+    ctx: OrganizationContext,
+    groupId: string,
+    updates: { name?: string | null; orderIndex?: number },
+  ): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Delete an exercise group (exercises will cascade)
+   */
+  deleteGroup(ctx: OrganizationContext, groupId: string): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Get the maximum order index for groups in a session
+   * Returns -1 if no groups exist
+   */
+  getMaxGroupOrderIndex(ctx: OrganizationContext, sessionId: string): ResultAsync<number, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
   // Exercise Row Operations
   // ---------------------------------------------------------------------------
 
@@ -259,9 +348,26 @@ export type ProgramRepositoryPort = {
     prescription: Prescription | null,
   ): ResultAsync<void, ProgramRepositoryError>
 
+  /**
+   * Update prescription with series array (new model)
+   * Replaces the series array for a specific cell
+   */
+  updatePrescriptionSeries(
+    ctx: OrganizationContext,
+    exerciseRowId: string,
+    weekId: string,
+    series: PrescriptionSeriesData[],
+  ): ResultAsync<void, ProgramRepositoryError>
+
   // ---------------------------------------------------------------------------
   // Bulk Operations
   // ---------------------------------------------------------------------------
+
+  /**
+   * Save draft changes atomically (bulk save operation)
+   * Updates prescriptions, exercise rows, and groups in a single transaction
+   */
+  saveDraft(ctx: OrganizationContext, input: SaveDraftInput): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError>
 
   /**
    * Reorder exercise rows within a session
