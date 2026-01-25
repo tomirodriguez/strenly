@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: 11/11 (all gap closure plans complete)
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed 02.5-11-PLAN.md (view athlete invitation modal)
+Last activity: 2026-01-25 - Completed quick task 013: Update oRPC query skill and refactor query invalidations
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
