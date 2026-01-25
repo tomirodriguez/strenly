@@ -146,6 +146,7 @@ None.
 | 016b | Fix dropdown menu min-width for action items | 2026-01-25 | 8c71475 | [016-fix-dropdown-menu-min-width-for-action-i](./quick/016-fix-dropdown-menu-min-width-for-action-i/) |
 | 017 | Add dev latency middleware (random 200-500ms) | 2026-01-25 | 78c3c21 | [017-add-dev-latency-middleware](./quick/017-add-dev-latency-middleware/) |
 | 018 | Redirect, breadcrumbs, sidebar collapse | 2026-01-25 | 89a1b77 | [018-redirect-slug-dashboard-breadcrumb-sidebar](./quick/018-redirect-slug-dashboard-breadcrumb-sidebar/) |
+| 019 | Remove hover on active sidebar items | 2026-01-25 | 2cfb380 | [019-remove-the-hover-on-active-items-in-the-](./quick/019-remove-the-hover-on-active-items-in-the-/) |
 
 ## Phase 2 Progress
 
