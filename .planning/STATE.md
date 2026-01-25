@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - VERIFIED)
-Plan: 13/13 - PHASE COMPLETE + VERIFIED
+Plan: 14/14 - Gap closure 14 complete
 Status: Phase 3.1 fully complete and verified (9/9 must-haves)
-Last activity: 2026-01-25 - Gap closure plans 12-13 executed, verification passed
+Last activity: 2026-01-25 - Gap closure plan 14 executed (athlete selector UX)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
 
@@ -241,6 +241,7 @@ None.
 | 03.1-11 | Keyboard Navigation & Edit Mode Fix | Complete |
 | 03.1-12 | Athlete Selector Accessibility | Complete |
 | 03.1-13 | Superset Grouping Fix | Complete |
+| 03.1-14 | Remove Redundant Athlete Selector Option | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -263,7 +264,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 3.1 COMPLETE + VERIFIED (13/13 plans, 9/9 must-haves)
+Stopped at: Completed 03.1-14-PLAN.md (gap closure - athlete selector UX)
 Resume file: None
 
 **Next:** Phase 3 has one remaining plan (03-16 Navigation/UAT). After that, Phase 4 (Athlete PWA).
