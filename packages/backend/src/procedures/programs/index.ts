@@ -13,6 +13,7 @@ import { getProgram } from './get'
 import { listPrograms } from './list'
 import { updatePrescriptionProcedure } from './prescriptions'
 import { addSessionProcedure, deleteSessionProcedure, updateSessionProcedure } from './sessions'
+import { createFromTemplateProcedure, listTemplatesProcedure, saveAsTemplateProcedure } from './templates'
 import { updateProgram } from './update'
 import { addWeekProcedure, deleteWeekProcedure, duplicateWeekProcedure, updateWeekProcedure } from './weeks'
 
@@ -26,6 +27,7 @@ import { addWeekProcedure, deleteWeekProcedure, duplicateWeekProcedure, updateWe
  * - sessions: session management (add, update, delete)
  * - exerciseRows: exercise row management (add, update, delete, reorder, split, superset)
  * - prescriptions: prescription cell updates
+ * - templates: template operations (list, saveAs, createFrom)
  */
 export const programs = {
   // Program CRUD
@@ -64,5 +66,12 @@ export const programs = {
   // Prescription operations
   prescriptions: {
     update: updatePrescriptionProcedure,
+  },
+
+  // Template operations
+  templates: {
+    list: listTemplatesProcedure,
+    saveAs: saveAsTemplateProcedure,
+    createFrom: createFromTemplateProcedure,
   },
 }
