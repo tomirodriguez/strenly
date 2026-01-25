@@ -92,6 +92,7 @@ Recent decisions affecting current work:
 - **Empty string coercion uses || not ??** - Nullish coalescing doesn't catch empty strings from forms, use || for optional field coercion
 - **Database ID prefix handling in repository layer** - Strip/add prefixes like mg- in repository mapToDomain/query, not in domain
 - **Node types for crypto module** - Added @types/node to core and backend packages for node:crypto import in athlete-invitation.ts
+- **oRPC key() for cache invalidation** - Use orpc.{procedure}.key() instead of custom query key factories for type-safe invalidation
 
 ### Pending Todos
 
@@ -119,6 +120,7 @@ None.
 | 010 | Remove planId subscription logic from auth hook | 2026-01-25 | a20679a | [010-remove-planid-from-org-metadata-onboarding](./quick/010-remove-planid-from-org-metadata-onboarding/) |
 | 011 | Fix Select showing value instead of label | 2026-01-25 | 34ebdfd | [011-fix-select-showing-value-instead-of-label](./quick/011-fix-select-showing-value-instead-of-label/) |
 | 012 | Audit and refactor forms to skill pattern | 2026-01-25 | 50ef1fd | [012-audit-and-refactor-forms-to-skill-patter](./quick/012-audit-and-refactor-forms-to-skill-patter/) |
+| 013 | Update oRPC query skill and refactor query invalidations | 2026-01-25 | 25934b3 | [013-update-orpc-query-skill-and-refactor-que](./quick/013-update-orpc-query-skill-and-refactor-que/) |
 
 ## Phase 2 Progress
 
