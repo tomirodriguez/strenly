@@ -1,38 +1,46 @@
 ---
 description: Create a new slash command following best practices
-argument-hint: [command-name] [description]
+argument-hint: <command-name> [description]
 allowed-tools: Read, Write, Bash(mkdir:*)
 ---
 
-# Create Slash Command
+<objective>
+Create a new slash command at `.claude/commands/<1>.md` following best practices and XML structure.
 
-Create a new slash command at `.claude/commands/` following best practices.
+This ensures new commands are consistent, well-documented, and follow the established patterns.
+</objective>
 
-## Arguments
-- Command name: $1
-- Description: $2
+<process>
+1. Parse arguments:
+   - Command name: <1>
+   - Description: <2> (or infer from command name if not provided)
+2. If no arguments provided, ask what kind of command the user wants to create
+3. Create command file at `.claude/commands/<1>.md` with:
+   - YAML frontmatter (`description`, `argument-hint` if needed, `allowed-tools`)
+   - XML-structured body with required tags
+4. Include appropriate tags based on command complexity:
+   - Always: `<objective>`, `<process>`, `<success_criteria>`
+   - If loading state: `<context>` with dynamic commands
+   - If creating files: `<output>` and `<verification>`
+5. Use minimal tool permissions (prefer read-only when possible)
+</process>
 
-## Best Practices to Follow
+<success_criteria>
+- Command file created at `.claude/commands/<1>.md`
+- YAML frontmatter includes `description`
+- Body uses XML structure (not markdown headings)
+- Required tags present: `<objective>`, `<process>`, `<success_criteria>`
+- Command has focused scope (one job)
+</success_criteria>
 
-1. **Focused scope**: One command = one job
-2. **Descriptive names**: Use clear names like `/review-security` not `/rs`
-3. **Always include**: description, argument-hint (if needed)
-4. **Tool restrictions**: Only allow tools the command actually needs
-5. **Dynamic content**: Prefix with exclamation mark to run bash, @ to embed files
+<output>
+File created: `.claude/commands/<1>.md`
+</output>
 
-## Task
-
-Create a new slash command file at `.claude/commands/$1.md` with:
-
-1. **Frontmatter** with:
-   - `description`: Based on "$2" or infer from command name
-   - `argument-hint`: If the command needs arguments
-   - `allowed-tools`: Minimal set needed (prefer read-only when possible)
-
-2. **Clear instructions** for what the command should do
-
-3. **Dynamic content** using exclamation or at-sign prefixes if relevant context is needed
-
-4. **Focused scope** - keep it to one specific task
-
-If no arguments provided, ask what kind of command the user wants to create.
+<rules>
+- Focused scope: One command = one job
+- Descriptive names: Use clear names like `/review-security` not `/rs`
+- Tool restrictions: Only allow tools the command actually needs
+- Dynamic content: Use `!command` for bash output, `@file` to embed files
+- Use `<1>`, `<2>` etc. for positional arguments (not `$1`, `$2`)
+</rules>

@@ -25,3 +25,6 @@ drizzle/
 
 # Test coverage
 coverage/
+.playwright-mcp/
+
+templates
