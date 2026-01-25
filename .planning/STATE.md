@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2.6 of 5 (Design System & Visual Refresh)
-Plan: 2/4
+Plan: 3/4
 Status: In progress
-Last activity: 2026-01-25 - Completed 02.6-02-PLAN.md (Layout Components)
+Last activity: 2026-01-25 - Completed 02.6-03-PLAN.md (Sidebar Active Nav Styling)
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5 complete, 2.6 in progress
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 4 min
-- Total execution time: 116 min
+- Total execution time: 119 min
 
 **By Phase:**
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.5-10 (4 min), 02.5-11 (6 min), 02.6-01 (4 min), 02.6-02 (5 min)
-- Trend: Phase 2.6 layout components updated
+- Last 5 plans: 02.5-11 (6 min), 02.6-01 (4 min), 02.6-02 (5 min), 02.6-03 (3 min)
+- Trend: Phase 2.6 visual refresh progressing smoothly
 
 *Updated after each plan completion*
 
@@ -99,6 +99,8 @@ Recent decisions affecting current work:
 - **User menu in sidebar footer** - User profile dropdown moved from header to sidebar footer
 - **Sidebar three-section layout** - Header (logo), content (nav groups), footer (user profile)
 - **AppHeader with primaryAction slot** - Optional CTA button passed through AppShell
+- **Active nav via isActive prop + data-active** - SidebarMenuButton uses isActive prop, styles via data-active:bg-sidebar-primary
+- **text-muted-foreground for inactive nav** - Nav items use muted gray for inactive state
 
 ### Pending Todos
 
@@ -198,7 +200,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 02.6-02-PLAN.md (Layout Components Update)
+Stopped at: Completed 02.6-03-PLAN.md (Sidebar Active Nav Styling)
 Resume file: None
 
-**Next:** Execute 02.6-03-PLAN.md (Header/Sidebar Polish)
+**Next:** Execute 02.6-04-PLAN.md (Design System Documentation)
