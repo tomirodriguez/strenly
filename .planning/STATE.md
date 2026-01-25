@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 3.1 of 5 (Custom Program Grid - VERIFIED v4)
-Plan: 15/15 - All plans complete
-Status: Phase 3.1 fully complete and verified (9/9 must-haves)
-Last activity: 2026-01-25 - Gap closure plans 14-15 executed, verification v4 passed
+Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
+Plan: 16/17 - Gap closure plan 16 complete
+Status: In progress - executing gap closure plans from UAT v4
+Last activity: 2026-01-25 - Gap closure plan 16 executed (athlete selector empty state fix)
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 COMPLETE, Phase 3.1 gap closure in progress
 
-**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-15) complete. "Everything is a group" labeling model.
+**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. Gap closure plans 08-16 complete. Plan 17 remaining.
 
 ## Performance Metrics
 
@@ -244,6 +244,7 @@ None.
 | 03.1-13 | Superset Grouping Fix | Complete |
 | 03.1-14 | Remove Redundant Athlete Selector Option | Complete |
 | 03.1-15 | Unified Row Labeling | Complete |
+| 03.1-16 | Athlete Selector Empty State Fix | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -266,7 +267,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 3.1 COMPLETE + VERIFIED v4 (15/15 plans, 9/9 must-haves)
+Stopped at: Completed 03.1-16-PLAN.md (athlete selector empty state fix)
 Resume file: None
 
-**Next:** Phase 3 has one remaining plan (03-16 Navigation/UAT). After that, Phase 4 (Athlete PWA).
+**Next:** Plan 17 (superset remove row bug fix), then Phase 3 Navigation/UAT, then Phase 4 (Athlete PWA).
