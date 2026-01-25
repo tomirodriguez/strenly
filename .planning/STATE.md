@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 2.6 - Design System & Visual Refresh (frontend)
+**Current focus:** Phase 3 - Program Builder (backend)
 
 ## Current Position
 
-Phase: 2.6 of 5 (Design System & Visual Refresh)
-Plan: 3/4
+Phase: 3 of 5 (Program Builder)
+Plan: 1/N
 Status: In progress
-Last activity: 2026-01-25 - Completed 02.6-03-PLAN.md (Sidebar Active Nav Styling)
+Last activity: 2026-01-25 - Completed 03-01-PLAN.md (Database Schema)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5 complete, 2.6 in progress
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 started
 
-**Note:** Phase 2.6 updates visual identity before Phase 3. Non-blocking for Program Builder.
+**Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 33
 - Average duration: 4 min
-- Total execution time: 119 min
+- Total execution time: 124 min
 
 **By Phase:**
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.5-11 (6 min), 02.6-01 (4 min), 02.6-02 (5 min), 02.6-03 (3 min)
-- Trend: Phase 2.6 visual refresh progressing smoothly
+- Last 5 plans: 02.6-01 (4 min), 02.6-02 (5 min), 02.6-03 (3 min), 03-01 (5 min)
+- Trend: Phase 3 program builder started
 
 *Updated after each plan completion*
 
@@ -101,6 +101,9 @@ Recent decisions affecting current work:
 - **AppHeader with primaryAction slot** - Optional CTA button passed through AppShell
 - **Active nav via isActive prop + data-active** - SidebarMenuButton uses isActive prop, styles via data-active:bg-sidebar-primary
 - **text-muted-foreground for inactive nav** - Nav items use muted gray for inactive state
+- **JSONB for prescription data** - prescriptions table uses JSONB with $type<ParsedPrescription>() for typed structured data
+- **Self-referencing parentRowId for split rows** - program_exercises uses parentRowId for same-exercise multiple-config rows
+- **Unique (exerciseId, weekId) for cell identity** - prescriptions table unique constraint identifies grid cells
 
 ### Pending Todos
 
@@ -197,10 +200,25 @@ None.
 - `packages/database/src/seed/index.ts` - Seed orchestrator
 - `packages/database/scripts/seed.ts` - CLI seed runner
 
+## Phase 3 Progress
+
+**Program Builder IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 03-01 | Database Schema | Complete |
+
+**Key artifacts so far:**
+- `packages/database/src/schema/programs.ts` - Programs table with status enum
+- `packages/database/src/schema/program-weeks.ts` - Week columns for grid
+- `packages/database/src/schema/program-sessions.ts` - Training days
+- `packages/database/src/schema/program-exercises.ts` - Exercise rows with superset/split support
+- `packages/database/src/schema/prescriptions.ts` - JSONB prescription storage
+
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 02.6-03-PLAN.md (Sidebar Active Nav Styling)
+Stopped at: Completed 03-01-PLAN.md (Database Schema)
 Resume file: None
 
-**Next:** Execute 02.6-04-PLAN.md (Design System Documentation)
+**Next:** Execute 03-02-PLAN.md (Domain Entities)
