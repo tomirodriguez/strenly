@@ -1,5 +1,5 @@
-import type { GridRow } from './types'
 import { SupersetIndicator } from './superset-indicator'
+import type { GridRow } from './types'
 import { cn } from '@/lib/utils'
 
 interface ExerciseRowPrefixProps {
@@ -41,8 +41,8 @@ export function ExerciseRowPrefix({ row }: ExerciseRowPrefixProps) {
       {/* Prefix label */}
       <span
         className={cn(
-          'z-30 flex h-full w-10 items-center justify-center border-r border-border text-[10px] font-bold',
-          row.supersetGroup ? 'bg-background text-primary' : 'bg-muted/20 text-muted-foreground'
+          'z-30 flex h-full w-10 items-center justify-center border-border border-r font-bold text-[10px]',
+          row.supersetGroup ? 'bg-background text-primary' : 'bg-muted/20 text-muted-foreground',
         )}
       >
         {label}

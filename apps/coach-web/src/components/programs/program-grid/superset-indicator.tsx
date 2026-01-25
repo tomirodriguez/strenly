@@ -18,10 +18,10 @@ export function SupersetIndicator({ position }: SupersetIndicatorProps) {
   return (
     <div
       className={cn(
-        'absolute left-[15px] w-[1.5px] bg-primary/40 z-20',
+        'absolute left-[15px] z-20 w-[1.5px] bg-primary/40',
         position === 'start' && 'top-1/2 bottom-[-50%]',
         position === 'middle' && 'top-[-50%] bottom-[-50%]',
-        position === 'end' && 'top-[-50%] bottom-1/2'
+        position === 'end' && 'top-[-50%] bottom-1/2',
       )}
     />
   )
