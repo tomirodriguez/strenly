@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3 - Program Builder (backend)
+**Current focus:** Phase 3 - Program Builder (frontend)
 
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 9/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete; wave 3: 03-05, 03-06, 03-07 complete; wave 4: 03-08, 03-09 complete)
+Plan: 11/N (waves 1-4 complete, wave 5 started: 03-11 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-09-PLAN.md (Grid Manipulation Procedures)
+Last activity: 2026-01-25 - Completed 03-11-PLAN.md (Core Grid Components)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 4 complete
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 5 started
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
@@ -119,6 +119,9 @@ Recent decisions affecting current work:
 - **Last entity protection** - Prevent deletion of last week/session at use case level (programs must have at least 1 of each)
 - **Nested router structure for grid ops** - programs.weeks.add, programs.exerciseRows.update, etc. for logical API organization
 - **Prescription endpoint returns nullable** - parsedPrescriptionSchema.nullable() - null for cleared cells, structured data otherwise
+- **Inline cell components for grid** - Define cell components inline in buildColumns() instead of spreading from helpers for TypeScript compatibility
+- **Flat grid row structure with session headers** - Session headers included as special rows with type: 'session-header'
+- **Exercise search inline in cell** - Exercise picker uses inline search dropdown, not modal
 
 ### Pending Todos
 
@@ -233,6 +236,7 @@ None.
 | 03-07 | Exercise Row & Prescription Use Cases | Complete |
 | 03-08 | Program Contracts | Complete |
 | 03-09 | Grid Manipulation Procedures | Complete |
+| 03-11 | Core Grid Components | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -267,11 +271,15 @@ None.
 - `packages/backend/src/procedures/programs/exercise-rows.ts` - Exercise row procedures
 - `packages/backend/src/procedures/programs/prescriptions.ts` - Prescription update procedure
 - `packages/backend/src/procedures/programs/index.ts` - Programs router with nested structure
+- `apps/coach-web/src/components/programs/program-grid.tsx` - Main grid component with data transformation
+- `apps/coach-web/src/components/programs/prescription-cell.tsx` - Prescription notation editing cell
+- `apps/coach-web/src/components/programs/exercise-picker-cell.tsx` - Exercise search and selection cell
+- `apps/coach-web/src/features/programs/hooks/mutations/use-grid-mutations.ts` - Grid mutation hooks
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-09-PLAN.md (Grid Manipulation Procedures)
+Stopped at: Completed 03-11-PLAN.md (Core Grid Components)
 Resume file: None
 
-**Next:** Continue with 03-10 (Program Builder Frontend) or proceed with remaining Wave 4 plans
+**Next:** Continue with 03-12 (Session Headers & Split Rows) or remaining wave 5 plans
