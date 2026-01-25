@@ -6,34 +6,22 @@ Add a development-only latency middleware to simulate network latency on API req
 
 ## Approach
 
-Add the latency at the Hono middleware level (in `app.ts`) rather than oRPC level because:
-1. It simulates real network latency more accurately (affects all API endpoints)
-2. The environment variable is accessible at the Hono handler level via `c.env`
-3. Cloudflare Workers use environment bindings, not `process.env`
+Add random latency (200-500ms) at the Hono middleware level, detecting dev environment by checking if `BETTER_AUTH_URL` contains "localhost".
 
 ## Tasks
 
-### Task 1: Add DEV_LATENCY_MS to Env type and wrangler.jsonc
-
-**Files:**
-- `packages/backend/src/app.ts` - Add `DEV_LATENCY_MS` to Env type
-- `apps/api/wrangler.jsonc` - Add dev latency env var (commented for production safety)
-
-**Changes:**
-1. Add `DEV_LATENCY_MS?: string` to Env type (optional, only set in dev)
-2. Add commented config in wrangler.jsonc
-
-### Task 2: Add dev latency middleware to Hono
+### Task 1: Add dev latency middleware to Hono
 
 **Files:**
 - `packages/backend/src/app.ts` - Add middleware before RPC handler
 
 **Implementation:**
 ```typescript
-// Dev-only latency simulation middleware
+// Dev-only: random latency 200-500ms to simulate network conditions
 app.use('/rpc/*', async (c, next) => {
-  const latencyMs = c.env.DEV_LATENCY_MS ? parseInt(c.env.DEV_LATENCY_MS, 10) : 0
-  if (latencyMs > 0) {
+  const isDev = c.env.BETTER_AUTH_URL.includes('localhost')
+  if (isDev) {
+    const latencyMs = Math.floor(Math.random() * 300) + 200
     await new Promise((resolve) => setTimeout(resolve, latencyMs))
   }
   await next()
@@ -42,13 +30,12 @@ app.use('/rpc/*', async (c, next) => {
 
 The middleware:
 - Only applies to `/rpc/*` routes (API calls)
-- Reads `DEV_LATENCY_MS` from environment
-- Adds delay only if value > 0
-- Runs before the oRPC handler
+- Detects dev by checking BETTER_AUTH_URL for "localhost"
+- Adds random delay 200-500ms only in dev
+- No configuration needed - works automatically
 
 ## Verification
 
-1. Set `DEV_LATENCY_MS=500` in `.dev.vars`
-2. Start dev server
-3. Make API call
-4. Observe ~500ms added latency in network tab
+1. Start dev server (`pnpm dev`)
+2. Make API calls
+3. Observe 200-500ms latency in network tab

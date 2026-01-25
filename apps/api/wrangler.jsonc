@@ -4,9 +4,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-01-18",
   "compatibility_flags": ["nodejs_compat"]
-  // Dev-only: Simulated latency in ms. Set in .dev.vars, not here.
   // "vars": {
-  //   "DEV_LATENCY_MS": "500"
+  //   "MY_VAR": "my-variable"
   // },
   // "kv_namespaces": [
   //   {

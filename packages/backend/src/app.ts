@@ -12,8 +12,6 @@ type Env = {
   BETTER_AUTH_URL: string
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
-  /** Dev-only: Simulated latency in milliseconds for API requests */
-  DEV_LATENCY_MS?: string
 }
 
 const app = new Hono<{ Bindings: Env }>()
@@ -55,10 +53,11 @@ app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
 // oRPC handler
 const rpcHandler = new RPCHandler(router)
 
-// Dev-only latency simulation middleware
+// Dev-only: random latency 200-500ms to simulate network conditions
 app.use('/rpc/*', async (c, next) => {
-  const latencyMs = c.env.DEV_LATENCY_MS ? parseInt(c.env.DEV_LATENCY_MS, 10) : 0
-  if (latencyMs > 0) {
+  const isDev = c.env.BETTER_AUTH_URL.includes('localhost')
+  if (isDev) {
+    const latencyMs = Math.floor(Math.random() * 300) + 200
     await new Promise((resolve) => setTimeout(resolve, latencyMs))
   }
   await next()
