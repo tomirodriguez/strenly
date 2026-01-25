@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.2 - Prescription Data Structure Refactor (PLANNED)
+**Current focus:** Phase 3.2 - Prescription Data Structure Refactor (IN PROGRESS)
 
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 1/8 - Database Schema complete
+Plan: 2/8 - Domain Entities complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.2-01-PLAN.md (database schema)
+Last activity: 2026-01-25 - Completed 03.2-02-PLAN.md (domain entities)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plan 01 complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-02 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -142,6 +142,9 @@ Recent decisions affecting current work:
 - **Everything is a group labeling** - Standalone exercise = group of 1 (A1), superset = group of N (B1, B2, B3); eliminates two-system complexity
 - **Superset removal repositions to end** - When removing row from superset, move it to end of session to prevent staying between group members
 - **Reorder auto-repairs superset adjacency** - ensureSupersetAdjacency helper consolidates split superset groups before persisting order
+- **PrescriptionSeries orderIndex as parameter** - createPrescriptionSeries(input, orderIndex) takes index as second parameter for array iteration
+- **ExerciseGroup name normalization** - Empty/whitespace names normalized to null for consistent auto-letter generation
+- **Reconstitute for DB loads** - Domain entities use reconstitute(props) function for database loads without validation
 
 ### Pending Todos
 
@@ -268,10 +271,29 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/index.ts` - Public exports
 - `apps/coach-web/src/styles/program-grid.css` - Grid-specific CSS styles (updated for custom table)
 
+## Phase 3.2 Progress
+
+**Prescription Data Structure Refactor IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 03.2-01 | Database Schema | Complete |
+| 03.2-02 | Domain Entities | Complete |
+| 03.2-03 | ExerciseGroup Repository | Pending |
+| 03.2-04 | Prescription Update | Pending |
+| 03.2-05 | Use Cases | Pending |
+| 03.2-06 | Contracts & Procedures | Pending |
+| 03.2-07 | Client-Side State | Pending |
+| 03.2-08 | Data Migration | Pending |
+
+**Key artifacts:**
+- `packages/core/src/domain/entities/prescription-series.ts` - Single set entity
+- `packages/core/src/domain/entities/exercise-group.ts` - Group container entity
+
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.2-01-PLAN.md (database schema)
+Stopped at: Completed 03.2-02-PLAN.md (domain entities)
 Resume file: None
 
-**Next:** Phase 3.2 Plan 02 (Domain Entities). ExerciseGroup and updated Prescription domain entities.
+**Next:** Phase 3.2 Plan 03 (ExerciseGroup Repository).
