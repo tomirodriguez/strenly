@@ -101,6 +101,9 @@ Recent decisions affecting current work:
 - **AppHeader with primaryAction slot** - Optional CTA button passed through AppShell
 - **Active nav via isActive prop + data-active** - SidebarMenuButton uses isActive prop, styles via data-active:bg-sidebar-primary
 - **text-muted-foreground for inactive nav** - Nav items use muted gray for inactive state
+- **Brand name is STRENLY (uppercase)** - Sidebar header shows "STRENLY" with text-xl
+- **Nav items use size=lg** - SidebarMenuButton with size="lg", gap-3, px-4 for larger click targets
+- **Design system documentation** - Comprehensive docs at docs/design-system.md with OKLCH palette reference
 - **JSONB for prescription data** - prescriptions table uses JSONB with $type<ParsedPrescription>() for typed structured data
 - **Self-referencing parentRowId for split rows** - program_exercises uses parentRowId for same-exercise multiple-config rows
 - **Unique (exerciseId, weekId) for cell identity** - prescriptions table unique constraint identifies grid cells
