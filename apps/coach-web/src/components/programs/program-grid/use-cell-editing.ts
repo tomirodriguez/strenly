@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { GridCell } from './types'
 
 interface UseCellEditingOptions {
@@ -10,6 +10,10 @@ interface UseCellEditingOptions {
    * Callback when editing stops (optional)
    */
   onEditStop?: () => void
+  /**
+   * Focus cell callback from useGridNavigation for focus restoration
+   */
+  focusCell?: (rowId: string, colId: string) => void
 }
 
 /**
@@ -24,11 +28,14 @@ interface UseCellEditingOptions {
  * - handleEditKeyDown: Handle Enter/Escape keys for edit mode
  */
 export function useCellEditing(options: UseCellEditingOptions = {}) {
-  const { onEditStart, onEditStop } = options
+  const { onEditStart, onEditStop, focusCell } = options
   const [editingCell, setEditingCell] = useState<GridCell | null>(null)
+  // Track last edited cell for focus restoration
+  const lastEditedCellRef = useRef<GridCell | null>(null)
 
   const startEditing = useCallback(
     (cell: GridCell) => {
+      lastEditedCellRef.current = cell
       setEditingCell(cell)
       onEditStart?.(cell)
     },
@@ -36,9 +43,17 @@ export function useCellEditing(options: UseCellEditingOptions = {}) {
   )
 
   const stopEditing = useCallback(() => {
+    const lastCell = lastEditedCellRef.current
     setEditingCell(null)
     onEditStop?.()
-  }, [onEditStop])
+    // Restore focus to the cell after edit mode ends
+    if (lastCell && focusCell) {
+      // Use requestAnimationFrame to ensure DOM is updated after edit mode closes
+      requestAnimationFrame(() => {
+        focusCell(lastCell.rowId, lastCell.colId)
+      })
+    }
+  }, [onEditStop, focusCell])
 
   const isEditing = useCallback(
     (rowId: string, colId: string) => {
