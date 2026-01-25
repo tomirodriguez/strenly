@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 3/N
+Plan: 3/N (wave 1: 03-01, 03-02, 03-03 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-03-PLAN.md (Program & Prescription Domain Entities)
+Last activity: 2026-01-25 - Completed 03-02-PLAN.md (Prescription Notation Parser)
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
+- Total plans completed: 35
 - Average duration: 4 min
-- Total execution time: 128 min
+- Total execution time: 133 min
 
 **By Phase:**
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.6-02 (5 min), 02.6-03 (3 min), 03-01 (5 min), 03-03 (4 min)
-- Trend: Phase 3 program builder TDD domain entities
+- Last 5 plans: 02.6-03 (3 min), 03-01 (5 min), 03-03 (4 min), 03-02 (5 min)
+- Trend: Phase 3 program builder TDD (prescription parser, domain entities)
 
 *Updated after each plan completion*
 
@@ -216,6 +216,7 @@ None.
 | Plan | Name | Status |
 |------|------|--------|
 | 03-01 | Database Schema | Complete |
+| 03-02 | Prescription Notation Parser | Complete |
 | 03-03 | Domain Entities | Complete |
 
 **Key artifacts so far:**
@@ -224,13 +225,14 @@ None.
 - `packages/database/src/schema/program-sessions.ts` - Training days
 - `packages/database/src/schema/program-exercises.ts` - Exercise rows with superset/split support
 - `packages/database/src/schema/prescriptions.ts` - JSONB prescription storage
+- `packages/contracts/src/programs/prescription.ts` - Prescription notation parser
 - `packages/core/src/domain/entities/program.ts` - Program entity with status transitions
 - `packages/core/src/domain/entities/prescription.ts` - Prescription entity with validation
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-03-PLAN.md (Program & Prescription Domain Entities)
+Stopped at: Completed 03-02-PLAN.md (Prescription Notation Parser)
 Resume file: None
 
 **Next:** Execute 03-04-PLAN.md (Ports)
