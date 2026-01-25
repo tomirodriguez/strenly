@@ -9,6 +9,7 @@ import '@wasback/react-datasheet-grid/dist/style.css'
 import { SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AddExerciseRow } from './add-exercise-row'
+import { ExerciseRowActions } from './exercise-row-actions'
 import { SplitRowDialog } from './split-row-dialog'
 import { WeekActionsMenu } from './week-actions-menu'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
@@ -584,6 +585,23 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
     return transformToGridRows(program)
   }, [program])
 
+  // Build session row IDs map for reordering
+  const sessionRowIdsMap = useMemo(() => {
+    if (!program) return new Map<string, string[]>()
+    const map = new Map<string, string[]>()
+    for (const session of program.sessions) {
+      const rowIds = session.rows.map((row) => row.id)
+      map.set(session.id, rowIds)
+    }
+    return map
+  }, [program])
+
+  // Get selected row data for actions
+  const selectedRowData = useMemo(() => {
+    if (!selectedRowId) return null
+    return rows.find((r) => r.rowId === selectedRowId) ?? null
+  }, [rows, selectedRowId])
+
   // Build columns based on weeks
   const columns = useMemo(() => {
     if (!program) return []
@@ -708,8 +726,39 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
     return <GridError message="Programa no encontrado" />
   }
 
+  // Handler to open split dialog from actions menu
+  const handleOpenSplitDialog = (rowId: string) => {
+    setSplitParentRowId(rowId)
+    setSplitDialogOpen(true)
+  }
+
   return (
     <div className="flex h-full flex-col program-grid" ref={gridContainerRef}>
+      {/* Row actions toolbar - appears when a row is selected */}
+      {selectedRowData && selectedRowData.rowId && (
+        <div className="flex items-center justify-between border-border border-b bg-muted/30 px-4 py-2">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Seleccionado:</span>
+            <span className="font-medium">{selectedRowData.exercise.exerciseName || 'Sin ejercicio'}</span>
+            {selectedRowData.supersetGroup && (
+              <span className="rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary text-xs">
+                Grupo {selectedRowData.supersetGroup}
+              </span>
+            )}
+          </div>
+          <ExerciseRowActions
+            programId={programId}
+            sessionId={selectedRowData.sessionId}
+            rowId={selectedRowData.rowId}
+            exerciseName={selectedRowData.exercise.exerciseName}
+            supersetGroup={selectedRowData.supersetGroup ?? null}
+            isSubRow={selectedRowData.isSubRow}
+            sessionRowIds={sessionRowIdsMap.get(selectedRowData.sessionId) ?? []}
+            onAddSplitRow={() => handleOpenSplitDialog(selectedRowData.rowId ?? '')}
+          />
+        </div>
+      )}
+
       {/* Main grid */}
       <div className="min-h-0 flex-1">
         <DataSheetGrid<GridRow>
