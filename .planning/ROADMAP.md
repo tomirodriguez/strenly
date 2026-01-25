@@ -16,6 +16,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
 - [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
+- [ ] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -184,9 +185,43 @@ Plans:
 - [x] 03.1-16-PLAN.md - [GAP CLOSURE] Fix athlete selector empty state visibility (Wave 9)
 - [x] 03.1-17-PLAN.md - [GAP CLOSURE] Fix superset removal repositioning and reorder adjacency (Wave 9)
 
+### Phase 3.2: Prescription Data Structure Refactor (INSERTED)
+**Goal**: Restructure program/prescription data model to represent sets as individual series in an ordered array, simplify superset handling via exercise groups, and move to client-side grid editing with manual save
+**Depends on**: Phase 3.1 (existing grid UX, but needs data model changes)
+**Requirements**: PRG-01 through PRG-13, RX-01 through RX-11 (reimplementation with new structure)
+**Success Criteria** (what must be TRUE):
+  1. Domain fully represents program structure: Program -> Cycles (weeks) -> Sessions -> Exercise Groups -> Group Items -> Prescriptions (series)
+  2. Each exercise has an ordered array of prescriptions where each element = one set (enables 3x8@120kg + 1x1@130kg as [8@120, 8@120, 8@120, 1@130])
+  3. Exercise groups replace superset system: standalone = group of 1, bi-series = group of 2, circuit = group of N
+  4. Grid editing is 100% client-side with explicit "Guardar" button (no auto-save on each change)
+  5. Multi-series per cell displays as multiple lines within same cell (not separate rows)
+  6. All existing grid UX (keyboard navigation, accessibility) preserved
+  7. Prescription notation parser supports new array-based structure
+  8. Database schema updated with proper migration from current structure
+**Plans**: 8 plans in 8 waves
+
+**Context:**
+- Current structure stores `sets: 3` as a single number, making variations (top sets, drop sets) require separate rows
+- New structure: each set is its own prescription object in an array, trivializing set-by-set variations
+- Exercise groups unify standalone/superset/circuit under one model (group size determines type)
+- Client-side editing removes complexity of per-change API calls and enables instant UX
+- Reference: `docs/domain-research-strength-training.md` for domain concepts
+- Reference: Current grid in `apps/coach-web/src/components/programs/program-grid/`
+- Reference: Current domain in `packages/core/src/domain/entities/`
+
+Plans:
+- [ ] 03.2-01-PLAN.md - Database schema: exercise_groups table, updated columns (Wave 1)
+- [ ] 03.2-02-PLAN.md - Domain entities: PrescriptionSeries, ExerciseGroup (Wave 2, TDD)
+- [ ] 03.2-03-PLAN.md - Parser update: multi-notation to series array (Wave 3, TDD)
+- [ ] 03.2-04-PLAN.md - Contracts + repository updates for groups/series (Wave 4)
+- [ ] 03.2-05-PLAN.md - saveDraft use case and procedure (Wave 5)
+- [ ] 03.2-06-PLAN.md - Frontend state: useGridState with immer (Wave 6)
+- [ ] 03.2-07-PLAN.md - Frontend UI: multi-series display, Guardar button (Wave 7)
+- [ ] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
+
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
-**Depends on**: Phase 3
+**Depends on**: Phase 3.2
 **Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10, ATH-08
 **Success Criteria** (what must be TRUE):
   1. Athlete can view assigned program and see next/upcoming workout on mobile device
@@ -220,7 +255,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -230,9 +265,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
+| 3.2. Prescription Data Structure Refactor (full-stack) | 0/8 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.1 complete - 17/17 plans, verified v5)*
+*Last updated: 2026-01-25 (Phase 3.2 planned - 8 plans in 8 waves)*
