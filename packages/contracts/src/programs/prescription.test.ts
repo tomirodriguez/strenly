@@ -652,3 +652,721 @@ describe('round-trip parsing', () => {
     expect(parsePrescriptionNotation('—')).toBeNull()
   })
 })
+
+// ============================================================================
+// parsePrescriptionToSeries and formatSeriesToNotation tests
+// ============================================================================
+
+import { formatSeriesToNotation, type PrescriptionSeriesInput, parsePrescriptionToSeries } from './prescription'
+
+describe('parsePrescriptionToSeries', () => {
+  describe('empty and skip notations', () => {
+    it('returns empty array for empty string', () => {
+      expect(parsePrescriptionToSeries('')).toEqual([])
+    })
+
+    it('returns empty array for em dash', () => {
+      expect(parsePrescriptionToSeries('—')).toEqual([])
+    })
+
+    it('returns empty array for regular dash', () => {
+      expect(parsePrescriptionToSeries('-')).toEqual([])
+    })
+  })
+
+  describe('basic single-notation expansion', () => {
+    it('expands 3x8 to 3 series', () => {
+      const result = parsePrescriptionToSeries('3x8')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        expect(result[0]).toEqual({
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        })
+        expect(result[1]?.orderIndex).toBe(1)
+        expect(result[2]?.orderIndex).toBe(2)
+        // All should have same reps
+        for (const s of result) {
+          expect(s.reps).toBe(8)
+        }
+      }
+    })
+
+    it('expands 3x8@120kg to 3 series with intensity', () => {
+      const result = parsePrescriptionToSeries('3x8@120kg')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        result.forEach((s, i) => {
+          expect(s.orderIndex).toBe(i)
+          expect(s.reps).toBe(8)
+          expect(s.intensityType).toBe('absolute')
+          expect(s.intensityValue).toBe(120)
+          expect(s.intensityUnit).toBe('kg')
+        })
+      }
+    })
+
+    it('expands 3x8-12 to 3 series with rep range', () => {
+      const result = parsePrescriptionToSeries('3x8-12')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.reps).toBe(8)
+          expect(s.repsMax).toBe(12)
+        })
+      }
+    })
+
+    it('expands 3xAMRAP to 3 series with isAmrap true', () => {
+      const result = parsePrescriptionToSeries('3xAMRAP')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.isAmrap).toBe(true)
+          expect(s.reps).toBe(0)
+        })
+      }
+    })
+
+    it('expands 2x10@75% to 2 series with percentage', () => {
+      const result = parsePrescriptionToSeries('2x10@75%')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(2)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.reps).toBe(10)
+          expect(s.intensityType).toBe('percentage')
+          expect(s.intensityValue).toBe(75)
+          expect(s.intensityUnit).toBe('%')
+        })
+      }
+    })
+
+    it('expands 4x6@RPE8 to 4 series with RPE', () => {
+      const result = parsePrescriptionToSeries('4x6@RPE8')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(4)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.intensityType).toBe('rpe')
+          expect(s.intensityValue).toBe(8)
+          expect(s.intensityUnit).toBe('rpe')
+        })
+      }
+    })
+
+    it('expands 3x8@RIR2 to 3 series with RIR', () => {
+      const result = parsePrescriptionToSeries('3x8@RIR2')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.intensityType).toBe('rir')
+          expect(s.intensityValue).toBe(2)
+          expect(s.intensityUnit).toBe('rir')
+        })
+      }
+    })
+
+    it('expands 2x5@100kg (3110) to 2 series with tempo', () => {
+      const result = parsePrescriptionToSeries('2x5@100kg (3110)')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(2)
+      if (result) {
+        result.forEach((s) => {
+          expect(s.tempo).toBe('3110')
+        })
+      }
+    })
+  })
+
+  describe('multi-part notation', () => {
+    it('parses 3x8@120kg + 1x1@130kg to 4 series', () => {
+      const result = parsePrescriptionToSeries('3x8@120kg + 1x1@130kg')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(4)
+      if (result) {
+        // First 3 series: 8 reps @ 120kg
+        expect(result[0]?.orderIndex).toBe(0)
+        expect(result[0]?.reps).toBe(8)
+        expect(result[0]?.intensityValue).toBe(120)
+
+        expect(result[1]?.orderIndex).toBe(1)
+        expect(result[1]?.reps).toBe(8)
+        expect(result[1]?.intensityValue).toBe(120)
+
+        expect(result[2]?.orderIndex).toBe(2)
+        expect(result[2]?.reps).toBe(8)
+        expect(result[2]?.intensityValue).toBe(120)
+
+        // Last series: 1 rep @ 130kg
+        expect(result[3]?.orderIndex).toBe(3)
+        expect(result[3]?.reps).toBe(1)
+        expect(result[3]?.intensityValue).toBe(130)
+      }
+    })
+
+    it('parses 2x8@120 + 2x8@100 + 1x10@80 to 5 series', () => {
+      const result = parsePrescriptionToSeries('2x8@120 + 2x8@100 + 1x10@80')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(5)
+      if (result) {
+        // First 2: 8 reps @ 120kg
+        expect(result[0]?.reps).toBe(8)
+        expect(result[0]?.intensityValue).toBe(120)
+        expect(result[1]?.reps).toBe(8)
+        expect(result[1]?.intensityValue).toBe(120)
+
+        // Next 2: 8 reps @ 100kg
+        expect(result[2]?.reps).toBe(8)
+        expect(result[2]?.intensityValue).toBe(100)
+        expect(result[3]?.reps).toBe(8)
+        expect(result[3]?.intensityValue).toBe(100)
+
+        // Last 1: 10 reps @ 80kg
+        expect(result[4]?.reps).toBe(10)
+        expect(result[4]?.intensityValue).toBe(80)
+
+        // Check sequential orderIndex
+        for (let i = 0; i < result.length; i++) {
+          expect(result[i]?.orderIndex).toBe(i)
+        }
+      }
+    })
+
+    it('parses 2x10 + 1xAMRAP to 3 series', () => {
+      const result = parsePrescriptionToSeries('2x10 + 1xAMRAP')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+      if (result) {
+        expect(result[0]?.reps).toBe(10)
+        expect(result[0]?.isAmrap).toBe(false)
+        expect(result[1]?.reps).toBe(10)
+        expect(result[1]?.isAmrap).toBe(false)
+        expect(result[2]?.reps).toBe(0)
+        expect(result[2]?.isAmrap).toBe(true)
+      }
+    })
+
+    it('handles extra whitespace around separator', () => {
+      const result = parsePrescriptionToSeries('2x8@100kg   +   1x5@110kg')
+      expect(result).not.toBeNull()
+      expect(result).toHaveLength(3)
+    })
+  })
+
+  describe('invalid inputs', () => {
+    it('returns null for completely invalid notation', () => {
+      expect(parsePrescriptionToSeries('invalid')).toBeNull()
+    })
+
+    it('returns null for gibberish', () => {
+      expect(parsePrescriptionToSeries('abc123xyz')).toBeNull()
+    })
+
+    it('returns null when any part is invalid (3x8 + invalid)', () => {
+      expect(parsePrescriptionToSeries('3x8 + invalid')).toBeNull()
+    })
+
+    it('returns null when first part is invalid (invalid + 3x8)', () => {
+      expect(parsePrescriptionToSeries('invalid + 3x8')).toBeNull()
+    })
+
+    it('returns null for incomplete notation (3x)', () => {
+      expect(parsePrescriptionToSeries('3x')).toBeNull()
+    })
+  })
+})
+
+describe('formatSeriesToNotation', () => {
+  describe('empty series', () => {
+    it('returns em dash for empty array', () => {
+      expect(formatSeriesToNotation([])).toBe('—')
+    })
+  })
+
+  describe('single series group', () => {
+    it('formats 3 identical series as 3x8', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('3x8')
+    })
+
+    it('formats 3 identical series with intensity as 3x8@120kg', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('3x8@120kg')
+    })
+
+    it('formats single series as 1x5', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 5,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('1x5')
+    })
+
+    it('formats series with rep range', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: 12,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: 12,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x8-12')
+    })
+
+    it('formats AMRAP series', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 0,
+          repsMax: null,
+          isAmrap: true,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 0,
+          repsMax: null,
+          isAmrap: true,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2xAMRAP')
+    })
+
+    it('formats series with percentage', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 5,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'percentage',
+          intensityValue: 80,
+          intensityUnit: '%',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 5,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'percentage',
+          intensityValue: 80,
+          intensityUnit: '%',
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 5,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'percentage',
+          intensityValue: 80,
+          intensityUnit: '%',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('3x5@80%')
+    })
+
+    it('formats series with RPE', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 6,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'rpe',
+          intensityValue: 8,
+          intensityUnit: 'rpe',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 6,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'rpe',
+          intensityValue: 8,
+          intensityUnit: 'rpe',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x6@RPE8')
+    })
+
+    it('formats series with RIR', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'rir',
+          intensityValue: 2,
+          intensityUnit: 'rir',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'rir',
+          intensityValue: 2,
+          intensityUnit: 'rir',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x8@RIR2')
+    })
+
+    it('formats series with tempo', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: '3110',
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: '3110',
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x8@100kg (3110)')
+    })
+  })
+
+  describe('multi-group compaction', () => {
+    it('formats 3+1 series as 3x8@120kg + 1x1@130kg', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 3,
+          reps: 1,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 130,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('3x8@120kg + 1x1@130kg')
+    })
+
+    it('formats 2+2+1 series correctly', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 120,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 3,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 4,
+          reps: 10,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 80,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x8@120kg + 2x8@100kg + 1x10@80kg')
+    })
+
+    it('formats regular sets + AMRAP', () => {
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 10,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 10,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 0,
+          repsMax: null,
+          isAmrap: true,
+          intensityType: null,
+          intensityValue: null,
+          intensityUnit: null,
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('2x10 + 1xAMRAP')
+    })
+
+    it('does not group non-consecutive identical series', () => {
+      // 8@100, 8@110, 8@100 -> should NOT compact the two 8@100
+      const series: PrescriptionSeriesInput[] = [
+        {
+          orderIndex: 0,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 1,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 110,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+        {
+          orderIndex: 2,
+          reps: 8,
+          repsMax: null,
+          isAmrap: false,
+          intensityType: 'absolute',
+          intensityValue: 100,
+          intensityUnit: 'kg',
+          tempo: null,
+        },
+      ]
+      expect(formatSeriesToNotation(series)).toBe('1x8@100kg + 1x8@110kg + 1x8@100kg')
+    })
+  })
+})
+
+describe('series round-trip', () => {
+  const notations = [
+    '3x8',
+    '3x8-12',
+    '3xAMRAP',
+    '3x8@120kg',
+    '5x5@225lb',
+    '3x8@75%',
+    '3x8@RIR2',
+    '4x6@RPE8',
+    '3x8@120kg (3110)',
+    '3x8@100kg (31X0)',
+    '4x6-8@70% (4020)',
+    '3x8@120kg + 1x1@130kg',
+    '2x8@120kg + 2x8@100kg + 1x10@80kg',
+    '2x10 + 1xAMRAP',
+  ]
+
+  it.each(notations)('round-trip: %s', (notation) => {
+    const series = parsePrescriptionToSeries(notation)
+    expect(series).not.toBeNull()
+    if (series && series.length > 0) {
+      const formatted = formatSeriesToNotation(series)
+      const reparsed = parsePrescriptionToSeries(formatted)
+      // Compare the series arrays for equivalence (ignoring orderIndex if needed)
+      expect(reparsed).toHaveLength(series.length)
+      if (reparsed) {
+        for (let i = 0; i < series.length; i++) {
+          const orig = series[i]
+          const repr = reparsed[i]
+          expect(repr?.reps).toBe(orig?.reps)
+          expect(repr?.repsMax).toBe(orig?.repsMax)
+          expect(repr?.isAmrap).toBe(orig?.isAmrap)
+          expect(repr?.intensityType).toBe(orig?.intensityType)
+          expect(repr?.intensityValue).toBe(orig?.intensityValue)
+          expect(repr?.tempo).toBe(orig?.tempo)
+        }
+      }
+    }
+  })
+})

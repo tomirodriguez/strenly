@@ -12,6 +12,13 @@ export const intensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir
 export type IntensityType = z.infer<typeof intensityTypeSchema>
 
 /**
+ * Units for intensity values
+ */
+export const intensityUnitSchema = z.enum(['kg', 'lb', '%', 'rpe', 'rir'])
+
+export type IntensityUnit = z.infer<typeof intensityUnitSchema>
+
+/**
  * Units for unilateral exercises
  */
 export const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'])
@@ -326,6 +333,212 @@ export function formatPrescription(prescription: ParsedPrescription | null): str
   // Add tempo
   if (tempo) {
     result += ` (${tempo})`
+  }
+
+  return result
+}
+
+// ============================================================================
+// Series-based parsing (new multi-part notation support)
+// ============================================================================
+
+/**
+ * Schema for a single series (one set) in a prescription.
+ * Used as input for creating prescription series arrays.
+ */
+export const prescriptionSeriesInputSchema = z.object({
+  orderIndex: z.number().min(0),
+  reps: z.number().min(0).nullable(), // null or 0 for AMRAP
+  repsMax: z.number().min(0).nullable(),
+  isAmrap: z.boolean(),
+  intensityType: intensityTypeSchema.nullable(),
+  intensityValue: z.number().nullable(),
+  intensityUnit: intensityUnitSchema.nullable(),
+  tempo: z
+    .string()
+    .regex(/^[\dX]{4}$/i)
+    .nullable(),
+})
+
+export type PrescriptionSeriesInput = z.infer<typeof prescriptionSeriesInputSchema>
+
+/**
+ * Parse prescription notation string into an array of series (one per set).
+ * Supports multi-part notation like "3x8@120kg + 1x1@130kg".
+ *
+ * @param input - The notation string to parse
+ * @returns Array of series (empty for skip/empty), or null if unparseable
+ */
+export function parsePrescriptionToSeries(input: string): PrescriptionSeriesInput[] | null {
+  const trimmed = input.trim()
+
+  // Empty input -> empty array
+  if (trimmed === '') {
+    return []
+  }
+
+  // Skip notation -> empty array
+  if (trimmed === '—' || trimmed === '-') {
+    return []
+  }
+
+  // Split on " + " to get multiple parts (handle extra whitespace)
+  const parts = trimmed.split(/\s*\+\s*/)
+
+  const allSeries: PrescriptionSeriesInput[] = []
+  let orderIndex = 0
+
+  for (const part of parts) {
+    const parsed = parsePrescriptionNotation(part.trim())
+    if (parsed === null) {
+      // If any part is invalid, the whole thing is invalid
+      return null
+    }
+
+    // Expand this part's sets into individual series
+    for (let i = 0; i < parsed.sets; i++) {
+      allSeries.push({
+        orderIndex: orderIndex++,
+        reps: parsed.isAmrap ? 0 : parsed.repsMin,
+        repsMax: parsed.repsMax,
+        isAmrap: parsed.isAmrap,
+        intensityType: parsed.intensityType,
+        intensityValue: parsed.intensityValue,
+        intensityUnit: parsed.intensityUnit,
+        tempo: parsed.tempo,
+      })
+    }
+  }
+
+  return allSeries
+}
+
+/**
+ * Format an array of series back to compact notation string.
+ * Groups consecutive identical series into count notation (e.g., 3x8).
+ *
+ * @param series - Array of prescription series
+ * @returns Compact notation string (em dash for empty array)
+ */
+export function formatSeriesToNotation(series: PrescriptionSeriesInput[]): string {
+  if (series.length === 0) {
+    return '—'
+  }
+
+  // Group consecutive identical series
+  const groups = groupConsecutiveIdentical(series)
+
+  // Format each group and join with " + "
+  const parts = groups.map((group) => formatGroup(group))
+
+  return parts.join(' + ')
+}
+
+/**
+ * Represents a group of identical consecutive series
+ */
+type SeriesGroup = {
+  count: number
+  template: PrescriptionSeriesInput
+}
+
+/**
+ * Group consecutive identical series together.
+ * Two series are "identical" if they have the same reps, repsMax, isAmrap,
+ * intensityType, intensityValue, intensityUnit, and tempo.
+ */
+function groupConsecutiveIdentical(series: PrescriptionSeriesInput[]): SeriesGroup[] {
+  if (series.length === 0) {
+    return []
+  }
+
+  const groups: SeriesGroup[] = []
+  const firstSeries = series[0]
+  if (!firstSeries) {
+    return []
+  }
+
+  let currentGroup: SeriesGroup = {
+    count: 1,
+    template: firstSeries,
+  }
+
+  for (let i = 1; i < series.length; i++) {
+    const current = series[i]
+    if (!current) continue
+
+    if (seriesAreIdentical(currentGroup.template, current)) {
+      currentGroup.count++
+    } else {
+      groups.push(currentGroup)
+      currentGroup = {
+        count: 1,
+        template: current,
+      }
+    }
+  }
+
+  // Push the last group
+  groups.push(currentGroup)
+
+  return groups
+}
+
+/**
+ * Check if two series are identical (ignoring orderIndex)
+ */
+function seriesAreIdentical(a: PrescriptionSeriesInput, b: PrescriptionSeriesInput): boolean {
+  return (
+    a.reps === b.reps &&
+    a.repsMax === b.repsMax &&
+    a.isAmrap === b.isAmrap &&
+    a.intensityType === b.intensityType &&
+    a.intensityValue === b.intensityValue &&
+    a.intensityUnit === b.intensityUnit &&
+    a.tempo === b.tempo
+  )
+}
+
+/**
+ * Format a single series group to notation
+ */
+function formatGroup(group: SeriesGroup): string {
+  const { count, template } = group
+
+  // AMRAP format
+  if (template.isAmrap) {
+    return template.tempo ? `${count}xAMRAP (${template.tempo})` : `${count}xAMRAP`
+  }
+
+  // Build result string
+  let result = `${count}x${template.reps}`
+
+  // Add rep range if different
+  if (template.repsMax !== null && template.repsMax !== template.reps) {
+    result += `-${template.repsMax}`
+  }
+
+  // Add intensity
+  if (template.intensityType && template.intensityValue !== null) {
+    switch (template.intensityType) {
+      case 'absolute':
+        result += `@${template.intensityValue}${template.intensityUnit}`
+        break
+      case 'percentage':
+        result += `@${template.intensityValue}%`
+        break
+      case 'rir':
+        result += `@RIR${template.intensityValue}`
+        break
+      case 'rpe':
+        result += `@RPE${template.intensityValue}`
+        break
+    }
+  }
+
+  // Add tempo
+  if (template.tempo) {
+    result += ` (${template.tempo})`
   }
 
   return result
