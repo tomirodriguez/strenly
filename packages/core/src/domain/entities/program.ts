@@ -88,7 +88,7 @@ export function activateProgram(program: Program): Result<Program, ProgramError>
 
   return ok({
     ...program,
-    status: 'active' as ProgramStatus,
+    status: 'active',
     updatedAt: new Date(),
   })
 }
@@ -108,7 +108,7 @@ export function archiveProgram(program: Program): Result<Program, ProgramError> 
 
   return ok({
     ...program,
-    status: 'archived' as ProgramStatus,
+    status: 'archived',
     updatedAt: new Date(),
   })
 }
