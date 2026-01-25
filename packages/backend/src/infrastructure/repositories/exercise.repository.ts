@@ -51,11 +51,13 @@ function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercis
   const secondaryMuscles: MuscleGroup[] = []
 
   for (const mapping of muscleMappings) {
-    if (isValidMuscleGroup(mapping.muscleGroupId)) {
+    // Strip mg- prefix if present (seed data uses mg-chest, validator expects chest)
+    const muscleId = mapping.muscleGroupId.replace(/^mg-/, '')
+    if (isValidMuscleGroup(muscleId)) {
       if (mapping.isPrimary) {
-        primaryMuscles.push(mapping.muscleGroupId)
+        primaryMuscles.push(muscleId)
       } else {
-        secondaryMuscles.push(mapping.muscleGroupId)
+        secondaryMuscles.push(muscleId)
       }
     }
   }
@@ -153,10 +155,12 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
           // If filtering by muscle group, we need a subquery
           let exerciseIdsWithMuscle: string[] | null = null
           if (options?.muscleGroup) {
+            // Database stores with mg- prefix, so add it for the query
+            const dbMuscleGroupId = `mg-${options.muscleGroup}`
             const muscleResults = await db
               .select({ exerciseId: exerciseMuscles.exerciseId })
               .from(exerciseMuscles)
-              .where(eq(exerciseMuscles.muscleGroupId, options.muscleGroup))
+              .where(eq(exerciseMuscles.muscleGroupId, dbMuscleGroupId))
             exerciseIdsWithMuscle = muscleResults.map((r) => r.exerciseId)
 
             // If no exercises match the muscle group, return empty
