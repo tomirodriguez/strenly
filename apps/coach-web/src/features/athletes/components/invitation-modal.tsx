@@ -9,6 +9,7 @@ import { useAthleteInvitation } from '../hooks/queries/use-athlete-invitation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import { orpc } from '@/lib/api-client'
 import { toast } from '@/lib/toast'
 
@@ -78,14 +79,29 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
           <DialogTitle>Invitacion para {athlete?.name}</DialogTitle>
         </DialogHeader>
 
-        {isLoading && <p className="text-muted-foreground text-sm">Cargando...</p>}
+        {isLoading && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-5 w-20" />
+            </div>
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="space-y-4">
             <p className="text-muted-foreground text-sm">No hay invitacion activa para este atleta.</p>
             <Button onClick={handleRegenerate} disabled={generateMutation.isPending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-              Invitar
+              Generar Invitacion
             </Button>
           </div>
         )}
@@ -120,7 +136,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
             {invitation.status !== 'accepted' && (
               <Button variant="outline" onClick={handleRegenerate} disabled={generateMutation.isPending}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-                Invitar
+                Regenerar Invitacion
               </Button>
             )}
 
