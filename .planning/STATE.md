@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 12/N (waves 1-5 complete, wave 6 in progress)
+Plan: 13/N (waves 1-5 complete, wave 6 in progress)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-12-PLAN.md (Program Editor Page)
+Last activity: 2026-01-25 - Completed 03-13-PLAN.md (Grid Manipulation Interactions)
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 6 in progress
 
@@ -120,6 +120,8 @@ Recent decisions affecting current work:
 - **Nested router structure for grid ops** - programs.weeks.add, programs.exerciseRows.update, etc. for logical API organization
 - **Prescription endpoint returns nullable** - parsedPrescriptionSchema.nullable() - null for cleared cells, structured data otherwise
 - **Select over Combobox for small lists** - Use Select component instead of Combobox when search isn't needed (athlete/template selectors)
+- **Modal for required input, direct mutation for optional** - Grid toolbar uses modal for session name (required) but direct mutation for week name (optional with auto-generate)
+- **onActiveCellChange for row tracking** - react-datasheet-grid provides cell via onActiveCellChange({ cell }), use cell.row to track selected row for keyboard shortcuts
 
 ### Pending Todos
 
@@ -237,7 +239,7 @@ None.
 | 03-10 | Programs List and Creation Frontend | Complete |
 | 03-11 | Core Grid Components | Complete |
 | 03-12 | Program Editor Page | Complete |
-| 03-13 | Grid Toolbar with Structure Actions | Complete |
+| 03-13 | Grid Manipulation Interactions | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -294,7 +296,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-12-PLAN.md (Program Editor Page)
+Stopped at: Completed 03-13-PLAN.md (Grid Manipulation Interactions)
 Resume file: None
 
 **Next:** Continue with 03-14 or remaining wave 6 plans
