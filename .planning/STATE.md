@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 3 of 5 (Program Builder)
-Plan: 15/N (waves 1-6 complete, wave 7 in progress)
+Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
+Plan: 2/7 (Create Program Form Improvements)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-15-PLAN.md (Template System)
+Last activity: 2026-01-25 - Completed 03.1-02-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 7 in progress
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 2/7
 
-**Note:** Phase 3 is the core differentiator - Excel-like program editing.
+**Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
 
 ## Performance Metrics
 
@@ -124,12 +124,18 @@ Recent decisions affecting current work:
 - **onActiveCellChange for row tracking** - react-datasheet-grid provides cell via onActiveCellChange({ cell }), use cell.row to track selected row for keyboard shortcuts
 - **Template ops reuse duplicateProgram** - Save-as-template and create-from-template delegate to existing deep copy logic
 - **Template verification in createFromTemplate** - Verify source is actually a template before creating program
+- **weeksCount optional with backend default** - Schema uses .optional(), backend applies default of 4. Avoids Zod z.infer output type conflicts with React Hook Form.
+- **Combobox for searchable athlete selection** - Use Combobox with local filtering for athlete selection in program form
 
 ### Pending Todos
 
 - Configure Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 - Generate BETTER_AUTH_SECRET
 - Set DATABASE_URL for database operations
+
+### Roadmap Evolution
+
+- Phase 3.1 inserted after Phase 3: Custom Program Grid (URGENT) - UAT revealed react-datasheet-grid doesn't match design system, need custom implementation
 
 ### Blockers/Concerns
 
@@ -306,10 +312,24 @@ None.
 - `apps/coach-web/src/features/programs/hooks/mutations/use-create-from-template.ts` - Create from template mutation
 - `apps/coach-web/src/features/programs/components/save-as-template-dialog.tsx` - Template save dialog
 
+## Phase 3.1 Progress
+
+**Custom Program Grid IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 03.1-01 | Programs Table Component | Complete |
+| 03.1-02 | Create Program Form Improvements | Complete |
+| 03.1-03 | Grid Foundation | Pending |
+| 03.1-04 | Cell Components | Pending |
+| 03.1-05 | Row Management | Pending |
+| 03.1-06 | Keyboard Navigation | Pending |
+| 03.1-07 | Final Integration | Pending |
+
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-15-PLAN.md (Template System)
+Stopped at: Completed 03.1-02-PLAN.md
 Resume file: None
 
-**Next:** Continue with remaining Phase 3 plans (wave 7+)
+**Next:** Execute 03.1-03-PLAN.md - Grid Foundation
