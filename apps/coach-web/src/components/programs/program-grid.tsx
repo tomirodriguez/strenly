@@ -10,6 +10,7 @@ import { SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AddExerciseRow } from './add-exercise-row'
 import { SplitRowDialog } from './split-row-dialog'
+import { WeekActionsMenu } from './week-actions-menu'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
 import {
   useToggleSuperset,
@@ -439,9 +440,29 @@ function PrescriptionCellComponent({
 }
 
 /**
+ * Week column header component with actions menu
+ */
+function WeekColumnHeader({
+  programId,
+  week,
+  isLastWeek,
+}: {
+  programId: string
+  week: ProgramWeek
+  isLastWeek: boolean
+}) {
+  return (
+    <div className="flex w-full items-center justify-between px-2 py-1">
+      <span className="font-medium text-muted-foreground text-xs uppercase tracking-wider">{week.name}</span>
+      <WeekActionsMenu programId={programId} weekId={week.id} weekName={week.name} isLastWeek={isLastWeek} />
+    </div>
+  )
+}
+
+/**
  * Build columns for the grid based on program weeks
  */
-function buildColumns(weeks: ProgramWeek[]): Column<GridRow>[] {
+function buildColumns(weeks: ProgramWeek[], programId: string): Column<GridRow>[] {
   // Exercise column
   const exerciseCol: Column<GridRow> = {
     id: 'exercise',
@@ -460,11 +481,15 @@ function buildColumns(weeks: ProgramWeek[]): Column<GridRow>[] {
     isCellEmpty: ({ rowData }) => rowData.type === 'session-header' || !rowData.exercise.exerciseId,
   }
 
+  const isLastWeek = weeks.length === 1
+
   // Week columns (prescription cells)
   const weekCols: Column<GridRow>[] = weeks.map((week) => ({
     id: week.id,
     title: week.name,
+    headerClassName: 'week-column-header',
     component: (props) => <PrescriptionCellComponent {...props} weekId={week.id} />,
+    headerComponent: () => <WeekColumnHeader programId={programId} week={week} isLastWeek={isLastWeek} />,
     deleteValue: ({ rowData }) => ({
       ...rowData,
       prescriptions: {
@@ -562,8 +587,8 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
   // Build columns based on weeks
   const columns = useMemo(() => {
     if (!program) return []
-    return buildColumns(program.weeks)
-  }, [program])
+    return buildColumns(program.weeks, programId)
+  }, [program, programId])
 
   // Handle cell changes
   const handleChange = useCallback(
