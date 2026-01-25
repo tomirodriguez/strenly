@@ -155,7 +155,7 @@ Plans:
   7. All existing mutation hooks (use-grid-mutations.ts) work with new grid
   8. Programs list uses DataTable instead of cards
   9. Create program form has weeks selector (default 4) and improved athlete combobox
-**Plans**: 7 plans in 5 waves
+**Plans**: 11 plans in 6 waves
 
 **Context:**
 - Backend API (procedures, use cases, contracts) is complete and unchanged
@@ -172,6 +172,10 @@ Plans:
 - [x] 03.1-05-PLAN.md - Exercise cell with combobox (Wave 3)
 - [x] 03.1-06-PLAN.md - Prescription cells and grid body (Wave 4)
 - [x] 03.1-07-PLAN.md - Grid integration and program editor (Wave 5)
+- [ ] 03.1-08-PLAN.md - [GAP CLOSURE] Fix athlete selector server search (Wave 6)
+- [ ] 03.1-09-PLAN.md - [GAP CLOSURE] Fix week ordering on rename (Wave 6)
+- [ ] 03.1-10-PLAN.md - [GAP CLOSURE] Fix superset groups dynamic + order (Wave 6)
+- [ ] 03.1-11-PLAN.md - [GAP CLOSURE] Fix keyboard navigation + edit mode (Wave 6)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -218,7 +222,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 7/7 | Complete | 2026-01-25 |
+| 3.1. Custom Program Grid (frontend) | 7/11 | Gap closure | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
