@@ -12,6 +12,7 @@ import {
 import { getProgram } from './get'
 import { listPrograms } from './list'
 import { updatePrescriptionProcedure } from './prescriptions'
+import { saveDraftProcedure } from './save-draft'
 import { addSessionProcedure, deleteSessionProcedure, updateSessionProcedure } from './sessions'
 import { createFromTemplateProcedure, listTemplatesProcedure, saveAsTemplateProcedure } from './templates'
 import { updateProgram } from './update'
@@ -66,6 +67,7 @@ export const programs = {
   // Prescription operations
   prescriptions: {
     update: updatePrescriptionProcedure,
+    saveDraft: saveDraftProcedure,
   },
 
   // Template operations
