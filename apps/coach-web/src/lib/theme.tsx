@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (stored === 'light' || stored === 'dark' || stored === 'system') {
       return stored
     }
-    return 'system'
+    return 'dark' // Default to dark theme for this app
   })
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => resolveTheme(theme))
@@ -33,7 +33,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const resolved = resolveTheme(theme)
     setResolvedTheme(resolved)
-    document.documentElement.setAttribute('data-theme', resolved)
+    // Use .dark class instead of data-theme attribute (shadcn/ui standard)
+    document.documentElement.classList.toggle('dark', resolved === 'dark')
   }, [theme])
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const handleChange = () => {
       const resolved = getSystemTheme()
       setResolvedTheme(resolved)
-      document.documentElement.setAttribute('data-theme', resolved)
+      document.documentElement.classList.toggle('dark', resolved === 'dark')
     }
 
     mediaQuery.addEventListener('change', handleChange)

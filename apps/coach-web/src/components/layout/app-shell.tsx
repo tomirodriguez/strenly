@@ -1,8 +1,6 @@
+import { AppHeader } from './app-header'
 import { AppSidebar } from './app-sidebar'
-import { Breadcrumbs } from './breadcrumbs'
-import { UserMenu } from './user-menu'
-import { Separator } from '@/components/ui/separator'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 type AppShellProps = {
   children: React.ReactNode
@@ -16,22 +14,20 @@ type AppShellProps = {
       id: string
     }
   }
+  primaryAction?: {
+    label: string
+    icon?: React.ReactNode
+    onClick: () => void
+  }
 }
 
-export function AppShell({ children, authData }: AppShellProps) {
+export function AppShell({ children, authData, primaryAction }: AppShellProps) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={authData.user} />
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-border border-b px-4">
-          <div className="flex flex-1 items-center gap-2">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="h-6" />
-            <Breadcrumbs />
-          </div>
-          <UserMenu user={authData.user} />
-        </header>
-        <main className="flex flex-1 flex-col p-4">{children}</main>
+        <AppHeader primaryAction={primaryAction} />
+        <main className="flex flex-1 flex-col p-4 md:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
