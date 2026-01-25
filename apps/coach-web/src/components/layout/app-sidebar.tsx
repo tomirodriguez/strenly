@@ -104,15 +104,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                 const isActive = matchRoute({ to, fuzzy: true })
                 return (
                   <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      render={
-                        <Link
-                          to={to}
-                          className="[&.active]:bg-sidebar-accent [&.active]:text-sidebar-accent-foreground"
-                        />
-                      }
-                      isActive={Boolean(isActive)}
-                    >
+                    <SidebarMenuButton render={<Link to={to} />} isActive={Boolean(isActive)}>
                       <item.icon />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
@@ -134,15 +126,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                 const isActive = matchRoute({ to, fuzzy: true })
                 return (
                   <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      render={
-                        <Link
-                          to={to}
-                          className="[&.active]:bg-sidebar-accent [&.active]:text-sidebar-accent-foreground"
-                        />
-                      }
-                      isActive={Boolean(isActive)}
-                    >
+                    <SidebarMenuButton render={<Link to={to} />} isActive={Boolean(isActive)}>
                       <item.icon />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
