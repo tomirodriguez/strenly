@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: Ready for Phase 3
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed quick task 011: Refactor forms to skill pattern
+Last activity: 2026-01-25 - Completed quick task 011: Fix Select showing value instead of label
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -88,6 +88,7 @@ Recent decisions affecting current work:
 - **Slug auto-generation via onChange** - Use onChange callbacks instead of useEffect for derived input values
 - **Context providers for route data caching** - AuthProvider at _authenticated, OrganizationProvider at $orgSlug, use hooks instead of Better-Auth hooks in components
 - **standardSchemaResolver for forms** - Use standardSchemaResolver instead of zodResolver, Controller for controlled components (Checkbox, Select)
+- **Select items prop for label display** - Pass items array to Select.Root for Base UI SelectValue to display labels instead of raw values
 
 ### Pending Todos
 
@@ -113,7 +114,7 @@ None.
 | 008 | Fix session and organization API calls on navigation | 2026-01-24 | 6d28f99 | [008-fix-session-and-organization-api-calls-o](./quick/008-fix-session-and-organization-api-calls-o/) |
 | 009 | Migrate create athlete drawer to modal and add modal vs drawer rules | 2026-01-24 | 5742c7d | [009-migrate-create-athlete-drawer-to-modal-a](./quick/009-migrate-create-athlete-drawer-to-modal-a/) |
 | 010 | Remove planId subscription logic from auth hook | 2026-01-25 | a20679a | [010-remove-planid-from-org-metadata-onboarding](./quick/010-remove-planid-from-org-metadata-onboarding/) |
-| 011 | Refactor forms to skill pattern (standardSchemaResolver + Controller) | 2026-01-25 | 05c38a3 | [011-refactor-forms-to-skill-pattern](./quick/011-refactor-forms-to-skill-pattern/) |
+| 011 | Fix Select showing value instead of label | 2026-01-25 | 34ebdfd | [011-fix-select-showing-value-instead-of-label](./quick/011-fix-select-showing-value-instead-of-label/) |
 
 ## Phase 2 Progress
 
@@ -180,7 +181,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed quick task 011 - Refactor forms to skill pattern
+Stopped at: Completed quick task 011 - Fix Select showing value instead of label
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
