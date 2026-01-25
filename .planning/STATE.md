@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
-Plan: Ready for Phase 3
+Plan: 11/11 (all gap closure plans complete)
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed quick task 012: Audit and refactor forms to skill pattern
+Last activity: 2026-01-25 - Completed 02.5-11-PLAN.md (view athlete invitation modal)
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
-**Note:** Backend (Phases 1-2) and Coach Web Foundation (Phase 2.5) complete. Ready for Program Builder (Phase 3).
+**Note:** Backend (Phases 1-2) and Coach Web Foundation (Phase 2.5) complete. All UAT gaps closed. Ready for Phase 3.
 
 ## Performance Metrics
 
@@ -89,6 +89,9 @@ Recent decisions affecting current work:
 - **Context providers for route data caching** - AuthProvider at _authenticated, OrganizationProvider at $orgSlug, use hooks instead of Better-Auth hooks in components
 - **zodResolver for forms** - Use zodResolver as primary resolver, standardSchemaResolver as fallback, Controller for controlled components (Checkbox, Select)
 - **Select items prop for label display** - Pass items array to Select.Root for Base UI SelectValue to display labels instead of raw values
+- **Empty string coercion uses || not ??** - Nullish coalescing doesn't catch empty strings from forms, use || for optional field coercion
+- **Database ID prefix handling in repository layer** - Strip/add prefixes like mg- in repository mapToDomain/query, not in domain
+- **Node types for crypto module** - Added @types/node to core and backend packages for node:crypto import in athlete-invitation.ts
 
 ### Pending Todos
 
@@ -182,7 +185,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed quick task 012 - Audit and refactor forms to skill pattern
+Stopped at: Completed 02.5-11-PLAN.md - view athlete invitation modal
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
