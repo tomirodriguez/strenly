@@ -155,8 +155,10 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
                           {athlete.name}
                         </ComboboxItem>
                       ))}
+
+                      {/* Empty state - must be inside ComboboxList for CSS visibility to work */}
+                      <ComboboxEmpty>No se encontraron atletas</ComboboxEmpty>
                     </ComboboxList>
-                    <ComboboxEmpty>No se encontraron atletas</ComboboxEmpty>
                   </ComboboxContent>
                 </Combobox>
               )
