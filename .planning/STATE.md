@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
-Plan: 9/N (Week Ordering Bug Fix) - COMPLETE
+Plan: 8-9/N (Athlete Selector + Week Ordering) - COMPLETE
 Status: Gap closure in progress
-Last activity: 2026-01-25 - Completed 03.1-09-PLAN.md (week ordering bug fix)
+Last activity: 2026-01-25 - Completed 03.1-08-PLAN.md (athlete selector server-side search)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 + gap fixes
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 4 min
-- Total execution time: 150 min
+- Total execution time: 153 min
 
 **By Phase:**
 
@@ -35,7 +35,7 @@ Progress: [███████████████████████
 | 3.1 | 7/7 | ~35 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-05 (5 min), 03.1-06 (4 min), 03.1-07 (5 min), 03.1-09 (1 min)
+- Last 5 plans: 03.1-06 (4 min), 03.1-07 (5 min), 03.1-08 (3 min), 03.1-09 (1 min)
 - Trend: Gap closure plans executing quickly
 
 *Updated after each plan completion*
@@ -126,7 +126,7 @@ Recent decisions affecting current work:
 - **Template ops reuse duplicateProgram** - Save-as-template and create-from-template delegate to existing deep copy logic
 - **Template verification in createFromTemplate** - Verify source is actually a template before creating program
 - **weeksCount optional with backend default** - Schema uses .optional(), backend applies default of 4. Avoids Zod z.infer output type conflicts with React Hook Form.
-- **Combobox for searchable athlete selection** - Use Combobox with local filtering for athlete selection in program form
+- **Popover-based searchable dropdown for athletes** - Use Popover with search input inside for Select-style UX with server-side search
 - **Roving tabindex for grid navigation** - W3C ARIA Grid pattern with only active cell having tabIndex=0
 - **Direction-aware navigation skips non-navigable rows** - Arrow key navigation skips session-header rows in direction of movement
 - **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
@@ -229,6 +229,7 @@ None.
 | 03.1-05 | Exercise Cell Components | Complete |
 | 03.1-06 | Row Components | Complete |
 | 03.1-07 | Final Integration | Complete |
+| 03.1-08 | Athlete Selector Server-Side Search | Complete |
 | 03.1-09 | Week Ordering Bug Fix | Complete |
 
 **Key artifacts:**
@@ -252,7 +253,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-09-PLAN.md - Week ordering bug fix
+Stopped at: Completed 03.1-08-PLAN.md - Athlete selector server-side search
 Resume file: None
 
 **Next:** Continue gap closure plans or re-run UAT to verify fixes.
