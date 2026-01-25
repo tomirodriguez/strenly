@@ -147,10 +147,31 @@ apps/coach-web/src/
 | With percentage | `3x8@75%` | 3 sets of 8 @ 75% 1RM |
 | With RIR | `3x8@RIR2` | 3 sets of 8, 2 reps in reserve |
 | With RPE | `3x8@RPE8` | 3 sets of 8 @ RPE 8 |
-| With tempo | `3x8@120kg (3110)` | 3 sets of 8 @ 120kg, tempo 3-1-1-0 |
+| With tempo | `3x8@120kg (3110)` | 3 sets of 8 @ 120kg, tempo 3-1-1-0 (see Tempo Notation below) |
 | Unilateral | `3x12/leg` | 3 sets of 12 per leg |
 | AMRAP | `3xAMRAP` | 3 sets of as many reps as possible |
 | Skip/rest | `—` | No prescription (em dash) |
+
+#### Tempo Notation (4-Character ECCC Format)
+
+Tempo controls the speed of each rep phase. Written as 4 characters (e.g., `3110`, `31X0`):
+
+| Position | Phase | Description | Example |
+|----------|-------|-------------|---------|
+| 1st | **Eccentric** | Lowering phase (e.g., lowering barbell to chest) | `3` = 3 seconds down |
+| 2nd | **Isometric (bottom)** | Pause at stretch position | `1` = 1 second pause |
+| 3rd | **Concentric** | Lifting phase (e.g., pushing bar up) | `1` = 1 second up, `X` = explosive |
+| 4th | **Isometric (top)** | Pause at contracted position | `0` = no pause |
+
+**Special values:**
+- `X` = Explosive/fast movement (typically in concentric phase)
+- `0` = No pause
+
+**Examples:**
+- `3110` = 3s down, 1s pause bottom, 1s up, no pause top
+- `4020` = 4s down, no pause, 2s up, no pause (hypertrophy focused)
+- `31X0` = 3s down, 1s pause, explosive up, no pause (power focused)
+- `2012` = 2s down, no pause, 1s up, 2s squeeze at top
 
 **Example:**
 ```typescript
@@ -332,7 +353,7 @@ export const parsedPrescriptionSchema = z.object({
   intensityType: intensityTypeSchema.nullable(),
   intensityValue: z.number().nullable(),
   intensityUnit: z.enum(['kg', 'lb', '%', 'rpe', 'rir']).nullable(),
-  tempo: z.string().regex(/^\d{4}$/).nullable(),  // "3110" format
+  tempo: z.string().regex(/^[\dX]{4}$/i).nullable(),  // "3110" or "31X0" format (X = explosive)
 })
 
 export type ParsedPrescription = z.infer<typeof parsedPrescriptionSchema>
@@ -350,13 +371,13 @@ export function parsePrescriptionNotation(input: string): ParsedPrescription | n
 
   const lower = trimmed.toLowerCase()
 
-  // Extract tempo if present: "3x8@120kg (3110)" -> tempo = "3110"
+  // Extract tempo if present: "3x8@120kg (3110)" or "3x8@120kg (31X0)" -> tempo = "3110" or "31X0"
   let tempo: string | null = null
   let withoutTempo = lower
-  const tempoMatch = lower.match(/\((\d{4})\)\s*$/)
+  const tempoMatch = trimmed.match(/\(([\dXx]{4})\)\s*$/i)
   if (tempoMatch) {
-    tempo = tempoMatch[1]
-    withoutTempo = lower.replace(/\s*\(\d{4}\)\s*$/, '')
+    tempo = tempoMatch[1].toUpperCase()  // Normalize X to uppercase
+    withoutTempo = lower.replace(/\s*\([\dXx]{4}\)\s*$/i, '')
   }
 
   // Pattern: 3xAMRAP
@@ -608,7 +629,7 @@ export interface ParsedPrescription {
   intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
   intensityValue: number | null
   intensityUnit: 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null
-  tempo: string | null          // "3110" format (4-digit ECCC)
+  tempo: string | null          // "3110" or "31X0" format (4-char ECCC, X = explosive)
 }
 
 // A row in the grid (can be split row for same exercise)
