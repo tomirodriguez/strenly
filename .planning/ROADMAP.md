@@ -13,6 +13,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure (backend)
 - [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations (backend)
 - [x] **Phase 2.5: Coach Web Foundation** - Auth UI, athlete management UI, exercise browser (frontend catch-up)
+- [ ] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
 - [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
@@ -91,6 +92,25 @@ Plans:
 - [x] 02.5-10-PLAN.md - [GAP CLOSURE] Fix athlete validation and exercise muscles (Wave 6)
 - [x] 02.5-11-PLAN.md - [GAP CLOSURE] Add invitation viewing modal (Wave 6)
 
+### Phase 2.6: Design System & Visual Refresh
+**Goal**: Transform coach web app visual identity with dark slate theme, blue primary accent, and consistent design system
+**Depends on**: Phase 2.5 (non-blocking for Phase 3)
+**Requirements**: None (visual refresh, no functional requirements)
+**Success Criteria** (what must be TRUE):
+  1. App uses dark slate color palette (slate-950 background, slate-900 surfaces, slate-800 borders)
+  2. Primary color is blue-600 (#2563eb) used for active states, buttons, and accent elements
+  3. Sidebar matches reference design with icon + label navigation, section dividers, and user profile footer
+  4. Header has breadcrumb navigation, search/notification icons, and primary action button
+  5. All existing UI components (DataTable, forms, modals) work correctly with new design tokens
+  6. Design tokens documented in docs/design-system.md for future development consistency
+**Plans**: 4 plans in 2 waves
+
+Plans:
+- [ ] 02.6-01-PLAN.md - Design tokens + CSS variables (Wave 1)
+- [ ] 02.6-02-PLAN.md - Layout components: sidebar, header, app-shell (Wave 1)
+- [ ] 02.6-03-PLAN.md - UI components: button, card, input, badge, dialog styling (Wave 2)
+- [ ] 02.6-04-PLAN.md - Design system documentation + visual verification (Wave 2)
+
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
 **Depends on**: Phase 2.5
@@ -152,6 +172,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 | 1. Foundation & Multi-Tenancy (backend) | 7/7 | Complete | 2026-01-24 |
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
+| 2.6. Design System & Visual Refresh (frontend) | 0/4 | Not started | - |
 | 3. Program Builder (full-stack) | 0/4 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |

@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3 - Program Builder (full-stack)
+**Current focus:** Phase 2.6 - Design System & Visual Refresh (frontend)
 
 ## Current Position
 
-Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
-Plan: 11/11 (all gap closure plans complete)
-Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed quick task 017: Add dev latency middleware
+Phase: 2.6 of 5 (Design System & Visual Refresh)
+Plan: 0/4
+Status: Planning
+Last activity: 2026-01-25 - Created Phase 2.6 for design system refresh
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
-**Note:** Backend (Phases 1-2) and Coach Web Foundation (Phase 2.5) complete. All UAT gaps closed. Ready for Phase 3.
+**Note:** Starting Phase 2.6 to update visual identity before Phase 3. Non-blocking for Program Builder.
 
 ## Performance Metrics
 
@@ -195,4 +195,4 @@ Last session: 2026-01-25
 Stopped at: Completed quick task 016 - Fix invitation modal unified action and skeleton loading
 Resume file: None
 
-**Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
+**Next:** Plan Phase 2.6 with /gsd:plan-phase 2.6
