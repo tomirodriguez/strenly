@@ -1,11 +1,11 @@
-import type { CreateProgramInput, Program } from '@strenly/contracts/programs/program'
+import type { CreateProgramInput, Program, ProgramWithDetails } from '@strenly/contracts/programs/program'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ProgramForm } from '../components/program-form'
+import { useCreateFromTemplate } from '../hooks/mutations/use-create-from-template'
 import { useCreateProgram } from '../hooks/mutations/use-create-program'
-import { useDuplicateProgram } from '../hooks/mutations/use-duplicate-program'
-import { usePrograms } from '../hooks/queries/use-programs'
+import { useTemplates } from '../hooks/queries/use-templates'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -31,10 +31,8 @@ export function NewProgramView() {
   })
   const athletes = athletesData?.items ?? []
 
-  // Fetch templates for duplication
-  const { data: templatesData, isLoading: isLoadingTemplates } = usePrograms({
-    isTemplate: true,
-    status: 'active',
+  // Fetch templates using dedicated hook
+  const { data: templatesData, isLoading: isLoadingTemplates } = useTemplates({
     limit: 100,
   })
   const templates = templatesData?.items ?? []
@@ -47,22 +45,21 @@ export function NewProgramView() {
 
   // Mutations
   const createMutation = useCreateProgram()
-  const duplicateMutation = useDuplicateProgram()
+  const createFromTemplateMutation = useCreateFromTemplate()
 
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId)
 
   const handleSubmit = (data: CreateProgramInput) => {
     if (selectedTemplateId) {
-      // Create from template
-      duplicateMutation.mutate(
+      // Create from template using dedicated mutation
+      createFromTemplateMutation.mutate(
         {
-          sourceProgramId: selectedTemplateId,
+          templateId: selectedTemplateId,
           name: data.name,
           athleteId: data.athleteId,
-          isTemplate: false,
         },
         {
-          onSuccess: (program: Program) => {
+          onSuccess: (program: ProgramWithDetails) => {
             navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
           },
         },
@@ -77,7 +74,7 @@ export function NewProgramView() {
     }
   }
 
-  const isSubmitting = createMutation.isPending || duplicateMutation.isPending
+  const isSubmitting = createMutation.isPending || createFromTemplateMutation.isPending
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
