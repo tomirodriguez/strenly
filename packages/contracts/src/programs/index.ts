@@ -1,6 +1,38 @@
 /**
  * Program contracts - API schemas for program CRUD operations
  */
+
+// Exercise row operations
+export {
+  type AddExerciseRowInput,
+  type AddSplitRowInput,
+  addExerciseRowSchema,
+  addSplitRowSchema,
+  type DeleteExerciseRowInput,
+  deleteExerciseRowSchema,
+  type ExerciseRowOutput,
+  exerciseRowOutputSchema,
+  type ReorderExerciseRowsInput,
+  reorderExerciseRowsSchema,
+  type ToggleSupersetInput,
+  toggleSupersetSchema,
+  type UpdateExerciseRowInput,
+  updateExerciseRowSchema,
+} from './exercise-row'
+// Re-export prescription notation utilities
+export {
+  formatPrescription,
+  type IntensityType,
+  intensityTypeSchema,
+  type ParsedPrescription,
+  parsedPrescriptionSchema,
+  parsePrescriptionNotation,
+  SKIP_PRESCRIPTION,
+  type UnilateralUnit,
+  type UpdatePrescriptionInput,
+  unilateralUnitSchema,
+  updatePrescriptionSchema,
+} from './prescription'
 export {
   // Input schemas
   type ArchiveProgramInput,
@@ -19,95 +51,59 @@ export {
   listProgramsInputSchema,
   listProgramsOutputSchema,
   type Prescription,
-  prescriptionSchema,
   // Output schemas
   type Program,
-  programSchema,
   type ProgramSession,
-  programSessionSchema,
   type ProgramStatus,
-  programStatusSchema,
   type ProgramWeek,
-  programWeekSchema,
   type ProgramWithDetails,
+  prescriptionSchema,
+  programSchema,
+  programSessionSchema,
+  programStatusSchema,
+  programWeekSchema,
   programWithDetailsSchema,
   type SessionWithRows,
   sessionWithRowsSchema,
   type UpdateProgramInput,
   updateProgramInputSchema,
 } from './program'
-
-// Re-export prescription notation utilities
-export {
-  formatPrescription,
-  type IntensityType,
-  intensityTypeSchema,
-  type ParsedPrescription,
-  parsedPrescriptionSchema,
-  parsePrescriptionNotation,
-  SKIP_PRESCRIPTION,
-  type UnilateralUnit,
-  unilateralUnitSchema,
-  updatePrescriptionSchema,
-  type UpdatePrescriptionInput,
-} from './prescription'
-
-// Week operations
-export {
-  addWeekSchema,
-  type AddWeekInput,
-  deleteWeekSchema,
-  type DeleteWeekInput,
-  duplicateWeekSchema,
-  type DuplicateWeekInput,
-  updateWeekSchema,
-  type UpdateWeekInput,
-  weekOutputSchema,
-  type WeekOutput,
-} from './week'
-
 // Session operations
 export {
-  addSessionSchema,
   type AddSessionInput,
-  deleteSessionSchema,
+  addSessionSchema,
   type DeleteSessionInput,
-  sessionOutputSchema,
+  deleteSessionSchema,
   type SessionOutput,
-  updateSessionSchema,
+  sessionOutputSchema,
   type UpdateSessionInput,
+  updateSessionSchema,
 } from './session'
-
-// Exercise row operations
-export {
-  addExerciseRowSchema,
-  type AddExerciseRowInput,
-  addSplitRowSchema,
-  type AddSplitRowInput,
-  deleteExerciseRowSchema,
-  type DeleteExerciseRowInput,
-  exerciseRowOutputSchema,
-  type ExerciseRowOutput,
-  reorderExerciseRowsSchema,
-  type ReorderExerciseRowsInput,
-  toggleSupersetSchema,
-  type ToggleSupersetInput,
-  updateExerciseRowSchema,
-  type UpdateExerciseRowInput,
-} from './exercise-row'
-
 // Template operations
 export {
   type CreateFromTemplateInput,
   createFromTemplateInputSchema,
   type ListTemplatesInput,
-  listTemplatesInputSchema,
   type ListTemplatesOutput,
+  listTemplatesInputSchema,
   listTemplatesOutputSchema,
   type SaveAsTemplateInput,
   saveAsTemplateInputSchema,
   type TemplateOutput,
-  templateOutputSchema,
   type TemplateWithDetailsOutput,
+  templateOutputSchema,
   templateWithDetailsOutputSchema,
 } from './template'
+// Week operations
+export {
+  type AddWeekInput,
+  addWeekSchema,
+  type DeleteWeekInput,
+  type DuplicateWeekInput,
+  deleteWeekSchema,
+  duplicateWeekSchema,
+  type UpdateWeekInput,
+  updateWeekSchema,
+  type WeekOutput,
+  weekOutputSchema,
+} from './week'
