@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 3/7 (Grid Foundation)
+Plan: 5/7 (Exercise Cell Components)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.1-03-PLAN.md
+Last activity: 2026-01-25 - Completed 03.1-05-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 3/7
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 5/7
 
 **Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
 
@@ -325,7 +325,7 @@ None.
 | 03.1-02 | Create Program Form Improvements | Complete |
 | 03.1-03 | Grid Foundation | Complete |
 | 03.1-04 | Cell Components | Pending |
-| 03.1-05 | Row Management | Pending |
+| 03.1-05 | Exercise Cell Components | Complete |
 | 03.1-06 | Keyboard Navigation | Pending |
 | 03.1-07 | Final Integration | Pending |
 
@@ -334,11 +334,14 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/use-grid-navigation.ts` - Keyboard navigation hook with W3C ARIA patterns
 - `apps/coach-web/src/components/programs/program-grid/use-cell-editing.ts` - Cell editing state management with keyboard handling
 - `apps/coach-web/src/components/programs/program-grid/transform-program.ts` - API-to-grid data transformer with superset position calculation
+- `apps/coach-web/src/components/programs/program-grid/superset-indicator.tsx` - Vertical blue line for superset grouping
+- `apps/coach-web/src/components/programs/program-grid/exercise-row-prefix.tsx` - Row prefix (A1, B2) with styling
+- `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - First column cell with combobox editing
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-03-PLAN.md
+Stopped at: Completed 03.1-05-PLAN.md
 Resume file: None
 
-**Next:** Execute 03.1-04-PLAN.md - Cell Components
+**Next:** Execute 03.1-06-PLAN.md - Keyboard Navigation
