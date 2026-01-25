@@ -23,7 +23,7 @@ function RootComponent() {
       <Outlet />
       <Toaster position="top-right" richColors />
       <Suspense>
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position="bottom-right" />
       </Suspense>
     </QueryClientProvider>
   )
