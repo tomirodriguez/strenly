@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 7/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete; wave 3: 03-05, 03-06, 03-07 complete)
+Plan: 9/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete; wave 3: 03-05, 03-06, 03-07 complete; wave 4: 03-08, 03-09 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed quick task 020: Fix collapsed sidebar layout and icon sizes
+Last activity: 2026-01-25 - Completed 03-09-PLAN.md (Grid Manipulation Procedures)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 4 complete
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
@@ -117,6 +117,8 @@ Recent decisions affecting current work:
 - **Intensity unit mapping in repository** - Database uses both intensityType and intensityUnit; repository handles translation
 - **programId in delete/duplicate inputs** - Require programId for efficient week/session count checks
 - **Last entity protection** - Prevent deletion of last week/session at use case level (programs must have at least 1 of each)
+- **Nested router structure for grid ops** - programs.weeks.add, programs.exerciseRows.update, etc. for logical API organization
+- **Prescription endpoint returns nullable** - parsedPrescriptionSchema.nullable() - null for cleared cells, structured data otherwise
 
 ### Pending Todos
 
@@ -229,6 +231,8 @@ None.
 | 03-05 | Program CRUD + Duplicate Use Cases | Complete |
 | 03-06 | Week and Session Use Cases | Complete |
 | 03-07 | Exercise Row & Prescription Use Cases | Complete |
+| 03-08 | Program Contracts | Complete |
+| 03-09 | Grid Manipulation Procedures | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -254,11 +258,20 @@ None.
 - `packages/backend/src/use-cases/programs/update-program.ts` - Update with merge
 - `packages/backend/src/use-cases/programs/archive-program.ts` - Archive with status transition
 - `packages/backend/src/use-cases/programs/duplicate-program.ts` - Deep copy with new IDs
+- `packages/contracts/src/programs/program.ts` - Program CRUD contracts
+- `packages/contracts/src/programs/week.ts` - Week operation contracts
+- `packages/contracts/src/programs/session.ts` - Session operation contracts
+- `packages/contracts/src/programs/exercise-row.ts` - Exercise row contracts
+- `packages/backend/src/procedures/programs/weeks.ts` - Week procedures
+- `packages/backend/src/procedures/programs/sessions.ts` - Session procedures
+- `packages/backend/src/procedures/programs/exercise-rows.ts` - Exercise row procedures
+- `packages/backend/src/procedures/programs/prescriptions.ts` - Prescription update procedure
+- `packages/backend/src/procedures/programs/index.ts` - Programs router with nested structure
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-05-PLAN.md (Program CRUD + Duplicate Use Cases)
+Stopped at: Completed 03-09-PLAN.md (Grid Manipulation Procedures)
 Resume file: None
 
-**Next:** Continue with contracts and procedures or frontend components
+**Next:** Continue with 03-10 (Program Builder Frontend) or proceed with remaining Wave 4 plans
