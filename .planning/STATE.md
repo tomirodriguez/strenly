@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 3.1 of 5 (Custom Program Grid - COMPLETE)
-Plan: 11/11 - PHASE COMPLETE + VERIFIED
-Status: Phase 3.1 fully complete
-Last activity: 2026-01-25 - Phase verification passed (9/9 must-haves)
+Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
+Plan: 12/13 - Gap closure plans in progress
+Status: Executing gap closure plans from UAT v2
+Last activity: 2026-01-25 - Completed 03.1-12-PLAN.md (athlete selector accessibility)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
 
-**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-11) complete and verified.
+**Note:** Phase 3.1 core complete. Gap closure plans 12-13 address UAT v2 issues.
 
 ## Performance Metrics
 
@@ -35,7 +35,7 @@ Progress: [███████████████████████
 | 3.1 | 11/11 | ~49 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-08 (3 min), 03.1-09 (1 min), 03.1-10 (4 min), 03.1-11 (6 min)
+- Last 5 plans: 03.1-09 (1 min), 03.1-10 (4 min), 03.1-11 (6 min), 03.1-12 (2 min)
 - Trend: Gap closure plans executing quickly
 
 *Updated after each plan completion*
@@ -126,7 +126,7 @@ Recent decisions affecting current work:
 - **Template ops reuse duplicateProgram** - Save-as-template and create-from-template delegate to existing deep copy logic
 - **Template verification in createFromTemplate** - Verify source is actually a template before creating program
 - **weeksCount optional with backend default** - Schema uses .optional(), backend applies default of 4. Avoids Zod z.infer output type conflicts with React Hook Form.
-- **Popover-based searchable dropdown for athletes** - Use Popover with search input inside for Select-style UX with server-side search
+- **Combobox for searchable dropdowns with server-side search** - Use @base-ui/react Combobox instead of custom Popover for built-in ARIA and keyboard navigation
 - **Roving tabindex for grid navigation** - W3C ARIA Grid pattern with only active cell having tabIndex=0
 - **Direction-aware navigation skips non-navigable rows** - Arrow key navigation skips session-header rows in direction of movement
 - **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
@@ -237,6 +237,7 @@ None.
 | 03.1-09 | Week Ordering Bug Fix | Complete |
 | 03.1-10 | Dynamic Superset Groups | Complete |
 | 03.1-11 | Keyboard Navigation & Edit Mode Fix | Complete |
+| 03.1-12 | Athlete Selector Accessibility | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -259,7 +260,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 3.1 COMPLETE + VERIFIED
+Stopped at: Completed 03.1-12-PLAN.md
 Resume file: None
 
-**Next:** Phase 3 has one remaining plan (03-16 Navigation/UAT). After that, Phase 4 (Athlete PWA).
+**Next:** Plan 03.1-13 (superset functionality fix), then Phase 3 remaining plans.
