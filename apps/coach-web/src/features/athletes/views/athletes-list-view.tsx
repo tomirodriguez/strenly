@@ -6,7 +6,6 @@ import { AthletesTable } from '../components/athletes-table'
 import { InvitationModal } from '../components/invitation-modal'
 import { useArchiveAthlete } from '../hooks/mutations/use-archive-athlete'
 import { useCreateAthlete } from '../hooks/mutations/use-create-athlete'
-import { useGenerateInvitation } from '../hooks/mutations/use-generate-invitation'
 import { useUpdateAthlete } from '../hooks/mutations/use-update-athlete'
 import { useAthletes } from '../hooks/queries/use-athletes'
 import { DataTable } from '@/components/data-table/data-table'
@@ -50,7 +49,6 @@ export function AthletesListView() {
   const createMutation = useCreateAthlete()
   const updateMutation = useUpdateAthlete()
   const archiveMutation = useArchiveAthlete()
-  const generateInvitationMutation = useGenerateInvitation()
 
   const handlePageChange = (newPageIndex: number, newPageSize: number) => {
     setPageIndex(newPageIndex)
@@ -73,11 +71,7 @@ export function AthletesListView() {
     }
   }
 
-  const handleInvite = (athlete: Athlete) => {
-    generateInvitationMutation.mutate({ athleteId: athlete.id })
-  }
-
-  const handleViewInvitation = (athlete: Athlete) => {
+  const handleInvitation = (athlete: Athlete) => {
     setInvitationAthlete(athlete)
   }
 
@@ -160,8 +154,7 @@ export function AthletesListView() {
           isLoading={isLoading}
           onEdit={handleEdit}
           onArchive={handleArchive}
-          onInvite={handleInvite}
-          onViewInvitation={handleViewInvitation}
+          onInvitation={handleInvitation}
         />
 
         <DataTablePagination />
