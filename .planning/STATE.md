@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 13/N (waves 1-5 complete, wave 6 in progress)
+Plan: 15/N (waves 1-6 complete, wave 7 in progress)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-13-PLAN.md (Grid Manipulation Interactions)
+Last activity: 2026-01-25 - Completed 03-15-PLAN.md (Template System)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 6 in progress
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 7 in progress
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
@@ -122,6 +122,8 @@ Recent decisions affecting current work:
 - **Select over Combobox for small lists** - Use Select component instead of Combobox when search isn't needed (athlete/template selectors)
 - **Modal for required input, direct mutation for optional** - Grid toolbar uses modal for session name (required) but direct mutation for week name (optional with auto-generate)
 - **onActiveCellChange for row tracking** - react-datasheet-grid provides cell via onActiveCellChange({ cell }), use cell.row to track selected row for keyboard shortcuts
+- **Template ops reuse duplicateProgram** - Save-as-template and create-from-template delegate to existing deep copy logic
+- **Template verification in createFromTemplate** - Verify source is actually a template before creating program
 
 ### Pending Todos
 
@@ -240,6 +242,8 @@ None.
 | 03-11 | Core Grid Components | Complete |
 | 03-12 | Program Editor Page | Complete |
 | 03-13 | Grid Manipulation Interactions | Complete |
+| 03-14 | Week Column Actions Menu | Complete |
+| 03-15 | Template System | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -292,11 +296,20 @@ None.
 - `apps/coach-web/src/components/programs/add-exercise-row.tsx` - Inline exercise addition
 - `apps/coach-web/src/components/programs/split-row-dialog.tsx` - Split row dialog
 - `apps/coach-web/src/styles/program-grid.css` - Grid-specific CSS styles
+- `apps/coach-web/src/components/programs/week-actions-menu.tsx` - Week column actions dropdown
+- `packages/backend/src/use-cases/programs/save-as-template.ts` - Save program as template
+- `packages/backend/src/use-cases/programs/create-from-template.ts` - Create program from template
+- `packages/contracts/src/programs/template.ts` - Template contracts
+- `packages/backend/src/procedures/programs/templates.ts` - Template procedures
+- `apps/coach-web/src/features/programs/hooks/queries/use-templates.ts` - Templates query hook
+- `apps/coach-web/src/features/programs/hooks/mutations/use-save-as-template.ts` - Save as template mutation
+- `apps/coach-web/src/features/programs/hooks/mutations/use-create-from-template.ts` - Create from template mutation
+- `apps/coach-web/src/features/programs/components/save-as-template-dialog.tsx` - Template save dialog
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-13-PLAN.md (Grid Manipulation Interactions)
+Stopped at: Completed 03-15-PLAN.md (Template System)
 Resume file: None
 
-**Next:** Continue with 03-14 or remaining wave 6 plans
+**Next:** Continue with remaining Phase 3 plans (wave 7+)
