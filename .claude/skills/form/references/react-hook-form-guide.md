@@ -2,9 +2,7 @@
 
 ## Introduction
 
-This guide covers the correct patterns for creating forms using React Hook Form with shadcn/ui's **Field** component. Forms must be **pure UI components** - they handle presentation and validation, but delegate data operations to their parent.
-
-> **Note**: shadcn/ui has deprecated the old `<Form>` wrapper component. Use the `<Field>` component instead for building forms.
+This guide covers the correct patterns for creating forms using React Hook Form with shadcn/ui's **Field** component following the [official shadcn/ui documentation](https://ui.shadcn.com/docs/forms/react-hook-form). Forms must be **pure UI components** - they handle presentation and validation, but delegate data operations to their parent.
 
 ---
 
@@ -35,41 +33,52 @@ function CreateUserForm({ onSubmit, isSubmitting }: CreateUserFormProps) {
 
 ---
 
-## 2. Setup with Zod 4
+## 2. Setup with Zod
 
 ### Schema Resolver
 
-With Zod 4, use `standardSchemaResolver` instead of `zodResolver`:
+Use `zodResolver` which is now compatible with Zod 4:
 
 ```tsx
-// OLD (Zod 3)
 import { zodResolver } from '@hookform/resolvers/zod'
-const form = useForm({ resolver: zodResolver(schema) })
 
-// NEW (Zod 4)
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-const form = useForm({ resolver: standardSchemaResolver(schema) })
+const form = useForm({
+  resolver: zodResolver(schema),
+  defaultValues: { ... },
+})
 ```
+
+> **Fallback**: If you encounter edge cases where `zodResolver` doesn't work with Zod 4, use `standardSchemaResolver` from `@hookform/resolvers/standard-schema` as a fallback.
 
 ---
 
 ## 3. Field Component Pattern
 
-### Installation
+### Component Structure
 
-```bash
-npx shadcn@latest add field input button
+shadcn/ui uses a compound component pattern:
+
+```tsx
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 ```
 
 ### Complete Form Structure
 
 ```tsx
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { z } from 'zod'
 import {
   Field,
+  FieldContent,
   FieldDescription,
+  FieldError,
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -85,6 +94,7 @@ type CreateUserFormData = z.infer<typeof createUserSchema>
 
 // 2. Define props - form receives callbacks, not mutations
 type CreateUserFormProps = {
+  id?: string
   onSubmit: (data: CreateUserFormData) => void
   onCancel?: () => void
   isSubmitting?: boolean
@@ -93,6 +103,7 @@ type CreateUserFormProps = {
 
 // 3. Pure UI form component
 export function CreateUserForm({
+  id,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -103,27 +114,31 @@ export function CreateUserForm({
     handleSubmit,
     formState: { errors },
   } = useForm<CreateUserFormData>({
-    resolver: standardSchemaResolver(createUserSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      ...defaultValues,
-    },
+    resolver: zodResolver(createUserSchema),
+    defaultValues,
   })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Field errors={errors.name?.message ? [errors.name.message] : []}>
-        <FieldLabel>Nombre</FieldLabel>
-        <Input placeholder="Juan Pérez" {...register('name')} />
+    <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <Field>
+        <FieldLabel htmlFor="name">
+          Nombre <span className="text-destructive">*</span>
+        </FieldLabel>
+        <FieldContent>
+          <Input id="name" placeholder="Juan Pérez" {...register('name')} />
+          <FieldError errors={[errors.name]} />
+        </FieldContent>
       </Field>
 
-      <Field errors={errors.email?.message ? [errors.email.message] : []}>
-        <FieldLabel>Email</FieldLabel>
-        <Input placeholder="juan@ejemplo.com" {...register('email')} />
-        <FieldDescription>
-          Usaremos este email para notificaciones
-        </FieldDescription>
+      <Field>
+        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldContent>
+          <Input id="email" placeholder="juan@ejemplo.com" {...register('email')} />
+          <FieldDescription>
+            Usaremos este email para notificaciones
+          </FieldDescription>
+          <FieldError errors={[errors.email]} />
+        </FieldContent>
       </Field>
 
       <div className="flex gap-2 justify-end">
@@ -145,27 +160,36 @@ export function CreateUserForm({
 
 ## 4. Field Component API
 
+### Available Components
+
+| Component | Purpose |
+|-----------|---------|
+| `Field` | Container for a form field group |
+| `FieldLabel` | Label with `htmlFor` attribute |
+| `FieldContent` | Wrapper for input + description + error |
+| `FieldDescription` | Help text below input |
+| `FieldError` | Displays validation errors |
+| `FieldSet` | Groups related fields semantically |
+| `FieldLegend` | Title for a FieldSet |
+| `FieldGroup` | Container for multiple fields |
+
 ### Basic Field
 
 ```tsx
-import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
-
-<Field errors={errors.fieldName?.message ? [errors.fieldName.message] : []}>
-  <FieldLabel>Label</FieldLabel>
-  <Input {...register('fieldName')} />
-  <FieldDescription>Optional help text</FieldDescription>
+<Field>
+  <FieldLabel htmlFor="fieldName">Label</FieldLabel>
+  <FieldContent>
+    <Input id="fieldName" {...register('fieldName')} />
+    <FieldDescription>Optional help text</FieldDescription>
+    <FieldError errors={[errors.fieldName]} />
+  </FieldContent>
 </Field>
 ```
 
-### Field with Multiple Errors
-
-The Field component automatically renders multiple errors as a list:
+### FieldError accepts array of error objects
 
 ```tsx
-<Field errors={['Error 1', 'Error 2']}>
-  <FieldLabel>Field</FieldLabel>
-  <Input {...register('field')} />
-</Field>
+<FieldError errors={[errors.fieldName]} />
 ```
 
 ### FieldSet for Grouping
@@ -176,13 +200,19 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 <FieldSet>
   <FieldLegend>Información Personal</FieldLegend>
   <FieldGroup>
-    <Field errors={...}>
-      <FieldLabel>Nombre</FieldLabel>
-      <Input {...register('name')} />
+    <Field>
+      <FieldLabel htmlFor="name">Nombre</FieldLabel>
+      <FieldContent>
+        <Input id="name" {...register('name')} />
+        <FieldError errors={[errors.name]} />
+      </FieldContent>
     </Field>
-    <Field errors={...}>
-      <FieldLabel>Email</FieldLabel>
-      <Input {...register('email')} />
+    <Field>
+      <FieldLabel htmlFor="email">Email</FieldLabel>
+      <FieldContent>
+        <Input id="email" {...register('email')} />
+        <FieldError errors={[errors.email]} />
+      </FieldContent>
     </Field>
   </FieldGroup>
 </FieldSet>
@@ -338,23 +368,34 @@ For components that don't work with `register`, use `Controller`:
 ```tsx
 import { Controller } from 'react-hook-form'
 
-<Field errors={errors.role?.message ? [errors.role.message] : []}>
-  <FieldLabel>Rol</FieldLabel>
-  <Controller
-    control={control}
-    name="role"
-    render={({ field }) => (
-      <Select onValueChange={field.onChange} defaultValue={field.value}>
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar rol" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="user">Usuario</SelectItem>
-        </SelectContent>
-      </Select>
-    )}
-  />
+const OPTIONS = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'user', label: 'Usuario' },
+]
+
+<Field>
+  <FieldLabel htmlFor="role">Rol</FieldLabel>
+  <FieldContent>
+    <Controller
+      control={control}
+      name="role"
+      render={({ field }) => (
+        <Select items={OPTIONS} value={field.value ?? ''} onValueChange={field.onChange}>
+          <SelectTrigger id="role">
+            <SelectValue placeholder="Seleccionar rol" />
+          </SelectTrigger>
+          <SelectContent>
+            {OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    />
+    <FieldError errors={[errors.role]} />
+  </FieldContent>
 </Field>
 ```
 
@@ -366,9 +407,10 @@ function OrderForm({ onSubmit }: Props) {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<OrderFormData>({
-    resolver: standardSchemaResolver(orderSchema),
+    resolver: zodResolver(orderSchema),
     defaultValues: {
       deliveryType: 'pickup',
       address: '',
@@ -380,30 +422,36 @@ function OrderForm({ onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Field errors={errors.deliveryType?.message ? [errors.deliveryType.message] : []}>
-        <FieldLabel>Tipo de entrega</FieldLabel>
-        <Controller
-          control={control}
-          name="deliveryType"
-          render={({ field }) => (
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pickup">Retiro en local</SelectItem>
-                <SelectItem value="delivery">Envío a domicilio</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
+      <Field>
+        <FieldLabel htmlFor="deliveryType">Tipo de entrega</FieldLabel>
+        <FieldContent>
+          <Controller
+            control={control}
+            name="deliveryType"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="deliveryType">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pickup">Retiro en local</SelectItem>
+                  <SelectItem value="delivery">Envío a domicilio</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <FieldError errors={[errors.deliveryType]} />
+        </FieldContent>
       </Field>
 
       {/* Conditional field - only show when delivery */}
       {deliveryType === 'delivery' && (
-        <Field errors={errors.address?.message ? [errors.address.message] : []}>
-          <FieldLabel>Dirección</FieldLabel>
-          <Input {...register('address')} />
+        <Field>
+          <FieldLabel htmlFor="address">Dirección</FieldLabel>
+          <FieldContent>
+            <Input id="address" {...register('address')} />
+            <FieldError errors={[errors.address]} />
+          </FieldContent>
         </Field>
       )}
 
@@ -425,7 +473,7 @@ function TeamForm({ onSubmit }: Props) {
     handleSubmit,
     formState: { errors },
   } = useForm<TeamFormData>({
-    resolver: standardSchemaResolver(teamSchema),
+    resolver: zodResolver(teamSchema),
     defaultValues: {
       name: '',
       members: [{ email: '' }],
@@ -439,26 +487,26 @@ function TeamForm({ onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Field errors={errors.name?.message ? [errors.name.message] : []}>
-        <FieldLabel>Nombre del equipo</FieldLabel>
-        <Input {...register('name')} />
+      <Field>
+        <FieldLabel htmlFor="teamName">Nombre del equipo</FieldLabel>
+        <FieldContent>
+          <Input id="teamName" {...register('name')} />
+          <FieldError errors={[errors.name]} />
+        </FieldContent>
       </Field>
 
       <div className="space-y-2">
         <FieldLabel>Miembros</FieldLabel>
         {fields.map((field, index) => (
           <div key={field.id} className="flex gap-2">
-            <Field
-              errors={errors.members?.[index]?.email?.message
-                ? [errors.members[index].email.message]
-                : []
-              }
-              className="flex-1"
-            >
-              <Input
-                placeholder="email@ejemplo.com"
-                {...register(`members.${index}.email`)}
-              />
+            <Field className="flex-1">
+              <FieldContent>
+                <Input
+                  placeholder="email@ejemplo.com"
+                  {...register(`members.${index}.email`)}
+                />
+                <FieldError errors={[errors.members?.[index]?.email]} />
+              </FieldContent>
             </Field>
             {fields.length > 1 && (
               <Button
@@ -505,7 +553,7 @@ function EditUserForm({ user, onSubmit, isSubmitting }: EditUserFormProps) {
     reset,
     formState: { errors },
   } = useForm<UpdateUserFormData>({
-    resolver: standardSchemaResolver(updateUserSchema),
+    resolver: zodResolver(updateUserSchema),
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -536,6 +584,9 @@ Standard props that forms should accept:
 
 ```tsx
 type BaseFormProps<T> = {
+  // Optional: form id for external submit buttons
+  id?: string
+
   // Required: callback with validated data
   onSubmit: (data: T) => void
 
@@ -586,8 +637,8 @@ const schema = z.object({
 
 ### DO ✅
 
-- Use `standardSchemaResolver` with Zod 4
-- Use the `Field` component (not the old `Form` wrapper)
+- Use `zodResolver` with Zod (fallback to `standardSchemaResolver` if needed)
+- Use the `Field` compound component pattern
 - Keep forms as pure UI components
 - Pass `onSubmit` callback from parent
 - Pass `isSubmitting` state from parent's mutation
@@ -595,6 +646,7 @@ const schema = z.object({
 - Use `Controller` for complex components (Select, Checkbox, etc.)
 - Use `reset()` to sync with external data
 - Watch only specific fields when needed
+- Use matching `id` and `htmlFor` attributes
 
 ### DON'T ❌
 
@@ -608,7 +660,6 @@ const schema = z.object({
 
 ## See Also
 
-- [shadcn/ui Field Component](https://ui.shadcn.com/docs/components/field)
 - [shadcn/ui Forms Guide](https://ui.shadcn.com/docs/forms/react-hook-form)
 - [React Hook Form Documentation](https://react-hook-form.com/)
 - `/mutation-errors` skill - Error handling for mutations
@@ -616,4 +667,3 @@ const schema = z.object({
 
 Sources:
 - [React Hook Form - shadcn/ui](https://ui.shadcn.com/docs/forms/react-hook-form)
-- [Field - shadcn/ui](https://ui.shadcn.com/docs/components/field)
