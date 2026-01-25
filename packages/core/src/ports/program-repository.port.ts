@@ -291,4 +291,23 @@ export type ProgramRepositoryPort = {
     rowId: string,
     supersetGroup: string,
   ): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Reposition a row to the end of a session.
+   * Used when removing a row from a superset to prevent it staying between group members.
+   */
+  repositionRowToEndOfSession(
+    ctx: OrganizationContext,
+    sessionId: string,
+    rowId: string,
+  ): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Find all exercise rows for a session.
+   * Used for validating reorder operations.
+   */
+  findExerciseRowsBySessionId(
+    ctx: OrganizationContext,
+    sessionId: string,
+  ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError>
 }

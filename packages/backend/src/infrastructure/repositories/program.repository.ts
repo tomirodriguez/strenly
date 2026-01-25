@@ -1185,5 +1185,99 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         return ok(undefined)
       })
     },
+
+    repositionRowToEndOfSession(
+      ctx: OrganizationContext,
+      sessionId: string,
+      rowId: string,
+    ): ResultAsync<void, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify session access
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          // 1. Get all rows in session ordered by orderIndex
+          const sessionRows = await db
+            .select({
+              id: programExercises.id,
+              orderIndex: programExercises.orderIndex,
+            })
+            .from(programExercises)
+            .where(eq(programExercises.sessionId, sessionId))
+            .orderBy(asc(programExercises.orderIndex))
+
+          // 2. Find the current row position
+          const currentIndex = sessionRows.findIndex((r) => r.id === rowId)
+          if (currentIndex === -1) {
+            return { ok: true } // Row not found in session, nothing to do
+          }
+
+          // 3. If already at end, no repositioning needed
+          if (currentIndex === sessionRows.length - 1) {
+            return { ok: true }
+          }
+
+          // 4. Build new order: remove the row, append to end
+          const currentRow = sessionRows[currentIndex]
+          if (!currentRow) {
+            return { ok: true }
+          }
+          const newOrder = sessionRows.filter((r) => r.id !== rowId)
+          newOrder.push(currentRow)
+
+          // 5. Update all orderIndex values
+          await db.transaction(async (tx) => {
+            for (let i = 0; i < newOrder.length; i++) {
+              const row = newOrder[i]
+              if (row) {
+                await tx
+                  .update(programExercises)
+                  .set({ orderIndex: i, updatedAt: new Date() })
+                  .where(eq(programExercises.id, row.id))
+              }
+            }
+          })
+
+          return { ok: true }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(undefined)
+      })
+    },
+
+    findExerciseRowsBySessionId(
+      ctx: OrganizationContext,
+      sessionId: string,
+    ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: ProgramExerciseRow[] } | { ok: false; error: ProgramRepositoryError }> => {
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          const rows = await db
+            .select()
+            .from(programExercises)
+            .where(eq(programExercises.sessionId, sessionId))
+            .orderBy(asc(programExercises.orderIndex))
+
+          return { ok: true, data: rows.map(mapExerciseRowToDomain) }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
   }
 }
