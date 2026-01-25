@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { exerciseGroupSchema } from './exercise-group'
+import { prescriptionSeriesInputSchema } from './prescription'
 
 /**
  * Program status schema
@@ -78,7 +80,26 @@ export const prescriptionSchema = z.object({
 export type Prescription = z.infer<typeof prescriptionSchema>
 
 /**
+ * Prescription with series array schema (new model)
+ * Contains series as individual set definitions
+ * - series: Array of prescription series (one per set)
+ * - prescription: Legacy flat prescription (deprecated, for backward compatibility)
+ */
+export const prescriptionWithSeriesSchema = z.object({
+  id: z.string(),
+  weekId: z.string(),
+  // New series array (nullable during migration)
+  series: z.array(prescriptionSeriesInputSchema).nullable(),
+  // Legacy flat prescription (deprecated, for backward compatibility)
+  prescription: prescriptionSchema.nullable(),
+  notes: z.string().nullable(),
+})
+
+export type PrescriptionWithSeries = z.infer<typeof prescriptionWithSeriesSchema>
+
+/**
  * Base exercise row schema (without subRows for recursion)
+ * Extended with group-based fields for the new model
  */
 const baseExerciseRowSchema = z.object({
   id: z.string(),
@@ -86,8 +107,13 @@ const baseExerciseRowSchema = z.object({
   exerciseId: z.string(),
   exerciseName: z.string(),
   orderIndex: z.number(),
+  // New group-based fields
+  groupId: z.string().nullable(), // null during migration
+  orderWithinGroup: z.number().int().min(0).nullable(), // null during migration
+  // Legacy superset fields (deprecated, for backward compatibility)
   supersetGroup: z.string().nullable(),
   supersetOrder: z.number().nullable(),
+  // Other existing fields
   setTypeLabel: z.string().nullable(),
   isSubRow: z.boolean(),
   parentRowId: z.string().nullable(),
@@ -114,9 +140,12 @@ export type ExerciseRowWithPrescriptions = z.infer<typeof baseExerciseRowSchema>
 
 /**
  * Session with rows output schema
+ * Extended with exerciseGroups for the new model
  */
 export const sessionWithRowsSchema = programSessionSchema.extend({
   rows: z.array(exerciseRowWithPrescriptionsSchema),
+  // New: exercise groups within this session
+  exerciseGroups: z.array(exerciseGroupSchema).optional(), // Optional for backward compatibility
 })
 
 export type SessionWithRows = z.infer<typeof sessionWithRowsSchema>
