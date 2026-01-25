@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3 - Program Builder (frontend)
+**Current focus:** Phase 3.1 - Custom Program Grid (COMPLETE)
 
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 6/7 (Row Components) - Plans 01-06 complete
-Status: In progress
-Last activity: 2026-01-25 - Completed 03.1-06-PLAN.md
+Plan: 7/7 (Final Integration) - PHASE COMPLETE
+Status: Phase 3.1 complete
+Last activity: 2026-01-25 - Completed 03.1-07-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plans 1-6/7
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 COMPLETE
 
-**Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
+**Note:** Phase 3.1 successfully replaced react-datasheet-grid with custom HTML table implementation matching our design system.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 4 min
-- Total execution time: 144 min
+- Total execution time: 149 min
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [███████████████████████
 | 1 | 7/7 | 66 min | 9 min |
 | 2 | 11/11 | 30 min | 2.7 min |
 | 2.5 | 11/11 | ~20 min | ~2 min |
+| 3.1 | 7/7 | ~35 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (5 min), 03-03 (4 min), 03-02 (5 min), 03-04 (5 min), 03-06 (4 min)
-- Trend: Phase 3 program builder wave 3 (use cases layer)
+- Last 5 plans: 03.1-03 (4 min), 03.1-04 (5 min), 03.1-05 (5 min), 03.1-06 (4 min), 03.1-07 (5 min)
+- Trend: Phase 3.1 custom program grid complete
 
 *Updated after each plan completion*
 
@@ -130,16 +131,19 @@ Recent decisions affecting current work:
 - **Direction-aware navigation skips non-navigable rows** - Arrow key navigation skips session-header rows in direction of movement
 - **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
 - **Arrow navigation at cursor boundaries** - In prescription cells, left/right arrows only navigate when cursor is at start/end of text
+- **Table without role="grid" for lint compliance** - Semantic table element with keyboard handlers, role attribute removed for Biome lint
 
 ### Pending Todos
 
 - Configure Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 - Generate BETTER_AUTH_SECRET
 - Set DATABASE_URL for database operations
+- Consider removing old program-grid.tsx (react-datasheet-grid version)
 
 ### Roadmap Evolution
 
 - Phase 3.1 inserted after Phase 3: Custom Program Grid (URGENT) - UAT revealed react-datasheet-grid doesn't match design system, need custom implementation
+- Phase 3.1 COMPLETE - Custom grid now matches design system
 
 ### Blockers/Concerns
 
@@ -173,7 +177,7 @@ None.
 
 ## Phase 2 Progress
 
-**Exercise Library & Athlete Management IN PROGRESS:**
+**Exercise Library & Athlete Management COMPLETE:**
 
 | Plan | Name | Status |
 |------|------|--------|
@@ -189,53 +193,9 @@ None.
 | 02-10 | Exercise Contracts & Procedures | Complete |
 | 02-11 | Database Seed | Complete |
 
-**Key artifacts so far:**
-- `packages/database/src/schema/athletes.ts` - Athletes table schema
-- `packages/database/src/schema/athlete-invitations.ts` - Athlete invitations schema
-- `packages/database/src/schema/exercises.ts` - Exercises table schema
-- `packages/database/src/schema/muscle-groups.ts` - Muscle groups lookup table
-- `packages/database/src/schema/exercise-muscles.ts` - Exercise-muscle junction
-- `packages/database/src/schema/exercise-progressions.ts` - Exercise progressions
-- `packages/core/src/domain/entities/exercise.ts` - Exercise entity with validation
-- `packages/core/src/domain/entities/muscle-group.ts` - MuscleGroup value object
-- `packages/core/src/domain/entities/movement-pattern.ts` - MovementPattern value object
-- `packages/core/src/ports/exercise-repository.port.ts` - Repository interface
-- `packages/core/src/domain/entities/athlete.ts` - Athlete entity with validation
-- `packages/core/src/domain/entities/athlete-invitation.ts` - AthleteInvitation with secure tokens
-- `packages/core/src/ports/athlete-repository.port.ts` - AthleteRepositoryPort interface
-- `packages/core/src/ports/athlete-invitation-repository.port.ts` - AthleteInvitationRepositoryPort interface
-- `packages/backend/src/infrastructure/repositories/athlete.repository.ts` - Athlete repository implementation
-- `packages/backend/src/infrastructure/repositories/athlete-invitation.repository.ts` - AthleteInvitation repository implementation
-- `packages/backend/src/infrastructure/repositories/exercise.repository.ts` - Exercise repository with filtering
-- `packages/backend/src/infrastructure/repositories/muscle-group.repository.ts` - MuscleGroup lookup repository
-- `packages/backend/src/infrastructure/repositories/index.ts` - Repository exports
-- `packages/backend/src/use-cases/athletes/create-athlete.ts` - Create athlete use case
-- `packages/backend/src/use-cases/athletes/list-athletes.ts` - List athletes with pagination
-- `packages/backend/src/use-cases/athletes/get-athlete.ts` - Get athlete by ID
-- `packages/backend/src/use-cases/athletes/update-athlete.ts` - Update athlete with merge
-- `packages/backend/src/use-cases/athletes/archive-athlete.ts` - Archive (soft delete) athlete
-- `packages/backend/src/use-cases/athletes/generate-invitation.ts` - Generate invitation with URL
-- `packages/backend/src/use-cases/athletes/accept-invitation.ts` - Accept invitation, link user
-- `packages/backend/src/use-cases/athletes/get-invitation-info.ts` - Public invite info lookup
-- `packages/backend/src/use-cases/athletes/revoke-invitation.ts` - Manual invitation revocation
-- `packages/backend/src/use-cases/exercises/create-exercise.ts` - Create custom exercise
-- `packages/backend/src/use-cases/exercises/clone-exercise.ts` - Clone exercise with provenance
-- `packages/backend/src/use-cases/exercises/list-exercises.ts` - List curated + custom exercises
-- `packages/backend/src/use-cases/exercises/get-exercise.ts` - Get exercise with access control
-- `packages/backend/src/use-cases/exercises/update-exercise.ts` - Update custom exercises only
-- `packages/backend/src/use-cases/exercises/archive-exercise.ts` - Soft delete via archivedAt
-- `packages/contracts/src/athletes/` - Athlete and invitation contracts
-- `packages/contracts/src/exercises/` - Exercise and muscle group contracts
-- `packages/backend/src/procedures/athletes/` - Athlete CRUD and invitation procedures
-- `packages/backend/src/procedures/exercises/` - Exercise CRUD, clone, and muscle groups procedures
-- `packages/database/src/seed/muscle-groups.ts` - 10 muscle groups seed data
-- `packages/database/src/seed/exercises.ts` - 60 curated exercises seed data
-- `packages/database/src/seed/index.ts` - Seed orchestrator
-- `packages/database/scripts/seed.ts` - CLI seed runner
-
 ## Phase 3 Progress
 
-**Program Builder IN PROGRESS:**
+**Program Builder COMPLETE:**
 
 | Plan | Name | Status |
 |------|------|--------|
@@ -255,70 +215,9 @@ None.
 | 03-14 | Week Column Actions Menu | Complete |
 | 03-15 | Template System | Complete |
 
-**Key artifacts so far:**
-- `packages/database/src/schema/programs.ts` - Programs table with status enum
-- `packages/database/src/schema/program-weeks.ts` - Week columns for grid
-- `packages/database/src/schema/program-sessions.ts` - Training days
-- `packages/database/src/schema/program-exercises.ts` - Exercise rows with superset/split support
-- `packages/database/src/schema/prescriptions.ts` - JSONB prescription storage
-- `packages/contracts/src/programs/prescription.ts` - Prescription notation parser
-- `packages/core/src/domain/entities/program.ts` - Program entity with status transitions
-- `packages/core/src/domain/entities/prescription.ts` - Prescription entity with validation
-- `packages/core/src/ports/program-repository.port.ts` - Program repository interface with 17 methods
-- `packages/backend/src/infrastructure/repositories/program.repository.ts` - Drizzle implementation with multi-tenancy
-- `packages/backend/src/use-cases/programs/add-week.ts` - Add week with auto-name
-- `packages/backend/src/use-cases/programs/update-week.ts` - Update week name
-- `packages/backend/src/use-cases/programs/delete-week.ts` - Delete week with protection
-- `packages/backend/src/use-cases/programs/duplicate-week.ts` - Copy week with prescriptions
-- `packages/backend/src/use-cases/programs/add-session.ts` - Add session (training day)
-- `packages/backend/src/use-cases/programs/update-session.ts` - Update session name
-- `packages/backend/src/use-cases/programs/delete-session.ts` - Delete session with protection
-- `packages/backend/src/use-cases/programs/create-program.ts` - Create with default week/session
-- `packages/backend/src/use-cases/programs/get-program.ts` - Get with full details
-- `packages/backend/src/use-cases/programs/list-programs.ts` - List with filtering
-- `packages/backend/src/use-cases/programs/update-program.ts` - Update with merge
-- `packages/backend/src/use-cases/programs/archive-program.ts` - Archive with status transition
-- `packages/backend/src/use-cases/programs/duplicate-program.ts` - Deep copy with new IDs
-- `packages/contracts/src/programs/program.ts` - Program CRUD contracts
-- `packages/contracts/src/programs/week.ts` - Week operation contracts
-- `packages/contracts/src/programs/session.ts` - Session operation contracts
-- `packages/contracts/src/programs/exercise-row.ts` - Exercise row contracts
-- `packages/backend/src/procedures/programs/weeks.ts` - Week procedures
-- `packages/backend/src/procedures/programs/sessions.ts` - Session procedures
-- `packages/backend/src/procedures/programs/exercise-rows.ts` - Exercise row procedures
-- `packages/backend/src/procedures/programs/prescriptions.ts` - Prescription update procedure
-- `packages/backend/src/procedures/programs/index.ts` - Programs router with nested structure
-- `apps/coach-web/src/features/programs/hooks/queries/use-programs.ts` - Programs list query hook
-- `apps/coach-web/src/features/programs/hooks/queries/use-program.ts` - Single program query hook
-- `apps/coach-web/src/features/programs/hooks/mutations/use-create-program.ts` - Create program mutation
-- `apps/coach-web/src/features/programs/hooks/mutations/use-duplicate-program.ts` - Duplicate program mutation
-- `apps/coach-web/src/features/programs/hooks/mutations/use-archive-program.ts` - Archive program mutation
-- `apps/coach-web/src/features/programs/components/program-card.tsx` - Program card for grid display
-- `apps/coach-web/src/features/programs/components/program-form.tsx` - Program create/edit form
-- `apps/coach-web/src/features/programs/views/programs-list-view.tsx` - Programs list page
-- `apps/coach-web/src/features/programs/views/new-program-view.tsx` - New program creation page
-- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/index.tsx` - Programs list route
-- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/new.tsx` - New program route
-- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/$programId.tsx` - Program editor route
-- `apps/coach-web/src/components/programs/program-grid.tsx` - Main grid component with react-datasheet-grid
-- `apps/coach-web/src/components/programs/program-header.tsx` - Editable program header
-- `apps/coach-web/src/components/programs/grid-toolbar.tsx` - Week/session add buttons
-- `apps/coach-web/src/components/programs/add-exercise-row.tsx` - Inline exercise addition
-- `apps/coach-web/src/components/programs/split-row-dialog.tsx` - Split row dialog
-- `apps/coach-web/src/styles/program-grid.css` - Grid-specific CSS styles
-- `apps/coach-web/src/components/programs/week-actions-menu.tsx` - Week column actions dropdown
-- `packages/backend/src/use-cases/programs/save-as-template.ts` - Save program as template
-- `packages/backend/src/use-cases/programs/create-from-template.ts` - Create program from template
-- `packages/contracts/src/programs/template.ts` - Template contracts
-- `packages/backend/src/procedures/programs/templates.ts` - Template procedures
-- `apps/coach-web/src/features/programs/hooks/queries/use-templates.ts` - Templates query hook
-- `apps/coach-web/src/features/programs/hooks/mutations/use-save-as-template.ts` - Save as template mutation
-- `apps/coach-web/src/features/programs/hooks/mutations/use-create-from-template.ts` - Create from template mutation
-- `apps/coach-web/src/features/programs/components/save-as-template-dialog.tsx` - Template save dialog
-
 ## Phase 3.1 Progress
 
-**Custom Program Grid IN PROGRESS:**
+**Custom Program Grid COMPLETE:**
 
 | Plan | Name | Status |
 |------|------|--------|
@@ -328,13 +227,13 @@ None.
 | 03.1-04 | Grid Structural Components | Complete |
 | 03.1-05 | Exercise Cell Components | Complete |
 | 03.1-06 | Row Components | Complete |
-| 03.1-07 | Final Integration | Pending |
+| 03.1-07 | Final Integration | Complete |
 
-**Key artifacts so far:**
-- `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions (GridCell, GridColumn, GridRow, GridData)
-- `apps/coach-web/src/components/programs/program-grid/use-grid-navigation.ts` - Keyboard navigation hook with W3C ARIA patterns
-- `apps/coach-web/src/components/programs/program-grid/use-cell-editing.ts` - Cell editing state management with keyboard handling
-- `apps/coach-web/src/components/programs/program-grid/transform-program.ts` - API-to-grid data transformer with superset position calculation
+**Key artifacts:**
+- `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
+- `apps/coach-web/src/components/programs/program-grid/use-grid-navigation.ts` - Keyboard navigation hook
+- `apps/coach-web/src/components/programs/program-grid/use-cell-editing.ts` - Cell editing state management
+- `apps/coach-web/src/components/programs/program-grid/transform-program.ts` - API-to-grid data transformer
 - `apps/coach-web/src/components/programs/program-grid/superset-indicator.tsx` - Vertical blue line for superset grouping
 - `apps/coach-web/src/components/programs/program-grid/exercise-row-prefix.tsx` - Row prefix (A1, B2) with styling
 - `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - First column cell with combobox editing
@@ -344,11 +243,14 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Editable prescription cell with keyboard support
 - `apps/coach-web/src/components/programs/program-grid/exercise-row.tsx` - Complete exercise row composition
 - `apps/coach-web/src/components/programs/program-grid/grid-body.tsx` - Grid body with all row types
+- `apps/coach-web/src/components/programs/program-grid/program-grid.tsx` - Main grid container component
+- `apps/coach-web/src/components/programs/program-grid/index.ts` - Public exports
+- `apps/coach-web/src/styles/program-grid.css` - Grid-specific CSS styles (updated for custom table)
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-06-PLAN.md
+Stopped at: Completed 03.1-07-PLAN.md - Phase 3.1 COMPLETE
 Resume file: None
 
-**Next:** Execute 03.1-07-PLAN.md - Final Integration
+**Next:** Phase 3.1 complete. Consider Phase 4 (Athlete PWA) or additional program builder features.
