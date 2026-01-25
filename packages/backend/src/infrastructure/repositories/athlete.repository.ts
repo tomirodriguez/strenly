@@ -10,7 +10,7 @@ import type {
 import { createAthlete } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { athletes } from '@strenly/database/schema'
-import { and, count, eq, ilike } from 'drizzle-orm'
+import { and, count, desc, eq, ilike } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
 function wrapDbError(error: unknown): AthleteRepositoryError {
@@ -137,7 +137,7 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
 
           const [countResult, rows] = await Promise.all([
             db.select({ count: count() }).from(athletes).where(whereClause),
-            query.orderBy(athletes.name),
+            query.orderBy(desc(athletes.updatedAt)),
           ])
 
           const items = rows.map(mapToDomain).filter((a): a is Athlete => a !== null)
