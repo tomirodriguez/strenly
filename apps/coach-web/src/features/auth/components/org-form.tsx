@@ -1,13 +1,23 @@
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-interface OrgFormData {
-  name: string
-  slug: string
-}
+const orgFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede superar los 50 caracteres'),
+  slug: z
+    .string()
+    .min(2, 'La URL debe tener al menos 2 caracteres')
+    .regex(/^[a-z0-9-]+$/, 'Solo puede contener letras minusculas, numeros y guiones'),
+})
+
+type OrgFormData = z.infer<typeof orgFormSchema>
 
 interface OrgFormProps {
   onSubmit: (data: OrgFormData) => void | Promise<void>
@@ -30,6 +40,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
     formState: { errors },
     setValue,
   } = useForm<OrgFormData>({
+    resolver: standardSchemaResolver(orgFormSchema),
     defaultValues: {
       name: '',
       slug: '',
@@ -58,18 +69,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
             type="text"
             placeholder="Mi Gimnasio"
             aria-invalid={!!errors.name}
-            {...register('name', {
-              required: 'El nombre de la organizacion es obligatorio',
-              minLength: {
-                value: 2,
-                message: 'El nombre debe tener al menos 2 caracteres',
-              },
-              maxLength: {
-                value: 50,
-                message: 'El nombre no puede superar los 50 caracteres',
-              },
-              onChange: handleNameChange,
-            })}
+            {...register('name', { onChange: handleNameChange })}
           />
           <FieldError errors={[errors.name]} />
         </FieldContent>
@@ -83,18 +83,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
             type="text"
             placeholder="mi-gimnasio"
             aria-invalid={!!errors.slug}
-            {...register('slug', {
-              required: 'La URL es obligatoria',
-              pattern: {
-                value: /^[a-z0-9-]+$/,
-                message: 'Solo puede contener letras minusculas, numeros y guiones',
-              },
-              minLength: {
-                value: 2,
-                message: 'La URL debe tener al menos 2 caracteres',
-              },
-              onChange: handleSlugChange,
-            })}
+            {...register('slug', { onChange: handleSlugChange })}
           />
           <FieldDescription>
             Se usara en la URL de tu organizacion. Solo se permiten letras minusculas, numeros y guiones.

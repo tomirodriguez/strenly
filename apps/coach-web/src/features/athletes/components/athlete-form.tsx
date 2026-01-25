@@ -1,6 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { type CreateAthleteInput, createAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -22,14 +22,11 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
+    control,
   } = useForm<CreateAthleteInput>({
-    resolver: zodResolver(createAthleteInputSchema),
+    resolver: standardSchemaResolver(createAthleteInputSchema),
     defaultValues,
   })
-
-  const genderValue = watch('gender')
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -71,19 +68,22 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
       <Field>
         <FieldLabel htmlFor="gender">Genero</FieldLabel>
         <FieldContent>
-          <Select
-            value={genderValue ?? ''}
-            onValueChange={(value) => setValue('gender', value as 'male' | 'female' | 'other')}
-          >
-            <SelectTrigger id="gender">
-              <SelectValue placeholder="Seleccionar genero" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Masculino</SelectItem>
-              <SelectItem value="female">Femenino</SelectItem>
-              <SelectItem value="other">Otro</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            control={control}
+            name="gender"
+            render={({ field }) => (
+              <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                <SelectTrigger id="gender">
+                  <SelectValue placeholder="Seleccionar genero" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Masculino</SelectItem>
+                  <SelectItem value="female">Femenino</SelectItem>
+                  <SelectItem value="other">Otro</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
           <FieldError errors={[errors.gender]} />
         </FieldContent>
       </Field>
