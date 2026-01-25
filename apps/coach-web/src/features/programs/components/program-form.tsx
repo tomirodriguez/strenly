@@ -141,11 +141,6 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
                   />
                   <ComboboxContent sideOffset={4}>
                     <ComboboxList>
-                      {/* Clear selection option */}
-                      <ComboboxItem value="" className="text-muted-foreground">
-                        Sin atleta asignado
-                      </ComboboxItem>
-
                       {/* Loading state */}
                       {isLoadingAthletes && athletes.length === 0 && (
                         <div className="py-6 text-center text-muted-foreground text-sm">
