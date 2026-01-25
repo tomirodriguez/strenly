@@ -3,6 +3,7 @@ import { archiveAthlete } from './archive-athlete'
 import { createAthlete } from './create-athlete'
 import { generateInvitation } from './generate-invitation'
 import { getAthlete } from './get-athlete'
+import { getAthleteInvitation } from './get-athlete-invitation'
 import { getInvitationInfo } from './get-invitation-info'
 import { listAthletes } from './list-athletes'
 import { updateAthlete } from './update-athlete'
@@ -28,6 +29,7 @@ export const athletes = {
   update: updateAthlete,
   archive: archiveAthlete,
   generateInvitation,
+  getInvitation: getAthleteInvitation,
   acceptInvitation,
   invitationInfo: getInvitationInfo,
 }

@@ -34,3 +34,19 @@ export const acceptInvitationOutputSchema = z.object({
 })
 
 export type AcceptInvitationOutput = z.infer<typeof acceptInvitationOutputSchema>
+
+/**
+ * Get athlete invitation output schema
+ * Returns full invitation details for viewing
+ */
+export const getAthleteInvitationOutputSchema = z.object({
+  id: z.string(),
+  athleteId: z.string(),
+  invitationUrl: z.string(),
+  status: z.enum(['pending', 'accepted', 'expired', 'revoked']),
+  expiresAt: z.string(), // ISO date string
+  createdAt: z.string(), // ISO date string
+  acceptedAt: z.string().nullable(),
+})
+
+export type GetAthleteInvitationOutput = z.infer<typeof getAthleteInvitationOutputSchema>
