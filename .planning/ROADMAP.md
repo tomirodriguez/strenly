@@ -165,13 +165,13 @@ Plans:
 - Existing hooks: `apps/coach-web/src/features/programs/hooks/mutations/use-grid-mutations.ts`
 
 Plans:
-- [ ] 03.1-01-PLAN.md - Programs list with DataTable (Wave 1)
-- [ ] 03.1-02-PLAN.md - Program form improvements (weeks selector, athlete combobox) (Wave 1)
-- [ ] 03.1-03-PLAN.md - Grid foundation (types, hooks, data transform) (Wave 2)
-- [ ] 03.1-04-PLAN.md - Grid structural components (header, session rows, superset) (Wave 3)
-- [ ] 03.1-05-PLAN.md - Exercise cell with combobox (Wave 3)
-- [ ] 03.1-06-PLAN.md - Prescription cells and grid body (Wave 4)
-- [ ] 03.1-07-PLAN.md - Grid integration and program editor (Wave 5)
+- [x] 03.1-01-PLAN.md - Programs list with DataTable (Wave 1)
+- [x] 03.1-02-PLAN.md - Program form improvements (weeks selector, athlete combobox) (Wave 1)
+- [x] 03.1-03-PLAN.md - Grid foundation (types, hooks, data transform) (Wave 2)
+- [x] 03.1-04-PLAN.md - Grid structural components (header, session rows, superset) (Wave 3)
+- [x] 03.1-05-PLAN.md - Exercise cell with combobox (Wave 3)
+- [x] 03.1-06-PLAN.md - Prescription cells and grid body (Wave 4)
+- [x] 03.1-07-PLAN.md - Grid integration and program editor (Wave 5)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -218,7 +218,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 0/7 | Not started | - |
+| 3.1. Custom Program Grid (frontend) | 7/7 | Complete | 2026-01-25 |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
