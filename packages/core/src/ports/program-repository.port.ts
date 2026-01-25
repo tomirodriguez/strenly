@@ -192,6 +192,23 @@ export type ProgramRepositoryPort = {
   // ---------------------------------------------------------------------------
 
   /**
+   * Find an exercise row by ID
+   */
+  findExerciseRowById(
+    ctx: OrganizationContext,
+    rowId: string,
+  ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+
+  /**
+   * Get the maximum order index for exercise rows in a session
+   * Returns -1 if no rows exist
+   */
+  getMaxExerciseRowOrderIndex(
+    ctx: OrganizationContext,
+    sessionId: string,
+  ): ResultAsync<number, ProgramRepositoryError>
+
+  /**
    * Create an exercise row for a session
    */
   createExerciseRow(
@@ -212,6 +229,14 @@ export type ProgramRepositoryPort = {
    * Delete an exercise row (cascades to prescriptions)
    */
   deleteExerciseRow(ctx: OrganizationContext, rowId: string): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Find all sub-rows for a parent exercise row
+   */
+  findSubRows(
+    ctx: OrganizationContext,
+    parentRowId: string,
+  ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Prescription Operations (Cell Values)

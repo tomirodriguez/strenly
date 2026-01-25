@@ -722,6 +722,48 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     // Exercise Row Operations
     // -------------------------------------------------------------------------
 
+    findExerciseRowById(
+      ctx: OrganizationContext,
+      rowId: string,
+    ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError> {
+      return RA.fromPromise(
+        verifyExerciseRowAccess(ctx, rowId),
+        wrapDbError,
+      ).andThen((row) => {
+        if (!row) {
+          return err(notFoundError('exercise_row', rowId))
+        }
+        return ok(mapExerciseRowToDomain(row))
+      })
+    },
+
+    getMaxExerciseRowOrderIndex(
+      ctx: OrganizationContext,
+      sessionId: string,
+    ): ResultAsync<number, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: number } | { ok: false; error: ProgramRepositoryError }> => {
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          const result = await db
+            .select({ maxOrder: sql<number>`COALESCE(MAX(${programExercises.orderIndex}), -1)` })
+            .from(programExercises)
+            .where(eq(programExercises.sessionId, sessionId))
+
+          return { ok: true, data: result[0]?.maxOrder ?? -1 }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
+
     createExerciseRow(
       ctx: OrganizationContext,
       sessionId: string,
@@ -831,6 +873,38 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           return err(result.error)
         }
         return ok(undefined)
+      })
+    },
+
+    findSubRows(
+      ctx: OrganizationContext,
+      parentRowId: string,
+    ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<
+          { ok: true; data: ProgramExerciseRow[] } | { ok: false; error: ProgramRepositoryError }
+        > => {
+          // First verify the parent row belongs to the organization
+          const parentRow = await verifyExerciseRowAccess(ctx, parentRowId)
+          if (!parentRow) {
+            return { ok: false, error: notFoundError('exercise_row', parentRowId) }
+          }
+
+          // Fetch all sub-rows for this parent
+          const rows = await db
+            .select()
+            .from(programExercises)
+            .where(eq(programExercises.parentRowId, parentRowId))
+            .orderBy(asc(programExercises.orderIndex))
+
+          return { ok: true, data: rows.map(mapExerciseRowToDomain) }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
       })
     },
 
