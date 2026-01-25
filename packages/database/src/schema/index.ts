@@ -17,5 +17,11 @@ export * from './exercises'
 export * from './muscle-groups'
 // Subscription plans
 export * from './plans'
+// Program builder
+export * from './prescriptions'
+export * from './program-exercises'
+export * from './program-sessions'
+export * from './program-weeks'
+export * from './programs'
 // Organization subscriptions
 export * from './subscriptions'
