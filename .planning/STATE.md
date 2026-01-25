@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 5/7 (Exercise Cell Components) - Plans 04 and 05 complete
+Plan: 6/7 (Row Components) - Plans 01-06 complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.1-04-PLAN.md
+Last activity: 2026-01-25 - Completed 03.1-06-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plans 1-5/7
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plans 1-6/7
 
 **Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 4 min
-- Total execution time: 142 min
+- Total execution time: 144 min
 
 **By Phase:**
 
@@ -129,6 +129,7 @@ Recent decisions affecting current work:
 - **Roving tabindex for grid navigation** - W3C ARIA Grid pattern with only active cell having tabIndex=0
 - **Direction-aware navigation skips non-navigable rows** - Arrow key navigation skips session-header rows in direction of movement
 - **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
+- **Arrow navigation at cursor boundaries** - In prescription cells, left/right arrows only navigate when cursor is at start/end of text
 
 ### Pending Todos
 
@@ -326,7 +327,7 @@ None.
 | 03.1-03 | Grid Foundation | Complete |
 | 03.1-04 | Grid Structural Components | Complete |
 | 03.1-05 | Exercise Cell Components | Complete |
-| 03.1-06 | Keyboard Navigation | Pending |
+| 03.1-06 | Row Components | Complete |
 | 03.1-07 | Final Integration | Pending |
 
 **Key artifacts so far:**
@@ -340,11 +341,14 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/grid-header.tsx` - Sticky header with week columns
 - `apps/coach-web/src/components/programs/program-grid/session-header-row.tsx` - Full-width session dividers
 - `apps/coach-web/src/components/programs/program-grid/add-exercise-row.tsx` - End-of-session exercise addition
+- `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Editable prescription cell with keyboard support
+- `apps/coach-web/src/components/programs/program-grid/exercise-row.tsx` - Complete exercise row composition
+- `apps/coach-web/src/components/programs/program-grid/grid-body.tsx` - Grid body with all row types
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-04-PLAN.md
+Stopped at: Completed 03.1-06-PLAN.md
 Resume file: None
 
-**Next:** Execute 03.1-06-PLAN.md - Keyboard Navigation
+**Next:** Execute 03.1-07-PLAN.md - Final Integration
