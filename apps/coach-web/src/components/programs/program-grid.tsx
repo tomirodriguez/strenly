@@ -6,12 +6,18 @@ import {
 import type { ProgramWeek, ProgramWithDetails } from '@strenly/contracts/programs/program'
 import { DataSheetGrid, type Column } from '@wasback/react-datasheet-grid'
 import '@wasback/react-datasheet-grid/dist/style.css'
+import { SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AddExerciseRow } from './add-exercise-row'
+import { SplitRowDialog } from './split-row-dialog'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
-import { useUpdateExerciseRow, useUpdatePrescription } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import {
+  useToggleSuperset,
+  useUpdateExerciseRow,
+  useUpdatePrescription,
+} from '@/features/programs/hooks/mutations/use-grid-mutations'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { cn } from '@/lib/utils'
-import { SearchIcon } from 'lucide-react'
 
 /**
  * Exercise data for cells
@@ -530,11 +536,22 @@ function prescriptionToNotation(rx: ParsedPrescription): string {
 /**
  * Main program grid component using react-datasheet-grid
  * Transforms program data to a flat row structure for Excel-like editing
+ *
+ * Keyboard shortcuts:
+ * - Shift+Enter: Add split row (same exercise, different config)
+ * - S: Toggle superset grouping
  */
 export function ProgramGrid({ programId }: ProgramGridProps) {
   const { data: program, isLoading, error } = useProgram(programId)
   const updatePrescription = useUpdatePrescription(programId)
   const updateExerciseRow = useUpdateExerciseRow(programId)
+  const toggleSuperset = useToggleSuperset(programId)
+
+  // Track selected row for keyboard operations
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
+  const [splitDialogOpen, setSplitDialogOpen] = useState(false)
+  const [splitParentRowId, setSplitParentRowId] = useState<string | null>(null)
+  const gridContainerRef = useRef<HTMLDivElement>(null)
 
   // Transform program data to grid rows
   const rows = useMemo(() => {
@@ -587,6 +604,59 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
     [rows, updatePrescription, updateExerciseRow],
   )
 
+  // Track active cell/row selection
+  const handleActiveCellChange = useCallback(
+    ({ row }: { row: number | null }) => {
+      if (row !== null && rows[row]) {
+        const gridRow = rows[row]
+        if (gridRow.type === 'exercise' && gridRow.rowId) {
+          setSelectedRowId(gridRow.rowId)
+        } else {
+          setSelectedRowId(null)
+        }
+      } else {
+        setSelectedRowId(null)
+      }
+    },
+    [rows],
+  )
+
+  // Keyboard event handler for shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if grid is focused
+      if (!gridContainerRef.current?.contains(document.activeElement)) {
+        return
+      }
+
+      // Shift+Enter: Add split row
+      if (e.shiftKey && e.key === 'Enter' && selectedRowId) {
+        e.preventDefault()
+        setSplitParentRowId(selectedRowId)
+        setSplitDialogOpen(true)
+        return
+      }
+
+      // S key: Toggle superset (only when not in an input)
+      if (e.key === 's' && !e.metaKey && !e.ctrlKey && !e.shiftKey && selectedRowId) {
+        const activeElement = document.activeElement
+        const isInInput = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
+        if (!isInInput) {
+          e.preventDefault()
+          const selectedRow = rows.find((r) => r.rowId === selectedRowId)
+          if (selectedRow) {
+            // Toggle: if has group, remove it. If no group, set to 'A'
+            const newGroup = selectedRow.supersetGroup ? null : 'A'
+            toggleSuperset.mutate({ rowId: selectedRowId, supersetGroup: newGroup })
+          }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedRowId, rows, toggleSuperset])
+
   // Custom row styling
   const rowClassName = useCallback(({ rowData }: { rowData: GridRow }) => {
     if (rowData.type === 'session-header') {
@@ -614,22 +684,42 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
   }
 
   return (
-    <div className="h-full program-grid">
-      <DataSheetGrid<GridRow>
-        value={rows}
-        onChange={handleChange}
-        columns={columns}
-        lockRows
-        rowClassName={rowClassName}
-        createRow={() => ({
-          id: '',
-          type: 'exercise',
-          sessionId: '',
-          exercise: { exerciseId: '', exerciseName: '' },
-          prescriptions: {},
-        })}
-        height={600}
+    <div className="flex h-full flex-col program-grid" ref={gridContainerRef}>
+      {/* Main grid */}
+      <div className="min-h-0 flex-1">
+        <DataSheetGrid<GridRow>
+          value={rows}
+          onChange={handleChange}
+          columns={columns}
+          lockRows
+          rowClassName={rowClassName}
+          onActiveCellChange={handleActiveCellChange}
+          createRow={() => ({
+            id: '',
+            type: 'exercise',
+            sessionId: '',
+            exercise: { exerciseId: '', exerciseName: '' },
+            prescriptions: {},
+          })}
+          height={600}
+        />
+      </div>
+
+      {/* Add exercise rows for each session */}
+      <div className="border-border border-t">
+        {program.sessions.map((session) => (
+          <AddExerciseRow key={session.id} programId={programId} sessionId={session.id} />
+        ))}
+      </div>
+
+      {/* Split row dialog */}
+      <SplitRowDialog
+        programId={programId}
+        parentRowId={splitParentRowId}
+        open={splitDialogOpen}
+        onOpenChange={setSplitDialogOpen}
       />
+
       <style>{`
         .program-grid .dsg-cell {
           border-right: 1px solid hsl(var(--border));

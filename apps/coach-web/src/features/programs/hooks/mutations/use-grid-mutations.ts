@@ -41,10 +41,7 @@ export function useUpdatePrescription(programId: string) {
     onError: (_err, _newPrescription, context) => {
       // Rollback on error
       if (context?.previous) {
-        queryClient.setQueryData(
-          orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
-          context.previous,
-        )
+        queryClient.setQueryData(orpc.programs.get.queryOptions({ input: { programId } }).queryKey, context.previous)
       }
       toast.error('Error al actualizar la prescripcion')
     },
