@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: 11/11 (all gap closure plans complete)
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed quick task 016: Fix invitation modal unified action and skeleton loading
+Last activity: 2026-01-25 - Completed quick task 016b: Fix dropdown menu min-width for action items
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -124,6 +124,7 @@ None.
 | 014 | Fix invitation modal unified invitar action | 2026-01-25 | 6c7ecb8 | [014-fix-invitation-modal-unified-invitar-act](./quick/014-fix-invitation-modal-unified-invitar-act/) |
 | 015 | Change athletes table default sort to updatedAt descending | 2026-01-25 | 2e8e339 | [015-change-athletes-table-default-sort-to-up](./quick/015-change-athletes-table-default-sort-to-up/) |
 | 016 | Fix invitation modal unified action and skeleton loading | 2026-01-25 | a47b32b | [016-fix-invitation-modal-unified-action-skeleton-loading](./quick/016-fix-invitation-modal-unified-action-skeleton-loading/) |
+| 016b | Fix dropdown menu min-width for action items | 2026-01-25 | 8c71475 | [016-fix-dropdown-menu-min-width-for-action-i](./quick/016-fix-dropdown-menu-min-width-for-action-i/) |
 
 ## Phase 2 Progress
 
