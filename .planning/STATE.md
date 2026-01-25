@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 2/8 - Domain Entities complete
+Plan: 3/8 - Multi-Part Parser complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.2-02-PLAN.md (domain entities)
+Last activity: 2026-01-25 - Completed 03.2-03-PLAN.md (multi-part parser)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-02 complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-03 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-13 (8 min), 03.1-14 (2 min), 03.1-15 (3 min), 03.1-16 (1 min), 03.1-17 (5 min)
-- Trend: Phase 3.1 complete with verification v5 passed
+- Last 5 plans: 03.1-15 (3 min), 03.1-16 (1 min), 03.1-17 (5 min), 03.2-02 (~5 min), 03.2-03 (3 min)
+- Trend: Phase 3.2 parser layer complete
 
 *Updated after each plan completion*
 
@@ -145,6 +145,9 @@ Recent decisions affecting current work:
 - **PrescriptionSeries orderIndex as parameter** - createPrescriptionSeries(input, orderIndex) takes index as second parameter for array iteration
 - **ExerciseGroup name normalization** - Empty/whitespace names normalized to null for consistent auto-letter generation
 - **Reconstitute for DB loads** - Domain entities use reconstitute(props) function for database loads without validation
+- **Empty/skip returns empty array** - parsePrescriptionToSeries("") and parsePrescriptionToSeries("—") return [] for easier downstream handling
+- **Partial invalid fails all** - Multi-part notation with any invalid part returns null entirely
+- **Consecutive grouping only** - formatSeriesToNotation only groups consecutive identical series, not non-adjacent
 
 ### Pending Todos
 
@@ -279,7 +282,7 @@ None.
 |------|------|--------|
 | 03.2-01 | Database Schema | Complete |
 | 03.2-02 | Domain Entities | Complete |
-| 03.2-03 | ExerciseGroup Repository | Pending |
+| 03.2-03 | Multi-Part Parser | Complete |
 | 03.2-04 | Prescription Update | Pending |
 | 03.2-05 | Use Cases | Pending |
 | 03.2-06 | Contracts & Procedures | Pending |
@@ -289,11 +292,12 @@ None.
 **Key artifacts:**
 - `packages/core/src/domain/entities/prescription-series.ts` - Single set entity
 - `packages/core/src/domain/entities/exercise-group.ts` - Group container entity
+- `packages/contracts/src/programs/prescription.ts` - Multi-part notation parser with series support
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.2-02-PLAN.md (domain entities)
+Stopped at: Completed 03.2-03-PLAN.md (multi-part parser)
 Resume file: None
 
-**Next:** Phase 3.2 Plan 03 (ExerciseGroup Repository).
+**Next:** Phase 3.2 Plan 04 (Prescription Update).
