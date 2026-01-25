@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 5 min
-- Total execution time: 96 min
+- Total plans completed: 29
+- Average duration: 4 min
+- Total execution time: 116 min
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1 | 7/7 | 66 min | 9 min |
 | 2 | 11/11 | 30 min | 2.7 min |
-| 2.5 | 9/9 | ~15 min | ~2 min |
+| 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.5-05 (2 min), 02.5-06 (2 min), 02.5-07 (1 min), 02.5-08 (2 min), 02.5-09 (3 min)
-- Trend: Phase 2.5 complete with fast gap closure execution
+- Last 5 plans: 02.5-08 (2 min), 02.5-09 (3 min), 02.5-10 (4 min), 02.5-11 (6 min), verification
+- Trend: Phase 2.5 complete with all UAT gaps closed
 
 *Updated after each plan completion*
 
