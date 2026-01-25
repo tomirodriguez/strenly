@@ -137,7 +137,7 @@ export type ProgramWithDetails = z.infer<typeof programWithDetailsSchema>
 
 /**
  * Create program input schema
- * @property weeksCount - Number of initial weeks to create (1-12, default 4)
+ * @property weeksCount - Number of initial weeks to create (1-12). Defaults to 4 if not provided.
  */
 export const createProgramInputSchema = z.object({
   name: z
@@ -156,7 +156,7 @@ export const createProgramInputSchema = z.object({
     .int({ message: 'El numero de semanas debe ser entero' })
     .min(1, { message: 'El programa debe tener al menos 1 semana' })
     .max(12, { message: 'El programa no puede tener mas de 12 semanas' })
-    .default(4),
+    .optional(),
 })
 
 export type CreateProgramInput = z.infer<typeof createProgramInputSchema>

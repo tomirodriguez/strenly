@@ -1,10 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Athlete } from '@strenly/contracts/athletes/athlete'
 import { type CreateProgramInput, createProgramInputSchema } from '@strenly/contracts/programs/program'
+import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
 type ProgramFormProps = {
@@ -13,6 +21,8 @@ type ProgramFormProps = {
   defaultValues?: Partial<CreateProgramInput>
   athletes?: Athlete[]
   isLoadingAthletes?: boolean
+  /** Whether to show the weeks count field (hidden when creating from template) */
+  showWeeksCount?: boolean
 }
 
 /**
@@ -26,6 +36,7 @@ export function ProgramForm({
   defaultValues,
   athletes = [],
   isLoadingAthletes = false,
+  showWeeksCount = true,
 }: ProgramFormProps) {
   const {
     register,
@@ -39,15 +50,27 @@ export function ProgramForm({
       description: '',
       athleteId: undefined,
       isTemplate: false,
+      weeksCount: 4,
       ...defaultValues,
     },
   })
 
-  // Build options for athlete select
-  const athleteOptions = athletes.map((athlete) => ({
-    value: athlete.id,
-    label: athlete.name,
-  }))
+  // Local search state for athlete combobox
+  const [athleteSearch, setAthleteSearch] = useState('')
+
+  // Filter athletes based on search
+  const filteredAthletes = useMemo(() => {
+    if (!athleteSearch.trim()) return athletes
+    const searchLower = athleteSearch.toLowerCase()
+    return athletes.filter((athlete) => athlete.name.toLowerCase().includes(searchLower))
+  }, [athletes, athleteSearch])
+
+  // Get athlete name for display
+  const getAthleteName = (athleteId: string | undefined): string => {
+    if (!athleteId) return ''
+    const athlete = athletes.find((a) => a.id === athleteId)
+    return athlete?.name ?? ''
+  }
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -75,6 +98,23 @@ export function ProgramForm({
         </FieldContent>
       </Field>
 
+      {showWeeksCount && (
+        <Field>
+          <FieldLabel htmlFor="weeksCount">Semanas iniciales</FieldLabel>
+          <FieldContent>
+            <Input
+              id="weeksCount"
+              type="number"
+              min={1}
+              max={12}
+              {...register('weeksCount', { valueAsNumber: true })}
+            />
+            <FieldDescription>Cantidad de semanas para crear inicialmente (1-12)</FieldDescription>
+            <FieldError errors={[errors.weeksCount]} />
+          </FieldContent>
+        </Field>
+      )}
+
       <Field>
         <FieldLabel htmlFor="athlete">Atleta</FieldLabel>
         <FieldContent>
@@ -82,24 +122,40 @@ export function ProgramForm({
             control={control}
             name="athleteId"
             render={({ field }) => (
-              <Select
-                items={athleteOptions}
+              <Combobox
                 value={field.value ?? ''}
-                onValueChange={(value) => field.onChange(value || undefined)}
+                onValueChange={(value) => {
+                  field.onChange(value || undefined)
+                  // Clear search when selection is made
+                  if (value) setAthleteSearch('')
+                }}
               >
-                <SelectTrigger id="athlete">
-                  <SelectValue
-                    placeholder={isLoadingAthletes ? 'Cargando atletas...' : 'Seleccionar atleta (opcional)'}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {athleteOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <ComboboxInput
+                  id="athlete"
+                  placeholder={isLoadingAthletes ? 'Cargando atletas...' : 'Buscar atleta...'}
+                  value={field.value ? getAthleteName(field.value) : athleteSearch}
+                  onChange={(e) => {
+                    // When typing, clear the selection and update search
+                    if (field.value) {
+                      field.onChange(undefined)
+                    }
+                    setAthleteSearch(e.target.value)
+                  }}
+                  showClear={!!field.value}
+                  disabled={isLoadingAthletes}
+                />
+                <ComboboxContent>
+                  <ComboboxList>
+                    <ComboboxItem value="">Sin atleta asignado</ComboboxItem>
+                    {filteredAthletes.map((athlete) => (
+                      <ComboboxItem key={athlete.id} value={athlete.id}>
+                        {athlete.name}
+                      </ComboboxItem>
+                    ))}
+                  </ComboboxList>
+                  <ComboboxEmpty>No se encontraron atletas</ComboboxEmpty>
+                </ComboboxContent>
+              </Combobox>
             )}
           />
           <FieldDescription>

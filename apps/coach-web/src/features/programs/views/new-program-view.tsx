@@ -142,6 +142,7 @@ export function NewProgramView() {
             onSubmit={handleSubmit}
             athletes={athletes}
             isLoadingAthletes={isLoadingAthletes}
+            showWeeksCount={!selectedTemplateId}
             defaultValues={
               selectedTemplate
                 ? {
