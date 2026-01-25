@@ -10,6 +10,7 @@ export * from './athlete-invitations'
 export * from './athletes'
 // Better-Auth schemas (users, sessions, accounts, organizations, members, invitations)
 export * from './auth'
+export * from './exercise-groups'
 export * from './exercise-muscles'
 export * from './exercise-progressions'
 export * from './exercises'
