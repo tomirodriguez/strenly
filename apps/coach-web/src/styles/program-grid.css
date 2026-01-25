@@ -1,36 +1,92 @@
 /**
  * Program Grid Styles
- * Custom styles for the Excel-like program editor grid
+ * Custom styles for the Excel-like program editor grid (custom HTML table)
  */
 
-/* Base cell styling */
-.program-grid .dsg-cell {
-  border-right: 1px solid hsl(var(--border));
-  border-bottom: 1px solid hsl(var(--border));
+/* Grid container with horizontal scroll */
+.program-grid-container {
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
-/* Header cells */
-.program-grid .dsg-cell-header {
-  background-color: hsl(var(--muted));
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.1em;
+.program-grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  min-width: 800px;
+}
+
+/* Sticky column shadow */
+.program-grid tbody td:first-child,
+.program-grid thead th:first-child {
+  box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Cell base styles */
+.program-grid th,
+.program-grid td {
+  transition: background-color 75ms ease;
+}
+
+/* Focus visible for keyboard navigation */
+.program-grid td:focus-visible {
+  outline: none;
+}
+
+/* Custom scrollbar for grid container */
+.program-grid-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.program-grid-container::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+.program-grid-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--muted));
+}
+
+.program-grid-container::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Grid footer with keyboard hints */
+.program-grid-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 4rem;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+.keyboard-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: hsl(var(--muted) / 0.5);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.25rem;
+  border: 1px solid hsl(var(--border));
+}
+
+.keyboard-hint kbd {
+  font-size: 9px;
+  font-weight: 700;
+  background: hsl(var(--muted));
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
   color: hsl(var(--muted-foreground));
 }
 
-/* Session header row styling */
-.program-grid .dsg-row:has(.session-header-cell) .dsg-cell {
-  background-color: hsl(var(--muted) / 0.5);
-}
-
-/* Sticky exercise column */
-.program-grid .dsg-cell:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background-color: hsl(var(--background));
-  box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+.keyboard-hint span {
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
 }
 
 /* Superset visual indicators */
@@ -159,19 +215,6 @@
   color: hsl(var(--muted-foreground));
 }
 
-/* Active cell highlight */
-.program-grid .dsg-cell.active {
-  background-color: hsl(var(--primary) / 0.05);
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: -2px;
-}
-
-/* Focused cell */
-.program-grid .dsg-cell:focus-within {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: -2px;
-}
-
 /* Week column headers */
 .week-column-header {
   display: flex;
@@ -187,25 +230,4 @@
 
 .week-column-header.peak {
   color: hsl(var(--primary));
-}
-
-/* Custom scrollbar for grid container */
-.program-grid ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.program-grid ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 4px;
-}
-
-.program-grid ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 4px;
-  border: 2px solid hsl(var(--muted));
-}
-
-.program-grid ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
 }
