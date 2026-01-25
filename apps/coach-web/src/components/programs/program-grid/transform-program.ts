@@ -115,6 +115,9 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
       parentRowId: string | null
       setTypeLabel: string | null
       prescriptionsByWeekId: Record<string, Prescription>
+      // Logical group for unified display (calculated below)
+      groupLetter?: string
+      groupIndex?: number
     }
 
     const flatRows: FlatRow[] = []
@@ -173,6 +176,36 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
       })
     }
 
+    // Calculate logical groups - treating ALL exercises as groups
+    // Standalone = group of 1, Superset = group of N
+    const LETTER_A_CODE = 65
+    let letterIndex = 0
+    const supersetLetters = new Map<string, string>()
+    const supersetCounters = new Map<string, number>()
+
+    for (const row of flatRows) {
+      if (row.supersetGroup) {
+        // Named group (superset) - share letter, increment counter
+        let letter = supersetLetters.get(row.supersetGroup)
+        if (!letter) {
+          letter = String.fromCharCode(LETTER_A_CODE + letterIndex)
+          supersetLetters.set(row.supersetGroup, letter)
+          supersetCounters.set(row.supersetGroup, 0)
+          letterIndex++
+        }
+        const counter = (supersetCounters.get(row.supersetGroup) ?? 0) + 1
+        supersetCounters.set(row.supersetGroup, counter)
+
+        row.groupLetter = letter
+        row.groupIndex = counter
+      } else {
+        // Standalone exercise = implicit group of 1
+        row.groupLetter = String.fromCharCode(LETTER_A_CODE + letterIndex)
+        row.groupIndex = 1
+        letterIndex++
+      }
+    }
+
     // Add exercise rows with superset position
     flatRows.forEach((row, idx) => {
       // Calculate superset position
@@ -213,6 +246,8 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
         supersetGroup: row.supersetGroup,
         supersetOrder: calculatedSupersetOrder,
         supersetPosition,
+        groupLetter: row.groupLetter,
+        groupIndex: row.groupIndex,
         isSubRow: row.isSubRow,
         parentRowId: row.parentRowId,
         setTypeLabel: row.setTypeLabel,
