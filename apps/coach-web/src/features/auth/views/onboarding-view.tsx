@@ -128,17 +128,10 @@ export function OnboardingView() {
         planId: state.planId,
       })
 
-      // 3. Set as active organization
-      await authClient.organization.setActive({
-        organizationId,
-      })
-
       toast.success('Organización creada exitosamente')
 
       // 4. Navigate to org-prefixed dashboard
-      // Using window.location because the route is dynamic and TanStack Router
-      // needs the generated route tree to be updated first
-      window.location.href = `/${orgData.slug}/dashboard`
+      navigate({ to: '/$orgSlug/dashboard', params: { orgSlug: orgData.slug } })
     } catch (error) {
       console.error('Onboarding error:', error)
       toast.error(error instanceof Error ? error.message : 'Error durante el registro')

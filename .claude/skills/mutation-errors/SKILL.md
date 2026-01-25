@@ -44,6 +44,7 @@ export function handleMutationError(
       if (onUnauthorized) {
         onUnauthorized()
       } else {
+        // Redirect to Loagin with the proper method
         window.location.href = '/auth/login'
       }
       return
