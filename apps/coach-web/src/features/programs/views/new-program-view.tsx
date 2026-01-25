@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 
 /**
  * New program view for creating programs.
@@ -23,13 +22,6 @@ export function NewProgramView() {
   const navigate = useNavigate()
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
-
-  // Fetch athletes for assignment
-  const { data: athletesData, isLoading: isLoadingAthletes } = useAthletes({
-    status: 'active',
-    limit: 100,
-  })
-  const athletes = athletesData?.items ?? []
 
   // Fetch templates using dedicated hook
   const { data: templatesData, isLoading: isLoadingTemplates } = useTemplates({
@@ -140,8 +132,6 @@ export function NewProgramView() {
           <ProgramForm
             id="program-form"
             onSubmit={handleSubmit}
-            athletes={athletes}
-            isLoadingAthletes={isLoadingAthletes}
             showWeeksCount={!selectedTemplateId}
             defaultValues={
               selectedTemplate
