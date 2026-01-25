@@ -39,6 +39,11 @@ export interface GridRow {
   supersetOrder: number | null
   supersetPosition: SupersetPosition
 
+  // Logical group for display (calculated in transform)
+  // Every exercise belongs to a group - standalone = group of 1
+  groupLetter?: string // A, B, C...
+  groupIndex?: number // 1, 2, 3... (position within group)
+
   // Split row fields
   isSubRow: boolean
   parentRowId: string | null
