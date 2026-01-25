@@ -1,16 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type CreateProgramInput, createProgramInputSchema } from '@strenly/contracts/programs/program'
-import { ChevronDownIcon, Loader2Icon, SearchIcon, XIcon } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 import { useDebounce } from '@/hooks/use-debounce'
-import { cn } from '@/lib/utils'
 
 type ProgramFormProps = {
   id?: string
@@ -45,7 +50,6 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
 
   // Search state for athlete selector
   const [athleteSearch, setAthleteSearch] = useState('')
-  const [isAthletePopoverOpen, setIsAthletePopoverOpen] = useState(false)
   const debouncedSearch = useDebounce(athleteSearch, 300)
 
   // Server-side athlete search
@@ -108,114 +112,60 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
           <Controller
             control={control}
             name="athleteId"
-            render={({ field }) => (
-              <Popover open={isAthletePopoverOpen} onOpenChange={setIsAthletePopoverOpen}>
-                <PopoverTrigger
-                  render={
-                    <button
-                      type="button"
-                      id="athlete"
-                      className={cn(
-                        'flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-left text-sm shadow-xs transition-[color,box-shadow]',
-                        'focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
-                        'disabled:cursor-not-allowed disabled:opacity-50',
-                        'dark:bg-input/30 dark:hover:bg-input/50',
-                        !field.value && 'text-muted-foreground',
-                      )}
-                    />
+            render={({ field }) => {
+              const handleSelect = (value: string | null) => {
+                if (value === '' || value === null) {
+                  // Clear selection
+                  field.onChange(undefined)
+                  setSelectedAthleteName('')
+                } else {
+                  // Select athlete
+                  const athlete = athletes.find((a) => a.id === value)
+                  if (athlete) {
+                    field.onChange(athlete.id)
+                    setSelectedAthleteName(athlete.name)
                   }
-                >
-                  <span className="flex-1 truncate">
-                    {field.value ? selectedAthleteName || 'Cargando...' : 'Seleccionar atleta...'}
-                  </span>
-                  {field.value ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      className="h-5 w-5 shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        field.onChange(undefined)
-                        setSelectedAthleteName('')
-                      }}
-                    >
-                      <XIcon className="h-3 w-3" />
-                    </Button>
-                  ) : (
-                    <ChevronDownIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  )}
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--anchor-width)] p-0" sideOffset={4}>
-                  <div className="flex flex-col">
-                    {/* Search input inside dropdown */}
-                    <div className="flex items-center border-b px-3 py-2">
-                      <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                      <input
-                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                        placeholder="Buscar atleta..."
-                        value={athleteSearch}
-                        onChange={(e) => setAthleteSearch(e.target.value)}
-                      />
-                      {isLoadingAthletes && <Loader2Icon className="ml-2 h-4 w-4 shrink-0 animate-spin" />}
-                    </div>
+                }
+                setAthleteSearch('')
+              }
 
-                    {/* Athlete list */}
-                    <div className="max-h-60 overflow-y-auto p-1">
+              return (
+                <Combobox value={field.value ?? ''} onValueChange={handleSelect}>
+                  <ComboboxInput
+                    id="athlete"
+                    placeholder={field.value ? selectedAthleteName || 'Cargando...' : 'Buscar atleta...'}
+                    value={athleteSearch}
+                    onChange={(e) => setAthleteSearch(e.target.value)}
+                    showTrigger
+                    showClear={!!field.value}
+                  />
+                  <ComboboxContent sideOffset={4}>
+                    <ComboboxList>
                       {/* Clear selection option */}
-                      <button
-                        type="button"
-                        className={cn(
-                          'flex w-full cursor-default items-center rounded-sm px-2 py-1.5 text-left text-muted-foreground text-sm',
-                          'hover:bg-accent hover:text-accent-foreground',
-                          'focus:bg-accent focus:text-accent-foreground focus:outline-none',
-                        )}
-                        onClick={() => {
-                          field.onChange(undefined)
-                          setSelectedAthleteName('')
-                          setAthleteSearch('')
-                          setIsAthletePopoverOpen(false)
-                        }}
-                      >
+                      <ComboboxItem value="" className="text-muted-foreground">
                         Sin atleta asignado
-                      </button>
+                      </ComboboxItem>
 
                       {/* Loading state */}
                       {isLoadingAthletes && athletes.length === 0 && (
-                        <div className="py-6 text-center text-muted-foreground text-sm">Buscando...</div>
-                      )}
-
-                      {/* Empty state */}
-                      {!isLoadingAthletes && athletes.length === 0 && debouncedSearch && (
-                        <div className="py-6 text-center text-muted-foreground text-sm">No se encontraron atletas</div>
+                        <div className="py-6 text-center text-muted-foreground text-sm">
+                          <Loader2Icon className="mr-2 inline h-4 w-4 animate-spin" />
+                          Buscando...
+                        </div>
                       )}
 
                       {/* Athlete options */}
                       {athletes.map((athlete) => (
-                        <button
-                          key={athlete.id}
-                          type="button"
-                          className={cn(
-                            'flex w-full cursor-default items-center rounded-sm px-2 py-1.5 text-left text-sm',
-                            'hover:bg-accent hover:text-accent-foreground',
-                            'focus:bg-accent focus:text-accent-foreground focus:outline-none',
-                            field.value === athlete.id && 'bg-accent',
-                          )}
-                          onClick={() => {
-                            field.onChange(athlete.id)
-                            setSelectedAthleteName(athlete.name)
-                            setAthleteSearch('')
-                            setIsAthletePopoverOpen(false)
-                          }}
-                        >
+                        <ComboboxItem key={athlete.id} value={athlete.id}>
                           {athlete.name}
-                        </button>
+                        </ComboboxItem>
                       ))}
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
+                    </ComboboxList>
+                    <ComboboxEmpty>No se encontraron atletas</ComboboxEmpty>
+                  </ComboboxContent>
+                </Combobox>
+              )
+            }}
           />
           <FieldDescription>
             Asigna el programa a un atleta. Dejalo vacio para crear una plantilla reutilizable.
