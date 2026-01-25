@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 4/8 - Contracts and Repository Layer complete
+Plan: 5/8 - Use Cases complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.2-04-PLAN.md (contracts and repository layer)
+Last activity: 2026-01-25 - Completed 03.2-05-PLAN.md (use cases)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-04 complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-05 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-15 (3 min), 03.1-16 (1 min), 03.1-17 (5 min), 03.2-02 (~5 min), 03.2-03 (3 min)
-- Trend: Phase 3.2 parser layer complete
+- Last 5 plans: 03.1-17 (5 min), 03.2-02 (~5 min), 03.2-03 (3 min), 03.2-04 (~3 min), 03.2-05 (2 min)
+- Trend: Phase 3.2 use case layer complete
 
 *Updated after each plan completion*
 
@@ -148,6 +148,9 @@ Recent decisions affecting current work:
 - **Empty/skip returns empty array** - parsePrescriptionToSeries("") and parsePrescriptionToSeries("—") return [] for easier downstream handling
 - **Partial invalid fails all** - Multi-part notation with any invalid part returns null entirely
 - **Consecutive grouping only** - formatSeriesToNotation only groups consecutive identical series, not non-adjacent
+- **saveDraft in prescriptions sub-router** - Placed at programs.prescriptions.saveDraft alongside existing update
+- **Conflict warning vs blocking** - saveDraft returns conflictWarning string rather than blocking, client decides handling
+- **mapRepoError helper** - Use typed helper function to map discriminated union errors from repository
 
 ### Pending Todos
 
@@ -284,7 +287,7 @@ None.
 | 03.2-02 | Domain Entities | Complete |
 | 03.2-03 | Multi-Part Parser | Complete |
 | 03.2-04 | Contracts and Repository Layer | Complete |
-| 03.2-05 | Use Cases | Pending |
+| 03.2-05 | Use Cases | Complete |
 | 03.2-06 | Contracts & Procedures | Pending |
 | 03.2-07 | Client-Side State | Pending |
 | 03.2-08 | Data Migration | Pending |
@@ -294,13 +297,16 @@ None.
 - `packages/core/src/domain/entities/exercise-group.ts` - Group container entity
 - `packages/contracts/src/programs/prescription.ts` - Multi-part notation parser with series support
 - `packages/contracts/src/programs/exercise-group.ts` - Exercise group contracts
+- `packages/contracts/src/programs/save-draft.ts` - Bulk save input/output schemas
 - `packages/core/src/ports/program-repository.port.ts` - Updated with group methods and saveDraft
 - `packages/backend/src/infrastructure/repositories/program.repository.ts` - Group and saveDraft implementation
+- `packages/backend/src/use-cases/programs/save-draft.ts` - Bulk save use case with auth and conflict detection
+- `packages/backend/src/procedures/programs/save-draft.ts` - saveDraft procedure
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.2-04-PLAN.md (contracts and repository layer)
+Stopped at: Completed 03.2-05-PLAN.md (use cases)
 Resume file: None
 
-**Next:** Phase 3.2 Plan 05 (Use Cases).
+**Next:** Phase 3.2 Plan 06 (Contracts & Procedures).
