@@ -214,6 +214,16 @@ export type ProgramRepositoryPort = {
   ): ResultAsync<number, ProgramRepositoryError>
 
   /**
+   * Get the maximum superset order for a given group in a session
+   * Returns 0 if no rows exist in that group
+   */
+  getMaxSupersetOrder(
+    ctx: OrganizationContext,
+    sessionId: string,
+    supersetGroup: string,
+  ): ResultAsync<number, ProgramRepositoryError>
+
+  /**
    * Create an exercise row for a session
    */
   createExerciseRow(

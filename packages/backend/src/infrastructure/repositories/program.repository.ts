@@ -770,6 +770,34 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
+    getMaxSupersetOrder(
+      ctx: OrganizationContext,
+      sessionId: string,
+      supersetGroup: string,
+    ): ResultAsync<number, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: number } | { ok: false; error: ProgramRepositoryError }> => {
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          const result = await db
+            .select({ maxOrder: sql<number>`COALESCE(MAX(${programExercises.supersetOrder}), 0)` })
+            .from(programExercises)
+            .where(and(eq(programExercises.sessionId, sessionId), eq(programExercises.supersetGroup, supersetGroup)))
+
+          return { ok: true, data: result[0]?.maxOrder ?? 0 }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
+
     createExerciseRow(
       ctx: OrganizationContext,
       sessionId: string,

@@ -70,48 +70,41 @@ export const makeToggleSuperset =
           )
         }
 
-        // 4. Adding to superset - need to find max order in that group
-        // This requires querying other rows in the same session with the same supersetGroup
-        // Since we don't have a dedicated method for this, we'll use findWithDetails
-        // But that requires the programId, which we don't have from the row...
-
-        // Alternative: Just use a timestamp-based order
-        // Or the simplest: count existing rows in group + 1
-        // For now, we'll set order based on how many rows exist with this group
-
-        // Actually, we need to get all rows in the session to determine order
-        // Let's get the program details via the session
-
-        // Simpler approach: set supersetOrder to 1 if it's the first, or increment
-        // The frontend will need to handle renumbering if needed
-
-        // For MVP: Set order to a high number, let frontend/procedure handle ordering
-        // Or we can get the session and count rows with same supersetGroup
-
-        // Since the row already has sessionId, we could add a method to count
-        // For now, let's use a simple incrementing approach
-
-        // Actually the cleanest is: new superset order = current order based on exerciseRow orderIndex
-        // within the superset group. But this requires fetching all rows.
-
-        // For now, let's keep it simple: use 1 if it's new, otherwise keep existing
-        const newSupersetOrder =
-          existing.supersetGroup === input.supersetGroup && existing.supersetOrder !== null
-            ? existing.supersetOrder
-            : 1
-
-        const updated: ProgramExerciseRow = {
-          ...existing,
-          supersetGroup: input.supersetGroup,
-          supersetOrder: newSupersetOrder,
-          updatedAt: new Date(),
+        // 4. Adding to superset - query max order in that group, then set order = max + 1
+        // If staying in the same group, keep the existing order
+        if (existing.supersetGroup === input.supersetGroup && existing.supersetOrder !== null) {
+          // Already in this superset group, no change needed
+          return deps.programRepository.updateExerciseRow(ctx, existing).mapErr(
+            (e): ToggleSupersetError => ({
+              type: 'repository_error',
+              message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
+            }),
+          )
         }
 
-        return deps.programRepository.updateExerciseRow(ctx, updated).mapErr(
-          (e): ToggleSupersetError => ({
-            type: 'repository_error',
-            message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
-          }),
-        )
+        // Query for max order in the target superset group
+        return deps.programRepository
+          .getMaxSupersetOrder(ctx, existing.sessionId, input.supersetGroup)
+          .mapErr(
+            (e): ToggleSupersetError => ({
+              type: 'repository_error',
+              message: e.type === 'DATABASE_ERROR' ? e.message : `Session not found: ${e.id}`,
+            }),
+          )
+          .andThen((maxOrder) => {
+            const updated: ProgramExerciseRow = {
+              ...existing,
+              supersetGroup: input.supersetGroup,
+              supersetOrder: maxOrder + 1,
+              updatedAt: new Date(),
+            }
+
+            return deps.programRepository.updateExerciseRow(ctx, updated).mapErr(
+              (e): ToggleSupersetError => ({
+                type: 'repository_error',
+                message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
+              }),
+            )
+          })
       })
   }
