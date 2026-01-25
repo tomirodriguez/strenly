@@ -51,9 +51,7 @@ type CreatePrescriptionInput = {
 // Tempo format: 4 characters, each is a digit (0-9) or X for explosive
 const TEMPO_REGEX = /^[\dXx]{4}$/
 
-export function createPrescription(
-  input: CreatePrescriptionInput
-): Result<Prescription, PrescriptionError> {
+export function createPrescription(input: CreatePrescriptionInput): Result<Prescription, PrescriptionError> {
   // Validate sets (1-20)
   if (input.sets < 1 || input.sets > 20) {
     return err({

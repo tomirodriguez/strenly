@@ -4,9 +4,7 @@ export const PROGRAM_STATUSES = ['draft', 'active', 'archived'] as const
 export type ProgramStatus = (typeof PROGRAM_STATUSES)[number]
 
 export function isProgramStatus(value: unknown): value is ProgramStatus {
-  return (
-    typeof value === 'string' && PROGRAM_STATUSES.includes(value as ProgramStatus)
-  )
+  return typeof value === 'string' && PROGRAM_STATUSES.includes(value as ProgramStatus)
 }
 
 export type Program = {
@@ -39,9 +37,7 @@ type CreateProgramInput = {
   updatedAt?: Date
 }
 
-export function createProgram(
-  input: CreateProgramInput
-): Result<Program, ProgramError> {
+export function createProgram(input: CreateProgramInput): Result<Program, ProgramError> {
   // Validate name
   const trimmedName = input.name.trim()
 
@@ -82,9 +78,7 @@ export function createProgram(
  * Transition a program from draft to active.
  * Only draft programs can be activated.
  */
-export function activateProgram(
-  program: Program
-): Result<Program, ProgramError> {
+export function activateProgram(program: Program): Result<Program, ProgramError> {
   if (program.status !== 'draft') {
     return err({
       type: 'INVALID_STATUS_TRANSITION',
@@ -104,9 +98,7 @@ export function activateProgram(
  * Both draft and active programs can be archived.
  * Archived programs cannot be archived again.
  */
-export function archiveProgram(
-  program: Program
-): Result<Program, ProgramError> {
+export function archiveProgram(program: Program): Result<Program, ProgramError> {
   if (program.status === 'archived') {
     return err({
       type: 'INVALID_STATUS_TRANSITION',

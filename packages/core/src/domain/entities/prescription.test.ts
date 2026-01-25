@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createPrescription, type Prescription, type PrescriptionError } from './prescription'
+import { createPrescription } from './prescription'
 
 const validInput = {
   id: 'prescription-123',

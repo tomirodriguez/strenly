@@ -1,12 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  createProgram,
-  activateProgram,
-  archiveProgram,
-  isProgramStatus,
-  type Program,
-  type ProgramStatus,
-} from './program'
+import { activateProgram, archiveProgram, createProgram, isProgramStatus } from './program'
 
 const validInput = {
   id: 'program-123',
