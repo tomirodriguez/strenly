@@ -1,14 +1,43 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState, type RefObject } from 'react'
 import type { GridCell, GridColumn, GridRow } from './types'
 
 interface UseGridNavigationOptions {
   rows: GridRow[]
   columns: GridColumn[]
+  tableRef?: RefObject<HTMLTableElement | null>
   onCellChange?: (cell: GridCell | null) => void
 }
 
-export function useGridNavigation({ rows, columns, onCellChange }: UseGridNavigationOptions) {
+export function useGridNavigation({ rows, columns, tableRef, onCellChange }: UseGridNavigationOptions) {
   const [activeCell, setActiveCellState] = useState<GridCell | null>(null)
+
+  /**
+   * Focus a specific cell in the DOM by finding it via data attributes.
+   * Uses requestAnimationFrame to ensure DOM updates are complete before focusing.
+   */
+  const focusCell = useCallback(
+    (rowId: string, colId: string) => {
+      if (!tableRef?.current) return
+
+      requestAnimationFrame(() => {
+        // Find cell by data attributes - could be either exercise cell or prescription cell
+        const cell = tableRef.current?.querySelector(
+          `[data-row-id="${rowId}"][data-col-id="${colId}"], [data-row-id="${rowId}"][data-week-id="${colId}"]`,
+        )
+        if (cell instanceof HTMLElement) {
+          cell.focus()
+        }
+      })
+    },
+    [tableRef],
+  )
+
+  // Sync DOM focus when activeCell changes
+  useEffect(() => {
+    if (activeCell) {
+      focusCell(activeCell.rowId, activeCell.colId)
+    }
+  }, [activeCell, focusCell])
 
   const findNextNavigableRow = useCallback(
     (startIndex: number, direction: 1 | -1): number => {
@@ -149,5 +178,6 @@ export function useGridNavigation({ rows, columns, onCellChange }: UseGridNaviga
     setActiveCell,
     clearActiveCell,
     handleKeyDown,
+    focusCell,
   }
 }
