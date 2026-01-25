@@ -163,6 +163,16 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
       }
     })
 
+    // Calculate dynamic supersetOrder based on physical position within each group
+    // This replaces stored supersetOrder values which become stale after reordering
+    const dynamicSupersetOrder = new Map<number, number>() // flatRowIndex -> order (1-based)
+    for (const [, indices] of supersetGroups) {
+      // indices are already in physical order (since we iterated flatRows in order)
+      indices.forEach((idx, orderInGroup) => {
+        dynamicSupersetOrder.set(idx, orderInGroup + 1) // 1-based: A1, A2, A3
+      })
+    }
+
     // Add exercise rows with superset position
     flatRows.forEach((row, idx) => {
       // Calculate superset position
@@ -181,6 +191,9 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
         }
       }
 
+      // Use dynamic supersetOrder instead of stored value
+      const calculatedSupersetOrder = row.supersetGroup ? dynamicSupersetOrder.get(idx) ?? null : null
+
       // Build prescriptions map: weekId -> formatted notation
       const prescriptions: Record<string, string> = {}
       for (const [weekId, prescription] of Object.entries(row.prescriptionsByWeekId)) {
@@ -198,7 +211,7 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
           position: row.position,
         },
         supersetGroup: row.supersetGroup,
-        supersetOrder: row.supersetOrder,
+        supersetOrder: calculatedSupersetOrder,
         supersetPosition,
         isSubRow: row.isSubRow,
         parentRowId: row.parentRowId,
