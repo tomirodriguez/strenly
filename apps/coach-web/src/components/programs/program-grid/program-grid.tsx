@@ -46,12 +46,14 @@ export function ProgramGrid({ program, isLoading }: ProgramGridProps) {
   // Transform program data for grid display
   const { rows, columns } = useMemo(() => transformProgramToGrid(program), [program])
 
-  // Grid state hooks
-  const { activeCell, setActiveCell, handleKeyDown } = useGridNavigation({
+  // Grid state hooks - pass tableRef for DOM focus management
+  const { activeCell, setActiveCell, handleKeyDown, focusCell } = useGridNavigation({
     rows,
     columns,
+    tableRef,
   })
-  const { editingCell, startEditing, stopEditing } = useCellEditing()
+  // Pass focusCell to useCellEditing for focus restoration on edit stop
+  const { editingCell, startEditing, stopEditing } = useCellEditing({ focusCell })
 
   // Mutation hooks
   const updatePrescription = useUpdatePrescription(program.id)
