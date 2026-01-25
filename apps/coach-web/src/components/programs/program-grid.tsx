@@ -606,9 +606,9 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
 
   // Track active cell/row selection
   const handleActiveCellChange = useCallback(
-    ({ row }: { row: number | null }) => {
-      if (row !== null && rows[row]) {
-        const gridRow = rows[row]
+    ({ cell }: { cell: { row: number; col: number; colId?: string } | null }) => {
+      if (cell !== null && rows[cell.row]) {
+        const gridRow = rows[cell.row]
         if (gridRow.type === 'exercise' && gridRow.rowId) {
           setSelectedRowId(gridRow.rowId)
         } else {
