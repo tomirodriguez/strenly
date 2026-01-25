@@ -1,6 +1,6 @@
 # Phase 3: Program Builder - Research
 
-**Researched:** 2026-01-25
+**Researched:** 2026-01-25 (Updated with UI/UX specifications)
 **Domain:** Excel-like grid editing, keyboard navigation, inline editing, prescription notation parsing
 **Confidence:** HIGH
 
@@ -10,12 +10,62 @@ This phase requires building an Excel-like program builder where coaches can cre
 
 1. **Grid Component Selection**: Choosing between building custom on TanStack Table or using a dedicated spreadsheet library
 2. **Keyboard Navigation**: Implementing arrow key navigation, Tab, Enter, and Escape for cell editing
-3. **Natural Notation Parsing**: Parsing training prescriptions like `3x8@120kg`, `4x6-8@RIR2`, `3x10@75%`
-4. **Performance**: Handling 4-6 weeks of program data (potentially hundreds of cells) efficiently
+3. **Natural Notation Parsing**: Parsing training prescriptions like `3x8@120kg`, `4x6-8@RIR2`, `3x10@75%`, `3x8@120kg (3110)`
+4. **Performance**: Handling 1-10+ weeks of program data (potentially hundreds of cells) efficiently
+5. **Split Rows**: Same exercise with multiple set configurations (Heavy Singles + Back-off Volume)
+6. **Superset Visual Grouping**: B1/B2/B3 exercises connected with vertical line
 
 The research reveals two viable approaches: (1) react-datasheet-grid for maximum Excel-like behavior out of the box, or (2) custom implementation on TanStack Table for tighter integration with existing codebase. Given the project already uses TanStack Table and the React 19 compatibility concerns with react-datasheet-grid, **the recommended approach is to use react-datasheet-grid via a React 19 compatible fork (@wasback/react-datasheet-grid) for the program grid**, while keeping TanStack Table for simpler list views like athletes and exercises.
 
 **Primary recommendation:** Use @wasback/react-datasheet-grid (MIT, React 19 compatible fork) for the program builder grid, implement custom prescription notation parser using regex patterns, and leverage existing TanStack Table for auxiliary lists.
+
+## UI/UX Specifications Reference
+
+**Source:** `.planning/phases/03-program-builder/ui-ux-specifications/` (screen.png, code.html)
+
+### Grid Layout Structure
+- **Columns:** Exercise/Pairing (sticky) + N week columns (1 to 10+, coach decides)
+- **Rows:** Exercises grouped by session (day), with day headers as separators
+- **Week names:** Simple string field, default "Semana X" (coach can rename to anything)
+
+### Key UI Patterns from Mockup
+
+#### 1. Split Rows (Sub-rows for same exercise)
+Same exercise can have multiple rows with different set configurations:
+```
+| A1 | Safety Bar Squat | HEAVY SINGLES    | 1x1 @ 140kg | 1x1 @ 145kg | ...
+| A1 | Safety Bar Squat | BACK-OFF VOLUME  | 3x5 @ 120kg | 3x5 @ 125kg | ...
+```
+- Second row shows exercise name dimmed
+- Set type label badge: "HEAVY SINGLES", "BACK-OFF VOLUME", "BACK-OFF", "VOLUME"
+- Keyboard shortcut: `Shift + Enter` to add sub-row
+
+#### 2. Superset Visual Connector
+Exercises in superset (B1, B2, B3) connected with vertical blue line:
+```css
+.superset-line { /* starts from mid, goes down */ }
+.superset-line-mid { /* connects through middle */ }
+.superset-line-end { /* ends at last exercise */ }
+```
+- Superset prefix (B1, B2) displayed in primary color (blue)
+- Keyboard shortcut: `S` to toggle superset grouping
+
+#### 3. Day/Session Headers
+Full-width row separating sessions:
+```
+DÍA 1 • SQUAT DOMINANT
+DÍA 2 • PUSH / UPPER BODY
+DÍA 3 • DEADLIFT / HINGE
+```
+
+#### 4. Exercise Column Structure
+```
+| Prefix | Exercise Name        | Set Type Label      |
+| A1     | Safety Bar Squat     | HEAVY SINGLES       |
+```
+- Narrow prefix column (A1, B1, B2, C1)
+- Exercise name (editable with autocomplete)
+- Optional set type label badge
 
 ## Standard Stack
 
@@ -86,20 +136,40 @@ apps/coach-web/src/
 ### Pattern 1: Prescription Notation Parser
 **What:** Parse natural notation like `3x8@120kg` into structured data
 **When to use:** On cell blur/commit to convert user input to stored format
+
+#### Supported Notation Patterns (from UI/UX specs + domain research)
+
+| Pattern | Example | Meaning |
+|---------|---------|---------|
+| Basic | `3x8` | 3 sets of 8 reps |
+| Rep range | `3x8-12` | 3 sets of 8-12 reps |
+| With weight | `3x8@120kg` | 3 sets of 8 @ 120kg |
+| With percentage | `3x8@75%` | 3 sets of 8 @ 75% 1RM |
+| With RIR | `3x8@RIR2` | 3 sets of 8, 2 reps in reserve |
+| With RPE | `3x8@RPE8` | 3 sets of 8 @ RPE 8 |
+| With tempo | `3x8@120kg (3110)` | 3 sets of 8 @ 120kg, tempo 3-1-1-0 |
+| Unilateral | `3x12/leg` | 3 sets of 12 per leg |
+| AMRAP | `3xAMRAP` | 3 sets of as many reps as possible |
+| Skip/rest | `—` | No prescription (em dash) |
+
 **Example:**
 ```typescript
-// Source: Custom implementation based on domain research
+// Source: Custom implementation based on domain research + UI/UX specs
 const prescriptionNotationSchema = z.string().transform((val, ctx) => {
-  // Pattern: {sets}x{reps}[@{intensity}]
+  // Full pattern: {sets}x{reps}[-{repsMax}][@{intensity}][ ({tempo})]
   // Examples: 3x8, 4x6-8, 3x10@120kg, 4x5@75%, 3x8@RIR2, 3x8@RPE8
+  // Extended: 3x8@120kg (3110), 3x12/leg, 3xAMRAP
 
   const patterns = {
+    skip: /^[—-]$/,
     basic: /^(\d+)\s*[xX]\s*(\d+)$/,
     repRange: /^(\d+)\s*[xX]\s*(\d+)\s*-\s*(\d+)$/,
-    withWeight: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*(kg|lb)?$/i,
-    withPercentage: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*%$/,
-    withRIR: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*RIR\s*(\d+)$/i,
-    withRPE: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*RPE\s*(\d+(?:\.\d+)?)$/i,
+    unilateral: /^(\d+)\s*[xX]\s*(\d+)\s*\/\s*(leg|arm|side)$/i,
+    withWeight: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*(kg|lb)?(?:\s*\((\d{4})\))?$/i,
+    withPercentage: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*%(?:\s*\((\d{4})\))?$/,
+    withRIR: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*RIR\s*(\d+)(?:\s*\((\d{4})\))?$/i,
+    withRPE: /^(\d+)\s*[xX]\s*(\d+)(?:-(\d+))?\s*@\s*RPE\s*(\d+(?:\.\d+)?)(?:\s*\((\d{4})\))?$/i,
+    amrap: /^(\d+)\s*[xX]\s*AMRAP$/i,
   }
 
   // Parse and return structured prescription
@@ -244,125 +314,193 @@ Verified patterns from official sources:
 
 ### Prescription Notation Parser
 ```typescript
-// Source: Custom implementation based on domain research (docs/domain-research-strength-training.md)
+// Source: Custom implementation based on domain research + UI/UX specifications
 import { z } from 'zod'
 
 // Intensity types supported
 const intensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'])
+const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'])
 
-// Parsed prescription structure
+// Parsed prescription structure (updated with tempo + unilateral support)
 export const parsedPrescriptionSchema = z.object({
   sets: z.number().min(1).max(20),
-  repsMin: z.number().min(1).max(100),
+  repsMin: z.number().min(0).max(100),  // 0 for AMRAP
   repsMax: z.number().min(1).max(100).nullable(),
   isAmrap: z.boolean(),
+  isUnilateral: z.boolean(),
+  unilateralUnit: unilateralUnitSchema.nullable(),
   intensityType: intensityTypeSchema.nullable(),
   intensityValue: z.number().nullable(),
   intensityUnit: z.enum(['kg', 'lb', '%', 'rpe', 'rir']).nullable(),
+  tempo: z.string().regex(/^\d{4}$/).nullable(),  // "3110" format
 })
 
 export type ParsedPrescription = z.infer<typeof parsedPrescriptionSchema>
 
+// Special value for skip/rest (em dash)
+export const SKIP_PRESCRIPTION = '—'
+
 export function parsePrescriptionNotation(input: string): ParsedPrescription | null {
-  const trimmed = input.trim().toLowerCase()
+  const trimmed = input.trim()
 
-  // Pattern: 3x8, 3x8-12
-  const basicMatch = trimmed.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?$/)
-  if (basicMatch) {
-    return {
-      sets: parseInt(basicMatch[1]),
-      repsMin: parseInt(basicMatch[2]),
-      repsMax: basicMatch[3] ? parseInt(basicMatch[3]) : null,
-      isAmrap: false,
-      intensityType: null,
-      intensityValue: null,
-      intensityUnit: null,
-    }
+  // Skip/rest notation
+  if (trimmed === '—' || trimmed === '-') {
+    return null  // null means no prescription for this week
   }
 
-  // Pattern: 3x8@120kg, 3x8@120lb
-  const weightMatch = trimmed.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*(kg|lb)$/)
-  if (weightMatch) {
-    return {
-      sets: parseInt(weightMatch[1]),
-      repsMin: parseInt(weightMatch[2]),
-      repsMax: weightMatch[3] ? parseInt(weightMatch[3]) : null,
-      isAmrap: false,
-      intensityType: 'absolute',
-      intensityValue: parseFloat(weightMatch[4]),
-      intensityUnit: weightMatch[5] as 'kg' | 'lb',
-    }
-  }
+  const lower = trimmed.toLowerCase()
 
-  // Pattern: 3x8@75%
-  const percentMatch = trimmed.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*%$/)
-  if (percentMatch) {
-    return {
-      sets: parseInt(percentMatch[1]),
-      repsMin: parseInt(percentMatch[2]),
-      repsMax: percentMatch[3] ? parseInt(percentMatch[3]) : null,
-      isAmrap: false,
-      intensityType: 'percentage',
-      intensityValue: parseFloat(percentMatch[4]),
-      intensityUnit: '%',
-    }
-  }
-
-  // Pattern: 3x8@RIR2, 3x8@rir2
-  const rirMatch = trimmed.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*rir\s*(\d+)$/)
-  if (rirMatch) {
-    return {
-      sets: parseInt(rirMatch[1]),
-      repsMin: parseInt(rirMatch[2]),
-      repsMax: rirMatch[3] ? parseInt(rirMatch[3]) : null,
-      isAmrap: false,
-      intensityType: 'rir',
-      intensityValue: parseInt(rirMatch[4]),
-      intensityUnit: 'rir',
-    }
-  }
-
-  // Pattern: 3x8@RPE8, 3x8@rpe8.5
-  const rpeMatch = trimmed.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*rpe\s*(\d+(?:\.\d+)?)$/)
-  if (rpeMatch) {
-    return {
-      sets: parseInt(rpeMatch[1]),
-      repsMin: parseInt(rpeMatch[2]),
-      repsMax: rpeMatch[3] ? parseInt(rpeMatch[3]) : null,
-      isAmrap: false,
-      intensityType: 'rpe',
-      intensityValue: parseFloat(rpeMatch[4]),
-      intensityUnit: 'rpe',
-    }
+  // Extract tempo if present: "3x8@120kg (3110)" -> tempo = "3110"
+  let tempo: string | null = null
+  let withoutTempo = lower
+  const tempoMatch = lower.match(/\((\d{4})\)\s*$/)
+  if (tempoMatch) {
+    tempo = tempoMatch[1]
+    withoutTempo = lower.replace(/\s*\(\d{4}\)\s*$/, '')
   }
 
   // Pattern: 3xAMRAP
-  const amrapMatch = trimmed.match(/^(\d+)\s*x\s*amrap$/i)
+  const amrapMatch = withoutTempo.match(/^(\d+)\s*x\s*amrap$/i)
   if (amrapMatch) {
     return {
       sets: parseInt(amrapMatch[1]),
       repsMin: 0,
       repsMax: null,
       isAmrap: true,
+      isUnilateral: false,
+      unilateralUnit: null,
       intensityType: null,
       intensityValue: null,
       intensityUnit: null,
+      tempo,
     }
   }
 
-  return null
+  // Pattern: 3x12/leg, 3x12/arm, 3x12/side (unilateral)
+  const unilateralMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)\s*\/\s*(leg|arm|side)$/i)
+  if (unilateralMatch) {
+    return {
+      sets: parseInt(unilateralMatch[1]),
+      repsMin: parseInt(unilateralMatch[2]),
+      repsMax: null,
+      isAmrap: false,
+      isUnilateral: true,
+      unilateralUnit: unilateralMatch[3].toLowerCase() as 'leg' | 'arm' | 'side',
+      intensityType: null,
+      intensityValue: null,
+      intensityUnit: null,
+      tempo,
+    }
+  }
+
+  // Pattern: 3x8, 3x8-12 (basic, no intensity)
+  const basicMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?$/)
+  if (basicMatch) {
+    return {
+      sets: parseInt(basicMatch[1]),
+      repsMin: parseInt(basicMatch[2]),
+      repsMax: basicMatch[3] ? parseInt(basicMatch[3]) : null,
+      isAmrap: false,
+      isUnilateral: false,
+      unilateralUnit: null,
+      intensityType: null,
+      intensityValue: null,
+      intensityUnit: null,
+      tempo,
+    }
+  }
+
+  // Pattern: 3x8@120kg, 3x8@120lb (with weight)
+  const weightMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*(kg|lb)?$/)
+  if (weightMatch) {
+    return {
+      sets: parseInt(weightMatch[1]),
+      repsMin: parseInt(weightMatch[2]),
+      repsMax: weightMatch[3] ? parseInt(weightMatch[3]) : null,
+      isAmrap: false,
+      isUnilateral: false,
+      unilateralUnit: null,
+      intensityType: 'absolute',
+      intensityValue: parseFloat(weightMatch[4]),
+      intensityUnit: (weightMatch[5] ?? 'kg') as 'kg' | 'lb',
+      tempo,
+    }
+  }
+
+  // Pattern: 3x8@75% (with percentage)
+  const percentMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*(\d+(?:\.\d+)?)\s*%$/)
+  if (percentMatch) {
+    return {
+      sets: parseInt(percentMatch[1]),
+      repsMin: parseInt(percentMatch[2]),
+      repsMax: percentMatch[3] ? parseInt(percentMatch[3]) : null,
+      isAmrap: false,
+      isUnilateral: false,
+      unilateralUnit: null,
+      intensityType: 'percentage',
+      intensityValue: parseFloat(percentMatch[4]),
+      intensityUnit: '%',
+      tempo,
+    }
+  }
+
+  // Pattern: 3x8@RIR2
+  const rirMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*rir\s*(\d+)$/i)
+  if (rirMatch) {
+    return {
+      sets: parseInt(rirMatch[1]),
+      repsMin: parseInt(rirMatch[2]),
+      repsMax: rirMatch[3] ? parseInt(rirMatch[3]) : null,
+      isAmrap: false,
+      isUnilateral: false,
+      unilateralUnit: null,
+      intensityType: 'rir',
+      intensityValue: parseInt(rirMatch[4]),
+      intensityUnit: 'rir',
+      tempo,
+    }
+  }
+
+  // Pattern: 3x8@RPE8
+  const rpeMatch = withoutTempo.match(/^(\d+)\s*x\s*(\d+)(?:-(\d+))?\s*@\s*rpe\s*(\d+(?:\.\d+)?)$/i)
+  if (rpeMatch) {
+    return {
+      sets: parseInt(rpeMatch[1]),
+      repsMin: parseInt(rpeMatch[2]),
+      repsMax: rpeMatch[3] ? parseInt(rpeMatch[3]) : null,
+      isAmrap: false,
+      isUnilateral: false,
+      unilateralUnit: null,
+      intensityType: 'rpe',
+      intensityValue: parseFloat(rpeMatch[4]),
+      intensityUnit: 'rpe',
+      tempo,
+    }
+  }
+
+  return null  // Could not parse
 }
 
-export function formatPrescription(prescription: ParsedPrescription): string {
-  const { sets, repsMin, repsMax, isAmrap, intensityType, intensityValue, intensityUnit } = prescription
+export function formatPrescription(prescription: ParsedPrescription | null): string {
+  if (prescription === null) {
+    return '—'  // Skip notation
+  }
+
+  const { sets, repsMin, repsMax, isAmrap, isUnilateral, unilateralUnit,
+          intensityType, intensityValue, intensityUnit, tempo } = prescription
 
   if (isAmrap) {
-    return `${sets}xAMRAP`
+    return tempo ? `${sets}xAMRAP (${tempo})` : `${sets}xAMRAP`
   }
 
   let result = `${sets}x${repsMin}`
+
   if (repsMax !== null && repsMax !== repsMin) {
     result += `-${repsMax}`
+  }
+
+  if (isUnilateral && unilateralUnit) {
+    result += `/${unilateralUnit}`
   }
 
   if (intensityType && intensityValue !== null) {
@@ -380,6 +518,10 @@ export function formatPrescription(prescription: ParsedPrescription): string {
         result += `@RPE${intensityValue}`
         break
     }
+  }
+
+  if (tempo) {
+    result += ` (${tempo})`
   }
 
   return result
@@ -452,30 +594,59 @@ export const prescriptionColumn = (): Column<ParsedPrescription | null> => ({
 
 ### Program Data Structure
 ```typescript
-// Source: Domain research (docs/domain-research-strength-training.md)
+// Source: Domain research + UI/UX specifications
 // Database-level structure for programs
 
-export interface ProgramRow {
-  exerciseId: string
-  exerciseName: string
-  supersetGroup: string | null  // 'A', 'B', etc. for A1/A2 grouping
-  supersetOrder: number | null  // 1, 2 for A1, A2
-  week1: ParsedPrescription | null
-  week2: ParsedPrescription | null
-  week3: ParsedPrescription | null
-  week4: ParsedPrescription | null
-  week5: ParsedPrescription | null
-  week6: ParsedPrescription | null
-  notes: string | null
-  restSeconds: number | null
-  tempo: string | null  // "3010" format
+// Parsed prescription with tempo support
+export interface ParsedPrescription {
+  sets: number
+  repsMin: number
+  repsMax: number | null        // For rep ranges (8-12)
+  isAmrap: boolean
+  isUnilateral: boolean         // true for "3x12/leg"
+  unilateralUnit: 'leg' | 'arm' | 'side' | null
+  intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  intensityValue: number | null
+  intensityUnit: 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null
+  tempo: string | null          // "3110" format (4-digit ECCC)
 }
 
+// A row in the grid (can be split row for same exercise)
+export interface ProgramRow {
+  id: string
+  exerciseId: string
+  exerciseName: string
+  supersetGroup: string | null  // 'A', 'B', 'C', etc.
+  supersetOrder: number         // 1, 2, 3 for A1, A2, A3
+  setTypeLabel: string | null   // "HEAVY SINGLES", "BACK-OFF VOLUME", "VOLUME", etc.
+  isSubRow: boolean             // true if this is a split row (second+ row for same exercise)
+  parentRowId: string | null    // Reference to main row if isSubRow
+  prescriptions: Map<string, ParsedPrescription | null>  // weekId -> prescription
+  notes: string | null
+  restSeconds: number | null
+}
+
+// Session (training day) with exercises
+export interface ProgramSession {
+  id: string
+  name: string                  // "DÍA 1 • SQUAT DOMINANT"
+  orderIndex: number
+  rows: ProgramRow[]
+}
+
+// Week column
+export interface ProgramWeek {
+  id: string
+  name: string                  // Default "Semana X", coach can rename
+  orderIndex: number
+}
+
+// Full program grid data
 export interface ProgramGridData {
   programId: string
-  sessionId: string
-  sessionName: string
-  rows: ProgramRow[]
+  programName: string
+  weeks: ProgramWeek[]          // 1 to N weeks (coach decides)
+  sessions: ProgramSession[]
 }
 ```
 
@@ -503,23 +674,41 @@ Things that couldn't be fully resolved:
    - What's unclear: Maintenance status, how far behind upstream it might be
    - Recommendation: Verify fork is maintained, have SVAR DataGrid as fallback
 
-2. **Superset visual grouping implementation**
-   - What we know: A1/A2 notation is standard, exercises should visually group
-   - What's unclear: Best way to render grouped rows with shared styling
-   - Recommendation: Start with prefix notation (A1, A2 in exercise name), add visual grouping later
-
-3. **Undo/Redo for grid edits**
+2. **Undo/Redo for grid edits**
    - What we know: Users expect Ctrl+Z to work
    - What's unclear: How to integrate grid undo with React state
-   - Recommendation: Defer to phase 3.2, use react-datasheet-grid's internal undo if available
+   - Recommendation: Defer to later sub-phase, use react-datasheet-grid's internal undo if available
+
+## Resolved from UI/UX Specifications
+
+The following were clarified by the UI/UX mockup:
+
+1. **Superset visual grouping** → Vertical blue line connecting B1/B2/B3 exercises
+   - CSS classes: `superset-line`, `superset-line-mid`, `superset-line-end`
+   - Prefix column shows letter+number (A1, B1, B2) in primary color for supersets
+
+2. **Split rows (same exercise, different set configs)** → Multiple rows with same prefix
+   - First row: full opacity exercise name + "HEAVY SINGLES" label
+   - Second row: dimmed exercise name + "BACK-OFF VOLUME" label
+   - Keyboard: `Shift + Enter` to add sub-row
+
+3. **Week naming** → Simple string field, default "Semana X", 1 to N weeks
+
+4. **Keyboard shortcuts**
+   - `Shift + Enter`: Add sub-row (split)
+   - `S`: Toggle superset grouping
+   - Arrow keys: Navigate
+   - Enter: Edit cell
+   - Esc: Exit edit
 
 ## Sources
 
 ### Primary (HIGH confidence)
+- **UI/UX Specifications** (`.planning/phases/03-program-builder/ui-ux-specifications/`) - Visual design, grid structure, split rows, supersets
 - [react-datasheet-grid documentation](https://react-datasheet-grid.netlify.app/docs/features/) - Keyboard shortcuts, features, performance
 - [react-datasheet-grid GitHub](https://github.com/nick-keller/react-datasheet-grid) - Implementation patterns
 - [TanStack Table editable data example](https://tanstack.com/table/latest/docs/framework/react/examples/editable-data) - Inline editing patterns
-- [Domain research document](docs/domain-research-strength-training.md) - Prescription formats, training notation
+- [Domain research document](docs/domain-research-strength-training.md) - Prescription formats, training notation, periodization
 
 ### Secondary (MEDIUM confidence)
 - [SVAR React DataGrid](https://svar.dev/react/datagrid/) - Alternative library, MIT + React 19
@@ -535,8 +724,10 @@ Things that couldn't be fully resolved:
 **Confidence breakdown:**
 - Standard stack: HIGH - Well-researched libraries, clear tradeoffs
 - Architecture: HIGH - Follows existing project patterns
-- Notation parser: HIGH - Based on project's own domain research
+- Notation parser: HIGH - Based on domain research + UI/UX specs
+- UI/UX patterns: HIGH - Directly from founder's mockup (authoritative)
 - Pitfalls: MEDIUM - Based on common issues reported in community
 
 **Research date:** 2026-01-25
+**Updated:** 2026-01-25 (incorporated UI/UX specifications)
 **Valid until:** 2026-02-25 (30 days - stable domain, libraries relatively stable)
