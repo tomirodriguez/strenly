@@ -3,7 +3,22 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import type * as React from 'react'
 import { cn } from '@/lib/utils'
 
-const Select = SelectPrimitive.Root
+/**
+ * Item type for Select component - maps values to display labels.
+ * When provided to Select, SelectValue will display the label instead of the raw value.
+ */
+export type SelectItem = { value: string; label: string }
+
+/**
+ * Select wrapper that accepts an optional items prop.
+ * When items is provided, Base UI's SelectValue automatically displays labels.
+ */
+function Select<Value = string>({
+  items,
+  ...props
+}: SelectPrimitive.Root.Props<Value, false> & { items?: SelectItem[] }) {
+  return <SelectPrimitive.Root items={items} {...props} />
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return <SelectPrimitive.Group data-slot="select-group" className={cn('scroll-my-1 p-1', className)} {...props} />
@@ -160,4 +175,5 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+  type SelectItem as SelectItemType,
 }
