@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 4/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete)
+Plan: 7/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete; wave 3: 03-05, 03-06, 03-07 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-04-PLAN.md (Program Repository)
+Last activity: 2026-01-25 - Completed 03-07-PLAN.md (Exercise Row & Prescription Use Cases)
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (5 min), 03-03 (4 min), 03-02 (5 min), 03-04 (5 min)
-- Trend: Phase 3 program builder wave 2 (repository layer)
+- Last 5 plans: 03-01 (5 min), 03-03 (4 min), 03-02 (5 min), 03-04 (5 min), 03-06 (4 min)
+- Trend: Phase 3 program builder wave 3 (use cases layer)
 
 *Updated after each plan completion*
 
@@ -115,6 +115,8 @@ Recent decisions affecting current work:
 - **Access verification helpers** - Internal functions to verify organization ownership for nested entities (weeks, sessions, rows)
 - **Result discriminant pattern** - Return { ok: true, data } | { ok: false, error } from async operations for TypeScript narrowing
 - **Intensity unit mapping in repository** - Database uses both intensityType and intensityUnit; repository handles translation
+- **programId in delete/duplicate inputs** - Require programId for efficient week/session count checks
+- **Last entity protection** - Prevent deletion of last week/session at use case level (programs must have at least 1 of each)
 
 ### Pending Todos
 
@@ -223,6 +225,7 @@ None.
 | 03-02 | Prescription Notation Parser | Complete |
 | 03-03 | Domain Entities | Complete |
 | 03-04 | Program Repository | Complete |
+| 03-06 | Week and Session Use Cases | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -235,11 +238,18 @@ None.
 - `packages/core/src/domain/entities/prescription.ts` - Prescription entity with validation
 - `packages/core/src/ports/program-repository.port.ts` - Program repository interface with 17 methods
 - `packages/backend/src/infrastructure/repositories/program.repository.ts` - Drizzle implementation with multi-tenancy
+- `packages/backend/src/use-cases/programs/add-week.ts` - Add week with auto-name
+- `packages/backend/src/use-cases/programs/update-week.ts` - Update week name
+- `packages/backend/src/use-cases/programs/delete-week.ts` - Delete week with protection
+- `packages/backend/src/use-cases/programs/duplicate-week.ts` - Copy week with prescriptions
+- `packages/backend/src/use-cases/programs/add-session.ts` - Add session (training day)
+- `packages/backend/src/use-cases/programs/update-session.ts` - Update session name
+- `packages/backend/src/use-cases/programs/delete-session.ts` - Delete session with protection
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-04-PLAN.md (Program Repository)
+Stopped at: Completed 03-06-PLAN.md (Week and Session Use Cases)
 Resume file: None
 
-**Next:** Execute 03-05-PLAN.md (Use Cases)
+**Next:** Execute 03-07-PLAN.md (Contracts and Procedures) or 03-05-PLAN.md (remaining use cases)
