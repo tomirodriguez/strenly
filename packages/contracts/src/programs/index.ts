@@ -95,3 +95,19 @@ export {
   updateExerciseRowSchema,
   type UpdateExerciseRowInput,
 } from './exercise-row'
+
+// Template operations
+export {
+  type CreateFromTemplateInput,
+  createFromTemplateInputSchema,
+  type ListTemplatesInput,
+  listTemplatesInputSchema,
+  type ListTemplatesOutput,
+  listTemplatesOutputSchema,
+  type SaveAsTemplateInput,
+  saveAsTemplateInputSchema,
+  type TemplateOutput,
+  templateOutputSchema,
+  type TemplateWithDetailsOutput,
+  templateWithDetailsOutputSchema,
+} from './template'
