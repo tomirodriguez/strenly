@@ -199,19 +199,13 @@ export type ProgramRepositoryPort = {
   /**
    * Find an exercise row by ID
    */
-  findExerciseRowById(
-    ctx: OrganizationContext,
-    rowId: string,
-  ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+  findExerciseRowById(ctx: OrganizationContext, rowId: string): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
 
   /**
    * Get the maximum order index for exercise rows in a session
    * Returns -1 if no rows exist
    */
-  getMaxExerciseRowOrderIndex(
-    ctx: OrganizationContext,
-    sessionId: string,
-  ): ResultAsync<number, ProgramRepositoryError>
+  getMaxExerciseRowOrderIndex(ctx: OrganizationContext, sessionId: string): ResultAsync<number, ProgramRepositoryError>
 
   /**
    * Get the maximum superset order for a given group in a session
@@ -248,10 +242,7 @@ export type ProgramRepositoryPort = {
   /**
    * Find all sub-rows for a parent exercise row
    */
-  findSubRows(
-    ctx: OrganizationContext,
-    parentRowId: string,
-  ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError>
+  findSubRows(ctx: OrganizationContext, parentRowId: string): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Prescription Operations (Cell Values)
@@ -289,4 +280,15 @@ export type ProgramRepositoryPort = {
     weekId: string,
     newName: string,
   ): ResultAsync<ProgramWeek, ProgramRepositoryError>
+
+  /**
+   * Reposition a row to be immediately after the last member of a superset group.
+   * Used when adding a row to an existing superset to ensure adjacent placement.
+   */
+  repositionRowToAfterSupersetGroup(
+    ctx: OrganizationContext,
+    sessionId: string,
+    rowId: string,
+    supersetGroup: string,
+  ): ResultAsync<void, ProgramRepositoryError>
 }

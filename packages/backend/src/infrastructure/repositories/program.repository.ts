@@ -1101,5 +1101,89 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         return ok(mapWeekToDomain(result.data))
       })
     },
+
+    repositionRowToAfterSupersetGroup(
+      ctx: OrganizationContext,
+      sessionId: string,
+      rowId: string,
+      supersetGroup: string,
+    ): ResultAsync<void, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
+          // Verify session access
+          const existingSession = await verifySessionAccess(ctx, sessionId)
+          if (!existingSession) {
+            return { ok: false, error: notFoundError('session', sessionId) }
+          }
+
+          // 1. Get all rows in session ordered by orderIndex
+          const sessionRows = await db
+            .select({
+              id: programExercises.id,
+              orderIndex: programExercises.orderIndex,
+              supersetGroup: programExercises.supersetGroup,
+            })
+            .from(programExercises)
+            .where(eq(programExercises.sessionId, sessionId))
+            .orderBy(asc(programExercises.orderIndex))
+
+          // 2. Find the last row in the target superset group (excluding the row being moved)
+          let lastGroupIndex = -1
+          for (let i = 0; i < sessionRows.length; i++) {
+            const row = sessionRows[i]
+            if (row && row.supersetGroup === supersetGroup && row.id !== rowId) {
+              lastGroupIndex = i
+            }
+          }
+
+          // 3. If no other members in group, no repositioning needed
+          if (lastGroupIndex === -1) {
+            return { ok: true }
+          }
+
+          // 4. Build new order: remove the row, insert it after lastGroupIndex
+          const currentIndex = sessionRows.findIndex((r) => r.id === rowId)
+          if (currentIndex === -1) {
+            return { ok: true } // Row not found, nothing to do
+          }
+
+          // If already in position (right after last group member), no change needed
+          if (currentIndex === lastGroupIndex + 1) {
+            return { ok: true }
+          }
+
+          // Create new order array
+          const currentRow = sessionRows[currentIndex]
+          if (!currentRow) {
+            return { ok: true }
+          }
+          const newOrder = sessionRows.filter((r) => r.id !== rowId)
+          // Insert after the last group member (adjust position if removing from before)
+          const insertPosition = lastGroupIndex < currentIndex ? lastGroupIndex + 1 : lastGroupIndex
+          newOrder.splice(insertPosition, 0, currentRow)
+
+          // 5. Update all orderIndex values
+          await db.transaction(async (tx) => {
+            for (let i = 0; i < newOrder.length; i++) {
+              const row = newOrder[i]
+              if (row) {
+                await tx
+                  .update(programExercises)
+                  .set({ orderIndex: i, updatedAt: new Date() })
+                  .where(eq(programExercises.id, row.id))
+              }
+            }
+          })
+
+          return { ok: true }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(undefined)
+      })
+    },
   }
 }

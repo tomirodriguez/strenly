@@ -71,8 +71,11 @@ export const makeToggleSuperset =
         }
 
         // 4. Adding to superset - query max order in that group, then set order = max + 1
+        // TypeScript narrowing: at this point, input.supersetGroup is guaranteed to be string
+        const targetGroup = input.supersetGroup
+
         // If staying in the same group, keep the existing order
-        if (existing.supersetGroup === input.supersetGroup && existing.supersetOrder !== null) {
+        if (existing.supersetGroup === targetGroup && existing.supersetOrder !== null) {
           // Already in this superset group, no change needed
           return deps.programRepository.updateExerciseRow(ctx, existing).mapErr(
             (e): ToggleSupersetError => ({
@@ -83,28 +86,42 @@ export const makeToggleSuperset =
         }
 
         // Query for max order in the target superset group
-        return deps.programRepository
-          .getMaxSupersetOrder(ctx, existing.sessionId, input.supersetGroup)
-          .mapErr(
-            (e): ToggleSupersetError => ({
-              type: 'repository_error',
-              message: e.type === 'DATABASE_ERROR' ? e.message : `Session not found: ${e.id}`,
-            }),
-          )
-          .andThen((maxOrder) => {
-            const updated: ProgramExerciseRow = {
-              ...existing,
-              supersetGroup: input.supersetGroup,
-              supersetOrder: maxOrder + 1,
-              updatedAt: new Date(),
-            }
-
-            return deps.programRepository.updateExerciseRow(ctx, updated).mapErr(
+        return (
+          deps.programRepository
+            .getMaxSupersetOrder(ctx, existing.sessionId, targetGroup)
+            .mapErr(
               (e): ToggleSupersetError => ({
                 type: 'repository_error',
-                message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
+                message: e.type === 'DATABASE_ERROR' ? e.message : `Session not found: ${e.id}`,
               }),
             )
-          })
+            .andThen((maxOrder) => {
+              const updated: ProgramExerciseRow = {
+                ...existing,
+                supersetGroup: targetGroup,
+                supersetOrder: maxOrder + 1,
+                updatedAt: new Date(),
+              }
+
+              return deps.programRepository.updateExerciseRow(ctx, updated).mapErr(
+                (e): ToggleSupersetError => ({
+                  type: 'repository_error',
+                  message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
+                }),
+              )
+            })
+            // After updating metadata, reposition the row to be adjacent to group members
+            .andThen((updatedRow) =>
+              deps.programRepository
+                .repositionRowToAfterSupersetGroup(ctx, updatedRow.sessionId, updatedRow.id, targetGroup)
+                .map(() => updatedRow)
+                .mapErr(
+                  (e): ToggleSupersetError => ({
+                    type: 'repository_error',
+                    message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to reposition row: ${e.id}`,
+                  }),
+                ),
+            )
+        )
       })
   }
