@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - VERIFIED)
-Plan: 14/14 - Gap closure 14 complete
-Status: Phase 3.1 fully complete and verified (9/9 must-haves)
-Last activity: 2026-01-25 - Gap closure plan 14 executed (athlete selector UX)
+Plan: 15/15 - Gap closure 15 complete
+Status: Phase 3.1 fully complete and verified
+Last activity: 2026-01-25 - Gap closure plan 15 executed (unified row labeling)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
 
-**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-13) complete. 3 verification iterations, 2 UAT rounds.
+**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-15) complete. "Everything is a group" labeling model.
 
 ## Performance Metrics
 
@@ -139,6 +139,7 @@ Recent decisions affecting current work:
 - **Navigation keys bubble from cells to grid** - Cells only handle edit triggers (Enter, F2, printable chars); arrow/tab bubble to grid
 - **Dynamic supersetOrder from physical position** - Calculate display order (A1, A2) from row position rather than stored values to avoid stale numbers after reordering
 - **Row repositioning on superset join** - When adding to an existing superset, physically move the row adjacent to other group members
+- **Everything is a group labeling** - Standalone exercise = group of 1 (A1), superset = group of N (B1, B2, B3); eliminates two-system complexity
 
 ### Pending Todos
 
@@ -242,6 +243,7 @@ None.
 | 03.1-12 | Athlete Selector Accessibility | Complete |
 | 03.1-13 | Superset Grouping Fix | Complete |
 | 03.1-14 | Remove Redundant Athlete Selector Option | Complete |
+| 03.1-15 | Unified Row Labeling | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -264,7 +266,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-14-PLAN.md (gap closure - athlete selector UX)
+Stopped at: Completed 03.1-15-PLAN.md (gap closure - unified row labeling)
 Resume file: None
 
 **Next:** Phase 3 has one remaining plan (03-16 Navigation/UAT). After that, Phase 4 (Athlete PWA).
