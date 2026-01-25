@@ -15,4 +15,5 @@ export {
   type MuscleGroupRepositoryError,
 } from './muscle-group.repository'
 export { createPlanRepository } from './plan.repository'
+export { createProgramRepository } from './program.repository'
 export { createSubscriptionRepository } from './subscription.repository'

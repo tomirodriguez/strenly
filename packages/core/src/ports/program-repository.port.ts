@@ -148,7 +148,11 @@ export type ProgramRepositoryPort = {
   /**
    * Create a week (column) for a program
    */
-  createWeek(ctx: OrganizationContext, programId: string, week: Omit<ProgramWeek, 'programId'>): ResultAsync<ProgramWeek, ProgramRepositoryError>
+  createWeek(
+    ctx: OrganizationContext,
+    programId: string,
+    week: Omit<ProgramWeek, 'programId'>,
+  ): ResultAsync<ProgramWeek, ProgramRepositoryError>
 
   /**
    * Update a week
@@ -167,7 +171,11 @@ export type ProgramRepositoryPort = {
   /**
    * Create a session (training day) for a program
    */
-  createSession(ctx: OrganizationContext, programId: string, session: Omit<ProgramSession, 'programId'>): ResultAsync<ProgramSession, ProgramRepositoryError>
+  createSession(
+    ctx: OrganizationContext,
+    programId: string,
+    session: Omit<ProgramSession, 'programId'>,
+  ): ResultAsync<ProgramSession, ProgramRepositoryError>
 
   /**
    * Update a session
@@ -186,12 +194,19 @@ export type ProgramRepositoryPort = {
   /**
    * Create an exercise row for a session
    */
-  createExerciseRow(ctx: OrganizationContext, sessionId: string, row: Omit<ProgramExerciseRow, 'sessionId'>): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+  createExerciseRow(
+    ctx: OrganizationContext,
+    sessionId: string,
+    row: Omit<ProgramExerciseRow, 'sessionId'>,
+  ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
 
   /**
    * Update an exercise row
    */
-  updateExerciseRow(ctx: OrganizationContext, row: ProgramExerciseRow): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+  updateExerciseRow(
+    ctx: OrganizationContext,
+    row: ProgramExerciseRow,
+  ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
 
   /**
    * Delete an exercise row (cascades to prescriptions)
@@ -220,10 +235,18 @@ export type ProgramRepositoryPort = {
   /**
    * Reorder exercise rows within a session
    */
-  reorderExerciseRows(ctx: OrganizationContext, sessionId: string, rowIds: string[]): ResultAsync<void, ProgramRepositoryError>
+  reorderExerciseRows(
+    ctx: OrganizationContext,
+    sessionId: string,
+    rowIds: string[],
+  ): ResultAsync<void, ProgramRepositoryError>
 
   /**
    * Duplicate a week with all prescriptions
    */
-  duplicateWeek(ctx: OrganizationContext, weekId: string, newName: string): ResultAsync<ProgramWeek, ProgramRepositoryError>
+  duplicateWeek(
+    ctx: OrganizationContext,
+    weekId: string,
+    newName: string,
+  ): ResultAsync<ProgramWeek, ProgramRepositoryError>
 }
