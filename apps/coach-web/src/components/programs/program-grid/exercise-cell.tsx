@@ -15,11 +15,13 @@ import { cn } from '@/lib/utils'
 
 interface ExerciseCellProps {
   row: GridRow
+  colId: string
   programId: string
   sessionRowIds: string[]
   sessionRows: SessionRowData[]
   isActive: boolean
   isEditing: boolean
+  onSelect: () => void
   onStartEdit: () => void
   onCommit: (exerciseId: string, exerciseName: string) => void
   onCancel: () => void
@@ -34,16 +36,18 @@ interface ExerciseCellProps {
  * - Shows set type badge for split rows (HEAVY SINGLES, BACK-OFF, etc.)
  * - Row prefix with superset indicator (A1, B2)
  * - Row actions menu on hover (delete, superset, move, split)
- * - Click to edit with searchable combobox
+ * - Single click selects cell, double-click enters edit mode
  * - Sticky first column behavior (parent handles this via CSS)
  */
 export function ExerciseCell({
   row,
+  colId,
   programId,
   sessionRowIds,
   sessionRows,
   isActive,
   isEditing,
+  onSelect,
   onStartEdit,
   onCommit,
   onCancel,
@@ -123,7 +127,10 @@ export function ExerciseCell({
         row.isSubRow ? 'bg-zinc-950/20' : 'bg-background',
         isActive && 'ring-1 ring-primary ring-inset',
       )}
-      onClick={onStartEdit}
+      data-row-id={row.id}
+      data-col-id={colId}
+      onClick={onSelect}
+      onDoubleClick={onStartEdit}
       onKeyDown={handleCellKeyDown}
       tabIndex={isActive ? 0 : -1}
     >
