@@ -1,18 +1,18 @@
-import { useMemo, useRef, useState } from 'react'
 import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
+import { useMemo, useRef, useState } from 'react'
+import { SplitRowDialog } from '../split-row-dialog'
 import { GridBody } from './grid-body'
 import { GridHeader } from './grid-header'
 import { transformProgramToGrid } from './transform-program'
 import { useCellEditing } from './use-cell-editing'
 import { useGridNavigation } from './use-grid-navigation'
-import { SplitRowDialog } from '../split-row-dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   useAddExerciseRow,
   useToggleSuperset,
   useUpdateExerciseRow,
   useUpdatePrescription,
 } from '@/features/programs/hooks/mutations/use-grid-mutations'
-import { Skeleton } from '@/components/ui/skeleton'
 import '@/styles/program-grid.css'
 
 interface ProgramGridProps {
@@ -174,11 +174,10 @@ export function ProgramGrid({ program, isLoading }: ProgramGridProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Grid container */}
-      <div className="flex-1 program-grid-container">
+      <div className="program-grid-container flex-1">
         <table
           ref={tableRef}
           className="program-grid"
-          role="grid"
           aria-label={`Programa: ${program.name}`}
           onKeyDown={handleTableKeyDown}
         >

@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { ArrowLeftIcon, FileDownIcon, SaveIcon } from 'lucide-react'
+import { ProgramGrid } from '@/components/programs/program-grid/program-grid'
+import { ProgramHeader } from '@/components/programs/program-header'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ProgramGrid } from '@/components/programs/program-grid'
-import { ProgramHeader } from '@/components/programs/program-header'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import '@/styles/program-grid.css'
 
@@ -34,7 +34,7 @@ function ProgramEditorPage() {
 
       {/* Main grid - takes remaining height */}
       <div className="min-h-0 flex-1 overflow-hidden">
-        <ProgramGrid programId={programId} />
+        <ProgramGrid program={program} />
       </div>
 
       {/* Footer with keyboard shortcuts help */}
