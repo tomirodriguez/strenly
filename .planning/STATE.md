@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 3 of 5 (Program Builder)
 Plan: 3/N (wave 1: 03-01, 03-02, 03-03 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-02-PLAN.md (Prescription Notation Parser)
+Last activity: 2026-01-25 - Completed quick task 019: remove hover on active sidebar items
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
 
