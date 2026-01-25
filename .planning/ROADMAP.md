@@ -15,7 +15,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 2.5: Coach Web Foundation** - Auth UI, athlete management UI, exercise browser (frontend catch-up)
 - [x] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
 - [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
-- [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
+- [ ] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -156,7 +156,7 @@ Plans:
   7. All existing mutation hooks (use-grid-mutations.ts) work with new grid
   8. Programs list uses DataTable instead of cards
   9. Create program form has weeks selector (default 4) and improved athlete combobox
-**Plans**: 15 plans in 8 waves
+**Plans**: 17 plans in 9 waves
 
 **Context:**
 - Backend API (procedures, use cases, contracts) is complete and unchanged
@@ -181,6 +181,8 @@ Plans:
 - [x] 03.1-13-PLAN.md - [GAP CLOSURE] Fix superset row repositioning (Wave 7)
 - [x] 03.1-14-PLAN.md - [GAP CLOSURE] Remove athlete selector empty option (Wave 8)
 - [x] 03.1-15-PLAN.md - [GAP CLOSURE] Fix superset label collision (Wave 8)
+- [ ] 03.1-16-PLAN.md - [GAP CLOSURE] Fix athlete selector empty state visibility (Wave 9)
+- [ ] 03.1-17-PLAN.md - [GAP CLOSURE] Fix superset removal repositioning and reorder adjacency (Wave 9)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -227,10 +229,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 15/15 | Complete | 2026-01-25 |
+| 3.1. Custom Program Grid (frontend) | 15/17 | In progress | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.1 complete - 15/15 plans, 9/9 success criteria verified)*
+*Last updated: 2026-01-25 (Phase 3.1 gap closure plans 16-17 added for UAT v4 issues)*
