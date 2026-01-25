@@ -1,6 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { type LoginInput, loginInputSchema } from '@strenly/contracts'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
@@ -16,18 +16,15 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
+    control,
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginInputSchema),
+    resolver: standardSchemaResolver(loginInputSchema),
     defaultValues: {
       email: '',
       password: '',
       rememberMe: false,
     },
   })
-
-  const rememberMe = watch('rememberMe')
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -55,10 +52,10 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
 
       <Field orientation="horizontal">
         <FieldLabel htmlFor="rememberMe" className="flex cursor-pointer items-center gap-2">
-          <Checkbox
-            id="rememberMe"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setValue('rememberMe', checked === true)}
+          <Controller
+            control={control}
+            name="rememberMe"
+            render={({ field }) => <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />}
           />
           <span className="text-sm">Recordarme</span>
         </FieldLabel>

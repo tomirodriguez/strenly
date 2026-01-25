@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { type SignupInput, signupInputSchema } from '@strenly/contracts'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,7 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<SignupInput>({
-    resolver: zodResolver(signupInputSchema),
+    resolver: standardSchemaResolver(signupInputSchema),
     defaultValues: {
       name: '',
       email: '',
