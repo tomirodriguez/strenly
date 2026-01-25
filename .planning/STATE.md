@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 3/8 - Multi-Part Parser complete
+Plan: 4/8 - Contracts and Repository Layer complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.2-03-PLAN.md (multi-part parser)
+Last activity: 2026-01-25 - Completed 03.2-04-PLAN.md (contracts and repository layer)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-03 complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-04 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -283,7 +283,7 @@ None.
 | 03.2-01 | Database Schema | Complete |
 | 03.2-02 | Domain Entities | Complete |
 | 03.2-03 | Multi-Part Parser | Complete |
-| 03.2-04 | Prescription Update | Pending |
+| 03.2-04 | Contracts and Repository Layer | Complete |
 | 03.2-05 | Use Cases | Pending |
 | 03.2-06 | Contracts & Procedures | Pending |
 | 03.2-07 | Client-Side State | Pending |
@@ -293,11 +293,14 @@ None.
 - `packages/core/src/domain/entities/prescription-series.ts` - Single set entity
 - `packages/core/src/domain/entities/exercise-group.ts` - Group container entity
 - `packages/contracts/src/programs/prescription.ts` - Multi-part notation parser with series support
+- `packages/contracts/src/programs/exercise-group.ts` - Exercise group contracts
+- `packages/core/src/ports/program-repository.port.ts` - Updated with group methods and saveDraft
+- `packages/backend/src/infrastructure/repositories/program.repository.ts` - Group and saveDraft implementation
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.2-03-PLAN.md (multi-part parser)
+Stopped at: Completed 03.2-04-PLAN.md (contracts and repository layer)
 Resume file: None
 
-**Next:** Phase 3.2 Plan 04 (Prescription Update).
+**Next:** Phase 3.2 Plan 05 (Use Cases).
