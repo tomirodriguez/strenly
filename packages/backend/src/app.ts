@@ -12,6 +12,7 @@ type Env = {
   BETTER_AUTH_URL: string
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
+  ENVIRONMENT?: 'development' | 'production' | 'test'
 }
 
 const app = new Hono<{ Bindings: Env }>()
@@ -55,8 +56,7 @@ const rpcHandler = new RPCHandler(router)
 
 // Dev-only: random latency 200-500ms to simulate network conditions
 app.use('/rpc/*', async (c, next) => {
-  const isDev = c.env.BETTER_AUTH_URL.includes('localhost')
-  if (isDev) {
+  if (c.env.ENVIRONMENT === 'development') {
     const latencyMs = Math.floor(Math.random() * 300) + 200
     await new Promise((resolve) => setTimeout(resolve, latencyMs))
   }
