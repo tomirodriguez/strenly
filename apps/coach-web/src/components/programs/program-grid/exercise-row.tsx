@@ -60,15 +60,14 @@ export function ExerciseRow({
             <ExerciseCell
               key={col.id}
               row={row}
+              colId={col.id}
               programId={programId}
               sessionRowIds={sessionRowIds}
               sessionRows={sessionRows}
               isActive={isActiveCell}
               isEditing={isEditingCell}
-              onStartEdit={() => {
-                onCellClick(row.id, col.id)
-                onStartEdit(row.id, col.id)
-              }}
+              onSelect={() => onCellClick(row.id, col.id)}
+              onStartEdit={() => onStartEdit(row.id, col.id)}
               onCommit={(exerciseId, exerciseName) => {
                 onCommitExercise(row.id, exerciseId, exerciseName)
                 onStopEdit()
@@ -94,10 +93,8 @@ export function ExerciseRow({
             isActive={isActiveCell}
             isEditing={isEditingCell}
             isSubRow={row.isSubRow}
-            onStartEdit={() => {
-              onCellClick(row.id, col.id)
-              onStartEdit(row.id, col.id)
-            }}
+            onSelect={() => onCellClick(row.id, col.id)}
+            onStartEdit={() => onStartEdit(row.id, col.id)}
             onCommit={(value) => {
               onCommitPrescription(row.id, weekId, value)
               onStopEdit()
