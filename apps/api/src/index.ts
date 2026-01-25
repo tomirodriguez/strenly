@@ -1,3 +1,3 @@
-import { app } from "@strenly/backend/app";
+import { app } from '@strenly/backend/app'
 
-export default app;
+export default app
