@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 11/N (waves 1-4 complete, wave 5 started: 03-11 complete)
+Plan: 10/N (waves 1-4 complete, wave 5 in progress: 03-10 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-11-PLAN.md (Core Grid Components)
+Last activity: 2026-01-25 - Completed 03-10-PLAN.md (Programs List and Creation Frontend)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 5 started
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 5 in progress
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
@@ -119,9 +119,7 @@ Recent decisions affecting current work:
 - **Last entity protection** - Prevent deletion of last week/session at use case level (programs must have at least 1 of each)
 - **Nested router structure for grid ops** - programs.weeks.add, programs.exerciseRows.update, etc. for logical API organization
 - **Prescription endpoint returns nullable** - parsedPrescriptionSchema.nullable() - null for cleared cells, structured data otherwise
-- **Inline cell components for grid** - Define cell components inline in buildColumns() instead of spreading from helpers for TypeScript compatibility
-- **Flat grid row structure with session headers** - Session headers included as special rows with type: 'session-header'
-- **Exercise search inline in cell** - Exercise picker uses inline search dropdown, not modal
+- **Select over Combobox for small lists** - Use Select component instead of Combobox when search isn't needed (athlete/template selectors)
 
 ### Pending Todos
 
@@ -236,7 +234,7 @@ None.
 | 03-07 | Exercise Row & Prescription Use Cases | Complete |
 | 03-08 | Program Contracts | Complete |
 | 03-09 | Grid Manipulation Procedures | Complete |
-| 03-11 | Core Grid Components | Complete |
+| 03-10 | Programs List and Creation Frontend | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -271,15 +269,23 @@ None.
 - `packages/backend/src/procedures/programs/exercise-rows.ts` - Exercise row procedures
 - `packages/backend/src/procedures/programs/prescriptions.ts` - Prescription update procedure
 - `packages/backend/src/procedures/programs/index.ts` - Programs router with nested structure
-- `apps/coach-web/src/components/programs/program-grid.tsx` - Main grid component with data transformation
-- `apps/coach-web/src/components/programs/prescription-cell.tsx` - Prescription notation editing cell
-- `apps/coach-web/src/components/programs/exercise-picker-cell.tsx` - Exercise search and selection cell
-- `apps/coach-web/src/features/programs/hooks/mutations/use-grid-mutations.ts` - Grid mutation hooks
+- `apps/coach-web/src/features/programs/hooks/queries/use-programs.ts` - Programs list query hook
+- `apps/coach-web/src/features/programs/hooks/queries/use-program.ts` - Single program query hook
+- `apps/coach-web/src/features/programs/hooks/mutations/use-create-program.ts` - Create program mutation
+- `apps/coach-web/src/features/programs/hooks/mutations/use-duplicate-program.ts` - Duplicate program mutation
+- `apps/coach-web/src/features/programs/hooks/mutations/use-archive-program.ts` - Archive program mutation
+- `apps/coach-web/src/features/programs/components/program-card.tsx` - Program card for grid display
+- `apps/coach-web/src/features/programs/components/program-form.tsx` - Program create/edit form
+- `apps/coach-web/src/features/programs/views/programs-list-view.tsx` - Programs list page
+- `apps/coach-web/src/features/programs/views/new-program-view.tsx` - New program creation page
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/index.tsx` - Programs list route
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/new.tsx` - New program route
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/$programId.tsx` - Program editor route (placeholder)
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-11-PLAN.md (Core Grid Components)
+Stopped at: Completed 03-10-PLAN.md (Programs List and Creation Frontend)
 Resume file: None
 
-**Next:** Continue with 03-12 (Session Headers & Split Rows) or remaining wave 5 plans
+**Next:** Continue with 03-11 (Grid Editor) or remaining wave 5 plans
