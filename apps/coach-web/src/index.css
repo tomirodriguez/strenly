@@ -42,36 +42,36 @@
 
 .dark {
   /* Core surfaces */
-  --background: oklch(0.129 0.042 264.695);      /* slate-950 #0f172a */
-  --foreground: oklch(0.985 0 0);                 /* white */
+  --background: oklch(0.129 0.042 264.695); /* slate-950 #0f172a */
+  --foreground: oklch(0.985 0 0); /* white */
 
   /* Cards and elevated surfaces */
-  --card: oklch(0.208 0.042 265.755);            /* slate-900 #1e293b */
+  --card: oklch(0.208 0.042 265.755); /* slate-900 #1e293b */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.208 0.042 265.755);         /* slate-900 */
+  --popover: oklch(0.208 0.042 265.755); /* slate-900 */
   --popover-foreground: oklch(0.985 0 0);
 
   /* Primary action color - blue */
-  --primary: oklch(0.546 0.245 262.881);         /* blue-600 #2563eb */
-  --primary-foreground: oklch(0.985 0 0);        /* white */
+  --primary: oklch(0.546 0.245 262.881); /* blue-600 #2563eb */
+  --primary-foreground: oklch(0.985 0 0); /* white */
 
   /* Secondary/muted elements */
-  --secondary: oklch(0.279 0.041 264.532);       /* slate-800 */
+  --secondary: oklch(0.279 0.041 264.532); /* slate-800 */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.208 0.042 265.755);           /* slate-900 */
+  --muted: oklch(0.208 0.042 265.755); /* slate-900 */
   --muted-foreground: oklch(0.554 0.046 257.417); /* slate-500 #94a3b8 */
 
   /* Accent for hover states */
-  --accent: oklch(0.279 0.041 264.532);          /* slate-800 */
+  --accent: oklch(0.279 0.041 264.532); /* slate-800 */
   --accent-foreground: oklch(0.985 0 0);
 
   /* Destructive - keep existing red */
   --destructive: oklch(0.704 0.191 22.216);
 
   /* Borders and inputs */
-  --border: oklch(0.279 0.041 264.532);          /* slate-800 #334155 */
+  --border: oklch(0.279 0.041 264.532); /* slate-800 #334155 */
   --input: oklch(0.279 0.041 264.532);
-  --ring: oklch(0.546 0.245 262.881);            /* blue-600 for focus */
+  --ring: oklch(0.546 0.245 262.881); /* blue-600 for focus */
 
   /* Charts - keep existing blues */
   --chart-1: oklch(0.809 0.105 251.813);
@@ -81,13 +81,13 @@
   --chart-5: oklch(0.424 0.199 265.638);
 
   /* Sidebar-specific */
-  --sidebar: oklch(0.129 0.042 264.695);         /* slate-950 */
+  --sidebar: oklch(0.129 0.042 264.695); /* slate-950 */
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.546 0.245 262.881); /* blue-600 */
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.279 0.041 264.532);  /* slate-800 */
+  --sidebar-accent: oklch(0.279 0.041 264.532); /* slate-800 */
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.279 0.041 264.532);  /* slate-800 */
+  --sidebar-border: oklch(0.279 0.041 264.532); /* slate-800 */
   --sidebar-ring: oklch(0.546 0.245 262.881);
 }
 
