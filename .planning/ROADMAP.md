@@ -179,8 +179,8 @@ Plans:
 - [x] 03.1-11-PLAN.md - [GAP CLOSURE] Fix keyboard navigation + edit mode (Wave 6)
 - [x] 03.1-12-PLAN.md - [GAP CLOSURE] Fix athlete selector keyboard accessibility (Wave 7)
 - [x] 03.1-13-PLAN.md - [GAP CLOSURE] Fix superset row repositioning (Wave 7)
-- [ ] 03.1-14-PLAN.md - [GAP CLOSURE] Remove athlete selector empty option (Wave 8)
-- [ ] 03.1-15-PLAN.md - [GAP CLOSURE] Fix superset label collision (Wave 8)
+- [x] 03.1-14-PLAN.md - [GAP CLOSURE] Remove athlete selector empty option (Wave 8)
+- [x] 03.1-15-PLAN.md - [GAP CLOSURE] Fix superset label collision (Wave 8)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -227,10 +227,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 13/15 | In progress | - |
+| 3.1. Custom Program Grid (frontend) | 15/15 | Complete | 2026-01-25 |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.1 gap closure plans 14-15 added for UAT v3 issues)*
+*Last updated: 2026-01-25 (Phase 3.1 complete - 15/15 plans, 9/9 success criteria verified)*
