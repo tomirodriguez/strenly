@@ -1,8 +1,9 @@
-import type { Program, ProgramStatus } from '@strenly/contracts/programs/program'
+import type { ProgramStatus } from '@strenly/contracts/programs/program'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { FileTextIcon, PlusIcon, SearchIcon } from 'lucide-react'
-import { useState } from 'react'
-import { ProgramCard } from '../components/program-card'
+import { useCallback, useState } from 'react'
+import { ProgramsTable } from '../components/programs-table'
+import type { ProgramRow } from '../components/programs-table-columns'
 import { useArchiveProgram } from '../hooks/mutations/use-archive-program'
 import { useDuplicateProgram } from '../hooks/mutations/use-duplicate-program'
 import { usePrograms } from '../hooks/queries/use-programs'
@@ -11,7 +12,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 
 const STATUS_OPTIONS = [
@@ -21,9 +21,11 @@ const STATUS_OPTIONS = [
   { value: 'archived', label: 'Archivado' },
 ]
 
+const DEFAULT_PAGE_SIZE = 20
+
 /**
  * Programs list view with search, filtering, and CRUD operations.
- * Displays programs as a card grid for visual browsing.
+ * Displays programs as a DataTable for scalable list view.
  */
 export function ProgramsListView() {
   const params = useParams({ strict: false })
@@ -33,13 +35,16 @@ export function ProgramsListView() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProgramStatus | 'all'>('all')
   const [showTemplates, setShowTemplates] = useState(false)
+  const [pageIndex, setPageIndex] = useState(0)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
-  // Fetch programs with current filters
+  // Fetch programs with current filters and pagination
   const { data, isLoading } = usePrograms({
     search: search || undefined,
     status: statusFilter === 'all' ? undefined : statusFilter,
     isTemplate: showTemplates ? true : undefined,
-    limit: 50,
+    limit: pageSize,
+    offset: pageIndex * pageSize,
   })
 
   // Fetch athletes for name lookup
@@ -54,26 +59,49 @@ export function ProgramsListView() {
     navigate({ to: '/$orgSlug/programs/new', params: { orgSlug } })
   }
 
-  const handleEditProgram = (program: Program) => {
-    navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
-  }
+  const handleEditProgram = useCallback(
+    (program: ProgramRow) => {
+      navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
+    },
+    [navigate, orgSlug],
+  )
 
-  const handleDuplicateProgram = (program: Program) => {
-    duplicateMutation.mutate({
-      sourceProgramId: program.id,
-      name: `${program.name} (copia)`,
-      athleteId: program.athleteId ?? undefined,
-      isTemplate: program.isTemplate,
-    })
-  }
+  const handleDuplicateProgram = useCallback(
+    (program: ProgramRow) => {
+      duplicateMutation.mutate({
+        sourceProgramId: program.id,
+        name: `${program.name} (copia)`,
+        athleteId: program.athleteId ?? undefined,
+        isTemplate: program.isTemplate,
+      })
+    },
+    [duplicateMutation],
+  )
 
-  const handleArchiveProgram = (program: Program) => {
-    if (window.confirm(`Estas seguro de que quieres archivar "${program.name}"?`)) {
-      archiveMutation.mutate({ programId: program.id })
-    }
-  }
+  const handleArchiveProgram = useCallback(
+    (program: ProgramRow) => {
+      if (window.confirm(`Estas seguro de que quieres archivar "${program.name}"?`)) {
+        archiveMutation.mutate({ programId: program.id })
+      }
+    },
+    [archiveMutation],
+  )
 
-  const programs = data?.items ?? []
+  const handlePageChange = useCallback((newPageIndex: number, newPageSize: number) => {
+    setPageIndex(newPageIndex)
+    setPageSize(newPageSize)
+  }, [])
+
+  // Map programs to include athlete names for display
+  const programsWithNames: ProgramRow[] =
+    data?.items.map((program) => ({
+      ...program,
+      athleteName: program.athleteId ? athleteMap.get(program.athleteId) : undefined,
+    })) ?? []
+
+  const totalCount = data?.totalCount ?? 0
+  const hasFilters = !!search || statusFilter !== 'all' || showTemplates
+  const showEmptyState = !isLoading && programsWithNames.length === 0
 
   return (
     <div className="space-y-6">
@@ -96,7 +124,10 @@ export function ProgramsListView() {
           <Input
             placeholder="Buscar programas..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPageIndex(0) // Reset to first page on search
+            }}
             className="pl-9"
           />
         </div>
@@ -104,7 +135,10 @@ export function ProgramsListView() {
         <Select
           items={STATUS_OPTIONS}
           value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v as ProgramStatus | 'all')}
+          onValueChange={(v) => {
+            setStatusFilter(v as ProgramStatus | 'all')
+            setPageIndex(0) // Reset to first page on filter change
+          }}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Estado" />
@@ -122,7 +156,10 @@ export function ProgramsListView() {
           <Checkbox
             id="show-templates"
             checked={showTemplates}
-            onCheckedChange={(checked) => setShowTemplates(checked === true)}
+            onCheckedChange={(checked) => {
+              setShowTemplates(checked === true)
+              setPageIndex(0) // Reset to first page on filter change
+            }}
           />
           <FieldLabel htmlFor="show-templates" className="font-normal text-sm">
             Solo plantillas
@@ -130,31 +167,21 @@ export function ProgramsListView() {
         </Field>
       </div>
 
-      {/* Programs Grid */}
-      {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={`skeleton-${i}`} className="h-[160px] rounded-xl" />
-          ))}
-        </div>
-      ) : programs.length === 0 ? (
-        <EmptyState
-          hasFilters={!!search || statusFilter !== 'all' || showTemplates}
-          onCreateProgram={handleCreateProgram}
-        />
+      {/* Programs Table */}
+      {showEmptyState ? (
+        <EmptyState hasFilters={hasFilters} onCreateProgram={handleCreateProgram} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {programs.map((program) => (
-            <ProgramCard
-              key={program.id}
-              program={program}
-              athleteName={program.athleteId ? athleteMap.get(program.athleteId) : undefined}
-              onEdit={handleEditProgram}
-              onDuplicate={handleDuplicateProgram}
-              onArchive={handleArchiveProgram}
-            />
-          ))}
-        </div>
+        <ProgramsTable
+          data={programsWithNames}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          isLoading={isLoading}
+          onEdit={handleEditProgram}
+          onDuplicate={handleDuplicateProgram}
+          onArchive={handleArchiveProgram}
+        />
       )}
     </div>
   )
