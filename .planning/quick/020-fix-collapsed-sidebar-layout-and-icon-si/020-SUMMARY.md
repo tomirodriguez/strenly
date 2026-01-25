@@ -3,7 +3,7 @@
 ## Fix Collapsed Sidebar Layout and Icon Sizes
 
 **Date:** 2026-01-25
-**Commits:** 3d64977, 19312d4
+**Commits:** 3d64977, 19312d4, 6ca9317
 
 ### Problem
 
@@ -27,6 +27,11 @@ The sidebar had visual issues when collapsed:
 - Footer: Added `group-data-[collapsible=icon]:p-2` to reduce padding
 - Footer: Added collapse-aware classes to user chip container
 - Footer: Hidden user info div and MoreVerticalIcon when collapsed
+
+**Task 3: Hide menu item text (commit 6ca9317)**
+- Added `[&>span]:group-data-[collapsible=icon]:hidden` to sidebarMenuButtonVariants
+- This explicitly hides all span children (text labels) when sidebar is collapsed
+- Menu items now show only centered icons
 
 ### Files Changed
 
