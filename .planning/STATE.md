@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
-Plan: 12/13 - Gap closure plans in progress
-Status: Executing gap closure plans from UAT v2
-Last activity: 2026-01-25 - Completed 03.1-12-PLAN.md (athlete selector accessibility)
+Phase: 3.1 of 5 (Custom Program Grid - Gap Closure COMPLETE)
+Plan: 13/13 - All gap closure plans complete
+Status: Phase 3.1 fully complete including gap closure
+Last activity: 2026-01-25 - Completed 03.1-13-PLAN.md (superset grouping fix)
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3 backend complete
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE (including gap closure), Phase 3 backend complete
 
-**Note:** Phase 3.1 core complete. Gap closure plans 12-13 address UAT v2 issues.
+**Note:** Phase 3.1 gap closure plans 12-13 complete. Superset grouping now works correctly.
 
 ## Performance Metrics
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 11/11 | ~49 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-09 (1 min), 03.1-10 (4 min), 03.1-11 (6 min), 03.1-12 (2 min)
-- Trend: Gap closure plans executing quickly
+- Last 5 plans: 03.1-10 (4 min), 03.1-11 (6 min), 03.1-12 (2 min), 03.1-13 (8 min)
+- Trend: Gap closure plans complete
 
 *Updated after each plan completion*
 
@@ -137,6 +137,8 @@ Recent decisions affecting current work:
 - **Ref-based last edited cell tracking** - Store last edited cell in ref for focus restoration without triggering re-renders
 - **Single click selects, double-click edits** - Excel convention: onClick triggers selection, onDoubleClick triggers edit mode
 - **Navigation keys bubble from cells to grid** - Cells only handle edit triggers (Enter, F2, printable chars); arrow/tab bubble to grid
+- **Dynamic supersetOrder from physical position** - Calculate display order (A1, A2) from row position rather than stored values to avoid stale numbers after reordering
+- **Row repositioning on superset join** - When adding to an existing superset, physically move the row adjacent to other group members
 
 ### Pending Todos
 
@@ -238,6 +240,7 @@ None.
 | 03.1-10 | Dynamic Superset Groups | Complete |
 | 03.1-11 | Keyboard Navigation & Edit Mode Fix | Complete |
 | 03.1-12 | Athlete Selector Accessibility | Complete |
+| 03.1-13 | Superset Grouping Fix | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -260,7 +263,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-12-PLAN.md
+Stopped at: Completed 03.1-13-PLAN.md
 Resume file: None
 
-**Next:** Plan 03.1-13 (superset functionality fix), then Phase 3 remaining plans.
+**Next:** UAT verification of superset functionality, then Phase 3 remaining plans (03-16 Navigation/UAT).
