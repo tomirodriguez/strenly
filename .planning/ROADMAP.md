@@ -13,7 +13,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 1: Foundation & Multi-Tenancy** - Auth, organization isolation, subscription structure (backend)
 - [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations (backend)
 - [x] **Phase 2.5: Coach Web Foundation** - Auth UI, athlete management UI, exercise browser (frontend catch-up)
-- [ ] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
+- [x] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
 - [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
@@ -106,10 +106,10 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 02.6-01-PLAN.md - Design tokens + CSS variables (Wave 1)
-- [ ] 02.6-02-PLAN.md - Layout components: sidebar, header, app-shell (Wave 1)
-- [ ] 02.6-03-PLAN.md - UI components: button, card, input, badge, dialog styling (Wave 2)
-- [ ] 02.6-04-PLAN.md - Design system documentation + visual verification (Wave 2)
+- [x] 02.6-01-PLAN.md - Design tokens + CSS variables (Wave 1)
+- [x] 02.6-02-PLAN.md - Layout components: sidebar, header, app-shell (Wave 1)
+- [x] 02.6-03-PLAN.md - Sidebar active nav styling (Wave 2)
+- [x] 02.6-04-PLAN.md - Design system documentation + visual verification (Wave 2)
 
 ### Phase 3: Program Builder
 **Goal**: Coaches can create and edit training programs with Excel-like speed using keyboard navigation and inline editing
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 | 1. Foundation & Multi-Tenancy (backend) | 7/7 | Complete | 2026-01-24 |
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
-| 2.6. Design System & Visual Refresh (frontend) | 0/4 | Not started | - |
+| 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 0/16 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
