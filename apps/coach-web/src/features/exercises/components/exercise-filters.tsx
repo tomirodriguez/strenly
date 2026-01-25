@@ -1,4 +1,5 @@
 import type { MovementPattern, MuscleGroup } from '@strenly/contracts/exercises/muscle-group'
+import { useMemo } from 'react'
 import { useMuscleGroups } from '../hooks/queries/use-muscle-groups'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -9,7 +10,15 @@ type ExerciseFiltersProps = {
   onMovementPatternChange: (value: MovementPattern | undefined) => void
 }
 
-const MOVEMENT_PATTERNS: MovementPattern[] = ['push', 'pull', 'squat', 'hinge', 'carry', 'core']
+const MOVEMENT_PATTERN_OPTIONS = [
+  { value: 'all', label: 'Todos los patrones' },
+  { value: 'push', label: 'Push' },
+  { value: 'pull', label: 'Pull' },
+  { value: 'squat', label: 'Squat' },
+  { value: 'hinge', label: 'Hinge' },
+  { value: 'carry', label: 'Carry' },
+  { value: 'core', label: 'Core' },
+]
 
 /**
  * Filter dropdowns for muscle group and movement pattern
@@ -21,6 +30,14 @@ export function ExerciseFilters({
   onMovementPatternChange,
 }: ExerciseFiltersProps) {
   const { data: muscleGroups, isLoading } = useMuscleGroups()
+
+  const muscleGroupItems = useMemo(
+    () => [
+      { value: 'all', label: 'Todos los musculos' },
+      ...(muscleGroups?.map((mg) => ({ value: mg.name, label: mg.displayName })) ?? []),
+    ],
+    [muscleGroups],
+  )
 
   const handleMuscleGroupChange = (value: string | null) => {
     if (value === 'all') {
@@ -40,29 +57,36 @@ export function ExerciseFilters({
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={muscleGroup ?? 'all'} onValueChange={handleMuscleGroupChange} disabled={isLoading}>
+      <Select
+        items={muscleGroupItems}
+        value={muscleGroup ?? 'all'}
+        onValueChange={handleMuscleGroupChange}
+        disabled={isLoading}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Grupo muscular" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos los musculos</SelectItem>
-          {muscleGroups?.map((mg) => (
-            <SelectItem key={mg.name} value={mg.name}>
-              {mg.displayName}
+          {muscleGroupItems.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Select value={movementPattern ?? 'all'} onValueChange={handleMovementPatternChange}>
+      <Select
+        items={MOVEMENT_PATTERN_OPTIONS}
+        value={movementPattern ?? 'all'}
+        onValueChange={handleMovementPatternChange}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Patron de movimiento" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos los patrones</SelectItem>
-          {MOVEMENT_PATTERNS.map((pattern) => (
-            <SelectItem key={pattern} value={pattern}>
-              {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
+          {MOVEMENT_PATTERN_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
             </SelectItem>
           ))}
         </SelectContent>

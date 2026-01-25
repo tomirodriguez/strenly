@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const
+const PAGE_SIZE_ITEMS = PAGE_SIZE_OPTIONS.map((size) => ({
+  value: size.toString(),
+  label: size.toString(),
+}))
 
 export function DataTablePagination() {
   const { table, totalCount, pageIndex, pageSize, onPageChange } = useDataTableContext()
@@ -111,14 +115,14 @@ export function DataTablePagination() {
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-sm">Elementos por pagina</span>
-          <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+          <Select items={PAGE_SIZE_ITEMS} value={pageSize.toString()} onValueChange={handlePageSizeChange}>
             <SelectTrigger className="w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {PAGE_SIZE_OPTIONS.map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
+              {PAGE_SIZE_ITEMS.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
                 </SelectItem>
               ))}
             </SelectContent>

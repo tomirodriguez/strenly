@@ -6,6 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
+const GENDER_OPTIONS = [
+  { value: 'male', label: 'Masculino' },
+  { value: 'female', label: 'Femenino' },
+  { value: 'other', label: 'Otro' },
+]
+
 type AthleteFormProps = {
   id?: string
   onSubmit: (data: CreateAthleteInput) => void
@@ -72,14 +78,16 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
             control={control}
             name="gender"
             render={({ field }) => (
-              <Select value={field.value ?? ''} onValueChange={field.onChange}>
+              <Select items={GENDER_OPTIONS} value={field.value ?? ''} onValueChange={field.onChange}>
                 <SelectTrigger id="gender">
                   <SelectValue placeholder="Seleccionar genero" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Masculino</SelectItem>
-                  <SelectItem value="female">Femenino</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
+                  {GENDER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             )}
