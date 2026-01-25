@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 2.6 of 5 (Design System & Visual Refresh)
-Plan: 1/4
+Plan: 2/4
 Status: In progress
-Last activity: 2026-01-25 - Completed 02.6-01-PLAN.md (Design Tokens)
+Last activity: 2026-01-25 - Completed 02.6-02-PLAN.md (Layout Components)
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5 complete, 2.6 in progress
 
@@ -21,7 +21,7 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 31
 - Average duration: 4 min
 - Total execution time: 116 min
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.5-09 (3 min), 02.5-10 (4 min), 02.5-11 (6 min), 02.6-01 (4 min)
-- Trend: Phase 2.6 started, design tokens updated
+- Last 5 plans: 02.5-10 (4 min), 02.5-11 (6 min), 02.6-01 (4 min), 02.6-02 (5 min)
+- Trend: Phase 2.6 layout components updated
 
 *Updated after each plan completion*
 
@@ -96,6 +96,9 @@ Recent decisions affecting current work:
 - **OKLCH color space for CSS variables** - Use OKLCH for perceptual uniformity in color tokens
 - **Dark mode via .dark class** - Use classList.toggle('dark') on document.documentElement (shadcn/ui standard)
 - **Slate palette for dark theme** - slate-950 background, slate-900 cards, slate-800 borders, blue-600 primary
+- **User menu in sidebar footer** - User profile dropdown moved from header to sidebar footer
+- **Sidebar three-section layout** - Header (logo), content (nav groups), footer (user profile)
+- **AppHeader with primaryAction slot** - Optional CTA button passed through AppShell
 
 ### Pending Todos
 
@@ -195,7 +198,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 02.6-01-PLAN.md (Design Tokens Update)
+Stopped at: Completed 02.6-02-PLAN.md (Layout Components Update)
 Resume file: None
 
-**Next:** Execute 02.6-02-PLAN.md (Component Library)
+**Next:** Execute 02.6-03-PLAN.md (Header/Sidebar Polish)
