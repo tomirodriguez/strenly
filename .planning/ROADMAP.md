@@ -14,7 +14,8 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 2: Exercise Library & Athlete Management** - Exercise database, athlete profiles, invitations (backend)
 - [x] **Phase 2.5: Coach Web Foundation** - Auth UI, athlete management UI, exercise browser (frontend catch-up)
 - [x] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
-- [ ] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
+- [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
+- [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -176,8 +177,8 @@ Plans:
 - [x] 03.1-09-PLAN.md - [GAP CLOSURE] Fix week ordering on rename (Wave 6)
 - [x] 03.1-10-PLAN.md - [GAP CLOSURE] Fix superset groups dynamic + order (Wave 6)
 - [x] 03.1-11-PLAN.md - [GAP CLOSURE] Fix keyboard navigation + edit mode (Wave 6)
-- [ ] 03.1-12-PLAN.md - [GAP CLOSURE] Fix athlete selector keyboard accessibility (Wave 7)
-- [ ] 03.1-13-PLAN.md - [GAP CLOSURE] Fix superset row repositioning (Wave 7)
+- [x] 03.1-12-PLAN.md - [GAP CLOSURE] Fix athlete selector keyboard accessibility (Wave 7)
+- [x] 03.1-13-PLAN.md - [GAP CLOSURE] Fix superset row repositioning (Wave 7)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -224,10 +225,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 11/13 | In progress | - |
+| 3.1. Custom Program Grid (frontend) | 13/13 | Complete | 2026-01-25 |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.1 gap closure plans 12-13 added)*
+*Last updated: 2026-01-25 (Phase 3.1 complete - all 13 plans executed, 9/9 must-haves verified)*
