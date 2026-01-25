@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { parsedPrescriptionSchema } from './prescription'
 
 /**
  * Program status schema
