@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 3 of 5 (Program Builder)
 Plan: 7/N (wave 1: 03-01, 03-02, 03-03 complete; wave 2: 03-04 complete; wave 3: 03-05, 03-06, 03-07 complete)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-07-PLAN.md (Exercise Row & Prescription Use Cases)
+Last activity: 2026-01-25 - Completed quick task 020: Fix collapsed sidebar layout and icon sizes
 
 Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
 
@@ -152,6 +152,7 @@ None.
 | 017 | Add dev latency middleware (random 200-500ms) | 2026-01-25 | 78c3c21 | [017-add-dev-latency-middleware](./quick/017-add-dev-latency-middleware/) |
 | 018 | Redirect, breadcrumbs, sidebar collapse | 2026-01-25 | 89a1b77 | [018-redirect-slug-dashboard-breadcrumb-sidebar](./quick/018-redirect-slug-dashboard-breadcrumb-sidebar/) |
 | 019 | Remove hover on active sidebar items | 2026-01-25 | 2cfb380 | [019-remove-the-hover-on-active-items-in-the-](./quick/019-remove-the-hover-on-active-items-in-the-/) |
+| 020 | Fix collapsed sidebar layout and icon sizes | 2026-01-25 | 3d64977 | [020-fix-collapsed-sidebar-layout-and-icon-si](./quick/020-fix-collapsed-sidebar-layout-and-icon-si/) |
 
 ## Phase 2 Progress
 
