@@ -1,4 +1,4 @@
-import { athleteSchema, createAthleteInputSchema, genderSchema } from '@strenly/contracts/athletes/athlete'
+import { athleteSchema, createAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateAthlete } from '../../use-cases/athletes/create-athlete'
@@ -20,9 +20,6 @@ export const createAthlete = authProcedure
       generateId: () => crypto.randomUUID(),
     })
 
-    // Parse gender from optional string to enum
-    const gender = input.gender ? genderSchema.parse(input.gender) : null
-
     const result = await useCase({
       organizationId: context.organization.id,
       userId: context.user.id,
@@ -31,7 +28,7 @@ export const createAthlete = authProcedure
       email: input.email ?? null,
       phone: input.phone ?? null,
       birthdate: input.birthdate ? new Date(input.birthdate) : null,
-      gender,
+      gender: input.gender ?? null,
       notes: input.notes ?? null,
     })
 

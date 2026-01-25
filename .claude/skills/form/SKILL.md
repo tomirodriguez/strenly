@@ -5,28 +5,32 @@ description: |
   Use this skill when creating forms with validation, refactoring existing forms to use the Field pattern,
   or working with controlled components (Select, Checkbox) and field arrays.
   Do NOT load for general React questions, state management, or non-form UI components.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <objective>
-Creates forms using React Hook Form + shadcn/ui Field component following best practices. Forms are pure UI components that receive callbacks from parents - they never contain mutations.
+Creates forms using React Hook Form + shadcn/ui Field components following the official shadcn/ui documentation. Forms are pure UI components that receive callbacks from parents - they never contain mutations.
 </objective>
 
 <quick_start>
 ```tsx
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 const { register, handleSubmit, formState: { errors } } = useForm({
-  resolver: standardSchemaResolver(schema),
+  resolver: zodResolver(schema),
   defaultValues: { name: '', email: '' },
 })
 
 <form onSubmit={handleSubmit(onSubmit)}>
-  <Field errors={errors.name?.message ? [errors.name.message] : []}>
-    <FieldLabel>Nombre</FieldLabel>
-    <Input {...register('name')} />
+  <Field>
+    <FieldLabel htmlFor="name">Nombre</FieldLabel>
+    <FieldContent>
+      <Input id="name" {...register('name')} />
+      <FieldError errors={[errors.name]} />
+    </FieldContent>
   </Field>
 </form>
 ```
@@ -56,38 +60,43 @@ function BadForm() {
 }
 ```
 
-**2. Use standardSchemaResolver (Zod 4)**
+**2. Use zodResolver (Zod 4 compatible)**
 
 ```tsx
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const { register, handleSubmit, formState: { errors } } = useForm({
-  resolver: standardSchemaResolver(schema),
+  resolver: zodResolver(schema),
   defaultValues: { ... },
 })
 ```
 
-**3. Use Field Component (NOT Form wrapper)**
+> **Fallback**: If you encounter edge cases where `zodResolver` doesn't work with Zod 4, use `standardSchemaResolver` from `@hookform/resolvers/standard-schema` as a fallback.
 
-shadcn/ui deprecated the old `Form` wrapper. Use `Field` component:
+**3. Use Field Component Structure**
+
+shadcn/ui uses a compound component pattern with `Field`, `FieldLabel`, `FieldContent`, and `FieldError`:
 
 ```tsx
-import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Field, FieldContent, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field'
 
-<Field errors={errors.fieldName?.message ? [errors.fieldName.message] : []}>
-  <FieldLabel>Label</FieldLabel>
-  <Input {...register('fieldName')} />
-  <FieldDescription>Optional help text</FieldDescription>
+<Field>
+  <FieldLabel htmlFor="fieldName">Label</FieldLabel>
+  <FieldContent>
+    <Input id="fieldName" {...register('fieldName')} />
+    <FieldDescription>Optional help text</FieldDescription>
+    <FieldError errors={[errors.fieldName]} />
+  </FieldContent>
 </Field>
 ```
 </core_rules>
 
 <template>
 ```tsx
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import type { z } from 'zod'
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -99,6 +108,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 type Props = {
+  id?: string
   onSubmit: (data: FormData) => void
   onCancel?: () => void
   isSubmitting?: boolean
@@ -106,6 +116,7 @@ type Props = {
 }
 
 export function MyForm({
+  id,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -116,24 +127,29 @@ export function MyForm({
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: standardSchemaResolver(schema),
-    defaultValues: {
-      name: '',
-      email: '',
-      ...defaultValues,
-    },
+    resolver: zodResolver(schema),
+    defaultValues,
   })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Field errors={errors.name?.message ? [errors.name.message] : []}>
-        <FieldLabel>Nombre</FieldLabel>
-        <Input {...register('name')} />
+    <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <Field>
+        <FieldLabel htmlFor="name">
+          Nombre <span className="text-destructive">*</span>
+        </FieldLabel>
+        <FieldContent>
+          <Input id="name" {...register('name')} placeholder="Ingresa el nombre" />
+          <FieldError errors={[errors.name]} />
+        </FieldContent>
       </Field>
 
-      <Field errors={errors.email?.message ? [errors.email.message] : []}>
-        <FieldLabel>Email</FieldLabel>
-        <Input type="email" {...register('email')} />
+      <Field>
+        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <FieldContent>
+          <Input id="email" type="email" {...register('email')} placeholder="ejemplo@correo.com" />
+          <FieldDescription>Usaremos este email para notificaciones</FieldDescription>
+          <FieldError errors={[errors.email]} />
+        </FieldContent>
       </Field>
 
       <div className="flex gap-2 justify-end">
@@ -215,47 +231,66 @@ Forms receive `onSubmit` and `isSubmitting` from parent.
 ```tsx
 import { Controller } from 'react-hook-form'
 
-<Field errors={errors.role?.message ? [errors.role.message] : []}>
-  <FieldLabel>Rol</FieldLabel>
-  <Controller
-    control={control}
-    name="role"
-    render={({ field }) => (
-      <Select onValueChange={field.onChange} defaultValue={field.value}>
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar rol" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="user">Usuario</SelectItem>
-        </SelectContent>
-      </Select>
-    )}
-  />
+const OPTIONS = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'user', label: 'Usuario' },
+]
+
+<Field>
+  <FieldLabel htmlFor="role">Rol</FieldLabel>
+  <FieldContent>
+    <Controller
+      control={control}
+      name="role"
+      render={({ field }) => (
+        <Select items={OPTIONS} value={field.value ?? ''} onValueChange={field.onChange}>
+          <SelectTrigger id="role">
+            <SelectValue placeholder="Seleccionar rol" />
+          </SelectTrigger>
+          <SelectContent>
+            {OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    />
+    <FieldError errors={[errors.role]} />
+  </FieldContent>
 </Field>
 ```
 
 **Checkbox (with Controller)**
 ```tsx
-<Field errors={errors.terms?.message ? [errors.terms.message] : []}>
+<Field>
   <div className="flex items-center gap-2">
     <Controller
       control={control}
       name="terms"
       render={({ field }) => (
-        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+        <Checkbox
+          id="terms"
+          checked={field.value}
+          onCheckedChange={field.onChange}
+        />
       )}
     />
-    <FieldLabel className="!mt-0">Acepto los términos</FieldLabel>
+    <FieldLabel htmlFor="terms" className="!mt-0">Acepto los términos</FieldLabel>
   </div>
+  <FieldError errors={[errors.terms]} />
 </Field>
 ```
 
 **Textarea**
 ```tsx
-<Field errors={errors.description?.message ? [errors.description.message] : []}>
-  <FieldLabel>Descripción</FieldLabel>
-  <Textarea rows={4} {...register('description')} />
+<Field>
+  <FieldLabel htmlFor="description">Descripción</FieldLabel>
+  <FieldContent>
+    <Textarea id="description" rows={4} {...register('description')} />
+    <FieldError errors={[errors.description]} />
+  </FieldContent>
 </Field>
 ```
 </controlled_components>
@@ -265,9 +300,12 @@ import { Controller } from 'react-hook-form'
 const type = watch('type')
 
 {type === 'advanced' && (
-  <Field errors={errors.advancedOption?.message ? [errors.advancedOption.message] : []}>
-    <FieldLabel>Opción avanzada</FieldLabel>
-    <Input {...register('advancedOption')} />
+  <Field>
+    <FieldLabel htmlFor="advancedOption">Opción avanzada</FieldLabel>
+    <FieldContent>
+      <Input id="advancedOption" {...register('advancedOption')} />
+      <FieldError errors={[errors.advancedOption]} />
+    </FieldContent>
   </Field>
 )}
 ```
@@ -283,14 +321,11 @@ const { fields, append, remove } = useFieldArray({
 })
 
 {fields.map((field, index) => (
-  <Field
-    key={field.id}
-    errors={errors.items?.[index]?.value?.message
-      ? [errors.items[index].value.message]
-      : []
-    }
-  >
-    <Input {...register(`items.${index}.value`)} />
+  <Field key={field.id}>
+    <FieldContent>
+      <Input {...register(`items.${index}.value`)} />
+      <FieldError errors={[errors.items?.[index]?.value]} />
+    </FieldContent>
   </Field>
 ))}
 
@@ -307,28 +342,55 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 <FieldSet>
   <FieldLegend>Información Personal</FieldLegend>
   <FieldGroup>
-    <Field errors={...}>
-      <FieldLabel>Nombre</FieldLabel>
-      <Input {...register('name')} />
+    <Field>
+      <FieldLabel htmlFor="name">Nombre</FieldLabel>
+      <FieldContent>
+        <Input id="name" {...register('name')} />
+        <FieldError errors={[errors.name]} />
+      </FieldContent>
     </Field>
-    <Field errors={...}>
-      <FieldLabel>Email</FieldLabel>
-      <Input {...register('email')} />
+    <Field>
+      <FieldLabel htmlFor="email">Email</FieldLabel>
+      <FieldContent>
+        <Input id="email" {...register('email')} />
+        <FieldError errors={[errors.email]} />
+      </FieldContent>
     </Field>
   </FieldGroup>
 </FieldSet>
 ```
 </fieldset_grouping>
 
+<field_component_api>
+**Available Components:**
+
+| Component | Purpose |
+|-----------|---------|
+| `Field` | Container for a form field group |
+| `FieldLabel` | Label with `htmlFor` attribute |
+| `FieldContent` | Wrapper for input + description + error |
+| `FieldDescription` | Help text below input |
+| `FieldError` | Displays validation errors |
+| `FieldSet` | Groups related fields semantically |
+| `FieldLegend` | Title for a FieldSet |
+| `FieldGroup` | Container for multiple fields |
+
+**FieldError accepts array of error objects:**
+```tsx
+<FieldError errors={[errors.fieldName]} />
+```
+</field_component_api>
+
 <success_criteria>
 When creating a form:
 
 - [ ] Form receives `onSubmit`, `onCancel`, `isSubmitting`, `defaultValues` as props
-- [ ] Uses `standardSchemaResolver` with Zod schema
-- [ ] Uses `Field` component (not deprecated Form wrapper)
+- [ ] Uses `zodResolver` with Zod schema (fallback to `standardSchemaResolver` if needed)
+- [ ] Uses `Field` > `FieldLabel` + `FieldContent` > `Input` + `FieldError` structure
+- [ ] All inputs have matching `id` and `htmlFor` attributes
 - [ ] No mutations inside the form component
 - [ ] Controlled components use `Controller` from react-hook-form
-- [ ] Error messages display correctly for each field
+- [ ] Error messages display correctly with `<FieldError errors={[errors.fieldName]} />`
 </success_criteria>
 
 <resources>
