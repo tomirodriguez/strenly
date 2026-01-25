@@ -1,0 +1,229 @@
+import type { ResultAsync } from 'neverthrow'
+import type { Prescription } from '../domain/entities/prescription'
+import type { Program, ProgramStatus } from '../domain/entities/program'
+import type { OrganizationContext } from '../types/organization-context'
+
+// ============================================================================
+// Error Types
+// ============================================================================
+
+export type ProgramRepositoryError =
+  | { type: 'NOT_FOUND'; entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription'; id: string }
+  | { type: 'DATABASE_ERROR'; message: string }
+
+// ============================================================================
+// Filter Types
+// ============================================================================
+
+export type ProgramFilters = {
+  status?: ProgramStatus
+  athleteId?: string | null // null = templates only, string = athlete programs, undefined = all
+  isTemplate?: boolean
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+// ============================================================================
+// Nested Entity Types (for grid operations)
+// ============================================================================
+
+export type ProgramWeek = {
+  readonly id: string
+  readonly programId: string
+  readonly name: string
+  readonly orderIndex: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+export type ProgramSession = {
+  readonly id: string
+  readonly programId: string
+  readonly name: string
+  readonly orderIndex: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+export type ProgramExerciseRow = {
+  readonly id: string
+  readonly sessionId: string
+  readonly exerciseId: string
+  readonly orderIndex: number
+  readonly supersetGroup: string | null
+  readonly supersetOrder: number | null
+  readonly setTypeLabel: string | null
+  readonly isSubRow: boolean
+  readonly parentRowId: string | null
+  readonly notes: string | null
+  readonly restSeconds: number | null
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+export type PrescriptionCell = {
+  readonly id: string
+  readonly programExerciseId: string
+  readonly weekId: string
+  readonly prescription: Prescription
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+// ============================================================================
+// Composite Types (for full grid view)
+// ============================================================================
+
+/**
+ * Exercise row with prescriptions keyed by week ID
+ */
+export type ExerciseRowWithPrescriptions = ProgramExerciseRow & {
+  readonly exerciseName: string // Joined from exercises table
+  readonly prescriptionsByWeekId: Record<string, Prescription>
+  readonly subRows: ExerciseRowWithPrescriptions[]
+}
+
+/**
+ * Session with exercise rows
+ */
+export type SessionWithRows = ProgramSession & {
+  readonly rows: ExerciseRowWithPrescriptions[]
+}
+
+/**
+ * Full program with all nested data for grid view
+ */
+export type ProgramWithDetails = Program & {
+  readonly weeks: ProgramWeek[]
+  readonly sessions: SessionWithRows[]
+}
+
+// ============================================================================
+// Repository Port
+// ============================================================================
+
+export type ProgramRepositoryPort = {
+  // ---------------------------------------------------------------------------
+  // Program CRUD
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create a new program
+   */
+  create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
+
+  /**
+   * Find a program by ID
+   */
+  findById(ctx: OrganizationContext, id: string): ResultAsync<Program, ProgramRepositoryError>
+
+  /**
+   * Update a program
+   */
+  update(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
+
+  /**
+   * List programs with optional filters
+   */
+  list(
+    ctx: OrganizationContext,
+    filters?: ProgramFilters,
+  ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
+
+  /**
+   * Get full program with nested data for grid view
+   */
+  findWithDetails(ctx: OrganizationContext, id: string): ResultAsync<ProgramWithDetails, ProgramRepositoryError>
+
+  /**
+   * List template programs
+   */
+  listTemplates(ctx: OrganizationContext): ResultAsync<Program[], ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Week Operations
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create a week (column) for a program
+   */
+  createWeek(ctx: OrganizationContext, programId: string, week: Omit<ProgramWeek, 'programId'>): ResultAsync<ProgramWeek, ProgramRepositoryError>
+
+  /**
+   * Update a week
+   */
+  updateWeek(ctx: OrganizationContext, week: ProgramWeek): ResultAsync<ProgramWeek, ProgramRepositoryError>
+
+  /**
+   * Delete a week (cascades to prescriptions)
+   */
+  deleteWeek(ctx: OrganizationContext, weekId: string): ResultAsync<void, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Session Operations
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create a session (training day) for a program
+   */
+  createSession(ctx: OrganizationContext, programId: string, session: Omit<ProgramSession, 'programId'>): ResultAsync<ProgramSession, ProgramRepositoryError>
+
+  /**
+   * Update a session
+   */
+  updateSession(ctx: OrganizationContext, session: ProgramSession): ResultAsync<ProgramSession, ProgramRepositoryError>
+
+  /**
+   * Delete a session (cascades to exercise rows and prescriptions)
+   */
+  deleteSession(ctx: OrganizationContext, sessionId: string): ResultAsync<void, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Exercise Row Operations
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create an exercise row for a session
+   */
+  createExerciseRow(ctx: OrganizationContext, sessionId: string, row: Omit<ProgramExerciseRow, 'sessionId'>): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+
+  /**
+   * Update an exercise row
+   */
+  updateExerciseRow(ctx: OrganizationContext, row: ProgramExerciseRow): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+
+  /**
+   * Delete an exercise row (cascades to prescriptions)
+   */
+  deleteExerciseRow(ctx: OrganizationContext, rowId: string): ResultAsync<void, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Prescription Operations (Cell Values)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create or update a prescription for a specific cell (exercise row + week)
+   * Pass null prescription to delete the cell value
+   */
+  upsertPrescription(
+    ctx: OrganizationContext,
+    exerciseRowId: string,
+    weekId: string,
+    prescription: Prescription | null,
+  ): ResultAsync<void, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Bulk Operations
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Reorder exercise rows within a session
+   */
+  reorderExerciseRows(ctx: OrganizationContext, sessionId: string, rowIds: string[]): ResultAsync<void, ProgramRepositoryError>
+
+  /**
+   * Duplicate a week with all prescriptions
+   */
+  duplicateWeek(ctx: OrganizationContext, weekId: string, newName: string): ResultAsync<ProgramWeek, ProgramRepositoryError>
+}
