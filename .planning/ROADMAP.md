@@ -155,7 +155,7 @@ Plans:
   7. All existing mutation hooks (use-grid-mutations.ts) work with new grid
   8. Programs list uses DataTable instead of cards
   9. Create program form has weeks selector (default 4) and improved athlete combobox
-**Plans**: 11 plans in 6 waves
+**Plans**: 13 plans in 7 waves
 
 **Context:**
 - Backend API (procedures, use cases, contracts) is complete and unchanged
@@ -176,6 +176,8 @@ Plans:
 - [x] 03.1-09-PLAN.md - [GAP CLOSURE] Fix week ordering on rename (Wave 6)
 - [x] 03.1-10-PLAN.md - [GAP CLOSURE] Fix superset groups dynamic + order (Wave 6)
 - [x] 03.1-11-PLAN.md - [GAP CLOSURE] Fix keyboard navigation + edit mode (Wave 6)
+- [ ] 03.1-12-PLAN.md - [GAP CLOSURE] Fix athlete selector keyboard accessibility (Wave 7)
+- [ ] 03.1-13-PLAN.md - [GAP CLOSURE] Fix superset row repositioning (Wave 7)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -200,8 +202,8 @@ Plans:
 **Requirements**: DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, EXP-01, EXP-02, ADM-01, ADM-02, ADM-03
 **Success Criteria** (what must be TRUE):
   1. Coach can view dashboard showing athletes needing updated programs, recent activity, and pending items
-  2. Coach can view Plan vs Log comparison showing what was prescribed vs what athlete actually did
-  3. Coach can navigate from dashboard directly to athlete profiles and programs
+  2. Coach can navigate from dashboard directly to athlete profiles and programs
+  3. Coach can view Plan vs Log comparison showing what was prescribed vs what athlete actually did
   4. Coach can export program data as CSV or JSON
   5. Platform admin can view platform-wide metrics and manage subscription plans
 **Plans**: TBD
@@ -222,10 +224,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 4 -> 5
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
-| 3.1. Custom Program Grid (frontend) | 11/11 | Complete | 2026-01-25 |
+| 3.1. Custom Program Grid (frontend) | 11/13 | In progress | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.1 complete)*
+*Last updated: 2026-01-25 (Phase 3.1 gap closure plans 12-13 added)*
