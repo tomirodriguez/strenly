@@ -225,7 +225,9 @@ None.
 | 03-02 | Prescription Notation Parser | Complete |
 | 03-03 | Domain Entities | Complete |
 | 03-04 | Program Repository | Complete |
+| 03-05 | Program CRUD + Duplicate Use Cases | Complete |
 | 03-06 | Week and Session Use Cases | Complete |
+| 03-07 | Exercise Row & Prescription Use Cases | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -245,11 +247,17 @@ None.
 - `packages/backend/src/use-cases/programs/add-session.ts` - Add session (training day)
 - `packages/backend/src/use-cases/programs/update-session.ts` - Update session name
 - `packages/backend/src/use-cases/programs/delete-session.ts` - Delete session with protection
+- `packages/backend/src/use-cases/programs/create-program.ts` - Create with default week/session
+- `packages/backend/src/use-cases/programs/get-program.ts` - Get with full details
+- `packages/backend/src/use-cases/programs/list-programs.ts` - List with filtering
+- `packages/backend/src/use-cases/programs/update-program.ts` - Update with merge
+- `packages/backend/src/use-cases/programs/archive-program.ts` - Archive with status transition
+- `packages/backend/src/use-cases/programs/duplicate-program.ts` - Deep copy with new IDs
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-06-PLAN.md (Week and Session Use Cases)
+Stopped at: Completed 03-05-PLAN.md (Program CRUD + Duplicate Use Cases)
 Resume file: None
 
-**Next:** Execute 03-07-PLAN.md (Contracts and Procedures) or 03-05-PLAN.md (remaining use cases)
+**Next:** Continue with contracts and procedures or frontend components
