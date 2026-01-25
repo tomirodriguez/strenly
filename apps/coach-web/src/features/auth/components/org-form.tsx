@@ -1,4 +1,4 @@
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -21,7 +21,7 @@ type OrgFormData = z.infer<typeof orgFormSchema>
 
 interface OrgFormProps {
   onSubmit: (data: OrgFormData) => void | Promise<void>
-  isLoading?: boolean
+  isSubmitting?: boolean
 }
 
 function generateSlug(name: string): string {
@@ -31,7 +31,7 @@ function generateSlug(name: string): string {
     .replace(/^-|-$/g, '')
 }
 
-export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
+export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
   const userEditedSlug = useRef(false)
 
   const {
@@ -40,7 +40,7 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
     formState: { errors },
     setValue,
   } = useForm<OrgFormData>({
-    resolver: standardSchemaResolver(orgFormSchema),
+    resolver: zodResolver(orgFormSchema),
     defaultValues: {
       name: '',
       slug: '',
@@ -62,8 +62,8 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Field>
+        <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
         <FieldContent>
-          <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
           <Input
             id="name"
             type="text"
@@ -76,8 +76,8 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
       </Field>
 
       <Field>
+        <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
         <FieldContent>
-          <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
           <Input
             id="slug"
             type="text"
@@ -92,8 +92,8 @@ export function OrgForm({ onSubmit, isLoading }: OrgFormProps) {
         </FieldContent>
       </Field>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? (
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
           <span className="inline-flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             Creando organizacion...

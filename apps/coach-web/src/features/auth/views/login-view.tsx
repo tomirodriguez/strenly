@@ -59,7 +59,7 @@ export function LoginView() {
         </CardHeader>
         <CardContent className="space-y-6">
           <OAuthButtons />
-          <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+          <LoginForm onSubmit={handleLogin} isSubmitting={isLoading} />
           <div className="text-center text-muted-foreground text-sm">
             No tienes cuenta?{' '}
             <Link to="/signup" className="text-primary hover:underline">

@@ -1,4 +1,4 @@
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { type CreateAthleteInput, createAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
 import { Controller, useForm } from 'react-hook-form'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -15,6 +15,7 @@ const GENDER_OPTIONS = [
 type AthleteFormProps = {
   id?: string
   onSubmit: (data: CreateAthleteInput) => void
+  isSubmitting?: boolean
   defaultValues?: Partial<CreateAthleteInput>
 }
 
@@ -30,7 +31,7 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
     formState: { errors },
     control,
   } = useForm<CreateAthleteInput>({
-    resolver: standardSchemaResolver(createAthleteInputSchema),
+    resolver: zodResolver(createAthleteInputSchema),
     defaultValues,
   })
 

@@ -21,7 +21,7 @@ export function OrgFormStep({ onNext, onBack, isLoading }: OrgFormStepProps) {
       </div>
 
       <div className="rounded-xl border bg-background p-6">
-        <OrgForm onSubmit={onNext} isLoading={isLoading} />
+        <OrgForm onSubmit={onNext} isSubmitting={isLoading} />
       </div>
 
       <div className="text-center">

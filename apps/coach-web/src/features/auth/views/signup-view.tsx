@@ -49,7 +49,7 @@ export function SignupView() {
         </CardHeader>
         <CardContent className="space-y-6">
           <OAuthButtons />
-          <SignupForm onSubmit={handleSignup} isLoading={isLoading} />
+          <SignupForm onSubmit={handleSignup} isSubmitting={isLoading} />
           <div className="text-center text-muted-foreground text-sm">
             Ya tienes cuenta?{' '}
             <Link to="/login" className="text-primary hover:underline">

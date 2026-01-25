@@ -1,4 +1,4 @@
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { type SignupInput, signupInputSchema } from '@strenly/contracts'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -7,16 +7,16 @@ import { Input } from '@/components/ui/input'
 
 type SignupFormProps = {
   onSubmit: (data: SignupInput) => void | Promise<void>
-  isLoading?: boolean
+  isSubmitting?: boolean
 }
 
-export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
+export function SignupForm({ onSubmit, isSubmitting }: SignupFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<SignupInput>({
-    resolver: standardSchemaResolver(signupInputSchema),
+    resolver: zodResolver(signupInputSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -56,8 +56,8 @@ export function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
         </FieldContent>
       </Field>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? (
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
           <span className="inline-flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             Creando cuenta...

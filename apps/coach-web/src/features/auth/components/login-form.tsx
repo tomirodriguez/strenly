@@ -1,4 +1,4 @@
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInput, loginInputSchema } from '@strenly/contracts'
 import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -8,17 +8,17 @@ import { Input } from '@/components/ui/input'
 
 type LoginFormProps = {
   onSubmit: (data: LoginInput) => void | Promise<void>
-  isLoading?: boolean
+  isSubmitting?: boolean
 }
 
-export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
+export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm<LoginInput>({
-    resolver: standardSchemaResolver(loginInputSchema),
+    resolver: zodResolver(loginInputSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -61,8 +61,8 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
         </FieldLabel>
       </Field>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? (
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
           <span className="inline-flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             Iniciando sesion...
