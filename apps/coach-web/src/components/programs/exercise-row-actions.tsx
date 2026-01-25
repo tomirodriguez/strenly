@@ -4,10 +4,11 @@ import {
   Link2Icon,
   Link2OffIcon,
   MoreVerticalIcon,
+  PlusIcon,
   SplitIcon,
   Trash2Icon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,12 @@ import {
   useToggleSuperset,
 } from '@/features/programs/hooks/mutations/use-grid-mutations'
 
+/** Minimal row data needed for superset group calculations */
+export interface SessionRowData {
+  id: string
+  supersetGroup: string | null
+}
+
 interface ExerciseRowActionsProps {
   programId: string
   sessionId: string
@@ -41,11 +48,11 @@ interface ExerciseRowActionsProps {
   isSubRow?: boolean
   /** All row IDs in this session, in order */
   sessionRowIds: string[]
+  /** All rows in this session with superset data for dynamic group calculation */
+  sessionRows: SessionRowData[]
   onAddSplitRow?: () => void
   onClose?: () => void
 }
-
-const SUPERSET_GROUPS = ['A', 'B', 'C', 'D', 'E']
 
 /**
  * Context menu/dropdown for exercise row actions:
@@ -62,6 +69,7 @@ export function ExerciseRowActions({
   supersetGroup,
   isSubRow,
   sessionRowIds,
+  sessionRows,
   onAddSplitRow,
   onClose,
 }: ExerciseRowActionsProps) {
@@ -76,6 +84,26 @@ export function ExerciseRowActions({
   const currentIndex = sessionRowIds.indexOf(rowId)
   const canMoveUp = currentIndex > 0
   const canMoveDown = currentIndex < sessionRowIds.length - 1 && currentIndex >= 0
+
+  // Derive existing superset groups from session rows
+  const { existingGroups, nextAvailableLetter } = useMemo(() => {
+    const groups = new Set<string>()
+    for (const row of sessionRows) {
+      if (row.supersetGroup) {
+        groups.add(row.supersetGroup)
+      }
+    }
+    const sortedGroups = Array.from(groups).sort()
+
+    // Calculate next available letter (A, B, C, ...)
+    const usedLetters = new Set(sortedGroups)
+    let nextLetter = 'A'
+    while (usedLetters.has(nextLetter) && nextLetter <= 'Z') {
+      nextLetter = String.fromCharCode(nextLetter.charCodeAt(0) + 1)
+    }
+
+    return { existingGroups: sortedGroups, nextAvailableLetter: nextLetter }
+  }, [sessionRows])
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -159,22 +187,35 @@ export function ExerciseRowActions({
                   <Link2OffIcon className="size-4" />
                   Quitar de superserie
                 </DropdownMenuItem>
-                {/* Change superset group */}
-                {SUPERSET_GROUPS.filter((g) => g !== supersetGroup).map((group) => (
-                  <DropdownMenuItem key={group} onClick={() => handleSetSupersetGroup(group)}>
-                    <Link2Icon className="size-4" />
-                    Cambiar a grupo {group}
-                  </DropdownMenuItem>
-                ))}
+                {/* Change to existing groups (excluding current) */}
+                {existingGroups
+                  .filter((g) => g !== supersetGroup)
+                  .map((group) => (
+                    <DropdownMenuItem key={group} onClick={() => handleSetSupersetGroup(group)}>
+                      <Link2Icon className="size-4" />
+                      Cambiar a superserie {group}
+                    </DropdownMenuItem>
+                  ))}
+                {/* Create new group option */}
+                <DropdownMenuItem onClick={() => handleSetSupersetGroup(nextAvailableLetter)}>
+                  <PlusIcon className="size-4" />
+                  Crear superserie {nextAvailableLetter}
+                </DropdownMenuItem>
               </>
             ) : (
               <>
-                {SUPERSET_GROUPS.map((group) => (
+                {/* Add to existing groups */}
+                {existingGroups.map((group) => (
                   <DropdownMenuItem key={group} onClick={() => handleSetSupersetGroup(group)}>
                     <Link2Icon className="size-4" />
                     Agregar a superserie {group}
                   </DropdownMenuItem>
                 ))}
+                {/* Create new group */}
+                <DropdownMenuItem onClick={() => handleSetSupersetGroup(nextAvailableLetter)}>
+                  <PlusIcon className="size-4" />
+                  Crear superserie {nextAvailableLetter}
+                </DropdownMenuItem>
               </>
             )}
           </DropdownMenuGroup>
