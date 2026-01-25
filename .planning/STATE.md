@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 10/N (waves 1-4 complete, wave 5 in progress: 03-10 complete)
+Plan: 12/N (waves 1-5 complete, wave 6 in progress)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-10-PLAN.md (Programs List and Creation Frontend)
+Last activity: 2026-01-25 - Completed 03-12-PLAN.md (Program Editor Page)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 5 in progress
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 wave 6 in progress
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
@@ -235,6 +235,9 @@ None.
 | 03-08 | Program Contracts | Complete |
 | 03-09 | Grid Manipulation Procedures | Complete |
 | 03-10 | Programs List and Creation Frontend | Complete |
+| 03-11 | Core Grid Components | Complete |
+| 03-12 | Program Editor Page | Complete |
+| 03-13 | Grid Toolbar with Structure Actions | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -280,12 +283,18 @@ None.
 - `apps/coach-web/src/features/programs/views/new-program-view.tsx` - New program creation page
 - `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/index.tsx` - Programs list route
 - `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/new.tsx` - New program route
-- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/$programId.tsx` - Program editor route (placeholder)
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/programs/$programId.tsx` - Program editor route
+- `apps/coach-web/src/components/programs/program-grid.tsx` - Main grid component with react-datasheet-grid
+- `apps/coach-web/src/components/programs/program-header.tsx` - Editable program header
+- `apps/coach-web/src/components/programs/grid-toolbar.tsx` - Week/session add buttons
+- `apps/coach-web/src/components/programs/add-exercise-row.tsx` - Inline exercise addition
+- `apps/coach-web/src/components/programs/split-row-dialog.tsx` - Split row dialog
+- `apps/coach-web/src/styles/program-grid.css` - Grid-specific CSS styles
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03-10-PLAN.md (Programs List and Creation Frontend)
+Stopped at: Completed 03-12-PLAN.md (Program Editor Page)
 Resume file: None
 
-**Next:** Continue with 03-11 (Grid Editor) or remaining wave 5 plans
+**Next:** Continue with 03-14 or remaining wave 6 plans
