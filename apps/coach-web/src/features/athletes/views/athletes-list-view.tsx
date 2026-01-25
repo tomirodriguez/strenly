@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { AthleteForm } from '../components/athlete-form'
 import { AthletesTable } from '../components/athletes-table'
+import { InvitationModal } from '../components/invitation-modal'
 import { useArchiveAthlete } from '../hooks/mutations/use-archive-athlete'
 import { useCreateAthlete } from '../hooks/mutations/use-create-athlete'
 import { useGenerateInvitation } from '../hooks/mutations/use-generate-invitation'
@@ -35,6 +36,7 @@ export function AthletesListView() {
   const [showArchived, setShowArchived] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null)
+  const [invitationAthlete, setInvitationAthlete] = useState<Athlete | null>(null)
 
   // Fetch athletes with current filters
   const { data, isLoading } = useAthletes({
@@ -73,6 +75,10 @@ export function AthletesListView() {
 
   const handleInvite = (athlete: Athlete) => {
     generateInvitationMutation.mutate({ athleteId: athlete.id })
+  }
+
+  const handleViewInvitation = (athlete: Athlete) => {
+    setInvitationAthlete(athlete)
   }
 
   const handleFormSubmit = (formData: CreateAthleteInput) => {
@@ -155,6 +161,7 @@ export function AthletesListView() {
           onEdit={handleEdit}
           onArchive={handleArchive}
           onInvite={handleInvite}
+          onViewInvitation={handleViewInvitation}
         />
 
         <DataTablePagination />
@@ -196,6 +203,12 @@ export function AthletesListView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <InvitationModal
+        athlete={invitationAthlete}
+        open={!!invitationAthlete}
+        onOpenChange={(open) => !open && setInvitationAthlete(null)}
+      />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import type { Athlete } from '@strenly/contracts/athletes/athlete'
 import type { ColumnDef } from '@tanstack/react-table'
 import { formatDistanceToNow } from 'date-fns'
-import { Copy, Edit, Trash } from 'lucide-react'
+import { Copy, Edit, Eye, Trash } from 'lucide-react'
 import { InvitationStatus } from './invitation-status'
 import { DataTable } from '@/components/data-table/data-table'
 import { DataTableRowActions, type RowAction } from '@/components/data-table/data-table-row-actions'
@@ -17,6 +17,7 @@ type AthletesTableProps = {
   onEdit: (athlete: Athlete) => void
   onArchive: (athlete: Athlete) => void
   onInvite: (athlete: Athlete) => void
+  onViewInvitation: (athlete: Athlete) => void
 }
 
 /**
@@ -33,6 +34,7 @@ export function AthletesTable({
   onEdit,
   onArchive,
   onInvite,
+  onViewInvitation,
 }: AthletesTableProps) {
   const columns: ColumnDef<Athlete>[] = [
     {
@@ -80,6 +82,11 @@ export function AthletesTable({
             label: 'Editar',
             icon: Edit,
             onClick: onEdit,
+          },
+          {
+            label: 'Ver invitacion',
+            icon: Eye,
+            onClick: onViewInvitation,
           },
           {
             label: 'Generar invitacion',
