@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { athleteKeys } from '../queries/use-athletes'
 import { orpc } from '@/lib/api-client'
 import { toast } from '@/lib/toast'
 
@@ -16,7 +15,7 @@ export function useGenerateInvitation() {
     onSuccess: async (data) => {
       try {
         await navigator.clipboard.writeText(data.invitationUrl)
-        queryClient.invalidateQueries({ queryKey: athleteKeys.all })
+        queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
         toast.success('Invitation link copied to clipboard!')
       } catch (_error) {
         toast.error('Failed to copy invitation link')

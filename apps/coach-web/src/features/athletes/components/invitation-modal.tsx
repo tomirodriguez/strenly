@@ -5,10 +5,11 @@ import { es } from 'date-fns/locale'
 import { Check, Copy, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { useGenerateInvitation } from '../hooks/mutations/use-generate-invitation'
-import { invitationKeys, useAthleteInvitation } from '../hooks/queries/use-athlete-invitation'
+import { useAthleteInvitation } from '../hooks/queries/use-athlete-invitation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { orpc } from '@/lib/api-client'
 import { toast } from '@/lib/toast'
 
 type InvitationModalProps = {
@@ -53,7 +54,9 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
       {
         onSuccess: () => {
           // Invalidate the invitation query to refetch
-          queryClient.invalidateQueries({ queryKey: invitationKeys.detail(athlete.id) })
+          queryClient.invalidateQueries({
+            queryKey: orpc.athletes.getInvitation.key({ input: { athleteId: athlete.id } }),
+          })
         },
       },
     )

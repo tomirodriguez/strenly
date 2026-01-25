@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { athleteKeys } from '../queries/use-athletes'
 import { orpc } from '@/lib/api-client'
 import { toast } from '@/lib/toast'
 
@@ -14,7 +13,7 @@ export function useCreateAthlete() {
   return useMutation({
     ...orpc.athletes.create.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: athleteKeys.all })
+      queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
       toast.success('Athlete created successfully')
     },
     onError: (error) => {
