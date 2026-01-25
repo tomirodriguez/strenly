@@ -121,13 +121,25 @@ Plans:
   3. Coach can type natural notation (3x8@120kg, 4x6-8@RIR2, 3x10@75%) that parses to structured data
   4. Coach can view full mesocycle (4-6 weeks) at once with 3+ prescription parameters visible per exercise
   5. Coach can duplicate programs and weeks, save as templates, and create new programs from templates
-**Plans**: TBD
+**Plans**: 16 plans in 8 waves
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
-- [ ] 03-04: TBD
+- [ ] 03-01-PLAN.md - Database schema: programs, weeks, sessions, exercises, prescriptions (Wave 1)
+- [ ] 03-02-PLAN.md - Prescription notation parser TDD (Wave 1)
+- [ ] 03-03-PLAN.md - Program and Prescription domain entities TDD (Wave 1)
+- [ ] 03-04-PLAN.md - Program repository port and implementation (Wave 2)
+- [ ] 03-05-PLAN.md - Program CRUD and duplicate use cases (Wave 3)
+- [ ] 03-06-PLAN.md - Week and session management use cases (Wave 3)
+- [ ] 03-07-PLAN.md - Exercise row and prescription use cases (Wave 3)
+- [ ] 03-08-PLAN.md - Program contracts and procedures (Wave 4)
+- [ ] 03-09-PLAN.md - Grid manipulation contracts and procedures (Wave 4)
+- [ ] 03-10-PLAN.md - Programs list and creation pages (Wave 5)
+- [ ] 03-11-PLAN.md - react-datasheet-grid integration and custom cells (Wave 5)
+- [ ] 03-12-PLAN.md - Program editor page with grid and styling (Wave 6)
+- [ ] 03-13-PLAN.md - Grid structure manipulation (add week/session/exercise) (Wave 6)
+- [ ] 03-14-PLAN.md - Advanced grid features: week/row actions, reordering (Wave 7)
+- [ ] 03-15-PLAN.md - Template system: save as template, create from template (Wave 7)
+- [ ] 03-16-PLAN.md - Navigation, polish, and final UAT (Wave 8)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -173,7 +185,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 3 -> 4 -> 5
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 0/4 | Not started | - |
-| 3. Program Builder (full-stack) | 0/4 | Not started | - |
+| 3. Program Builder (full-stack) | 0/16 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
