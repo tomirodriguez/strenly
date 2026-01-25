@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 5/7 (Exercise Cell Components)
+Plan: 5/7 (Exercise Cell Components) - Plans 04 and 05 complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.1-05-PLAN.md
+Last activity: 2026-01-25 - Completed 03.1-04-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 5/7
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plans 1-5/7
 
 **Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
 
@@ -324,7 +324,7 @@ None.
 | 03.1-01 | Programs Table Component | Complete |
 | 03.1-02 | Create Program Form Improvements | Complete |
 | 03.1-03 | Grid Foundation | Complete |
-| 03.1-04 | Cell Components | Pending |
+| 03.1-04 | Grid Structural Components | Complete |
 | 03.1-05 | Exercise Cell Components | Complete |
 | 03.1-06 | Keyboard Navigation | Pending |
 | 03.1-07 | Final Integration | Pending |
@@ -337,11 +337,14 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/superset-indicator.tsx` - Vertical blue line for superset grouping
 - `apps/coach-web/src/components/programs/program-grid/exercise-row-prefix.tsx` - Row prefix (A1, B2) with styling
 - `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - First column cell with combobox editing
+- `apps/coach-web/src/components/programs/program-grid/grid-header.tsx` - Sticky header with week columns
+- `apps/coach-web/src/components/programs/program-grid/session-header-row.tsx` - Full-width session dividers
+- `apps/coach-web/src/components/programs/program-grid/add-exercise-row.tsx` - End-of-session exercise addition
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-05-PLAN.md
+Stopped at: Completed 03.1-04-PLAN.md
 Resume file: None
 
 **Next:** Execute 03.1-06-PLAN.md - Keyboard Navigation
