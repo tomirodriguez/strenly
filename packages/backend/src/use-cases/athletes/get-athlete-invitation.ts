@@ -60,14 +60,12 @@ export const makeGetAthleteInvitation =
       })
       .andThen(() => {
         // 3. Get active invitation
-        return deps.invitationRepository
-          .findByAthleteId(ctx, input.athleteId)
-          .mapErr(
-            (e): GetAthleteInvitationError => ({
-              type: 'repository_error',
-              message: e.type === 'DATABASE_ERROR' ? e.message : 'Invitation error',
-            }),
-          )
+        return deps.invitationRepository.findByAthleteId(ctx, input.athleteId).mapErr(
+          (e): GetAthleteInvitationError => ({
+            type: 'repository_error',
+            message: e.type === 'DATABASE_ERROR' ? e.message : 'Invitation error',
+          }),
+        )
       })
       .andThen((invitation) => {
         if (!invitation) {
