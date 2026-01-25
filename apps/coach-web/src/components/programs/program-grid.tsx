@@ -9,7 +9,7 @@ import '@wasback/react-datasheet-grid/dist/style.css'
 import { SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AddExerciseRow } from './add-exercise-row'
-import { ExerciseRowActions } from './exercise-row-actions'
+import { ExerciseRowActions, type SessionRowData } from './exercise-row-actions'
 import { SplitRowDialog } from './split-row-dialog'
 import { WeekActionsMenu } from './week-actions-menu'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
@@ -596,6 +596,20 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
     return map
   }, [program])
 
+  // Build session rows map for superset group calculations
+  const sessionRowsMap = useMemo(() => {
+    if (!program) return new Map<string, SessionRowData[]>()
+    const map = new Map<string, SessionRowData[]>()
+    for (const session of program.sessions) {
+      const sessionRowData: SessionRowData[] = session.rows.map((row) => ({
+        id: row.id,
+        supersetGroup: row.supersetGroup ?? null,
+      }))
+      map.set(session.id, sessionRowData)
+    }
+    return map
+  }, [program])
+
   // Get selected row data for actions
   const selectedRowData = useMemo(() => {
     if (!selectedRowId) return null
@@ -754,6 +768,7 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
             supersetGroup={selectedRowData.supersetGroup ?? null}
             isSubRow={selectedRowData.isSubRow}
             sessionRowIds={sessionRowIdsMap.get(selectedRowData.sessionId) ?? []}
+            sessionRows={sessionRowsMap.get(selectedRowData.sessionId) ?? []}
             onAddSplitRow={() => handleOpenSplitDialog(selectedRowData.rowId ?? '')}
           />
         </div>
