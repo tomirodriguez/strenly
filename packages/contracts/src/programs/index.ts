@@ -2,6 +2,17 @@
  * Program contracts - API schemas for program CRUD operations
  */
 
+// Exercise group operations
+export {
+  type CreateExerciseGroupInput,
+  createExerciseGroupInputSchema,
+  type DeleteExerciseGroupInput,
+  deleteExerciseGroupInputSchema,
+  type ExerciseGroup,
+  exerciseGroupSchema,
+  type UpdateExerciseGroupInput,
+  updateExerciseGroupInputSchema,
+} from './exercise-group'
 // Exercise row operations
 export {
   type AddExerciseRowInput,
