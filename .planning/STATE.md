@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.1 - Custom Program Grid (COMPLETE)
+**Current focus:** Phase 3.1 - Custom Program Grid (Gap Closure)
 
 ## Current Position
 
-Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 7/7 (Final Integration) - PHASE COMPLETE
-Status: Phase 3.1 complete
-Last activity: 2026-01-25 - Completed 03.1-07-PLAN.md
+Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
+Plan: 9/N (Week Ordering Bug Fix) - COMPLETE
+Status: Gap closure in progress
+Last activity: 2026-01-25 - Completed 03.1-09-PLAN.md (week ordering bug fix)
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 COMPLETE
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 + gap fixes
 
-**Note:** Phase 3.1 successfully replaced react-datasheet-grid with custom HTML table implementation matching our design system.
+**Note:** Phase 3.1 successfully replaced react-datasheet-grid with custom HTML table implementation. Gap closure plans address UAT failures.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 39
+- Total plans completed: 40
 - Average duration: 4 min
-- Total execution time: 149 min
+- Total execution time: 150 min
 
 **By Phase:**
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 7/7 | ~35 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-03 (4 min), 03.1-04 (5 min), 03.1-05 (5 min), 03.1-06 (4 min), 03.1-07 (5 min)
-- Trend: Phase 3.1 custom program grid complete
+- Last 5 plans: 03.1-05 (5 min), 03.1-06 (4 min), 03.1-07 (5 min), 03.1-09 (1 min)
+- Trend: Gap closure plans executing quickly
 
 *Updated after each plan completion*
 
@@ -132,6 +132,7 @@ Recent decisions affecting current work:
 - **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
 - **Arrow navigation at cursor boundaries** - In prescription cells, left/right arrows only navigate when cursor is at start/end of text
 - **Table without role="grid" for lint compliance** - Semantic table element with keyboard handlers, role attribute removed for Biome lint
+- **Fetch existing before partial update** - Use findById before updateX to preserve non-input fields (e.g., orderIndex)
 
 ### Pending Todos
 
@@ -228,6 +229,7 @@ None.
 | 03.1-05 | Exercise Cell Components | Complete |
 | 03.1-06 | Row Components | Complete |
 | 03.1-07 | Final Integration | Complete |
+| 03.1-09 | Week Ordering Bug Fix | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -250,7 +252,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-07-PLAN.md - Phase 3.1 COMPLETE
+Stopped at: Completed 03.1-09-PLAN.md - Week ordering bug fix
 Resume file: None
 
-**Next:** Phase 3.1 complete. Consider Phase 4 (Athlete PWA) or additional program builder features.
+**Next:** Continue gap closure plans or re-run UAT to verify fixes.
