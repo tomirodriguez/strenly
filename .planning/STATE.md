@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3 of 5 (Program Builder)
-Plan: 1/N
+Plan: 3/N
 Status: In progress
-Last activity: 2026-01-25 - Completed 03-01-PLAN.md (Database Schema)
+Last activity: 2026-01-25 - Completed 03-03-PLAN.md (Program & Prescription Domain Entities)
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 started
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 in progress
 
 **Note:** Phase 3 is the core differentiator - Excel-like program editing.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33
+- Total plans completed: 34
 - Average duration: 4 min
-- Total execution time: 124 min
+- Total execution time: 128 min
 
 **By Phase:**
 
@@ -34,8 +34,8 @@ Progress: [███████████████████████
 | 2.5 | 11/11 | ~20 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.6-01 (4 min), 02.6-02 (5 min), 02.6-03 (3 min), 03-01 (5 min)
-- Trend: Phase 3 program builder started
+- Last 5 plans: 02.6-02 (5 min), 02.6-03 (3 min), 03-01 (5 min), 03-03 (4 min)
+- Trend: Phase 3 program builder TDD domain entities
 
 *Updated after each plan completion*
 
@@ -107,6 +107,11 @@ Recent decisions affecting current work:
 - **JSONB for prescription data** - prescriptions table uses JSONB with $type<ParsedPrescription>() for typed structured data
 - **Self-referencing parentRowId for split rows** - program_exercises uses parentRowId for same-exercise multiple-config rows
 - **Unique (exerciseId, weekId) for cell identity** - prescriptions table unique constraint identifies grid cells
+- **Program status one-way transitions** - draft -> active -> archived; programs cannot be unarchived
+- **Program name 3-100 chars** - Minimum 3 to prevent short names like "AB"
+- **Tempo 4-char ECCC format** - Digits or X for explosive (31X0), normalized to uppercase
+- **Intensity bounds by type** - percentage 0-100, RPE/RIR 0-10, absolute >= 0
+- **AMRAP requires repsMin 0** - Cannot specify reps when AMRAP is true
 
 ### Pending Todos
 
@@ -211,6 +216,7 @@ None.
 | Plan | Name | Status |
 |------|------|--------|
 | 03-01 | Database Schema | Complete |
+| 03-03 | Domain Entities | Complete |
 
 **Key artifacts so far:**
 - `packages/database/src/schema/programs.ts` - Programs table with status enum
@@ -218,11 +224,13 @@ None.
 - `packages/database/src/schema/program-sessions.ts` - Training days
 - `packages/database/src/schema/program-exercises.ts` - Exercise rows with superset/split support
 - `packages/database/src/schema/prescriptions.ts` - JSONB prescription storage
+- `packages/core/src/domain/entities/program.ts` - Program entity with status transitions
+- `packages/core/src/domain/entities/prescription.ts` - Prescription entity with validation
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed quick task 018: Redirect, breadcrumbs, sidebar collapse
+Stopped at: Completed 03-03-PLAN.md (Program & Prescription Domain Entities)
 Resume file: None
 
-**Next:** Execute 03-02-PLAN.md (Domain Entities)
+**Next:** Execute 03-04-PLAN.md (Ports)
