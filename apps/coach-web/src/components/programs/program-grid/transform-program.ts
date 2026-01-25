@@ -225,7 +225,7 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
       }
 
       // Use dynamic supersetOrder instead of stored value
-      const calculatedSupersetOrder = row.supersetGroup ? dynamicSupersetOrder.get(idx) ?? null : null
+      const calculatedSupersetOrder = row.supersetGroup ? (dynamicSupersetOrder.get(idx) ?? null) : null
 
       // Build prescriptions map: weekId -> formatted notation
       const prescriptions: Record<string, string> = {}

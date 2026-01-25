@@ -6,32 +6,26 @@ interface ExerciseRowPrefixProps {
   row: GridRow
 }
 
-// Letters for labeling non-superset rows based on position
-const POSITION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-
 /**
- * Row prefix showing superset group (A1, B2) or position number.
+ * Row prefix showing logical group label (A1, B1, B2, C1).
+ *
+ * All exercises are treated as groups:
+ * - Standalone exercise = group of 1 (A1, B1)
+ * - Superset = group of N (C1, C2, C3)
  *
  * Visual rules from UI/UX spec:
- * - Superset rows: primary color text, background-dark bg
- * - Non-superset rows: muted text, slightly darker bg
+ * - Superset rows (multiple items in group): primary color text
+ * - Non-superset rows (single-item group): muted text
  * - Width: w-10 (40px)
  * - Font: 10px, bold
  */
 export function ExerciseRowPrefix({ row }: ExerciseRowPrefixProps) {
-  // Generate display label: A1, B2, C1 for supersets, or just letter + position for non-superset
-  const getLabel = (): string => {
-    if (row.supersetGroup) {
-      return `${row.supersetGroup}${row.supersetOrder ?? ''}`
-    }
-
-    // For non-superset rows, show letter based on exercise position
-    const position = row.exercise?.position ?? 0
-    const letter = POSITION_LETTERS[position] ?? 'A'
-    return `${letter}1`
-  }
-
-  const label = getLabel()
+  // Unified format: always letter + number
+  // Standalone exercises are groups of 1 (A1, B1)
+  // Supersets are groups of N (C1, C2, C3)
+  const letter = row.groupLetter ?? 'A'
+  const index = row.groupIndex ?? 1
+  const label = `${letter}${index}`
 
   return (
     <div className="relative flex h-full items-center">
