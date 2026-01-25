@@ -137,6 +137,7 @@ None.
 | 016 | Fix invitation modal unified action and skeleton loading | 2026-01-25 | a47b32b | [016-fix-invitation-modal-unified-action-skeleton-loading](./quick/016-fix-invitation-modal-unified-action-skeleton-loading/) |
 | 016b | Fix dropdown menu min-width for action items | 2026-01-25 | 8c71475 | [016-fix-dropdown-menu-min-width-for-action-i](./quick/016-fix-dropdown-menu-min-width-for-action-i/) |
 | 017 | Add dev latency middleware (random 200-500ms) | 2026-01-25 | 78c3c21 | [017-add-dev-latency-middleware](./quick/017-add-dev-latency-middleware/) |
+| 018 | Redirect, breadcrumbs, sidebar collapse | 2026-01-25 | 89a1b77 | [018-redirect-slug-dashboard-breadcrumb-sidebar](./quick/018-redirect-slug-dashboard-breadcrumb-sidebar/) |
 
 ## Phase 2 Progress
 
