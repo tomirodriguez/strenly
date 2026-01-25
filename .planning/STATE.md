@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 2.5 of 5 (Coach Web Foundation) ✓ Complete
 Plan: 11/11 (all gap closure plans complete)
 Status: Phase 2.5 verified and complete
-Last activity: 2026-01-25 - Completed quick task 014: Fix invitation modal unified invitar action
+Last activity: 2026-01-25 - Completed quick task 015: Change athletes table default sort to updatedAt descending
 
 Progress: [██████████████████████████████] Phases 1, 2, 2.5 complete
 
@@ -122,6 +122,7 @@ None.
 | 012 | Audit and refactor forms to skill pattern | 2026-01-25 | 50ef1fd | [012-audit-and-refactor-forms-to-skill-patter](./quick/012-audit-and-refactor-forms-to-skill-patter/) |
 | 013 | Update oRPC query skill and refactor query invalidations | 2026-01-25 | 25934b3 | [013-update-orpc-query-skill-and-refactor-que](./quick/013-update-orpc-query-skill-and-refactor-que/) |
 | 014 | Fix invitation modal unified invitar action | 2026-01-25 | 6c7ecb8 | [014-fix-invitation-modal-unified-invitar-act](./quick/014-fix-invitation-modal-unified-invitar-act/) |
+| 015 | Change athletes table default sort to updatedAt descending | 2026-01-25 | 2e8e339 | [015-change-athletes-table-default-sort-to-up](./quick/015-change-athletes-table-default-sort-to-up/) |
 
 ## Phase 2 Progress
 
@@ -188,7 +189,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed quick task 014 - Fix invitation modal UX
+Stopped at: Completed quick task 015 - Change athletes table default sort
 Resume file: None
 
 **Next:** Begin Phase 3 planning with /gsd:discuss-phase 3 or /gsd:plan-phase 3
