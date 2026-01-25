@@ -87,11 +87,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border border-r">
       <SidebarHeader className="h-16 border-sidebar-border border-b">
-        <div className="flex h-full items-center gap-2 px-4">
+        <div className="flex h-full items-center gap-2 px-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
           <div className="flex size-8 items-center justify-center rounded-md bg-primary">
             <ZapIcon className="size-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-xl tracking-tight">STRENLY</span>
+          <span className="font-bold text-xl tracking-tight group-data-[collapsible=icon]:hidden">STRENLY</span>
         </div>
       </SidebarHeader>
 
@@ -148,18 +148,18 @@ export function AppSidebar({ user }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-sidebar-border border-t p-4">
+      <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:p-2">
         <DropdownMenu>
           <DropdownMenuTrigger className="w-full outline-none">
-            <div className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-sidebar-accent">
+            <div className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-sidebar-accent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:p-0">
               <Avatar className="size-9">
                 <AvatarFallback className="text-xs">{userInitials}</AvatarFallback>
               </Avatar>
-              <div className="min-w-0 flex-1 text-left">
+              <div className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
                 <p className="truncate font-semibold text-sm">{user.name ?? 'Usuario'}</p>
                 <p className="truncate text-muted-foreground text-xs">{user.email}</p>
               </div>
-              <MoreVerticalIcon className="size-4 text-muted-foreground" />
+              <MoreVerticalIcon className="size-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
