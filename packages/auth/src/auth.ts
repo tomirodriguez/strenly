@@ -3,9 +3,7 @@
  * Factory function that creates Better Auth instances on-demand
  */
 
-import { eq } from '@strenly/database'
 import * as schema from '@strenly/database/schemas'
-import { plans, subscriptions } from '@strenly/database/schemas'
 import { betterAuth } from 'better-auth'
 import { type DB, drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { organization } from 'better-auth/plugins'
@@ -92,37 +90,7 @@ export function createAuth(env: AuthEnv, db: DB) {
         creatorRole: 'owner',
         membershipLimit: 100,
         // Roles: owner (full control), admin (manage members), member (basic access)
-        organizationHooks: {
-          afterCreateOrganization: async ({ organization: org }) => {
-            // Better-Auth passes metadata as an object, not a JSON string
-            const metadata = org.metadata as { planId?: string } | null
-            const planId = metadata?.planId
-
-            if (!planId) {
-              console.error('[auth] No planId in organization metadata for org:', org.id)
-              return
-            }
-
-            // Get plan details
-            const [plan] = await db.select().from(plans).where(eq(plans.id, planId)).limit(1)
-
-            if (!plan) {
-              console.error(`[auth] Plan ${planId} not found for org:`, org.id)
-              return
-            }
-
-            // Create subscription linked to organization
-            await db.insert(subscriptions).values({
-              id: `sub_${crypto.randomUUID()}`,
-              organizationId: org.id,
-              planId,
-              status: 'active',
-              currentPeriodStart: new Date(),
-              currentPeriodEnd: null, // Set when checkout completes
-              athleteCount: 0,
-            })
-          },
-        },
+        // Subscription creation handled by oRPC createSubscription procedure after org creation
       }),
     ],
   })
