@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -40,7 +40,7 @@ export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
     formState: { errors },
     setValue,
   } = useForm<OrgFormData>({
-    resolver: zodResolver(orgFormSchema),
+    resolver: standardSchemaResolver(orgFormSchema),
     defaultValues: {
       name: '',
       slug: '',
