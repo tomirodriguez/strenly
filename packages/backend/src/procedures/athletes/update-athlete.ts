@@ -37,11 +37,11 @@ export const updateAthlete = authProcedure
       memberRole: context.membership.role,
       athleteId: input.athleteId,
       name: input.name,
-      email: input.email !== undefined ? (input.email ?? null) : undefined,
-      phone: input.phone !== undefined ? (input.phone ?? null) : undefined,
+      email: input.email !== undefined ? input.email || null : undefined,
+      phone: input.phone !== undefined ? input.phone || null : undefined,
       birthdate: input.birthdate !== undefined ? (input.birthdate ? new Date(input.birthdate) : null) : undefined,
       gender,
-      notes: input.notes !== undefined ? (input.notes ?? null) : undefined,
+      notes: input.notes !== undefined ? input.notes || null : undefined,
       status,
     })
 

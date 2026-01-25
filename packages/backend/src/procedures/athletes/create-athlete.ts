@@ -25,11 +25,11 @@ export const createAthlete = authProcedure
       userId: context.user.id,
       memberRole: context.membership.role,
       name: input.name,
-      email: input.email ?? null,
-      phone: input.phone ?? null,
+      email: input.email || null,
+      phone: input.phone || null,
       birthdate: input.birthdate ? new Date(input.birthdate) : null,
-      gender: input.gender ?? null,
-      notes: input.notes ?? null,
+      gender: input.gender || null,
+      notes: input.notes || null,
     })
 
     if (result.isErr()) {
