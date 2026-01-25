@@ -25,6 +25,13 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secon
   revoked: { label: 'Revocada', variant: 'destructive' },
 }
 
+function truncateUrl(url: string, maxLength = 50): string {
+  if (url.length <= maxLength) return url
+  const start = url.slice(0, 25)
+  const end = url.slice(-20)
+  return `${start}...${end}`
+}
+
 /**
  * Modal to view, copy, and regenerate athlete invitations.
  * Shows invitation URL, status, and expiration date.
@@ -78,7 +85,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
             <p className="text-muted-foreground text-sm">No hay invitacion activa para este atleta.</p>
             <Button onClick={handleRegenerate} disabled={generateMutation.isPending}>
               <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-              Generar invitacion
+              Invitar
             </Button>
           </div>
         )}
@@ -103,7 +110,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
             <div className="space-y-2">
               <span className="text-muted-foreground text-sm">Link de invitacion:</span>
               <div className="flex items-center gap-2 rounded-md bg-muted p-2">
-                <code className="flex-1 truncate text-xs">{invitation.invitationUrl}</code>
+                <code className="flex-1 text-xs">{truncateUrl(invitation.invitationUrl)}</code>
                 <Button size="sm" variant="ghost" onClick={handleCopy}>
                   {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 </Button>
@@ -113,7 +120,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
             {invitation.status !== 'accepted' && (
               <Button variant="outline" onClick={handleRegenerate} disabled={generateMutation.isPending}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${generateMutation.isPending ? 'animate-spin' : ''}`} />
-                Regenerar invitacion
+                Invitar
               </Button>
             )}
 
