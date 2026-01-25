@@ -146,6 +146,26 @@ export function PrescriptionCell({
     )
   }
 
+  // Render prescription display with multi-line support for varied series
+  const renderPrescriptionDisplay = (displayValue: string) => {
+    // If value contains " + " it's multi-part with variations
+    if (displayValue.includes(' + ')) {
+      const parts = displayValue.split(' + ')
+      return (
+        <div className="flex flex-col justify-center py-0.5">
+          {parts.map((part, i) => (
+            <span key={i} className="text-xs leading-tight">
+              {part}
+            </span>
+          ))}
+        </div>
+      )
+    }
+
+    // Single part - normal display
+    return <span>{displayValue}</span>
+  }
+
   // View mode
   return (
     <td
@@ -162,11 +182,11 @@ export function PrescriptionCell({
     >
       <div
         className={cn(
-          'flex h-10 items-center justify-center px-2 text-[13px]',
+          'flex min-h-10 items-center justify-center px-2 py-1 text-[13px]',
           isSubRow ? 'text-muted-foreground' : 'text-foreground',
         )}
       >
-        {value || '\u2014'} {/* Em dash for empty cells */}
+        {value ? renderPrescriptionDisplay(value) : '\u2014'} {/* Em dash for empty cells */}
       </div>
     </td>
   )
