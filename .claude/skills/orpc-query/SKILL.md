@@ -134,30 +134,54 @@ export function useAthleteProgram(athleteId: string | undefined) {
 ```
 </query_patterns>
 
-<query_key_factories>
-```typescript
-// src/features/athletes/api/athletes-keys.ts
-export const athleteKeys = {
-  all: ['athletes'] as const,
-  lists: () => [...athleteKeys.all, 'list'] as const,
-  list: (filters: { status?: string; search?: string }) =>
-    [...athleteKeys.lists(), filters] as const,
-  details: () => [...athleteKeys.all, 'detail'] as const,
-  detail: (id: string) => [...athleteKeys.details(), id] as const,
-}
+<query_keys>
+oRPC provides built-in methods for query key management. **Do NOT create custom query key factories.**
 
-// Usage
-export function useAthletes(filters: { status?: string; search?: string }) {
-  return useQuery({
-    queryKey: athleteKeys.list(filters),
-    queryFn: () => orpc.athletes.list.call({
-      status: filters.status,
-      search: filters.search,
-    }),
-  })
-}
+**Available Methods:**
+
+| Method | Purpose | Use Case |
+|--------|---------|----------|
+| `.key()` | Partial matching | Invalidate all queries for a procedure |
+| `.key({ input })` | Exact matching with input | Invalidate/get specific query |
+| `.queryKey({ input })` | Full query key | `setQueryData`, `getQueryData` |
+| `.mutationKey()` | Mutation key matching | Track mutation state |
+| `.infiniteKey()` | Infinite query key | Invalidate infinite queries |
+
+**Invalidation Patterns:**
+
+```typescript
+import { useQueryClient } from '@tanstack/react-query'
+import { orpc } from '@/lib/api-client'
+
+// Invalidate ALL athlete queries (list, get, etc.)
+queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
+
+// Invalidate specific list query
+queryClient.invalidateQueries({ queryKey: orpc.athletes.list.key() })
+
+// Invalidate specific detail query with input
+queryClient.invalidateQueries({
+  queryKey: orpc.athletes.get.key({ input: { athleteId } })
+})
+
+// Get/set specific query data
+const athlete = queryClient.getQueryData(
+  orpc.athletes.get.queryKey({ input: { athleteId } })
+)
+
+queryClient.setQueryData(
+  orpc.athletes.get.queryKey({ input: { athleteId } }),
+  updatedAthlete
+)
 ```
-</query_key_factories>
+
+**Why oRPC Keys Are Better:**
+
+1. **Type-safe** - Input is validated at compile time
+2. **Automatic** - Keys match what `queryOptions` generates
+3. **Consistent** - No manual key string management
+4. **Refactor-friendly** - Renaming procedures updates keys automatically
+</query_keys>
 
 <mutations>
 **Standard Mutation with Cache Invalidation:**
@@ -166,18 +190,16 @@ export function useAthletes(filters: { status?: string; search?: string }) {
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { orpc } from '@/lib/api-client'
-import { athleteKeys } from './athletes-keys'
-import type { CreateAthleteInput } from '@my-app/contracts/athletes/create-athlete'
 
 export function useCreateAthlete() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: CreateAthleteInput) =>
-      orpc.athletes.create.call(input),
+    ...orpc.athletes.create.mutationOptions(),
     onSuccess: () => {
       toast.success('Atleta creado correctamente')
-      queryClient.invalidateQueries({ queryKey: athleteKeys.lists() })
+      // Invalidate ALL athlete queries using oRPC's key() method
+      queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
       toast.error(error.message ?? 'Error al crear atleta')
@@ -193,19 +215,21 @@ export function useUpdateAthlete() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: UpdateAthleteInput) =>
-      orpc.athletes.update.call(input),
+    ...orpc.athletes.update.mutationOptions(),
     onMutate: async (newData) => {
+      // Cancel with oRPC key
       await queryClient.cancelQueries({
-        queryKey: athleteKeys.detail(newData.athleteId)
+        queryKey: orpc.athletes.get.key({ input: { athleteId: newData.athleteId } })
       })
 
+      // Get previous data with oRPC queryKey
       const previousAthlete = queryClient.getQueryData(
-        athleteKeys.detail(newData.athleteId)
+        orpc.athletes.get.queryKey({ input: { athleteId: newData.athleteId } })
       )
 
+      // Optimistically update
       queryClient.setQueryData(
-        athleteKeys.detail(newData.athleteId),
+        orpc.athletes.get.queryKey({ input: { athleteId: newData.athleteId } }),
         (old: Athlete | undefined) => old ? { ...old, ...newData } : old
       )
 
@@ -214,15 +238,16 @@ export function useUpdateAthlete() {
     onError: (_err, newData, context) => {
       if (context?.previousAthlete) {
         queryClient.setQueryData(
-          athleteKeys.detail(newData.athleteId),
+          orpc.athletes.get.queryKey({ input: { athleteId: newData.athleteId } }),
           context.previousAthlete
         )
       }
       toast.error('Error al actualizar atleta')
     },
     onSettled: (_data, _error, variables) => {
+      // Invalidate the specific query
       queryClient.invalidateQueries({
-        queryKey: athleteKeys.detail(variables.athleteId)
+        queryKey: orpc.athletes.get.key({ input: { athleteId: variables.athleteId } })
       })
     },
   })
@@ -234,33 +259,30 @@ export function useUpdateAthlete() {
 For paginated lists with "load more" functionality:
 
 ```typescript
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
 const PAGE_SIZE = 20
 
-export const historyKeys = {
-  all: ['workout-history'] as const,
-  list: (filters?: { status?: string }) =>
-    [...historyKeys.all, 'list', filters] as const,
-}
-
 export function useWorkoutHistory(filters?: { status?: string }) {
   return useInfiniteQuery({
-    queryKey: historyKeys.list(filters),
-    queryFn: ({ pageParam = 0 }) =>
-      orpc.workoutLogs.getHistory.call({
-        limit: PAGE_SIZE,
-        offset: pageParam,
-        status: filters?.status,
-      }),
+    // Let oRPC manage the query key automatically
+    ...orpc.workoutLogs.getHistory.infiniteOptions({
+      input: { limit: PAGE_SIZE, status: filters?.status },
+    }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (!lastPage.hasMore) return undefined
       return lastPageParam + PAGE_SIZE
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
+  })
+}
+
+// Invalidate infinite query using infiniteKey()
+function useRefreshHistory() {
+  const queryClient = useQueryClient()
+  return () => queryClient.invalidateQueries({
+    queryKey: orpc.workoutLogs.getHistory.infiniteKey()
   })
 }
 
@@ -286,19 +308,44 @@ function HistoryList() {
 <file_organization>
 ```
 src/features/athletes/
-├── api/
-│   ├── athletes-keys.ts      # Query key factory
-│   ├── athletes-queries.ts   # useQuery hooks
-│   └── athletes-mutations.ts # useMutation hooks
-├── components/
-│   ├── athletes-list.tsx
-│   └── create-athlete-form.tsx
-└── hooks/
-    └── use-athletes.ts       # Composite hooks (optional)
+├── hooks/
+│   ├── queries/
+│   │   ├── use-athletes.ts       # List query hook
+│   │   └── use-athlete.ts        # Detail query hook
+│   └── mutations/
+│       ├── use-create-athlete.ts
+│       └── use-update-athlete.ts
+└── components/
+    ├── athletes-list.tsx
+    └── athlete-form.tsx
 ```
+
+**Note:** No separate `*-keys.ts` files needed. oRPC provides `.key()` methods directly.
 </file_organization>
 
 <anti_patterns>
+**WRONG: Creating custom query key factories**
+```typescript
+// DON'T DO THIS - oRPC has built-in key management
+export const athleteKeys = {
+  all: ['athletes'] as const,
+  detail: (id: string) => [...athleteKeys.all, id] as const,
+}
+
+queryClient.invalidateQueries({ queryKey: athleteKeys.all })
+```
+
+**CORRECT: Use oRPC's built-in key methods**
+```typescript
+// Invalidate all athlete queries
+queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
+
+// Invalidate specific query with input
+queryClient.invalidateQueries({
+  queryKey: orpc.athletes.get.key({ input: { athleteId } })
+})
+```
+
 **WRONG: Creating custom fetch wrappers**
 ```typescript
 export async function fetchAthletes() {
@@ -309,13 +356,10 @@ export async function fetchAthletes() {
 }
 ```
 
-**CORRECT: Use oRPC client**
+**CORRECT: Use oRPC client with queryOptions**
 ```typescript
 export function useAthletes() {
-  return useQuery({
-    queryKey: ['athletes'],
-    queryFn: () => orpc.athletes.list.call({}),
-  })
+  return useQuery(orpc.athletes.list.queryOptions({ input: {} }))
 }
 ```
 
@@ -340,8 +384,10 @@ function AthletesList() {
 | Pattern | When to Use | Example |
 |---------|-------------|---------|
 | `queryOptions()` | Simple queries, no custom config | `orpc.dashboard.get.queryOptions({})` |
-| Manual `queryFn` | Custom staleTime, keys, or enabled | `queryFn: () => orpc.x.call({})` |
-| Query Key Factory | Multiple related queries | `athleteKeys.list(filters)` |
+| Manual `queryFn` | Custom staleTime or enabled | `queryFn: () => orpc.x.call({})` |
+| `.key()` | Invalidate all queries for procedure | `orpc.athletes.key()` |
+| `.key({ input })` | Invalidate specific query | `orpc.athletes.get.key({ input })` |
+| `.queryKey({ input })` | Get/set query data | `orpc.athletes.get.queryKey({ input })` |
 | `useMutation` | Create/Update/Delete operations | With `invalidateQueries` on success |
 | `useInfiniteQuery` | Paginated "load more" lists | With `getNextPageParam` |
 </success_criteria>

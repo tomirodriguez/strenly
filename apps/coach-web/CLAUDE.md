@@ -57,19 +57,25 @@ routes/
 ### API Hooks Pattern
 
 ```typescript
-// lib/api/{domain}.ts
-import { orpc } from '../api-client'
+// features/athletes/hooks/queries/use-athletes.ts
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '@/lib/api-client'
 
 export function useAthletes(filters?: ListAthletesInput) {
   return useQuery(orpc.athletes.list.queryOptions({ input: filters }))
 }
+
+// features/athletes/hooks/mutations/use-create-athlete.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { orpc } from '@/lib/api-client'
 
 export function useCreateAthlete() {
   const queryClient = useQueryClient()
   return useMutation({
     ...orpc.athletes.create.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['athletes'] })
+      // Use oRPC's key() method for cache invalidation
+      queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
   })
 }
