@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - INSERTED)
-Plan: 2/7 (Create Program Form Improvements)
+Plan: 3/7 (Grid Foundation)
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.1-02-PLAN.md
+Last activity: 2026-01-25 - Completed 03.1-03-PLAN.md
 
-Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 2/7
+Progress: [██████████████████████████████░] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 plan 3/7
 
 **Note:** Phase 3.1 replaces react-datasheet-grid with custom implementation matching our design system.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 36
+- Total plans completed: 37
 - Average duration: 4 min
-- Total execution time: 138 min
+- Total execution time: 142 min
 
 **By Phase:**
 
@@ -126,6 +126,9 @@ Recent decisions affecting current work:
 - **Template verification in createFromTemplate** - Verify source is actually a template before creating program
 - **weeksCount optional with backend default** - Schema uses .optional(), backend applies default of 4. Avoids Zod z.infer output type conflicts with React Hook Form.
 - **Combobox for searchable athlete selection** - Use Combobox with local filtering for athlete selection in program form
+- **Roving tabindex for grid navigation** - W3C ARIA Grid pattern with only active cell having tabIndex=0
+- **Direction-aware navigation skips non-navigable rows** - Arrow key navigation skips session-header rows in direction of movement
+- **Separate navigation and editing hooks** - useGridNavigation for cell focus, useCellEditing for edit mode state
 
 ### Pending Todos
 
@@ -320,16 +323,22 @@ None.
 |------|------|--------|
 | 03.1-01 | Programs Table Component | Complete |
 | 03.1-02 | Create Program Form Improvements | Complete |
-| 03.1-03 | Grid Foundation | Pending |
+| 03.1-03 | Grid Foundation | Complete |
 | 03.1-04 | Cell Components | Pending |
 | 03.1-05 | Row Management | Pending |
 | 03.1-06 | Keyboard Navigation | Pending |
 | 03.1-07 | Final Integration | Pending |
 
+**Key artifacts so far:**
+- `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions (GridCell, GridColumn, GridRow, GridData)
+- `apps/coach-web/src/components/programs/program-grid/use-grid-navigation.ts` - Keyboard navigation hook with W3C ARIA patterns
+- `apps/coach-web/src/components/programs/program-grid/use-cell-editing.ts` - Cell editing state management with keyboard handling
+- `apps/coach-web/src/components/programs/program-grid/transform-program.ts` - API-to-grid data transformer with superset position calculation
+
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-02-PLAN.md
+Stopped at: Completed 03.1-03-PLAN.md
 Resume file: None
 
-**Next:** Execute 03.1-03-PLAN.md - Grid Foundation
+**Next:** Execute 03.1-04-PLAN.md - Cell Components
