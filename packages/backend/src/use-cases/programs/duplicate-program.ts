@@ -212,15 +212,10 @@ export const makeDuplicateProgram =
                     const newPrescriptionId = deps.generateId()
                     result = result.andThen(() =>
                       deps.programRepository
-                        .upsertPrescription(
-                          ctx,
-                          newRowId,
-                          newWeekId,
-                          {
-                            ...prescription,
-                            id: newPrescriptionId,
-                          },
-                        )
+                        .upsertPrescription(ctx, newRowId, newWeekId, {
+                          ...prescription,
+                          id: newPrescriptionId,
+                        })
                         .mapErr(
                           (e): DuplicateProgramError => ({
                             type: 'repository_error',
@@ -268,15 +263,10 @@ export const makeDuplicateProgram =
                       const newPrescriptionId = deps.generateId()
                       result = result.andThen(() =>
                         deps.programRepository
-                          .upsertPrescription(
-                            ctx,
-                            newSubRowId,
-                            newWeekId,
-                            {
-                              ...prescription,
-                              id: newPrescriptionId,
-                            },
-                          )
+                          .upsertPrescription(ctx, newSubRowId, newWeekId, {
+                            ...prescription,
+                            id: newPrescriptionId,
+                          })
                           .mapErr(
                             (e): DuplicateProgramError => ({
                               type: 'repository_error',
@@ -298,12 +288,14 @@ export const makeDuplicateProgram =
               .andThen(() => createExerciseRows())
               .andThen(() =>
                 // 10. Return the new program with full details
-                deps.programRepository.findWithDetails(ctx, newProgram.id).mapErr(
-                  (e): DuplicateProgramError => ({
-                    type: 'repository_error',
-                    message: e.type === 'DATABASE_ERROR' ? e.message : `Program not found: ${e.id}`,
-                  }),
-                ),
+                deps.programRepository
+                  .findWithDetails(ctx, newProgram.id)
+                  .mapErr(
+                    (e): DuplicateProgramError => ({
+                      type: 'repository_error',
+                      message: e.type === 'DATABASE_ERROR' ? e.message : `Program not found: ${e.id}`,
+                    }),
+                  ),
               )
           })
       })

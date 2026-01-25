@@ -21,9 +21,7 @@ export type ListProgramsResult = {
   totalCount: number
 }
 
-export type ListProgramsError =
-  | { type: 'forbidden'; message: string }
-  | { type: 'repository_error'; message: string }
+export type ListProgramsError = { type: 'forbidden'; message: string } | { type: 'repository_error'; message: string }
 
 type Dependencies = {
   programRepository: ProgramRepositoryPort

@@ -62,26 +62,28 @@ export const makeToggleSuperset =
             updatedAt: new Date(),
           }
 
-          return deps.programRepository
-            .updateExerciseRow(ctx, updated)
-            .mapErr(
-              (e): ToggleSupersetError => ({
-                type: 'repository_error',
-                message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
-              }),
-            )
-            // After clearing superset metadata, move row to end of session
-            .andThen((updatedRow) =>
-              deps.programRepository
-                .repositionRowToEndOfSession(ctx, existing.sessionId, updatedRow.id)
-                .map(() => updatedRow)
-                .mapErr(
-                  (e): ToggleSupersetError => ({
-                    type: 'repository_error',
-                    message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to reposition row: ${e.id}`,
-                  }),
-                ),
-            )
+          return (
+            deps.programRepository
+              .updateExerciseRow(ctx, updated)
+              .mapErr(
+                (e): ToggleSupersetError => ({
+                  type: 'repository_error',
+                  message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
+                }),
+              )
+              // After clearing superset metadata, move row to end of session
+              .andThen((updatedRow) =>
+                deps.programRepository
+                  .repositionRowToEndOfSession(ctx, existing.sessionId, updatedRow.id)
+                  .map(() => updatedRow)
+                  .mapErr(
+                    (e): ToggleSupersetError => ({
+                      type: 'repository_error',
+                      message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to reposition row: ${e.id}`,
+                    }),
+                  ),
+              )
+          )
         }
 
         // 4. Adding to superset - query max order in that group, then set order = max + 1

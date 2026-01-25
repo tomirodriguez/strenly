@@ -1,5 +1,5 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type Role } from '@strenly/core'
-import { errAsync, okAsync, ResultAsync } from 'neverthrow'
+import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type DeleteWeekInput = OrganizationContext & {
   memberRole: Role

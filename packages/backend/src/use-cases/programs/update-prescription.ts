@@ -1,3 +1,4 @@
+import { parsePrescriptionNotation } from '@strenly/contracts/programs/prescription'
 import {
   createPrescription,
   hasPermission,
@@ -6,8 +7,7 @@ import {
   type ProgramRepositoryPort,
   type Role,
 } from '@strenly/core'
-import { parsePrescriptionNotation } from '@strenly/contracts/programs/prescription'
-import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdatePrescriptionInput = OrganizationContext & {
   memberRole: Role
