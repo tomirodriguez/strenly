@@ -561,6 +561,15 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
+    findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek, ProgramRepositoryError> {
+      return RA.fromPromise(verifyWeekAccess(ctx, weekId), wrapDbError).andThen((row) => {
+        if (!row) {
+          return err(notFoundError('week', weekId))
+        }
+        return ok(mapWeekToDomain(row))
+      })
+    },
+
     updateWeek(ctx: OrganizationContext, week: ProgramWeek): ResultAsync<ProgramWeek, ProgramRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<{ ok: true; data: WeekRow } | { ok: false; error: ProgramRepositoryError }> => {
@@ -726,10 +735,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       ctx: OrganizationContext,
       rowId: string,
     ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError> {
-      return RA.fromPromise(
-        verifyExerciseRowAccess(ctx, rowId),
-        wrapDbError,
-      ).andThen((row) => {
+      return RA.fromPromise(verifyExerciseRowAccess(ctx, rowId), wrapDbError).andThen((row) => {
         if (!row) {
           return err(notFoundError('exercise_row', rowId))
         }
@@ -881,9 +887,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       parentRowId: string,
     ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError> {
       return RA.fromPromise(
-        (async (): Promise<
-          { ok: true; data: ProgramExerciseRow[] } | { ok: false; error: ProgramRepositoryError }
-        > => {
+        (async (): Promise<{ ok: true; data: ProgramExerciseRow[] } | { ok: false; error: ProgramRepositoryError }> => {
           // First verify the parent row belongs to the organization
           const parentRow = await verifyExerciseRowAccess(ctx, parentRowId)
           if (!parentRow) {

@@ -155,6 +155,11 @@ export type ProgramRepositoryPort = {
   ): ResultAsync<ProgramWeek, ProgramRepositoryError>
 
   /**
+   * Find a week by ID
+   */
+  findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek, ProgramRepositoryError>
+
+  /**
    * Update a week
    */
   updateWeek(ctx: OrganizationContext, week: ProgramWeek): ResultAsync<ProgramWeek, ProgramRepositoryError>
