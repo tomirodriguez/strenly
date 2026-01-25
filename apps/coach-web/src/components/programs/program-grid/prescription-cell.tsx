@@ -9,6 +9,7 @@ interface PrescriptionCellProps {
   isActive: boolean
   isEditing: boolean
   isSubRow: boolean
+  onSelect: () => void
   onStartEdit: () => void
   onCommit: (value: string) => void
   onCancel: () => void
@@ -19,11 +20,12 @@ interface PrescriptionCellProps {
  * Prescription cell component for week columns in the program grid.
  *
  * Features:
- * - Click to start editing
+ * - Single click selects cell
+ * - Double-click or Enter/F2 enters edit mode
  * - Type any key to start editing with that character
  * - Enter commits, Escape cancels
  * - Tab/Shift+Tab commit and navigate horizontally
- * - Arrow keys commit and navigate
+ * - Arrow keys commit and navigate (or bubble to grid when not editing)
  * - Em dash for empty values
  * - Sub-row values dimmed
  */
@@ -34,6 +36,7 @@ export function PrescriptionCell({
   isActive,
   isEditing,
   isSubRow,
+  onSelect,
   onStartEdit,
   onCommit,
   onCancel,
@@ -107,28 +110,8 @@ export function PrescriptionCell({
   }
 
   const handleCellKeyDown = (e: React.KeyboardEvent) => {
-    // Navigate between cells when not editing
+    // Only handle edit mode triggers - let navigation keys bubble to grid
     switch (e.key) {
-      case 'ArrowUp':
-        e.preventDefault()
-        onNavigate('up')
-        break
-      case 'ArrowDown':
-        e.preventDefault()
-        onNavigate('down')
-        break
-      case 'ArrowLeft':
-        e.preventDefault()
-        onNavigate('left')
-        break
-      case 'ArrowRight':
-        e.preventDefault()
-        onNavigate('right')
-        break
-      case 'Tab':
-        e.preventDefault()
-        onNavigate(e.shiftKey ? 'shift-tab' : 'tab')
-        break
       case 'Enter':
       case 'F2':
         // Start editing on Enter or F2 (Excel convention)
@@ -137,11 +120,12 @@ export function PrescriptionCell({
         break
       default:
         // Start editing on any printable character
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault()
           setEditValue(e.key) // Start with typed character
           onStartEdit()
         }
+        // Let arrow keys, Tab, etc. bubble to the grid for navigation
     }
   }
 
@@ -169,7 +153,8 @@ export function PrescriptionCell({
         'cursor-text border-border border-r border-b p-0',
         isActive && 'bg-primary/5 ring-1 ring-primary ring-inset',
       )}
-      onClick={onStartEdit}
+      onClick={onSelect}
+      onDoubleClick={onStartEdit}
       onKeyDown={handleCellKeyDown}
       tabIndex={isActive ? 0 : -1}
       data-row-id={rowId}
