@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.1 of 5 (Custom Program Grid - Gap Closure)
-Plan: 10/N (Dynamic Superset Groups) - COMPLETE
+Plan: 11/N (Keyboard Navigation & Edit Mode Fix) - COMPLETE
 Status: Gap closure in progress
-Last activity: 2026-01-25 - Completed 03.1-10-PLAN.md (dynamic superset groups and order calculation)
+Last activity: 2026-01-25 - Completed 03.1-11-PLAN.md (keyboard navigation and edit mode fix)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6 complete, Phase 3 backend complete, Phase 3.1 + gap fixes
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 42
+- Total plans completed: 43
 - Average duration: 4 min
-- Total execution time: 157 min
+- Total execution time: 163 min
 
 **By Phase:**
 
@@ -35,7 +35,7 @@ Progress: [███████████████████████
 | 3.1 | 7/7 | ~35 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-07 (5 min), 03.1-08 (3 min), 03.1-09 (1 min), 03.1-10 (4 min)
+- Last 5 plans: 03.1-08 (3 min), 03.1-09 (1 min), 03.1-10 (4 min), 03.1-11 (6 min)
 - Trend: Gap closure plans executing quickly
 
 *Updated after each plan completion*
@@ -133,6 +133,10 @@ Recent decisions affecting current work:
 - **Arrow navigation at cursor boundaries** - In prescription cells, left/right arrows only navigate when cursor is at start/end of text
 - **Table without role="grid" for lint compliance** - Semantic table element with keyboard handlers, role attribute removed for Biome lint
 - **Fetch existing before partial update** - Use findById before updateX to preserve non-input fields (e.g., orderIndex)
+- **DOM focus via requestAnimationFrame** - Use requestAnimationFrame for focus after state changes to ensure DOM updates complete
+- **Ref-based last edited cell tracking** - Store last edited cell in ref for focus restoration without triggering re-renders
+- **Single click selects, double-click edits** - Excel convention: onClick triggers selection, onDoubleClick triggers edit mode
+- **Navigation keys bubble from cells to grid** - Cells only handle edit triggers (Enter, F2, printable chars); arrow/tab bubble to grid
 
 ### Pending Todos
 
@@ -231,6 +235,8 @@ None.
 | 03.1-07 | Final Integration | Complete |
 | 03.1-08 | Athlete Selector Server-Side Search | Complete |
 | 03.1-09 | Week Ordering Bug Fix | Complete |
+| 03.1-10 | Dynamic Superset Groups | Complete |
+| 03.1-11 | Keyboard Navigation & Edit Mode Fix | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/program-grid/types.ts` - Grid type definitions
@@ -253,7 +259,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 03.1-10-PLAN.md - Dynamic superset groups and order calculation
+Stopped at: Completed 03.1-11-PLAN.md - Keyboard navigation and edit mode fix
 Resume file: None
 
-**Next:** Continue gap closure plans or re-run UAT to verify fixes.
+**Next:** Continue gap closure plans or re-run UAT to verify fixes (Tests 10 and 13 addressed).
