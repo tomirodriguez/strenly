@@ -15,7 +15,8 @@
     "./exercises/muscle-group": "./src/exercises/muscle-group.ts",
     "./athletes": "./src/athletes/index.ts",
     "./athletes/athlete": "./src/athletes/athlete.ts",
-    "./athletes/invitation": "./src/athletes/invitation.ts"
+    "./athletes/invitation": "./src/athletes/invitation.ts",
+    "./programs/prescription": "./src/programs/prescription.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -23,12 +24,17 @@
     "format": "pnpm biome format --write src",
     "lint": "pnpm biome check --write src",
     "lint:fix": "pnpm biome check --write --unsafe src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
   }
 }
