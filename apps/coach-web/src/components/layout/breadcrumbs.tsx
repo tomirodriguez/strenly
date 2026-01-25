@@ -1,4 +1,4 @@
-import { Link, useMatches } from '@tanstack/react-router'
+import { Link, useMatches, useParams } from '@tanstack/react-router'
 import { ChevronRightIcon } from 'lucide-react'
 import {
   Breadcrumb,
@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/breadcrumb'
 
 const routeLabels: Record<string, string> = {
-  dashboard: 'Dashboard',
-  athletes: 'Athletes',
-  exercises: 'Exercises',
-  settings: 'Settings',
+  dashboard: 'Panel',
+  athletes: 'Atletas',
+  exercises: 'Ejercicios',
+  settings: 'Configuracion',
 }
 
 function capitalizeFirst(str: string): string {
@@ -22,7 +22,10 @@ function capitalizeFirst(str: string): string {
 
 export function Breadcrumbs() {
   const matches = useMatches()
+  const params = useParams({ strict: false })
+  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
 
+  // Build breadcrumb items from route matches
   const breadcrumbs = matches
     .filter((match) => match.pathname !== '/')
     .map((match) => {
@@ -34,37 +37,50 @@ export function Breadcrumbs() {
       return {
         pathname: match.pathname,
         label,
+        segment: lastSegment,
       }
     })
-    .filter((item) => item.label && item.label !== '_authenticated' && item.label !== '_auth')
+    // Filter out layout routes and the orgSlug segment
+    .filter(
+      (item) => item.label && item.label !== '_authenticated' && item.label !== '_auth' && item.segment !== orgSlug,
+    )
 
-  if (breadcrumbs.length === 0) {
-    return null
-  }
+  // Check if we're on the dashboard page
+  const isOnDashboard = breadcrumbs.length === 1 && breadcrumbs[0]?.segment === 'dashboard'
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {breadcrumbs.map((item, index) => {
-          const isLast = index === breadcrumbs.length - 1
+        {/* Home breadcrumb - always first */}
+        <BreadcrumbItem>
+          {isOnDashboard ? (
+            <BreadcrumbPage>Inicio</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink render={<Link to="/$orgSlug/dashboard" params={{ orgSlug }} />}>Inicio</BreadcrumbLink>
+          )}
+        </BreadcrumbItem>
 
-          return (
-            <div key={item.pathname} className="flex items-center gap-2">
-              {index > 0 && (
+        {/* Remaining breadcrumbs after "Inicio", excluding dashboard */}
+        {breadcrumbs
+          .filter((item) => item.segment !== 'dashboard')
+          .map((item, index, arr) => {
+            const isLast = index === arr.length - 1
+
+            return (
+              <div key={item.pathname} className="flex items-center gap-2">
                 <BreadcrumbSeparator>
                   <ChevronRightIcon className="size-4" />
                 </BreadcrumbSeparator>
-              )}
-              <BreadcrumbItem>
-                {isLast ? (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink render={<Link to={item.pathname} />}>{item.label}</BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </div>
-          )
-        })}
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink render={<Link to={item.pathname} />}>{item.label}</BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+              </div>
+            )
+          })}
       </BreadcrumbList>
     </Breadcrumb>
   )
