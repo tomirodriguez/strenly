@@ -85,13 +85,13 @@ export function AppSidebar({ user }: AppSidebarProps) {
     : (user.email?.[0]?.toUpperCase() ?? 'U')
 
   return (
-    <Sidebar collapsible="offExamples" className="border-sidebar-border border-r">
+    <Sidebar collapsible="icon" className="border-sidebar-border border-r">
       <SidebarHeader className="h-16 border-sidebar-border border-b">
         <div className="flex h-full items-center gap-2 px-4">
           <div className="flex size-8 items-center justify-center rounded-md bg-primary">
             <ZapIcon className="size-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg tracking-tight">Treino</span>
+          <span className="font-bold text-xl tracking-tight">STRENLY</span>
         </div>
       </SidebarHeader>
 
@@ -107,9 +107,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     <SidebarMenuButton
                       render={<Link to={to} />}
                       isActive={Boolean(isActive)}
-                      className="text-muted-foreground"
+                      size="lg"
+                      className="gap-3 px-4 text-muted-foreground"
                     >
-                      <item.icon />
+                      <item.icon className="size-5" />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -133,9 +134,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     <SidebarMenuButton
                       render={<Link to={to} />}
                       isActive={Boolean(isActive)}
-                      className="text-muted-foreground"
+                      size="lg"
+                      className="gap-3 px-4 text-muted-foreground"
                     >
-                      <item.icon />
+                      <item.icon className="size-5" />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

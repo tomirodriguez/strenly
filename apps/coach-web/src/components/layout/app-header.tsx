@@ -16,8 +16,8 @@ export function AppHeader({ primaryAction }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-border border-b bg-background/80 px-4 backdrop-blur-md md:px-8">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="md:hidden" />
-        <Separator orientation="vertical" className="h-6 md:hidden" />
+        <SidebarTrigger />
+        <Separator orientation="vertical" className="h-6" />
         <Breadcrumbs />
       </div>
 
