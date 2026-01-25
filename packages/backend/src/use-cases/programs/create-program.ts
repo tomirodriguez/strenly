@@ -13,6 +13,7 @@ export type CreateProgramInput = OrganizationContext & {
   description?: string | null
   athleteId?: string | null
   isTemplate?: boolean
+  weeksCount?: number
 }
 
 export type CreateProgramError =
@@ -79,31 +80,42 @@ export const makeCreateProgram =
     return athleteCheck
       .andThen(() =>
         // 4. Save program
-        deps.programRepository.create(ctx, program).mapErr((e): CreateProgramError => {
-          if (e.type === 'DATABASE_ERROR') {
-            return { type: 'repository_error', message: e.message }
-          }
-          return { type: 'repository_error', message: `Not found: ${e.id}` }
-        }),
+        deps.programRepository
+          .create(ctx, program)
+          .mapErr((e): CreateProgramError => {
+            if (e.type === 'DATABASE_ERROR') {
+              return { type: 'repository_error', message: e.message }
+            }
+            return { type: 'repository_error', message: `Not found: ${e.id}` }
+          }),
       )
       .andThen((createdProgram) => {
         const now = new Date()
+        const weeksCount = input.weeksCount ?? 4
 
-        // 5. Create default week ("Semana 1")
-        return deps.programRepository
-          .createWeek(ctx, createdProgram.id, {
-            id: deps.generateId(),
-            name: 'Semana 1',
-            orderIndex: 0,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .mapErr(
-            (e): CreateProgramError => ({
-              type: 'repository_error',
-              message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
-            }),
-          )
+        // 5. Create weeks ("Semana 1", "Semana 2", etc.)
+        const createWeeksSequentially = (index: number): ResultAsync<void, CreateProgramError> => {
+          if (index >= weeksCount) {
+            return okAsync(undefined)
+          }
+          return deps.programRepository
+            .createWeek(ctx, createdProgram.id, {
+              id: deps.generateId(),
+              name: `Semana ${index + 1}`,
+              orderIndex: index,
+              createdAt: now,
+              updatedAt: now,
+            })
+            .mapErr(
+              (e): CreateProgramError => ({
+                type: 'repository_error',
+                message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+              }),
+            )
+            .andThen(() => createWeeksSequentially(index + 1))
+        }
+
+        return createWeeksSequentially(0)
           .andThen(() =>
             // 6. Create default session ("DIA 1")
             deps.programRepository
