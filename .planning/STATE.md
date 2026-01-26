@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 7/8 - Grid Integration complete
-Status: In progress
-Last activity: 2026-01-26 - Completed 03.2-07-PLAN.md (grid integration)
+Plan: 8/8 - Data Migration complete
+Status: PHASE COMPLETE
+Last activity: 2026-01-25 - Completed 03.2-08-PLAN.md (data migration)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-07 complete
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE
 
-**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
+**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. Phase 3.2 refactored prescription data structure to series arrays with client-side state management.
 
 ## Performance Metrics
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.2-03 (3 min), 03.2-04 (~3 min), 03.2-05 (2 min), 03.2-06 (2 min), 03.2-07 (3 min)
-- Trend: Phase 3.2 grid integration complete
+- Last 5 plans: 03.2-04 (~3 min), 03.2-05 (2 min), 03.2-06 (2 min), 03.2-07 (3 min), 03.2-08 (~15 min)
+- Trend: Phase 3.2 COMPLETE - prescription data structure refactor done
 
 *Updated after each plan completion*
 
@@ -154,6 +154,7 @@ Recent decisions affecting current work:
 - **Notation parsed in handlePrescriptionCommit** - Grid converts notation to series array via parsePrescriptionToSeries before calling store action
 - **Multi-line display for varied series** - Prescription cells split on ' + ' delimiter to show each part on separate line
 - **Backward compatible grid props** - Optional gridData/onPrescriptionChange/onExerciseChange props; falls back to server mutations if not provided
+- **useShallow for Zustand selectors** - Selectors returning objects/arrays need useShallow to prevent reference inequality causing infinite loops
 
 ### Pending Todos
 
@@ -293,7 +294,7 @@ None.
 | 03.2-05 | Use Cases | Complete |
 | 03.2-06 | Client-Side State | Complete |
 | 03.2-07 | Grid Integration | Complete |
-| 03.2-08 | Data Migration | Pending |
+| 03.2-08 | Data Migration | Complete |
 
 **Key artifacts:**
 - `packages/core/src/domain/entities/prescription-series.ts` - Single set entity
@@ -309,11 +310,12 @@ None.
 - `apps/coach-web/src/hooks/use-unsaved-changes.ts` - Navigation guard hook
 - `apps/coach-web/src/features/programs/hooks/mutations/use-save-draft.ts` - Bulk save mutation hook
 - `apps/coach-web/src/components/programs/program-grid/save-button.tsx` - Save button component
+- `packages/database/src/seed/migrate-to-series.ts` - Data migration script
 
 ## Session Continuity
 
-Last session: 2026-01-26
-Stopped at: Completed 03.2-07-PLAN.md (grid integration)
+Last session: 2026-01-25
+Stopped at: Completed 03.2-08-PLAN.md (data migration) - Phase 3.2 COMPLETE
 Resume file: None
 
-**Next:** Phase 3.2 Plan 08 (Data Migration).
+**Next:** Ready for next phase. Phase 3.2 Prescription Data Structure Refactor complete.
