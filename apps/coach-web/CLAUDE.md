@@ -129,6 +129,7 @@ export function AthleteForm() {
 - **No `!` assertions** - Use optional chaining or guards
 - **Avoid `useEffect`** - Prefer callback functions, event handlers, or derived state
 - **Dark mode support** - Use CSS variables and Tailwind dark: variants
+- **Test coverage** - Maintain 75%+ coverage on mutation hooks and critical components
 
 ## Development
 

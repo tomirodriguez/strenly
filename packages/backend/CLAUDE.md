@@ -63,6 +63,7 @@ src/
 - **Import from `@strenly/contracts`** - Never define Zod schemas inline
 - **No `as` casting** - Fix actual type issues
 - **No `!` assertions** - Use guards or optional chaining
+- **Test coverage** - Maintain 80%+ coverage on use cases, 75%+ on repositories
 
 ## Example Patterns
 
