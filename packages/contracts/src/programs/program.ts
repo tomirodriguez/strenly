@@ -12,6 +12,171 @@ export const programStatusSchema = z.enum(['draft', 'active', 'archived'])
 
 export type ProgramStatus = z.infer<typeof programStatusSchema>
 
+/**
+ * Intensity type schema for aggregate
+ * - absolute: Weight in kg/lb
+ * - percentage: Percentage of 1RM
+ * - rpe: Rate of Perceived Exertion
+ * - rir: Reps in Reserve
+ */
+export const aggregateIntensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'])
+
+export type AggregateIntensityType = z.infer<typeof aggregateIntensityTypeSchema>
+
+// ============================================================================
+// Aggregate Schemas (NEW - for full program hierarchy)
+// ============================================================================
+
+/**
+ * Series schema - individual set within a group item
+ * Used in the aggregate hierarchy: Program > Week > Session > Group > Item > Series
+ */
+export const seriesSchema = z.object({
+  orderIndex: z.number().int().min(0),
+  reps: z.number().int().min(0).nullable(),
+  repsMax: z.number().int().min(0).nullable(),
+  isAmrap: z.boolean(),
+  intensityType: aggregateIntensityTypeSchema.nullable(),
+  intensityValue: z.number().nullable(),
+  tempo: z.string().regex(/^[\dX]{4}$/i).nullable(),
+  restSeconds: z.number().int().min(0).nullable(),
+})
+
+export type Series = z.infer<typeof seriesSchema>
+
+/**
+ * Group item schema - an exercise within a group
+ * Contains series (individual sets)
+ */
+export const groupItemSchema = z.object({
+  id: z.string(),
+  exerciseId: z.string(),
+  orderIndex: z.number().int().min(0),
+  series: z.array(seriesSchema),
+})
+
+export type GroupItem = z.infer<typeof groupItemSchema>
+
+/**
+ * Exercise group schema for aggregate
+ * Contains items (exercises with their series)
+ */
+export const exerciseGroupAggregateSchema = z.object({
+  id: z.string(),
+  orderIndex: z.number().int().min(0),
+  items: z.array(groupItemSchema),
+})
+
+export type ExerciseGroupAggregate = z.infer<typeof exerciseGroupAggregateSchema>
+
+/**
+ * Session schema for aggregate
+ * Contains exercise groups
+ */
+export const sessionAggregateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  orderIndex: z.number().int().min(0),
+  exerciseGroups: z.array(exerciseGroupAggregateSchema),
+})
+
+export type SessionAggregate = z.infer<typeof sessionAggregateSchema>
+
+/**
+ * Week schema for aggregate
+ * Contains sessions with their exercise groups
+ */
+export const weekAggregateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  orderIndex: z.number().int().min(0),
+  sessions: z.array(sessionAggregateSchema),
+})
+
+export type WeekAggregate = z.infer<typeof weekAggregateSchema>
+
+/**
+ * Full program aggregate schema for output
+ * Contains the complete hierarchy: weeks > sessions > groups > items > series
+ */
+export const programAggregateSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  athleteId: z.string().nullable(),
+  isTemplate: z.boolean(),
+  status: programStatusSchema,
+  weeks: z.array(weekAggregateSchema),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+export type ProgramAggregate = z.infer<typeof programAggregateSchema>
+
+/**
+ * Series input schema (for creating/updating)
+ * Same as output but no orderIndex (auto-calculated)
+ */
+export const seriesInputSchema = z.object({
+  reps: z.number().int().min(0).nullable(),
+  repsMax: z.number().int().min(0).nullable().optional(),
+  isAmrap: z.boolean(),
+  intensityType: aggregateIntensityTypeSchema.nullable().optional(),
+  intensityValue: z.number().nullable().optional(),
+  tempo: z.string().regex(/^[\dX]{4}$/i).nullable().optional(),
+  restSeconds: z.number().int().min(0).nullable().optional(),
+})
+
+export type SeriesInput = z.infer<typeof seriesInputSchema>
+
+/**
+ * Group item input schema
+ */
+export const groupItemInputSchema = z.object({
+  id: z.string(),
+  exerciseId: z.string(),
+  orderIndex: z.number().int().min(0),
+  series: z.array(seriesInputSchema).optional(),
+})
+
+export type GroupItemInput = z.infer<typeof groupItemInputSchema>
+
+/**
+ * Exercise group input schema
+ */
+export const exerciseGroupInputSchema = z.object({
+  id: z.string(),
+  orderIndex: z.number().int().min(0),
+  items: z.array(groupItemInputSchema),
+})
+
+export type ExerciseGroupInput = z.infer<typeof exerciseGroupInputSchema>
+
+/**
+ * Session input schema
+ */
+export const sessionInputSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  orderIndex: z.number().int().min(0),
+  exerciseGroups: z.array(exerciseGroupInputSchema).optional(),
+})
+
+export type SessionInput = z.infer<typeof sessionInputSchema>
+
+/**
+ * Week input schema
+ */
+export const weekInputSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  orderIndex: z.number().int().min(0),
+  sessions: z.array(sessionInputSchema).optional(),
+})
+
+export type WeekInput = z.infer<typeof weekInputSchema>
+
 // ============================================================================
 // Output Schemas
 // ============================================================================

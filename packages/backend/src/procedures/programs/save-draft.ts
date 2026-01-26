@@ -4,19 +4,16 @@ import { authProcedure } from '../../lib/orpc'
 import { makeSaveDraft } from '../../use-cases/programs/save-draft'
 
 /**
- * Save draft changes to a program atomically.
- * This is the bulk save operation for client-side editing.
+ * Save draft changes to a program using the aggregate pattern.
  *
- * Accepts all changes made client-side (prescriptions, exercise rows, groups)
- * and persists them in a single transaction.
- *
- * This coexists with existing per-change mutations (updatePrescription, updateExerciseRow)
- * during the transition period.
+ * Accepts the complete program state from the frontend and persists it atomically.
+ * Validation happens via the createProgram() domain factory in the use case.
  */
 export const saveDraftProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
     PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
+    VALIDATION_ERROR: { message: 'Error de validacion' },
     CONFLICT: { message: 'El programa fue modificado por otro usuario' },
   })
   .input(saveDraftInputSchema)
@@ -32,7 +29,11 @@ export const saveDraftProcedure = authProcedure
         userId: context.user.id,
         memberRole: context.membership.role,
       },
-      input,
+      {
+        programId: input.programId,
+        program: input.program,
+        lastLoadedAt: input.lastLoadedAt,
+      },
     )
 
     if (result.isErr()) {
@@ -41,6 +42,8 @@ export const saveDraftProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'program_not_found':
           throw errors.PROGRAM_NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'conflict':
           throw errors.CONFLICT({ message: result.error.message })
         case 'repository_error':

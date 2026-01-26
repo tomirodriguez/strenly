@@ -1,15 +1,34 @@
-import type { SaveDraftInput } from '@strenly/contracts/programs/save-draft'
-import {
-  hasPermission,
-  type OrganizationContext,
-  type PrescriptionSeriesData,
-  type ProgramRepositoryPort,
-  type SaveDraftInput as RepoSaveDraftInput,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
+import type { CreateProgramInput, ProgramStatus, WeekInput } from '@strenly/core/domain/entities/program/types'
 import { errAsync, type ResultAsync } from 'neverthrow'
+
+/**
+ * Program data input from the procedure (without id/organizationId).
+ * The use case adds these from context.
+ */
+export type ProgramDataInput = {
+  name: string
+  description?: string | null
+  athleteId?: string | null
+  isTemplate?: boolean
+  status?: ProgramStatus
+  weeks?: WeekInput[]
+}
+
+/**
+ * Input for saveDraft use case.
+ * Receives the full program aggregate input (not delta changes).
+ */
+export type SaveDraftInput = {
+  programId: string
+  program: ProgramDataInput
+  lastLoadedAt?: Date // For optimistic locking
+}
 
 export type SaveDraftError =
   | { type: 'unauthorized'; message: string }
+  | { type: 'validation_error'; message: string; details?: unknown }
   | { type: 'program_not_found'; programId: string }
   | { type: 'conflict'; message: string; serverUpdatedAt: Date }
   | { type: 'repository_error'; message: string }
@@ -25,21 +44,39 @@ type Dependencies = {
 
 /**
  * Map repository error to use case error.
- * Handles the discriminated union from ProgramRepositoryError.
  */
 function mapRepoError(e: { type: 'NOT_FOUND' | 'DATABASE_ERROR'; message?: string; id?: string }): SaveDraftError {
   if (e.type === 'DATABASE_ERROR') {
     return { type: 'repository_error', message: e.message ?? 'Database error' }
   }
-  return { type: 'repository_error', message: `Entity not found: ${e.id ?? 'unknown'}` }
+  return { type: 'program_not_found', programId: e.id ?? 'unknown' }
 }
 
 /**
- * Save draft changes to a program atomically.
- * This is the bulk save operation for client-side editing.
+ * Save a validated program aggregate.
+ */
+function saveProgram(
+  deps: Dependencies,
+  ctx: OrganizationContext,
+  program: Program,
+  conflictWarning: string | null,
+): ResultAsync<SaveDraftResult, SaveDraftError> {
+  return deps.programRepository
+    .saveProgramAggregate(ctx, program)
+    .mapErr(mapRepoError)
+    .map((result) => ({ updatedAt: result.updatedAt, conflictWarning }))
+}
+
+/**
+ * Save draft changes to a program using the aggregate pattern.
  *
- * Accepts all changes made client-side (prescriptions, exercise rows, groups)
- * and persists them in a single transaction.
+ * This use case:
+ * 1. Checks authorization
+ * 2. Optionally checks for conflicts (via lastLoadedAt)
+ * 3. Validates the entire aggregate via createProgram() domain factory
+ * 4. Persists via saveProgramAggregate() (replace-on-save)
+ *
+ * The frontend sends the complete program aggregate, not delta changes.
  */
 export const makeSaveDraft =
   (deps: Dependencies) =>
@@ -52,83 +89,43 @@ export const makeSaveDraft =
       })
     }
 
-    // 2. Verify program exists and belongs to org
-    return deps.programRepository
-      .findById(ctx, input.programId)
-      .mapErr(mapRepoError)
-      .andThen((program) => {
-        // 3. Check if program exists
-        if (!program) {
-          return errAsync<SaveDraftResult, SaveDraftError>({
-            type: 'program_not_found',
-            programId: input.programId,
-          })
-        }
+    // 2. Build CreateProgramInput by adding id and organizationId
+    const createInput: CreateProgramInput = {
+      ...input.program,
+      id: input.programId,
+      organizationId: ctx.organizationId,
+    }
 
-        // 4. Optional conflict check using lastLoadedAt
-        let conflictWarning: string | null = null
-        if (input.lastLoadedAt && program.updatedAt > input.lastLoadedAt) {
-          conflictWarning =
-            'El programa fue modificado por otro usuario. Tus cambios se guardaron pero podrian sobrescribir cambios recientes.'
-        }
+    // 3. Validate aggregate via domain factory
+    const programResult = createProgram(createInput)
 
-        // 5. Apply all updates in transaction (repository handles atomicity)
-        // Map contract input to repository format
-        const repoInput: RepoSaveDraftInput = {
-          programId: input.programId,
-          prescriptionUpdates: input.prescriptions.map((p) => ({
-            exerciseRowId: p.exerciseRowId,
-            weekId: p.weekId,
-            series: p.series.map(
-              (s): PrescriptionSeriesData => ({
-                orderIndex: s.orderIndex,
-                reps: s.reps,
-                repsMax: s.repsMax,
-                isAmrap: s.isAmrap,
-                intensityType: s.intensityType,
-                intensityValue: s.intensityValue,
-                intensityUnit: s.intensityUnit,
-                tempo: s.tempo,
-                restSeconds: null, // Not used in current contract
-              }),
-            ),
-          })),
-          exerciseRowUpdates: input.exerciseRows.map((r) => ({
-            rowId: r.rowId,
-            exerciseId: r.exerciseId,
-          })),
-          groupUpdates: input.groups.map((g) => ({
-            groupId: g.groupId,
-            name: g.name,
-            // Note: exerciseRowIds in the contract is for membership changes,
-            // but the repository handles this differently via orderWithinGroup.
-            // For now, we map the basic group updates.
-          })),
-          // Map new structural changes
-          newWeeks: input.newWeeks?.map((w) => ({
-            tempId: w.tempId,
-            name: w.name,
-            orderIndex: w.orderIndex,
-          })),
-          newSessions: input.newSessions?.map((s) => ({
-            tempId: s.tempId,
-            name: s.name,
-            orderIndex: s.orderIndex,
-          })),
-          newExerciseRows: input.newExerciseRows?.map((r) => ({
-            tempId: r.tempId,
-            sessionId: r.sessionId,
-            exerciseId: r.exerciseId,
-            orderIndex: r.orderIndex,
-          })),
-        }
-
-        return deps.programRepository
-          .saveDraft(ctx, repoInput)
-          .map((result) => ({
-            updatedAt: result.updatedAt,
-            conflictWarning,
-          }))
-          .mapErr(mapRepoError)
+    if (programResult.isErr()) {
+      return errAsync({
+        type: 'validation_error',
+        message: programResult.error.message,
+        details: programResult.error,
       })
+    }
+
+    const program = programResult.value
+
+    // 4. Optional conflict check - load current program to compare updatedAt
+    if (input.lastLoadedAt) {
+      const lastLoadedAt = input.lastLoadedAt // Capture for closure
+      return deps.programRepository
+        .loadProgramAggregate(ctx, input.programId)
+        .mapErr(mapRepoError)
+        .andThen((currentProgram) => {
+          const conflictWarning =
+            currentProgram.updatedAt > lastLoadedAt
+              ? 'El programa fue modificado por otro usuario. Tus cambios se guardaron pero podrian sobrescribir cambios recientes.'
+              : null
+
+          // 5. Save aggregate (replace-on-save)
+          return saveProgram(deps, ctx, program, conflictWarning)
+        })
+    }
+
+    // No conflict check needed - just save
+    return saveProgram(deps, ctx, program, null)
   }
