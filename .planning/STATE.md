@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 6/8 - Client-Side State complete
+Plan: 7/8 - Grid Integration complete
 Status: In progress
-Last activity: 2026-01-25 - Completed 03.2-06-PLAN.md (client-side state)
+Last activity: 2026-01-26 - Completed 03.2-07-PLAN.md (grid integration)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-06 complete
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1 COMPLETE, Phase 3.2 Plans 01-07 complete
 
 **Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. All gap closure plans (08-17) complete. Superset adjacency maintained on all operations.
 
@@ -35,8 +35,8 @@ Progress: [███████████████████████
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.2-02 (~5 min), 03.2-03 (3 min), 03.2-04 (~3 min), 03.2-05 (2 min), 03.2-06 (2 min)
-- Trend: Phase 3.2 client-side state complete
+- Last 5 plans: 03.2-03 (3 min), 03.2-04 (~3 min), 03.2-05 (2 min), 03.2-06 (2 min), 03.2-07 (3 min)
+- Trend: Phase 3.2 grid integration complete
 
 *Updated after each plan completion*
 
@@ -151,6 +151,9 @@ Recent decisions affecting current work:
 - **saveDraft in prescriptions sub-router** - Placed at programs.prescriptions.saveDraft alongside existing update
 - **Conflict warning vs blocking** - saveDraft returns conflictWarning string rather than blocking, client decides handling
 - **mapRepoError helper** - Use typed helper function to map discriminated union errors from repository
+- **Notation parsed in handlePrescriptionCommit** - Grid converts notation to series array via parsePrescriptionToSeries before calling store action
+- **Multi-line display for varied series** - Prescription cells split on ' + ' delimiter to show each part on separate line
+- **Backward compatible grid props** - Optional gridData/onPrescriptionChange/onExerciseChange props; falls back to server mutations if not provided
 
 ### Pending Todos
 
@@ -289,7 +292,7 @@ None.
 | 03.2-04 | Contracts and Repository Layer | Complete |
 | 03.2-05 | Use Cases | Complete |
 | 03.2-06 | Client-Side State | Complete |
-| 03.2-07 | Grid Integration | Pending |
+| 03.2-07 | Grid Integration | Complete |
 | 03.2-08 | Data Migration | Pending |
 
 **Key artifacts:**
@@ -304,11 +307,13 @@ None.
 - `packages/backend/src/procedures/programs/save-draft.ts` - saveDraft procedure
 - `apps/coach-web/src/stores/grid-store.ts` - Zustand store for grid state
 - `apps/coach-web/src/hooks/use-unsaved-changes.ts` - Navigation guard hook
+- `apps/coach-web/src/features/programs/hooks/mutations/use-save-draft.ts` - Bulk save mutation hook
+- `apps/coach-web/src/components/programs/program-grid/save-button.tsx` - Save button component
 
 ## Session Continuity
 
-Last session: 2026-01-25
-Stopped at: Completed 03.2-06-PLAN.md (client-side state)
+Last session: 2026-01-26
+Stopped at: Completed 03.2-07-PLAN.md (grid integration)
 Resume file: None
 
-**Next:** Phase 3.2 Plan 07 (Grid Integration).
+**Next:** Phase 3.2 Plan 08 (Data Migration).
