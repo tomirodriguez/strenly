@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.4 of 5 (Domain Restructure - Training Programs)
-Plan: 3/? (03.4-01, 03.4-03 complete)
+Plan: 4/? (03.4-01, 03.4-03, 03.4-04 complete)
 Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.4-03-PLAN.md (Aggregate Repository Methods)
+Last activity: 2026-01-26 - Completed 03.4-04-PLAN.md (Use Cases for Aggregate Pattern)
 
 Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL, 3.4 IN PROGRESS
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 54
+- Total plans completed: 55
 - Average duration: ~4 min
-- Total execution time: ~206 min
+- Total execution time: ~212 min
 
 **By Phase:**
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min), 03.4-03 (3 min)
-- Trend: Phase 3.4 IN PROGRESS - Aggregate persistence methods (load/save) implemented
+- Last 5 plans: 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min), 03.4-03 (3 min), 03.4-04 (6 min)
+- Trend: Phase 3.4 IN PROGRESS - Use cases now use aggregate pattern
 
 *Updated after each plan completion*
 
@@ -174,6 +174,8 @@ Recent decisions affecting current work:
 - **DELETE+INSERT aggregate persistence** - saveProgramAggregate deletes all children then re-inserts entire hierarchy atomically
 - **Synthetic groups for ungrouped exercises** - loadProgramAggregate creates eg-synthetic-{id} groups for exercises without groupId
 - **Prescription lookup by (exerciseId, weekId)** - prescriptionsByKey map enables efficient series attachment during reconstitution
+- **saveDraft receives full aggregate** - Frontend sends complete program state, not delta changes; simpler validation via domain factory
+- **Procedures return programAggregateSchema** - Full hierarchy (weeks > sessions > groups > items > series) for frontend rendering
 
 ### Pending Todos
 
@@ -376,17 +378,22 @@ None.
 |------|------|--------|
 | 03.4-01 | Program Aggregate Domain Entity | Complete |
 | 03.4-03 | Aggregate Repository Methods | Complete |
+| 03.4-04 | Use Cases for Aggregate Pattern | Complete |
 
 **Key artifacts:**
 - `packages/core/src/domain/entities/program/` - Program aggregate folder (types, series, group-item, exercise-group, session, week, program)
 - `packages/core/src/domain/entities/program/program.test.ts` - 60 tests, 99.73% coverage
 - `packages/core/src/ports/program-repository.port.ts` - loadProgramAggregate/saveProgramAggregate methods
 - `packages/backend/src/infrastructure/repositories/program.repository.ts` - Aggregate persistence implementation
+- `packages/backend/src/use-cases/programs/save-draft.ts` - Aggregate-based save with domain validation
+- `packages/backend/src/use-cases/programs/get-program.ts` - Returns full Program aggregate
+- `packages/backend/src/use-cases/programs/create-program.ts` - Creates with default weeks/sessions
+- `packages/backend/src/use-cases/programs/duplicate-program.ts` - Clones aggregate with new IDs
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.4-03-PLAN.md
+Stopped at: Completed 03.4-04-PLAN.md
 Resume file: None
 
-**Next:** Continue Phase 3.4 (Domain Restructure) - next plan TBD
+**Next:** Continue Phase 3.4 (Domain Restructure) - 03.4-05 Delete Legacy Code
