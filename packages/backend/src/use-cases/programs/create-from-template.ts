@@ -1,9 +1,5 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramWithDetails,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import type { Program } from '@strenly/core/domain/entities/program/program'
 import { errAsync, type ResultAsync } from 'neverthrow'
 import { makeDuplicateProgram } from './duplicate-program'
 
@@ -28,10 +24,12 @@ type Dependencies = {
 /**
  * Create a new program from a template.
  * Verifies the source is a template before creating a deep copy.
+ *
+ * Returns the full Program aggregate.
  */
 export const makeCreateFromTemplate =
   (deps: Dependencies) =>
-  (input: CreateFromTemplateInput): ResultAsync<ProgramWithDetails, CreateFromTemplateError> => {
+  (input: CreateFromTemplateInput): ResultAsync<Program, CreateFromTemplateError> => {
     // 1. Authorization FIRST - creating from template requires programs:write
     if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
@@ -47,8 +45,9 @@ export const makeCreateFromTemplate =
     }
 
     // 2. Verify the source is actually a template
+    // Load the aggregate to check isTemplate
     return deps.programRepository
-      .findById(ctx, input.templateId)
+      .loadProgramAggregate(ctx, input.templateId)
       .mapErr((e): CreateFromTemplateError => {
         if (e.type === 'NOT_FOUND') {
           return { type: 'not_found', templateId: input.templateId }
@@ -56,15 +55,8 @@ export const makeCreateFromTemplate =
         return { type: 'repository_error', message: e.message }
       })
       .andThen((program) => {
-        if (!program) {
-          return errAsync<ProgramWithDetails, CreateFromTemplateError>({
-            type: 'not_found',
-            templateId: input.templateId,
-          })
-        }
-
         if (!program.isTemplate) {
-          return errAsync<ProgramWithDetails, CreateFromTemplateError>({
+          return errAsync<Program, CreateFromTemplateError>({
             type: 'not_a_template',
             templateId: input.templateId,
           })

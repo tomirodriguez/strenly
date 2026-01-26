@@ -1,9 +1,5 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramWithDetails,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import type { Program } from '@strenly/core/domain/entities/program/program'
 import { errAsync, type ResultAsync } from 'neverthrow'
 import { makeDuplicateProgram } from './duplicate-program'
 
@@ -28,10 +24,12 @@ type Dependencies = {
  * Save a program as a template.
  * Creates a deep copy of the source program with isTemplate: true and athleteId: null.
  * The original program is not modified.
+ *
+ * Returns the full Program aggregate.
  */
 export const makeSaveAsTemplate =
   (deps: Dependencies) =>
-  (input: SaveAsTemplateInput): ResultAsync<ProgramWithDetails, SaveAsTemplateError> => {
+  (input: SaveAsTemplateInput): ResultAsync<Program, SaveAsTemplateError> => {
     // 1. Authorization FIRST - saving as template requires programs:write
     if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
@@ -41,7 +39,7 @@ export const makeSaveAsTemplate =
     }
 
     // 2. Use duplicate program to create a template copy
-    // This ensures we deep copy all weeks, sessions, exercise rows, and prescriptions
+    // This ensures we deep copy all weeks, sessions, exercise groups, items, and series
     const duplicateProgramUseCase = makeDuplicateProgram(deps)
 
     return duplicateProgramUseCase({

@@ -1,11 +1,16 @@
-import {
-  createProgram,
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramWithDetails,
-} from '@strenly/core'
-import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
+import type {
+  ExerciseGroup,
+  ExerciseGroupInput,
+  GroupItem,
+  GroupItemInput,
+  Session,
+  SessionInput,
+  Week,
+  WeekInput,
+} from '@strenly/core/domain/entities/program/types'
+import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type DuplicateProgramInput = OrganizationContext & {
   sourceProgramId: string
@@ -25,9 +30,73 @@ type Dependencies = {
   generateId: () => string
 }
 
+/**
+ * Clone a group item with a new ID.
+ */
+function cloneGroupItem(item: GroupItem, generateId: () => string): GroupItemInput {
+  return {
+    id: generateId(),
+    exerciseId: item.exerciseId,
+    orderIndex: item.orderIndex,
+    series: item.series.map((s) => ({
+      reps: s.reps,
+      repsMax: s.repsMax,
+      isAmrap: s.isAmrap,
+      intensityType: s.intensityType,
+      intensityValue: s.intensityValue,
+      tempo: s.tempo,
+      restSeconds: s.restSeconds,
+    })),
+  }
+}
+
+/**
+ * Clone an exercise group with a new ID.
+ */
+function cloneExerciseGroup(group: ExerciseGroup, generateId: () => string): ExerciseGroupInput {
+  return {
+    id: generateId(),
+    orderIndex: group.orderIndex,
+    items: group.items.map((item) => cloneGroupItem(item, generateId)),
+  }
+}
+
+/**
+ * Clone a session with a new ID.
+ */
+function cloneSession(session: Session, generateId: () => string): SessionInput {
+  return {
+    id: generateId(),
+    name: session.name,
+    orderIndex: session.orderIndex,
+    exerciseGroups: session.exerciseGroups.map((group) => cloneExerciseGroup(group, generateId)),
+  }
+}
+
+/**
+ * Clone a week with a new ID.
+ */
+function cloneWeek(week: Week, generateId: () => string): WeekInput {
+  return {
+    id: generateId(),
+    name: week.name,
+    orderIndex: week.orderIndex,
+    sessions: week.sessions.map((session) => cloneSession(session, generateId)),
+  }
+}
+
+/**
+ * Duplicate a program using the aggregate pattern.
+ *
+ * Uses aggregate operations:
+ * 1. Load source via loadProgramAggregate
+ * 2. Clone with new IDs
+ * 3. Validate via createProgram() domain factory
+ * 4. Save via saveProgramAggregate()
+ */
 export const makeDuplicateProgram =
   (deps: Dependencies) =>
-  (input: DuplicateProgramInput): ResultAsync<ProgramWithDetails, DuplicateProgramError> => {
+  (input: DuplicateProgramInput): ResultAsync<Program, DuplicateProgramError> => {
     // 1. Authorization FIRST - duplicating creates a new program
     if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
@@ -42,9 +111,9 @@ export const makeDuplicateProgram =
       memberRole: input.memberRole,
     }
 
-    // 2. Fetch source program with full details
+    // 2. Load source program aggregate
     return deps.programRepository
-      .findWithDetails(ctx, input.sourceProgramId)
+      .loadProgramAggregate(ctx, input.sourceProgramId)
       .mapErr((e): DuplicateProgramError => {
         if (e.type === 'NOT_FOUND') {
           return { type: 'not_found', programId: input.sourceProgramId }
@@ -52,225 +121,39 @@ export const makeDuplicateProgram =
         return { type: 'repository_error', message: e.message }
       })
       .andThen((sourceProgram) => {
-        // 3. Create new program entity with domain validation
-        const newProgramId = deps.generateId()
+        // 3. Clone weeks with new IDs (this recursively clones sessions, groups, items)
+        const clonedWeeks = sourceProgram.weeks.map((week) => cloneWeek(week, deps.generateId))
+
+        // 4. Create new program with cloned structure
         const programResult = createProgram({
-          id: newProgramId,
+          id: deps.generateId(),
           organizationId: input.organizationId,
           name: input.name,
           description: sourceProgram.description,
           athleteId: input.athleteId ?? null,
           isTemplate: input.isTemplate ?? false,
           status: 'draft', // Always reset to draft
+          weeks: clonedWeeks,
         })
 
         if (programResult.isErr()) {
-          return errAsync<ProgramWithDetails, DuplicateProgramError>({
+          return errAsync<Program, DuplicateProgramError>({
             type: 'validation_error',
             message: programResult.error.message,
           })
         }
 
-        // 4. Persist new program
+        const newProgram = programResult.value
+
+        // 5. Save complete aggregate
         return deps.programRepository
-          .create(ctx, programResult.value)
+          .saveProgramAggregate(ctx, newProgram)
           .mapErr(
             (e): DuplicateProgramError => ({
               type: 'repository_error',
               message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
             }),
           )
-          .andThen((newProgram) => {
-            // 5. Generate ID mapping for all nested entities
-            const weekIdMap = new Map<string, string>()
-            const sessionIdMap = new Map<string, string>()
-            const exerciseRowIdMap = new Map<string, string>()
-            const groupIdMap = new Map<string, string>()
-
-            // Generate new IDs for weeks
-            for (const week of sourceProgram.weeks) {
-              weekIdMap.set(week.id, deps.generateId())
-            }
-
-            // Generate new IDs for sessions and groups
-            for (const session of sourceProgram.sessions) {
-              sessionIdMap.set(session.id, deps.generateId())
-              // Generate new IDs for exercise groups
-              if (session.exerciseGroups) {
-                for (const group of session.exerciseGroups) {
-                  groupIdMap.set(group.id, deps.generateId())
-                }
-              }
-              // Generate new IDs for exercise rows
-              for (const row of session.rows) {
-                exerciseRowIdMap.set(row.id, deps.generateId())
-              }
-            }
-
-            // 6. Create weeks sequentially
-            const createWeeks = (): ResultAsync<void, DuplicateProgramError> => {
-              let result: ResultAsync<void, DuplicateProgramError> = okAsync(undefined)
-
-              for (const week of sourceProgram.weeks) {
-                const newWeekId = weekIdMap.get(week.id)
-                if (!newWeekId) continue
-
-                const now = new Date()
-                result = result.andThen(() =>
-                  deps.programRepository
-                    .createWeek(ctx, newProgram.id, {
-                      id: newWeekId,
-                      name: week.name,
-                      orderIndex: week.orderIndex,
-                      createdAt: now,
-                      updatedAt: now,
-                    })
-                    .mapErr(
-                      (e): DuplicateProgramError => ({
-                        type: 'repository_error',
-                        message: e.type === 'DATABASE_ERROR' ? e.message : `Week not found: ${e.id}`,
-                      }),
-                    )
-                    .map(() => undefined),
-                )
-              }
-
-              return result
-            }
-
-            // 7. Create sessions sequentially
-            const createSessions = (): ResultAsync<void, DuplicateProgramError> => {
-              let result: ResultAsync<void, DuplicateProgramError> = okAsync(undefined)
-
-              for (const session of sourceProgram.sessions) {
-                const newSessionId = sessionIdMap.get(session.id)
-                if (!newSessionId) continue
-
-                const now = new Date()
-                result = result.andThen(() =>
-                  deps.programRepository
-                    .createSession(ctx, newProgram.id, {
-                      id: newSessionId,
-                      name: session.name,
-                      orderIndex: session.orderIndex,
-                      createdAt: now,
-                      updatedAt: now,
-                    })
-                    .mapErr(
-                      (e): DuplicateProgramError => ({
-                        type: 'repository_error',
-                        message: e.type === 'DATABASE_ERROR' ? e.message : `Session not found: ${e.id}`,
-                      }),
-                    )
-                    .map(() => undefined),
-                )
-
-                // Create exercise groups for this session
-                if (session.exerciseGroups) {
-                  for (const group of session.exerciseGroups) {
-                    const newGroupId = groupIdMap.get(group.id)
-                    if (!newGroupId) continue
-
-                    result = result.andThen(() =>
-                      deps.programRepository
-                        .createGroup(ctx, newSessionId, group.name)
-                        .mapErr(
-                          (e): DuplicateProgramError => ({
-                            type: 'repository_error',
-                            message: e.type === 'DATABASE_ERROR' ? e.message : `Group not found: ${e.id}`,
-                          }),
-                        )
-                        .map(() => undefined),
-                    )
-                  }
-                }
-              }
-
-              return result
-            }
-
-            // 8. Create exercise rows sequentially (with prescriptions)
-            const createExerciseRows = (): ResultAsync<void, DuplicateProgramError> => {
-              let result: ResultAsync<void, DuplicateProgramError> = okAsync(undefined)
-
-              for (const session of sourceProgram.sessions) {
-                const newSessionId = sessionIdMap.get(session.id)
-                if (!newSessionId) continue
-
-                for (const row of session.rows) {
-                  const newRowId = exerciseRowIdMap.get(row.id)
-                  if (!newRowId) continue
-
-                  // Map the groupId to the new group ID
-                  const newGroupId = row.groupId ? (groupIdMap.get(row.groupId) ?? null) : null
-
-                  const now = new Date()
-                  result = result.andThen(() =>
-                    deps.programRepository
-                      .createExerciseRow(ctx, newSessionId, {
-                        id: newRowId,
-                        exerciseId: row.exerciseId,
-                        orderIndex: row.orderIndex,
-                        // Group-based fields (mapped to new IDs)
-                        groupId: newGroupId,
-                        orderWithinGroup: row.orderWithinGroup,
-                        // Other fields
-                        setTypeLabel: row.setTypeLabel,
-                        notes: row.notes,
-                        restSeconds: row.restSeconds,
-                        createdAt: now,
-                        updatedAt: now,
-                      })
-                      .mapErr(
-                        (e): DuplicateProgramError => ({
-                          type: 'repository_error',
-                          message: e.type === 'DATABASE_ERROR' ? e.message : `Row not found: ${e.id}`,
-                        }),
-                      )
-                      .map(() => undefined),
-                  )
-
-                  // Create prescriptions for this row
-                  for (const [weekId, prescription] of Object.entries(row.prescriptionsByWeekId)) {
-                    const newWeekId = weekIdMap.get(weekId)
-                    if (!newWeekId) continue
-
-                    const newPrescriptionId = deps.generateId()
-                    result = result.andThen(() =>
-                      deps.programRepository
-                        .upsertPrescription(ctx, newRowId, newWeekId, {
-                          ...prescription,
-                          id: newPrescriptionId,
-                        })
-                        .mapErr(
-                          (e): DuplicateProgramError => ({
-                            type: 'repository_error',
-                            message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
-                          }),
-                        ),
-                    )
-                  }
-                }
-              }
-
-              return result
-            }
-
-            // 9. Execute all creation steps sequentially
-            return createWeeks()
-              .andThen(() => createSessions())
-              .andThen(() => createExerciseRows())
-              .andThen(() =>
-                // 10. Return the new program with full details
-                deps.programRepository
-                  .findWithDetails(ctx, newProgram.id)
-                  .mapErr(
-                    (e): DuplicateProgramError => ({
-                      type: 'repository_error',
-                      message: e.type === 'DATABASE_ERROR' ? e.message : `Program not found: ${e.id}`,
-                    }),
-                  ),
-              )
-          })
+          .map(() => newProgram)
       })
   }

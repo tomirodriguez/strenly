@@ -1,11 +1,6 @@
-import {
-  type AthleteRepositoryPort,
-  createProgram,
-  hasPermission,
-  type OrganizationContext,
-  type Program,
-  type ProgramRepositoryPort,
-} from '@strenly/core'
+import { type AthleteRepositoryPort, hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
+import type { SessionInput, WeekInput } from '@strenly/core/domain/entities/program/types'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateProgramInput = OrganizationContext & {
@@ -29,6 +24,50 @@ type Dependencies = {
   generateId: () => string
 }
 
+/**
+ * Generate default weeks with empty sessions for a new program.
+ *
+ * Each week contains the same sessions (by structure, not by ID).
+ * Sessions have exerciseGroups: [] (empty).
+ */
+function generateDefaultWeeks(
+  weeksCount: number,
+  sessionsCount: number,
+  generateId: () => string,
+): WeekInput[] {
+  const weeks: WeekInput[] = []
+
+  for (let w = 0; w < weeksCount; w++) {
+    const sessions: SessionInput[] = []
+
+    for (let s = 0; s < sessionsCount; s++) {
+      sessions.push({
+        id: generateId(),
+        name: `Dia ${s + 1}`,
+        orderIndex: s,
+        exerciseGroups: [],
+      })
+    }
+
+    weeks.push({
+      id: generateId(),
+      name: `Semana ${w + 1}`,
+      orderIndex: w,
+      sessions,
+    })
+  }
+
+  return weeks
+}
+
+/**
+ * Create a new program with default weeks and sessions.
+ *
+ * Uses the aggregate pattern:
+ * 1. Validates input via createProgram() domain factory
+ * 2. Generates default weeks with empty sessions
+ * 3. Saves the complete aggregate via saveProgramAggregate()
+ */
 export const makeCreateProgram =
   (deps: Dependencies) =>
   (input: CreateProgramInput): ResultAsync<Program, CreateProgramError> => {
@@ -46,7 +85,12 @@ export const makeCreateProgram =
       memberRole: input.memberRole,
     }
 
-    // 2. Domain validation
+    // 2. Generate default weeks with empty sessions
+    const weeksCount = input.weeksCount ?? 4
+    const sessionsCount = input.sessionsCount ?? 3
+    const weeks = generateDefaultWeeks(weeksCount, sessionsCount, deps.generateId)
+
+    // 3. Domain validation - create full aggregate
     const programResult = createProgram({
       id: deps.generateId(),
       organizationId: input.organizationId,
@@ -54,6 +98,7 @@ export const makeCreateProgram =
       description: input.description,
       athleteId: input.athleteId,
       isTemplate: input.isTemplate,
+      weeks,
     })
 
     if (programResult.isErr()) {
@@ -65,7 +110,7 @@ export const makeCreateProgram =
 
     const program = programResult.value
 
-    // 3. If athleteId provided, verify athlete exists in organization
+    // 4. If athleteId provided, verify athlete exists in organization
     const athleteCheck: ResultAsync<void, CreateProgramError> = input.athleteId
       ? deps.athleteRepository
           .findById(ctx, input.athleteId)
@@ -78,69 +123,16 @@ export const makeCreateProgram =
           })
       : okAsync(undefined)
 
-    return athleteCheck
-      .andThen(() =>
-        // 4. Save program
-        deps.programRepository
-          .create(ctx, program)
-          .mapErr((e): CreateProgramError => {
-            if (e.type === 'DATABASE_ERROR') {
-              return { type: 'repository_error', message: e.message }
-            }
-            return { type: 'repository_error', message: `Not found: ${e.id}` }
+    // 5. Save complete aggregate
+    return athleteCheck.andThen(() =>
+      deps.programRepository
+        .saveProgramAggregate(ctx, program)
+        .mapErr(
+          (e): CreateProgramError => ({
+            type: 'repository_error',
+            message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
           }),
-      )
-      .andThen((createdProgram) => {
-        const now = new Date()
-        const weeksCount = input.weeksCount ?? 4
-
-        // 5. Create weeks ("Semana 1", "Semana 2", etc.)
-        const createWeeksSequentially = (index: number): ResultAsync<void, CreateProgramError> => {
-          if (index >= weeksCount) {
-            return okAsync(undefined)
-          }
-          return deps.programRepository
-            .createWeek(ctx, createdProgram.id, {
-              id: deps.generateId(),
-              name: `Semana ${index + 1}`,
-              orderIndex: index,
-              createdAt: now,
-              updatedAt: now,
-            })
-            .mapErr(
-              (e): CreateProgramError => ({
-                type: 'repository_error',
-                message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
-              }),
-            )
-            .andThen(() => createWeeksSequentially(index + 1))
-        }
-
-        // 6. Create sessions ("Dia 1", "Dia 2", etc.)
-        const sessionsCount = input.sessionsCount ?? 3
-        const createSessionsSequentially = (index: number): ResultAsync<void, CreateProgramError> => {
-          if (index >= sessionsCount) {
-            return okAsync(undefined)
-          }
-          return deps.programRepository
-            .createSession(ctx, createdProgram.id, {
-              id: deps.generateId(),
-              name: `Dia ${index + 1}`,
-              orderIndex: index,
-              createdAt: now,
-              updatedAt: now,
-            })
-            .mapErr(
-              (e): CreateProgramError => ({
-                type: 'repository_error',
-                message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
-              }),
-            )
-            .andThen(() => createSessionsSequentially(index + 1))
-        }
-
-        return createWeeksSequentially(0)
-          .andThen(() => createSessionsSequentially(0))
-          .map(() => createdProgram)
-      })
+        )
+        .map(() => program),
+    )
   }

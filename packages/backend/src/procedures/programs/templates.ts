@@ -2,11 +2,9 @@ import {
   createFromTemplateInputSchema,
   listTemplatesInputSchema,
   listTemplatesOutputSchema,
-  programWithDetailsSchema,
+  programAggregateSchema,
   saveAsTemplateInputSchema,
-  templateWithDetailsOutputSchema,
 } from '@strenly/contracts/programs'
-import type { ExerciseRowWithPrescriptions } from '@strenly/core'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateFromTemplate } from '../../use-cases/programs/create-from-template'
@@ -14,8 +12,12 @@ import { makeListPrograms } from '../../use-cases/programs/list-programs'
 import { makeSaveAsTemplate } from '../../use-cases/programs/save-as-template'
 
 /**
- * Save a program as a template
- * Requires authentication and programs:write permission
+ * Save a program as a template.
+ *
+ * Returns the complete program aggregate with:
+ * weeks -> sessions -> exerciseGroups -> items -> series
+ *
+ * Requires authentication and programs:write permission.
  */
 export const saveAsTemplateProcedure = authProcedure
   .errors({
@@ -24,7 +26,7 @@ export const saveAsTemplateProcedure = authProcedure
     VALIDATION_ERROR: { message: 'Invalid template data' },
   })
   .input(saveAsTemplateInputSchema)
-  .output(templateWithDetailsOutputSchema)
+  .output(programAggregateSchema)
   .handler(async ({ input, context, errors }) => {
     const saveAsTemplateUseCase = makeSaveAsTemplate({
       programRepository: createProgramRepository(context.db),
@@ -56,6 +58,7 @@ export const saveAsTemplateProcedure = authProcedure
 
     const program = result.value
 
+    // Map domain Program to contract ProgramAggregate
     return {
       id: program.id,
       organizationId: program.organizationId,
@@ -64,39 +67,47 @@ export const saveAsTemplateProcedure = authProcedure
       athleteId: program.athleteId,
       isTemplate: program.isTemplate,
       status: program.status,
-      weekCount: program.weeks.length,
-      sessionCount: program.sessions.length,
       createdAt: program.createdAt.toISOString(),
       updatedAt: program.updatedAt.toISOString(),
       weeks: program.weeks.map((week) => ({
         id: week.id,
-        programId: week.programId,
         name: week.name,
         orderIndex: week.orderIndex,
-        createdAt: week.createdAt.toISOString(),
-        updatedAt: week.updatedAt.toISOString(),
-      })),
-      sessions: program.sessions.map((session) => ({
-        id: session.id,
-        programId: session.programId,
-        name: session.name,
-        orderIndex: session.orderIndex,
-        createdAt: session.createdAt.toISOString(),
-        updatedAt: session.updatedAt.toISOString(),
-        rows: session.rows.map((row) => mapExerciseRow(row)),
-        exerciseGroups: session.exerciseGroups?.map((group) => ({
-          id: group.id,
-          sessionId: group.sessionId,
-          orderIndex: group.orderIndex,
-          name: group.name,
+        sessions: week.sessions.map((session) => ({
+          id: session.id,
+          name: session.name,
+          orderIndex: session.orderIndex,
+          exerciseGroups: session.exerciseGroups.map((group) => ({
+            id: group.id,
+            orderIndex: group.orderIndex,
+            items: group.items.map((item) => ({
+              id: item.id,
+              exerciseId: item.exerciseId,
+              orderIndex: item.orderIndex,
+              series: item.series.map((s) => ({
+                orderIndex: s.orderIndex,
+                reps: s.reps,
+                repsMax: s.repsMax,
+                isAmrap: s.isAmrap,
+                intensityType: s.intensityType,
+                intensityValue: s.intensityValue,
+                tempo: s.tempo,
+                restSeconds: s.restSeconds,
+              })),
+            })),
+          })),
         })),
       })),
     }
   })
 
 /**
- * Create a new program from a template
- * Requires authentication and programs:write permission
+ * Create a new program from a template.
+ *
+ * Returns the complete program aggregate with:
+ * weeks -> sessions -> exerciseGroups -> items -> series
+ *
+ * Requires authentication and programs:write permission.
  */
 export const createFromTemplateProcedure = authProcedure
   .errors({
@@ -106,7 +117,7 @@ export const createFromTemplateProcedure = authProcedure
     VALIDATION_ERROR: { message: 'Invalid program data' },
   })
   .input(createFromTemplateInputSchema)
-  .output(programWithDetailsSchema)
+  .output(programAggregateSchema)
   .handler(async ({ input, context, errors }) => {
     const createFromTemplateUseCase = makeCreateFromTemplate({
       programRepository: createProgramRepository(context.db),
@@ -142,6 +153,7 @@ export const createFromTemplateProcedure = authProcedure
 
     const program = result.value
 
+    // Map domain Program to contract ProgramAggregate
     return {
       id: program.id,
       organizationId: program.organizationId,
@@ -154,33 +166,42 @@ export const createFromTemplateProcedure = authProcedure
       updatedAt: program.updatedAt.toISOString(),
       weeks: program.weeks.map((week) => ({
         id: week.id,
-        programId: week.programId,
         name: week.name,
         orderIndex: week.orderIndex,
-        createdAt: week.createdAt.toISOString(),
-        updatedAt: week.updatedAt.toISOString(),
-      })),
-      sessions: program.sessions.map((session) => ({
-        id: session.id,
-        programId: session.programId,
-        name: session.name,
-        orderIndex: session.orderIndex,
-        createdAt: session.createdAt.toISOString(),
-        updatedAt: session.updatedAt.toISOString(),
-        rows: session.rows.map((row) => mapExerciseRow(row)),
-        exerciseGroups: session.exerciseGroups?.map((group) => ({
-          id: group.id,
-          sessionId: group.sessionId,
-          orderIndex: group.orderIndex,
-          name: group.name,
+        sessions: week.sessions.map((session) => ({
+          id: session.id,
+          name: session.name,
+          orderIndex: session.orderIndex,
+          exerciseGroups: session.exerciseGroups.map((group) => ({
+            id: group.id,
+            orderIndex: group.orderIndex,
+            items: group.items.map((item) => ({
+              id: item.id,
+              exerciseId: item.exerciseId,
+              orderIndex: item.orderIndex,
+              series: item.series.map((s) => ({
+                orderIndex: s.orderIndex,
+                reps: s.reps,
+                repsMax: s.repsMax,
+                isAmrap: s.isAmrap,
+                intensityType: s.intensityType,
+                intensityValue: s.intensityValue,
+                tempo: s.tempo,
+                restSeconds: s.restSeconds,
+              })),
+            })),
+          })),
         })),
       })),
     }
   })
 
 /**
- * List all templates in the organization
- * Requires authentication and programs:read permission
+ * List all templates in the organization.
+ *
+ * Returns basic template info (not full aggregate).
+ *
+ * Requires authentication and programs:read permission.
  */
 export const listTemplatesProcedure = authProcedure
   .errors({
@@ -216,20 +237,8 @@ export const listTemplatesProcedure = authProcedure
 
     const { items, totalCount } = result.value
 
-    // For templates, we need to fetch additional details (weekCount, sessionCount)
-    // Since we already have the list use case returning basic info, we'll use getProgram
-    // for full details. For efficiency, we'd ideally add a listWithDetails method,
-    // but for now we'll compute from a separate query pattern.
-
-    // For MVP, we'll return basic template info with counts from a lightweight approach
-    // The list endpoint already returns basic program data; we need week/session counts
-
-    // To get counts efficiently, we'll use a simplified approach:
-    // Templates typically don't need full nested data in lists, just counts
-    // We'll need to enhance the repository to support this in the future
-
-    // For now, return without counts (they're required in schema, so set to 0)
-    // This is a known limitation - we'll need to enhance this later
+    // For templates, we return basic info with counts from lightweight query
+    // Counts would need efficient aggregate query - for MVP we set to 0
     return {
       items: items.map((program) => ({
         id: program.id,
@@ -247,52 +256,3 @@ export const listTemplatesProcedure = authProcedure
       totalCount,
     }
   })
-
-/**
- * Maps an exercise row from domain to contract format
- */
-function mapExerciseRow(row: ExerciseRowWithPrescriptions): {
-  id: string
-  sessionId: string
-  exerciseId: string
-  exerciseName: string
-  orderIndex: number
-  groupId: string | null
-  orderWithinGroup: number | null
-  setTypeLabel: string | null
-  notes: string | null
-  restSeconds: number | null
-  prescriptionsByWeekId: Record<
-    string,
-    {
-      id: string
-      sets: number
-      repsMin: number
-      repsMax: number | null
-      isAmrap: boolean
-      isUnilateral: boolean
-      unilateralUnit: 'leg' | 'arm' | 'side' | null
-      intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
-      intensityValue: number | null
-      tempo: string | null
-    }
-  >
-  createdAt: string
-  updatedAt: string
-} {
-  return {
-    id: row.id,
-    sessionId: row.sessionId,
-    exerciseId: row.exerciseId,
-    exerciseName: row.exerciseName,
-    orderIndex: row.orderIndex,
-    groupId: row.groupId,
-    orderWithinGroup: row.orderWithinGroup,
-    setTypeLabel: row.setTypeLabel,
-    notes: row.notes,
-    restSeconds: row.restSeconds,
-    prescriptionsByWeekId: row.prescriptionsByWeekId,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-  }
-}
