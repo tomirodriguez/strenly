@@ -11,10 +11,10 @@
  * Run with: npx tsx src/seed/migrate-to-series.ts
  */
 import { eq, isNull, sql } from 'drizzle-orm'
-import type { DbClient } from '../client'
-import { exerciseGroups } from '../schema/exercise-groups'
-import { prescriptions } from '../schema/prescriptions'
-import { programExercises } from '../schema/program-exercises'
+import type { DbClient } from '../../client'
+import { exerciseGroups } from '../../schema/exercise-groups'
+import { prescriptions } from '../../schema/prescriptions'
+import { programExercises } from '../../schema/program-exercises'
 
 interface LegacyPrescriptionData {
   sets: number
