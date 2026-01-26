@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.3 - Program Builder QA & Bug Fixes (NOT STARTED)
+**Current focus:** Phase 3.3 - Program Builder QA & Bug Fixes (IN PROGRESS)
 
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 0/? - Not yet planned
-Status: NOT STARTED
-Last activity: 2026-01-26 - Completed quick task 022: Fix app shell scroll containment
+Plan: 1/4 complete
+Status: IN PROGRESS
+Last activity: 2026-01-26 - Completed 03.3-01-PLAN.md (prescription cell edit mode fixes)
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE
+Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 in progress
 
 **Note:** Phase 3.3 inserted to complete client-side editing transition and fix UI bugs discovered during UAT.
 
@@ -156,6 +156,9 @@ Recent decisions affecting current work:
 - **Backward compatible grid props** - Optional gridData/onPrescriptionChange/onExerciseChange props; falls back to server mutations if not provided
 - **useShallow for Zustand selectors** - Selectors returning objects/arrays need useShallow to prevent reference inequality causing infinite loops
 - **Flexbox containment chain for scroll** - h-svh on wrapper, min-h-0 + overflow-hidden on flex container, min-h-0 + overflow-auto on scroll target
+- **Digits only trigger edit mode** - Changed from any printable character to digits 0-9 only for Excel-like behavior
+- **Cursor at end on edit** - Use setSelectionRange(len, len) instead of select() for cursor positioning
+- **requestAnimationFrame for cursor** - Ensure DOM is ready before setting cursor position
 
 ### Pending Todos
 
@@ -317,10 +320,21 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/save-button.tsx` - Save button component
 - `packages/database/src/seed/migrate-to-series.ts` - Data migration script
 
+## Phase 3.3 Progress
+
+**Program Builder QA & Bug Fixes IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 03.3-01 | Prescription Cell Edit Mode | Complete |
+| 03.3-02 | Superset Menu in Row Context | Pending |
+| 03.3-03 | Create Program Form | Pending |
+| 03.3-04 | Tab Navigation & Edge Cases | Pending |
+
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed quick task 022 (app shell scroll containment)
+Stopped at: Completed 03.3-01-PLAN.md
 Resume file: None
 
-**Next:** Ready for next phase. Phase 3.2 Prescription Data Structure Refactor complete.
+**Next:** Ready for 03.3-02: Superset menu in row context menu.
