@@ -2,10 +2,9 @@ import { CalendarDays, Columns, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { AddSessionModal } from './add-session-modal'
 import { Button } from '@/components/ui/button'
-import { useAddWeek } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { useGridActions } from '@/stores/grid-store'
 
 type GridToolbarProps = {
-  programId: string
   weekCount: number
   sessionCount: number
 }
@@ -13,15 +12,15 @@ type GridToolbarProps = {
 /**
  * Toolbar for the program grid editor.
  * Shows week/session counts and provides buttons to add structure.
- * - Add Week: Directly adds with auto-generated name
- * - Add Session: Opens modal for name input (required field)
+ * - Add Week: Updates local state (no API call until save)
+ * - Add Session: Opens modal for name input, updates local state
  */
-export function GridToolbar({ programId, weekCount, sessionCount }: GridToolbarProps) {
+export function GridToolbar({ weekCount, sessionCount }: GridToolbarProps) {
   const [addSessionOpen, setAddSessionOpen] = useState(false)
-  const addWeek = useAddWeek(programId)
+  const { addWeek } = useGridActions()
 
   const handleAddWeek = () => {
-    addWeek.mutate({ programId })
+    addWeek() // Local state only - no API call
   }
 
   return (
@@ -45,7 +44,7 @@ export function GridToolbar({ programId, weekCount, sessionCount }: GridToolbarP
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleAddWeek} disabled={addWeek.isPending}>
+          <Button variant="outline" size="sm" onClick={handleAddWeek}>
             <Plus className="size-4" />
             Semana
           </Button>
@@ -56,7 +55,7 @@ export function GridToolbar({ programId, weekCount, sessionCount }: GridToolbarP
         </div>
       </div>
 
-      <AddSessionModal programId={programId} open={addSessionOpen} onOpenChange={setAddSessionOpen} />
+      <AddSessionModal open={addSessionOpen} onOpenChange={setAddSessionOpen} />
     </>
   )
 }

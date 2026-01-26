@@ -11,10 +11,9 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useAddSession } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { useGridActions } from '@/stores/grid-store'
 
 type AddSessionModalProps = {
-  programId: string
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -22,28 +21,20 @@ type AddSessionModalProps = {
 /**
  * Modal for adding a new session (training day) to the program.
  * Session name is required (e.g., "DIA 4 - PULL").
+ * Updates local state only - persisted via saveDraft.
  */
-export function AddSessionModal({ programId, open, onOpenChange }: AddSessionModalProps) {
+export function AddSessionModal({ open, onOpenChange }: AddSessionModalProps) {
   const [name, setName] = useState('')
-  const addSession = useAddSession(programId)
+  const { addSession } = useGridActions()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmedName = name.trim()
     if (!trimmedName) return
 
-    addSession.mutate(
-      {
-        programId,
-        name: trimmedName,
-      },
-      {
-        onSuccess: () => {
-          setName('')
-          onOpenChange(false)
-        },
-      },
-    )
+    addSession(trimmedName) // Local state only - no API call
+    setName('')
+    onOpenChange(false)
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -85,8 +76,8 @@ export function AddSessionModal({ programId, open, onOpenChange }: AddSessionMod
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={addSession.isPending || !name.trim()}>
-              {addSession.isPending ? 'Agregando...' : 'Agregar Sesion'}
+            <Button type="submit" disabled={!name.trim()}>
+              Agregar Sesion
             </Button>
           </DialogFooter>
         </form>
