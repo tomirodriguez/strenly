@@ -251,6 +251,25 @@ Plans:
 - [x] 03.3-07-PLAN.md - [GAP CLOSURE] Client-side only operations for add week/session (Wave 2)
 - [x] 03.3-08-PLAN.md - [GAP CLOSURE] Exercise combobox debounce (Wave 1)
 
+### Phase 3.4: Superset & Search Fixes (INSERTED)
+**Goal**: Fix remaining superset grouping and exercise search debounce issues from Phase 3.3
+**Depends on**: Phase 3.3 (partial - keyboard/client-side ops work, supersets/debounce don't)
+**Requirements**: PRG-01 through PRG-13 (completing what 3.3 couldn't)
+**Success Criteria** (what must be TRUE):
+  1. Superset menu shows existing groups and allows joining/creating groups
+  2. Exercise rows display correct group labels (A1, A2, B1, etc.) after superset changes
+  3. Exercise combobox search is debounced (300ms) - rapid typing produces fewer API calls than keystrokes
+**Plans**: TBD
+
+**Context:**
+- Phase 3.3 went through 4+ revision cycles without resolving supersets and debounce
+- Fresh start with clean investigation needed
+- Two focused issues only - no scope creep
+
+Plans:
+- [ ] 03.4-01-PLAN.md - TBD
+- [ ] 03.4-02-PLAN.md - TBD
+
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
 **Depends on**: Phase 3.3
@@ -287,7 +306,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 3.4 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -298,10 +317,11 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
-| 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Complete | 2026-01-26 |
+| 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Partial | 2026-01-26 |
+| 3.4. Superset & Search Fixes (frontend) | 0/2 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-26 (Phase 3.3 COMPLETE - all 8 plans executed, verification passed)*
+*Last updated: 2026-01-26 (Phase 3.3 partial - supersets and debounce deferred to 3.4)*

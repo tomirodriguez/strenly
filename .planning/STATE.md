@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.3 COMPLETE - Ready for Phase 4 (Athlete PWA)
+**Current focus:** Phase 3.4 - Fix supersets and exercise search debounce
 
 ## Current Position
 
-Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 8/8 complete (includes gap closure plans 06-08)
-Status: VERIFIED COMPLETE
-Last activity: 2026-01-26 - Phase 3.3 verification passed (8/8 success criteria)
+Phase: 3.4 of 5 (Superset & Search Fixes)
+Plan: 0/2 (not yet planned)
+Status: NOT STARTED
+Last activity: 2026-01-26 - Phase 3.3 closed as partial, deferred supersets/debounce to 3.4
 
-Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
+Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL
 
-**Note:** Phase 3.3 verified complete — all success criteria met. Focus state sync, superset labeling, client-side structural operations, exercise search debounce all implemented and verified.
+**Note:** Phase 3.3 achieved keyboard editing, client-side ops, sessions form. Supersets and debounce remain broken after 4+ revision cycles — deferred to fresh Phase 3.4.
 
 ## Performance Metrics
 
@@ -334,37 +334,44 @@ None.
 
 ## Phase 3.3 Progress
 
-**Program Builder QA & Bug Fixes COMPLETE:**
+**Program Builder QA & Bug Fixes PARTIAL (supersets/debounce deferred to 3.4):**
 
-| Plan | Name | Status |
-|------|------|--------|
-| 03.3-01 | Prescription Cell Edit Mode | Complete |
-| 03.3-02 | Add Exercise Local State | Complete |
-| 03.3-03 | Superset Menu Fix | Complete |
-| 03.3-04 | Sessions Count in Create Program | Complete |
-| 03.3-05 | UAT Gap Closure | Complete |
-| 03.3-06 | Focus State Sync and Superset Labeling | Complete |
-| 03.3-07 | Client-Side Structural Changes | Complete |
-| 03.3-08 | Exercise Search Debounce | Complete |
+| Plan | Name | Status | UAT |
+|------|------|--------|-----|
+| 03.3-01 | Prescription Cell Edit Mode | Complete | Pass |
+| 03.3-02 | Add Exercise Local State | Complete | Pass |
+| 03.3-03 | Superset Menu Fix | Complete | FAIL |
+| 03.3-04 | Sessions Count in Create Program | Complete | Pass |
+| 03.3-05 | UAT Gap Closure | Complete | Partial |
+| 03.3-06 | Focus State Sync and Superset Labeling | Complete | FAIL |
+| 03.3-07 | Client-Side Structural Changes | Complete | Pass |
+| 03.3-08 | Exercise Search Debounce | Complete | FAIL |
+
+**What works:**
+- Keyboard edit mode (digits, Enter, F2)
+- Cursor at end (not select all)
+- Arrow keys in edit mode
+- Add exercise local state
+- Add week/session local state
+- Sessions count in create form
+
+**What's broken (deferred to 3.4):**
+- Superset group labels (all show A1)
+- Exercise search debounce (not working)
 
 **Key artifacts:**
-- `apps/coach-web/src/components/programs/exercise-row-actions.tsx` - Superset menu with existing group display, uses store action
-- `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - sessionRows prop, debounced search
-- `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Arrow key stopPropagation, digits-only edit trigger
-- `apps/coach-web/src/components/programs/program-grid/use-cell-editing.ts` - Focus restoration removed for correct boundary navigation
-- `apps/coach-web/src/components/programs/program-grid/transform-program.ts` - recalculateSessionGroups for label recalculation
-- `apps/coach-web/src/stores/grid-store.ts` - addWeek, addSession, updateSupersetGroup, addExercise with structural tracking
-- `apps/coach-web/src/components/programs/grid-toolbar.tsx` - Wired to store actions (zero API calls)
-- `apps/coach-web/src/components/programs/add-session-modal.tsx` - Wired to store action (zero API calls)
-- `packages/contracts/src/programs/save-draft.ts` - Extended with newWeeks, newSessions, newExerciseRows
-- `packages/backend/src/infrastructure/repositories/program.repository.ts` - Structural change persistence with tempId mapping
+- `apps/coach-web/src/stores/grid-store.ts` - Client-side state with addWeek, addSession, addExercise
+- `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Edit mode triggers
+- `packages/backend/src/infrastructure/repositories/program.repository.ts` - Structural change persistence
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 VERIFIED COMPLETE
+Stopped at: Phase 3.3 closed as partial
 Resume file: None
 
-**Next:** Ready for Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
+**Next:** Phase 3.4 (Superset & Search Fixes) — run `/gsd:discuss-phase 3.4` or `/gsd:plan-phase 3.4`
 
-**Verification:** `.planning/phases/03.3-program-builder-qa-and-bugs/03.3-VERIFICATION-FINAL.md` - 8/8 success criteria passed
+**Known issues from 3.3:**
+- Supersets: Group labels not working correctly after multiple fix attempts
+- Debounce: Exercise search API calls not debounced despite implementation
