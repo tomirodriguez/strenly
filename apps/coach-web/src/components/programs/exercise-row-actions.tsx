@@ -26,11 +26,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  useDeleteExerciseRow,
-  useReorderExerciseRows,
-  useUpdateExerciseRow,
-} from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { useDeleteExerciseRow, useReorderExerciseRows } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { useGridStore } from '@/stores/grid-store'
 
 /** Minimal row data needed for group calculations */
 export interface SessionRowData {
@@ -73,7 +70,7 @@ export function ExerciseRowActions({
 
   const deleteExerciseRow = useDeleteExerciseRow(programId)
   const reorderRows = useReorderExerciseRows(programId)
-  const updateExerciseRow = useUpdateExerciseRow(programId)
+  const updateSupersetGroup = useGridStore((state) => state.updateSupersetGroup)
 
   // Calculate current position in session
   const currentIndex = sessionRowIds.indexOf(rowId)
@@ -132,7 +129,7 @@ export function ExerciseRowActions({
   }
 
   const handleSetSupersetGroup = (group: string | null) => {
-    updateExerciseRow.mutate({ rowId, groupId: group })
+    updateSupersetGroup(rowId, group)
     setOpen(false)
   }
 
