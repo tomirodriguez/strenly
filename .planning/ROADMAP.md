@@ -18,6 +18,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [x] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
 - [x] **Phase 3.3: Program Builder QA & Bug Fixes** - Fix UI bugs, improve form UX (INSERTED)
+- [ ] **Phase 3.4: Domain Restructure - Training Programs** - Correct domain model, eliminate legacy, full-stack alignment (INSERTED)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -251,9 +252,64 @@ Plans:
 - [x] 03.3-07-PLAN.md - [GAP CLOSURE] Client-side only operations for add week/session (Wave 2)
 - [x] 03.3-08-PLAN.md - [GAP CLOSURE] Exercise combobox debounce (Wave 1)
 
+### Phase 3.4: Domain Restructure - Training Programs (INSERTED)
+**Goal**: Restructure the core domain to correctly model training programs with proper aggregation, eliminate legacy code, and ensure full-stack alignment
+**Depends on**: Phase 3.3 (existing builder needs foundation fix)
+**Requirements**: PRG-01 through PRG-13 (reimplementation with correct domain model)
+**Success Criteria** (what must be TRUE):
+  1. Program aggregate validates entire training plan in one operation (saveDraft receives complete Program object)
+  2. Domain correctly models: Program -> Weeks (cycles) -> Sessions -> ExerciseGroups -> GroupItems -> Series
+  3. ExerciseGroups unify standalone/superset/circuit (group size determines type, no separate superset concept)
+  4. Each exercise-per-week has an ordered array of Series (not a single "sets" number)
+  5. Moving an exercise to another group preserves its prescriptions and repositions correctly
+  6. All legacy entities/files removed: old Prescription entity, unused types, deprecated code
+  7. Frontend grid uses new domain model with full replace-on-save strategy
+  8. 90%+ test coverage on Program aggregate and all domain entities
+**Plans**: 7 plans in 5 waves
+
+**Context:**
+- Phase 3.2/3.3 made changes that aren't reflected in core domain
+- ExerciseGroups exist but don't function as proper groups
+- Old Prescription entity still exists (series was inside prescription, not separate)
+- Legacy code and files not cleaned up
+- This is BLOCKING for Phase 4 - domain must be correct before athlete features
+- User decisions:
+  - Keep "weeks" naming (document they're not calendar weeks)
+  - Allow empty programs (no minimum cycles/sessions required)
+  - Preserve prescriptions when moving exercises between groups
+  - Replace entire program on save (DELETE + INSERT strategy)
+  - Delete all legacy code completely (no deprecated folder)
+  - Series stored per exercise-per-week (allows progression)
+  - Full stack scope (domain + backend + frontend in this phase)
+
+**Domain Model Target:**
+```
+Program (Aggregate Root)
+├── id, name, athleteId, organizationId, status
+├── weeks: Week[] (ordered by orderIndex)
+│   ├── id, name, orderIndex
+│   └── sessions: Session[] (ordered by orderIndex)
+│       ├── id, name, orderIndex
+│       └── exerciseGroups: ExerciseGroup[] (ordered by orderIndex)
+│           ├── id, name (optional, for named supersets)
+│           └── items: GroupItem[] (ordered by orderIndex)
+│               ├── id, exerciseId, orderIndex
+│               └── series: Series[] (ordered by orderIndex)
+│                   └── reps, weight, rpe, rir, tempo, rest, notes
+```
+
+Plans:
+- [ ] 03.4-01-PLAN.md - Program aggregate domain entity (TDD) (Wave 1)
+- [ ] 03.4-02-PLAN.md - Delete legacy domain code, update port imports (Wave 2)
+- [ ] 03.4-03-PLAN.md - Repository: saveProgramAggregate + loadProgramAggregate (Wave 2)
+- [ ] 03.4-04-PLAN.md - Use case updates for aggregate pattern (Wave 3)
+- [ ] 03.4-05-PLAN.md - Contracts and procedures for aggregate API (Wave 3)
+- [ ] 03.4-06-PLAN.md - Frontend store and hooks for aggregate (Wave 4)
+- [ ] 03.4-07-PLAN.md - Integration and UAT verification (Wave 5)
+
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
-**Depends on**: Phase 3.3
+**Depends on**: Phase 3.4
 **Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10, ATH-08
 **Success Criteria** (what must be TRUE):
   1. Athlete can view assigned program and see next/upcoming workout on mobile device
@@ -287,7 +343,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 3.4 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -299,9 +355,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
 | 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Partial | 2026-01-26 |
+| 3.4. Domain Restructure (full-stack) | 0/7 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-26 (Phase 3.4 removed)*
+*Last updated: 2026-01-26 (Phase 3.4 planned with 7 plans in 5 waves)*
