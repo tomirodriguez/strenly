@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 7/7 complete (includes gap closure plans 06-08)
+Plan: 8/8 complete (includes gap closure plans 06-08)
 Status: COMPLETE
-Last activity: 2026-01-26 - Completed 03.3-06-PLAN.md (focus state sync, superset labeling)
+Last activity: 2026-01-26 - Completed 03.3-07-PLAN.md (client-side structural changes)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
 
-**Note:** Phase 3.3 complete — all UAT gaps closed including focus state sync, superset labeling, and exercise search debounce.
+**Note:** Phase 3.3 complete — all client-side editing complete with zero API calls during editing, structural changes (weeks, sessions, exercises) persisted via saveDraft.
 
 ## Performance Metrics
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 7/7 | ~24 min | ~3.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-04 (4 min), 03.3-05 (2 min), 03.3-06 (6 min), 03.3-08 (2 min)
-- Trend: Phase 3.3 COMPLETE - all UAT gaps closed
+- Last 5 plans: 03.3-04 (4 min), 03.3-05 (2 min), 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min)
+- Trend: Phase 3.3 COMPLETE - all client-side editing with saveDraft persistence
 
 *Updated after each plan completion*
 
@@ -168,6 +168,9 @@ Recent decisions affecting current work:
 - **Reuse existing useDebounce hook** - apps/coach-web/src/hooks/use-debounce.ts for API-backed search inputs
 - **Focus restoration removed from stopEditing** - useGridNavigation handles DOM focus sync via activeCell state; focus restoration was interfering with boundary navigation
 - **Session-wide group recalculation** - recalculateSessionGroups() recalculates all exercise rows in session after superset mutations
+- **Structural change tracking in grid store** - newWeeks, newSessions, newExerciseRows Maps track new entities with tempIds
+- **tempId to realId mapping in saveDraft** - Repository builds tempId -> realId map during transaction to resolve foreign key references
+- **Dependency order in saveDraft** - Create weeks first, then sessions, then exercises to satisfy foreign key constraints
 
 ### Pending Todos
 
@@ -341,6 +344,7 @@ None.
 | 03.3-04 | Sessions Count in Create Program | Complete |
 | 03.3-05 | UAT Gap Closure | Complete |
 | 03.3-06 | Focus State Sync and Superset Labeling | Complete |
+| 03.3-07 | Client-Side Structural Changes | Complete |
 | 03.3-08 | Exercise Search Debounce | Complete |
 
 **Key artifacts:**
@@ -352,7 +356,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 execution complete (7/7 plans including gap closure)
+Stopped at: Phase 3.3 execution complete (8/8 plans including gap closure)
 Resume file: None
 
 **Next:** Ready for Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
