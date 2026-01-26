@@ -1,9 +1,14 @@
 import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
-import { useMemo, useRef, useState } from 'react'
+import {
+  parsePrescriptionToSeries,
+  type PrescriptionSeriesInput,
+} from '@strenly/contracts/programs/prescription'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { SplitRowDialog } from '../split-row-dialog'
 import { GridBody } from './grid-body'
 import { GridHeader } from './grid-header'
 import { transformProgramToGrid } from './transform-program'
+import type { GridData } from './types'
 import { useCellEditing } from './use-cell-editing'
 import { useGridNavigation } from './use-grid-navigation'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -18,6 +23,21 @@ import '@/styles/program-grid.css'
 interface ProgramGridProps {
   program: ProgramWithDetails
   isLoading?: boolean
+  /**
+   * Optional grid data from Zustand store.
+   * When provided, uses this instead of transforming program data.
+   */
+  gridData?: GridData
+  /**
+   * Handler for prescription changes - receives parsed series array.
+   * When provided, local state is used instead of server mutations.
+   */
+  onPrescriptionChange?: (rowId: string, weekId: string, series: PrescriptionSeriesInput[]) => void
+  /**
+   * Handler for exercise changes.
+   * When provided, local state is used instead of server mutations.
+   */
+  onExerciseChange?: (rowId: string, exerciseId: string, exerciseName: string) => void
 }
 
 /**
@@ -30,6 +50,7 @@ interface ProgramGridProps {
  * - Superset toggle (S key)
  * - Split row (Shift+Enter)
  * - Sticky first column
+ * - Optional local state management via props
  *
  * Keyboard shortcuts:
  * - S: Toggle superset grouping for current row
@@ -39,12 +60,19 @@ interface ProgramGridProps {
  * - Enter/F2: Start editing current cell
  * - Escape: Cancel editing
  */
-export function ProgramGrid({ program, isLoading }: ProgramGridProps) {
+export function ProgramGrid({
+  program,
+  isLoading,
+  gridData,
+  onPrescriptionChange,
+  onExerciseChange,
+}: ProgramGridProps) {
   const tableRef = useRef<HTMLTableElement>(null)
   const [splitRowId, setSplitRowId] = useState<string | null>(null)
 
-  // Transform program data for grid display
-  const { rows, columns } = useMemo(() => transformProgramToGrid(program), [program])
+  // Transform program data for grid display (use provided gridData if available)
+  const transformedData = useMemo(() => transformProgramToGrid(program), [program])
+  const { rows, columns } = gridData ?? transformedData
 
   // Grid state hooks - pass tableRef for DOM focus management
   const { activeCell, setActiveCell, handleKeyDown, focusCell } = useGridNavigation({
@@ -77,21 +105,45 @@ export function ProgramGrid({ program, isLoading }: ProgramGridProps) {
   }
 
   // Handle prescription commit
-  const handleCommitPrescription = (rowId: string, weekId: string, value: string) => {
-    updatePrescription.mutate({
-      exerciseRowId: rowId,
-      weekId,
-      notation: value,
-    })
-  }
+  // Parses notation to series when using local state, or calls server mutation
+  const handleCommitPrescription = useCallback(
+    (rowId: string, weekId: string, value: string) => {
+      if (onPrescriptionChange) {
+        // Local state mode: parse notation to series array
+        const series = parsePrescriptionToSeries(value)
+        if (series !== null) {
+          // Pass the parsed series array to the parent handler
+          onPrescriptionChange(rowId, weekId, series)
+        }
+        // If parsing fails (returns null), don't update - the notation was invalid
+      } else {
+        // Server mutation mode (legacy)
+        updatePrescription.mutate({
+          exerciseRowId: rowId,
+          weekId,
+          notation: value,
+        })
+      }
+    },
+    [onPrescriptionChange, updatePrescription],
+  )
 
   // Handle exercise commit
-  const handleCommitExercise = (rowId: string, exerciseId: string, _exerciseName: string) => {
-    updateExerciseRow.mutate({
-      rowId,
-      exerciseId,
-    })
-  }
+  const handleCommitExercise = useCallback(
+    (rowId: string, exerciseId: string, exerciseName: string) => {
+      if (onExerciseChange) {
+        // Local state mode
+        onExerciseChange(rowId, exerciseId, exerciseName)
+      } else {
+        // Server mutation mode (legacy)
+        updateExerciseRow.mutate({
+          rowId,
+          exerciseId,
+        })
+      }
+    },
+    [onExerciseChange, updateExerciseRow],
+  )
 
   // Handle add exercise
   const handleAddExercise = (sessionId: string, exerciseId: string, _exerciseName: string) => {

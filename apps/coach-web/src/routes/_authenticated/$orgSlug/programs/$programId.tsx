@@ -1,10 +1,16 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
-import { ArrowLeftIcon, FileDownIcon, SaveIcon } from 'lucide-react'
+import { ArrowLeftIcon, FileDownIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { ProgramGrid } from '@/components/programs/program-grid/program-grid'
+import { SaveButton } from '@/components/programs/program-grid/save-button'
+import { transformProgramToGrid } from '@/components/programs/program-grid/transform-program'
 import { ProgramHeader } from '@/components/programs/program-header'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useSaveDraft } from '@/features/programs/hooks/mutations/use-save-draft'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
 import '@/styles/program-grid.css'
 
 export const Route = createFileRoute('/_authenticated/$orgSlug/programs/$programId')({
@@ -14,10 +20,49 @@ export const Route = createFileRoute('/_authenticated/$orgSlug/programs/$program
 /**
  * Program editor page with Excel-like grid for program creation.
  * Full-height layout with header, grid, and footer.
+ *
+ * Uses Zustand store for local state management with explicit save.
  */
 function ProgramEditorPage() {
   const { orgSlug, programId } = useParams({ from: '/_authenticated/$orgSlug/programs/$programId' })
   const { data: program, isLoading, error } = useProgram(programId)
+
+  // Zustand store - select only what you need
+  const gridData = useGridData()
+  const isDirty = useGridIsDirty()
+  const actions = useGridActions()
+
+  // Transform program to grid data when loaded
+  const transformedGridData = useMemo(
+    () => (program ? transformProgramToGrid(program) : null),
+    [program],
+  )
+
+  // Initialize store when program loads
+  useEffect(() => {
+    if (transformedGridData && programId) {
+      actions.initialize(programId, transformedGridData)
+    }
+  }, [transformedGridData, programId, actions])
+
+  // Navigation guard - warn before leaving with unsaved changes
+  useUnsavedChanges(isDirty)
+
+  // Save mutation
+  const saveMutation = useSaveDraft(programId, () => {
+    actions.markSaved()
+  })
+
+  const handleSave = useCallback(() => {
+    const changes = actions.getChanges()
+    saveMutation.mutate({
+      programId,
+      prescriptions: changes.prescriptions,
+      exerciseRows: changes.exerciseRows,
+      groups: [],
+      lastLoadedAt: changes.lastLoadedAt ?? undefined,
+    })
+  }, [programId, actions, saveMutation])
 
   if (isLoading) {
     return <ProgramEditorSkeleton />
@@ -27,6 +72,11 @@ function ProgramEditorPage() {
     return <ProgramNotFound orgSlug={orgSlug} />
   }
 
+  // Don't render until store is initialized
+  if (!gridData) {
+    return <ProgramEditorSkeleton />
+  }
+
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
       {/* Header with program name, status, actions */}
@@ -34,11 +84,20 @@ function ProgramEditorPage() {
 
       {/* Main grid - takes remaining height */}
       <div className="min-h-0 flex-1 overflow-hidden">
-        <ProgramGrid program={program} />
+        <ProgramGrid
+          program={program}
+          gridData={gridData}
+          onPrescriptionChange={actions.updatePrescription}
+          onExerciseChange={actions.updateExercise}
+        />
       </div>
 
-      {/* Footer with keyboard shortcuts help */}
-      <ProgramFooter />
+      {/* Footer with keyboard shortcuts help and save button */}
+      <ProgramFooter
+        isDirty={isDirty}
+        isPending={saveMutation.isPending}
+        onSave={handleSave}
+      />
     </div>
   )
 }
@@ -94,10 +153,16 @@ function ProgramNotFound({ orgSlug }: { orgSlug: string }) {
   )
 }
 
+interface ProgramFooterProps {
+  isDirty: boolean
+  isPending: boolean
+  onSave: () => void
+}
+
 /**
- * Footer with keyboard shortcuts help and action buttons
+ * Footer with keyboard shortcuts help and save button
  */
-function ProgramFooter() {
+function ProgramFooter({ isDirty, isPending, onSave }: ProgramFooterProps) {
   return (
     <footer className="flex h-16 shrink-0 items-center justify-between border-border border-t bg-background px-6">
       {/* Keyboard shortcuts */}
@@ -118,10 +183,7 @@ function ProgramFooter() {
           <FileDownIcon className="size-4" />
           Exportar PDF
         </Button>
-        <Button>
-          <SaveIcon className="size-4" />
-          Guardar Programa
-        </Button>
+        <SaveButton isDirty={isDirty} isPending={isPending} onSave={onSave} />
       </div>
     </footer>
   )
