@@ -15,6 +15,19 @@ import type {
   SessionWithRows,
 } from '@strenly/core'
 import { createPrescription, createProgram, isProgramStatus, type Program } from '@strenly/core'
+import {
+  type Program as ProgramAggregate,
+  reconstituteProgram,
+} from '@strenly/core/domain/entities/program/program'
+import {
+  isProgramStatus as isAggregateStatus,
+  type ExerciseGroup,
+  type GroupItem,
+  type IntensityType,
+  type Series,
+  type Session,
+  type Week,
+} from '@strenly/core/domain/entities/program/types'
 import type { DbClient } from '@strenly/database'
 import {
   type PrescriptionSeriesData as DbPrescriptionSeriesData,
@@ -26,7 +39,7 @@ import {
   programs,
   programWeeks,
 } from '@strenly/database/schema'
-import { and, asc, count, eq, ilike, isNull, sql } from 'drizzle-orm'
+import { and, asc, count, eq, ilike, inArray, isNull, sql } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
 // ============================================================================
@@ -189,6 +202,31 @@ function mapPrescriptionToSeries(prescription: Prescription): DbPrescriptionSeri
   return series
 }
 
+/**
+ * Map IntensityType to database intensityUnit
+ */
+function mapIntensityTypeToUnit(type: IntensityType | null): 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null {
+  if (!type) return null
+  switch (type) {
+    case 'absolute':
+      return 'kg'
+    case 'percentage':
+      return '%'
+    case 'rpe':
+      return 'rpe'
+    case 'rir':
+      return 'rir'
+  }
+}
+
+/**
+ * Map database intensityType to domain IntensityType
+ */
+function mapDbIntensityType(type: DbPrescriptionSeriesData['intensityType']): IntensityType | null {
+  if (!type) return null
+  return type // Types are the same: 'absolute' | 'percentage' | 'rpe' | 'rir'
+}
+
 // ============================================================================
 // Repository Factory
 // ============================================================================
@@ -263,7 +301,387 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
 
   return {
     // -------------------------------------------------------------------------
-    // Program CRUD
+    // Aggregate Operations (NEW - Primary Interface)
+    // -------------------------------------------------------------------------
+
+    saveProgramAggregate(
+      ctx: OrganizationContext,
+      program: ProgramAggregate,
+    ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: { updatedAt: Date } } | { ok: false; error: ProgramRepositoryError }> => {
+          // 1. Verify program exists and belongs to organization
+          const existingProgram = await verifyProgramAccess(ctx, program.id)
+          if (!existingProgram) {
+            return { ok: false, error: notFoundError('program', program.id) }
+          }
+
+          const updatedAt = new Date()
+
+          await db.transaction(async (tx) => {
+            // Get all session IDs for this program to delete their children
+            const sessionRows = await tx
+              .select({ id: programSessions.id })
+              .from(programSessions)
+              .where(eq(programSessions.programId, program.id))
+            const sessionIds = sessionRows.map((s) => s.id)
+
+            // Get all week IDs for this program
+            const weekRows = await tx
+              .select({ id: programWeeks.id })
+              .from(programWeeks)
+              .where(eq(programWeeks.programId, program.id))
+            const weekIds = weekRows.map((w) => w.id)
+
+            // 2. Delete all children in reverse dependency order
+            if (weekIds.length > 0) {
+              await tx.delete(prescriptions).where(inArray(prescriptions.weekId, weekIds))
+            }
+            if (sessionIds.length > 0) {
+              await tx.delete(programExercises).where(inArray(programExercises.sessionId, sessionIds))
+              await tx.delete(exerciseGroups).where(inArray(exerciseGroups.sessionId, sessionIds))
+            }
+            await tx.delete(programSessions).where(eq(programSessions.programId, program.id))
+            await tx.delete(programWeeks).where(eq(programWeeks.programId, program.id))
+
+            // 3. Insert weeks
+            for (const week of program.weeks) {
+              await tx.insert(programWeeks).values({
+                id: week.id,
+                programId: program.id,
+                name: week.name,
+                orderIndex: week.orderIndex,
+                createdAt: updatedAt,
+                updatedAt,
+              })
+            }
+
+            // 4. Insert sessions ONCE (at program level)
+            // Sessions are shared across weeks - take structure from first week
+            const firstWeek = program.weeks[0]
+            if (firstWeek) {
+              for (const session of firstWeek.sessions) {
+                await tx.insert(programSessions).values({
+                  id: session.id,
+                  programId: program.id,
+                  name: session.name,
+                  orderIndex: session.orderIndex,
+                  createdAt: updatedAt,
+                  updatedAt,
+                })
+
+                // 5. Insert exercise groups for each session
+                for (const group of session.exerciseGroups) {
+                  await tx.insert(exerciseGroups).values({
+                    id: group.id,
+                    sessionId: session.id,
+                    orderIndex: group.orderIndex,
+                    name: null, // Domain aggregate doesn't track group names yet
+                    createdAt: updatedAt,
+                    updatedAt,
+                  })
+
+                  // 6. Insert program exercises (items) for each group
+                  for (const item of group.items) {
+                    await tx.insert(programExercises).values({
+                      id: item.id,
+                      sessionId: session.id,
+                      exerciseId: item.exerciseId,
+                      orderIndex: item.orderIndex,
+                      groupId: group.id,
+                      orderWithinGroup: item.orderIndex,
+                      setTypeLabel: null,
+                      notes: null,
+                      restSeconds: null,
+                      createdAt: updatedAt,
+                      updatedAt,
+                    })
+                  }
+                }
+              }
+            }
+
+            // 7. Insert prescriptions for each week
+            // Each week has the same session/group/item structure but different series values
+            for (const week of program.weeks) {
+              for (const session of week.sessions) {
+                for (const group of session.exerciseGroups) {
+                  for (const item of group.items) {
+                    // Only insert prescription if there are series
+                    if (item.series.length > 0) {
+                      const seriesData: DbPrescriptionSeriesData[] = item.series.map((s, i) => ({
+                        orderIndex: i,
+                        reps: s.reps,
+                        repsMax: s.repsMax,
+                        isAmrap: s.isAmrap,
+                        intensityType: s.intensityType,
+                        intensityValue: s.intensityValue,
+                        intensityUnit: mapIntensityTypeToUnit(s.intensityType),
+                        tempo: s.tempo,
+                        restSeconds: s.restSeconds,
+                      }))
+
+                      await tx.insert(prescriptions).values({
+                        id: `rx-${crypto.randomUUID()}`,
+                        programExerciseId: item.id,
+                        weekId: week.id,
+                        series: seriesData,
+                        createdAt: updatedAt,
+                        updatedAt,
+                      })
+                    }
+                  }
+                }
+              }
+            }
+
+            // 8. Update program metadata
+            await tx
+              .update(programs)
+              .set({
+                name: program.name,
+                description: program.description,
+                athleteId: program.athleteId,
+                isTemplate: program.isTemplate,
+                status: program.status,
+                updatedAt,
+              })
+              .where(eq(programs.id, program.id))
+          })
+
+          return { ok: true, data: { updatedAt } }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
+
+    loadProgramAggregate(
+      ctx: OrganizationContext,
+      programId: string,
+    ): ResultAsync<ProgramAggregate, ProgramRepositoryError> {
+      return RA.fromPromise(
+        (async (): Promise<{ ok: true; data: ProgramAggregate } | { ok: false; error: ProgramRepositoryError }> => {
+          // 1. Load program row
+          const programRows = await db
+            .select()
+            .from(programs)
+            .where(and(eq(programs.id, programId), eq(programs.organizationId, ctx.organizationId)))
+
+          const programRow = programRows[0]
+          if (!programRow) {
+            return { ok: false, error: notFoundError('program', programId) }
+          }
+
+          // 2. Load weeks ordered by orderIndex
+          const weekRows = await db
+            .select()
+            .from(programWeeks)
+            .where(eq(programWeeks.programId, programId))
+            .orderBy(asc(programWeeks.orderIndex))
+
+          // 3. Load sessions (at program level) ordered by orderIndex
+          const sessionRows = await db
+            .select()
+            .from(programSessions)
+            .where(eq(programSessions.programId, programId))
+            .orderBy(asc(programSessions.orderIndex))
+
+          const sessionIds = sessionRows.map((s) => s.id)
+
+          // 4. Load exercise groups for all sessions
+          let groupRows: ExerciseGroupRow[] = []
+          if (sessionIds.length > 0) {
+            groupRows = await db
+              .select()
+              .from(exerciseGroups)
+              .where(inArray(exerciseGroups.sessionId, sessionIds))
+              .orderBy(asc(exerciseGroups.orderIndex))
+          }
+
+          // 5. Load program exercises (items) for all sessions
+          let exerciseRows: ExerciseRowDb[] = []
+          if (sessionIds.length > 0) {
+            exerciseRows = await db
+              .select()
+              .from(programExercises)
+              .where(inArray(programExercises.sessionId, sessionIds))
+              .orderBy(asc(programExercises.orderIndex))
+          }
+
+          const exerciseIds = exerciseRows.map((e) => e.id)
+          const weekIds = weekRows.map((w) => w.id)
+
+          // 6. Load all prescriptions
+          let prescriptionRows: PrescriptionRow[] = []
+          if (exerciseIds.length > 0 && weekIds.length > 0) {
+            prescriptionRows = await db
+              .select()
+              .from(prescriptions)
+              .where(inArray(prescriptions.programExerciseId, exerciseIds))
+          }
+
+          // 7. Build lookup maps
+          // Groups by session
+          const groupsBySession = new Map<string, ExerciseGroupRow[]>()
+          for (const group of groupRows) {
+            const existing = groupsBySession.get(group.sessionId) ?? []
+            existing.push(group)
+            groupsBySession.set(group.sessionId, existing)
+          }
+
+          // Exercises by group (or by session if no group)
+          const exercisesByGroup = new Map<string, ExerciseRowDb[]>()
+          const exercisesBySession = new Map<string, ExerciseRowDb[]>()
+          for (const exercise of exerciseRows) {
+            if (exercise.groupId) {
+              const existing = exercisesByGroup.get(exercise.groupId) ?? []
+              existing.push(exercise)
+              exercisesByGroup.set(exercise.groupId, existing)
+            } else {
+              const existing = exercisesBySession.get(exercise.sessionId) ?? []
+              existing.push(exercise)
+              exercisesBySession.set(exercise.sessionId, existing)
+            }
+          }
+
+          // Prescriptions by (exerciseId, weekId)
+          const prescriptionsByKey = new Map<string, PrescriptionRow>()
+          for (const prescription of prescriptionRows) {
+            const key = `${prescription.programExerciseId}:${prescription.weekId}`
+            prescriptionsByKey.set(key, prescription)
+          }
+
+          // 8. Build the aggregate hierarchy
+          // For each week, reconstruct the session structure with that week's prescriptions
+          const weeks: Week[] = weekRows.map((weekRow) => {
+            const sessions: Session[] = sessionRows.map((sessionRow) => {
+              const sessionGroups = groupsBySession.get(sessionRow.id) ?? []
+              const ungroupedExercises = exercisesBySession.get(sessionRow.id) ?? []
+
+              // Build exercise groups
+              const exerciseGroupsList: ExerciseGroup[] = sessionGroups.map((groupRow) => {
+                const groupExercises = exercisesByGroup.get(groupRow.id) ?? []
+
+                const items: GroupItem[] = groupExercises.map((exerciseRow) => {
+                  // Get prescription for this exercise + week
+                  const prescriptionKey = `${exerciseRow.id}:${weekRow.id}`
+                  const prescription = prescriptionsByKey.get(prescriptionKey)
+
+                  const series: Series[] = prescription
+                    ? prescription.series.map((s, i) => ({
+                        orderIndex: i,
+                        reps: s.reps,
+                        repsMax: s.repsMax,
+                        isAmrap: s.isAmrap,
+                        intensityType: mapDbIntensityType(s.intensityType),
+                        intensityValue: s.intensityValue,
+                        tempo: s.tempo,
+                        restSeconds: s.restSeconds,
+                      }))
+                    : []
+
+                  return {
+                    id: exerciseRow.id,
+                    exerciseId: exerciseRow.exerciseId,
+                    orderIndex: exerciseRow.orderIndex,
+                    series,
+                  }
+                })
+
+                return {
+                  id: groupRow.id,
+                  orderIndex: groupRow.orderIndex,
+                  items,
+                }
+              })
+
+              // Add ungrouped exercises as single-item groups
+              // Each ungrouped exercise becomes its own group
+              let nextGroupOrder = exerciseGroupsList.length
+              for (const exerciseRow of ungroupedExercises) {
+                const prescriptionKey = `${exerciseRow.id}:${weekRow.id}`
+                const prescription = prescriptionsByKey.get(prescriptionKey)
+
+                const series: Series[] = prescription
+                  ? prescription.series.map((s, i) => ({
+                      orderIndex: i,
+                      reps: s.reps,
+                      repsMax: s.repsMax,
+                      isAmrap: s.isAmrap,
+                      intensityType: mapDbIntensityType(s.intensityType),
+                      intensityValue: s.intensityValue,
+                      tempo: s.tempo,
+                      restSeconds: s.restSeconds,
+                    }))
+                  : []
+
+                exerciseGroupsList.push({
+                  id: `eg-synthetic-${exerciseRow.id}`,
+                  orderIndex: nextGroupOrder++,
+                  items: [
+                    {
+                      id: exerciseRow.id,
+                      exerciseId: exerciseRow.exerciseId,
+                      orderIndex: 0,
+                      series,
+                    },
+                  ],
+                })
+              }
+
+              // Sort by orderIndex
+              exerciseGroupsList.sort((a, b) => a.orderIndex - b.orderIndex)
+
+              return {
+                id: sessionRow.id,
+                name: sessionRow.name,
+                orderIndex: sessionRow.orderIndex,
+                exerciseGroups: exerciseGroupsList,
+              }
+            })
+
+            return {
+              id: weekRow.id,
+              name: weekRow.name,
+              orderIndex: weekRow.orderIndex,
+              sessions,
+            }
+          })
+
+          // 9. Reconstitute the program aggregate
+          const status = isAggregateStatus(programRow.status) ? programRow.status : 'draft'
+
+          const programAggregate = reconstituteProgram({
+            id: programRow.id,
+            organizationId: programRow.organizationId,
+            name: programRow.name,
+            description: programRow.description,
+            athleteId: programRow.athleteId,
+            isTemplate: programRow.isTemplate,
+            status,
+            weeks,
+            createdAt: programRow.createdAt,
+            updatedAt: programRow.updatedAt,
+          })
+
+          return { ok: true, data: programAggregate }
+        })(),
+        wrapDbError,
+      ).andThen((result) => {
+        if (!result.ok) {
+          return err(result.error)
+        }
+        return ok(result.data)
+      })
+    },
+
+    // -------------------------------------------------------------------------
+    // Program CRUD (Legacy - will be deprecated)
     // -------------------------------------------------------------------------
 
     create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError> {
