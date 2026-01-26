@@ -1,4 +1,4 @@
-import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
+import type { ProgramAggregate } from '@strenly/contracts/programs/program'
 import { Link, useParams } from '@tanstack/react-router'
 import { ArrowLeftIcon, CheckCircle2Icon, CopyIcon, MoreVerticalIcon, PencilIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -17,7 +17,7 @@ import { useUpdateProgram } from '@/features/programs/hooks/mutations/use-update
 import { cn } from '@/lib/utils'
 
 interface ProgramHeaderProps {
-  program: ProgramWithDetails
+  program: ProgramAggregate
 }
 
 /**
@@ -132,7 +132,7 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
       </div>
 
       {/* Grid toolbar row */}
-      <GridToolbar weekCount={program.weeks.length} sessionCount={program.sessions.length} />
+      <GridToolbar weekCount={program.weeks.length} sessionCount={program.weeks[0]?.sessions.length ?? 0} />
     </header>
   )
 }

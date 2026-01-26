@@ -1,12 +1,12 @@
+import { formatSeriesToNotation, parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
 import type {
-  ExerciseGroupInput,
+  ExerciseGroupAggregate,
   ProgramAggregate,
   SeriesInput,
-  SessionInput,
-  WeekInput,
+  SessionAggregate,
+  WeekAggregate,
 } from '@strenly/contracts/programs/program'
 import type { ProgramDataInput } from '@strenly/contracts/programs/save-draft'
-import { formatSeriesToNotation, parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import { recalculateSessionGroups } from '@/components/programs/program-grid/transform-program'
@@ -391,7 +391,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
           const maxGroupOrder = Math.max(-1, ...session.exerciseGroups.map((g) => g.orderIndex))
 
           // Create new group with single item
-          const newGroup: ExerciseGroupInput = {
+          const newGroup: ExerciseGroupAggregate = {
             id: groupId,
             orderIndex: maxGroupOrder + 1,
             items: [
@@ -433,7 +433,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
 
       // Clone structure from first week if exists
       const firstWeek = newAggregate.weeks[0]
-      const sessions: SessionInput[] = firstWeek
+      const sessions: SessionAggregate[] = firstWeek
         ? firstWeek.sessions.map((s) => ({
             id: s.id,
             name: s.name,
@@ -451,7 +451,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
           }))
         : []
 
-      const newWeek: WeekInput = {
+      const newWeek: WeekAggregate = {
         id: weekId,
         name: `Semana ${orderIndex + 1}`,
         orderIndex,
@@ -484,7 +484,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
 
       // Add to all weeks
       for (const week of newAggregate.weeks) {
-        const newSession: SessionInput = {
+        const newSession: SessionAggregate = {
           id: sessionId,
           name,
           orderIndex,

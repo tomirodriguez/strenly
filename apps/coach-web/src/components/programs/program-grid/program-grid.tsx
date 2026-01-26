@@ -1,9 +1,7 @@
-import { type PrescriptionSeriesInput, parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
-import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
-import { useCallback, useMemo, useRef } from 'react'
+import type { ProgramAggregate } from '@strenly/contracts/programs/program'
+import { useCallback, useRef } from 'react'
 import { GridBody } from './grid-body'
 import { GridHeader } from './grid-header'
-import { transformProgramToGrid } from './transform-program'
 import type { GridData } from './types'
 import { useCellEditing } from './use-cell-editing'
 import { useGridNavigation } from './use-grid-navigation'
@@ -16,7 +14,7 @@ import {
 import '@/styles/program-grid.css'
 
 interface ProgramGridProps {
-  program: ProgramWithDetails
+  program: ProgramAggregate
   isLoading?: boolean
   /**
    * Optional grid data from Zustand store.
@@ -24,10 +22,11 @@ interface ProgramGridProps {
    */
   gridData?: GridData
   /**
-   * Handler for prescription changes - receives parsed series array.
+   * Handler for prescription changes - receives notation string.
    * When provided, local state is used instead of server mutations.
+   * The grid store parses notation internally.
    */
-  onPrescriptionChange?: (rowId: string, weekId: string, series: PrescriptionSeriesInput[]) => void
+  onPrescriptionChange?: (rowId: string, weekId: string, notation: string) => void
   /**
    * Handler for exercise changes.
    * When provided, local state is used instead of server mutations.
@@ -67,9 +66,11 @@ export function ProgramGrid({
 }: ProgramGridProps) {
   const tableRef = useRef<HTMLTableElement>(null)
 
-  // Transform program data for grid display (use provided gridData if available)
-  const transformedData = useMemo(() => transformProgramToGrid(program), [program])
-  const { rows, columns } = gridData ?? transformedData
+  // Use provided gridData if available
+  // When gridData is not provided, we need rows/columns for navigation but can't transform without exercisesMap
+  // In that case, return empty data (the caller should always provide gridData)
+  const emptyData: GridData = { rows: [], columns: [] }
+  const { rows, columns } = gridData ?? emptyData
 
   // Grid state hooks - pass tableRef for DOM focus management
   const { activeCell, setActiveCell, handleKeyDown } = useGridNavigation({
@@ -101,17 +102,13 @@ export function ProgramGrid({
   }
 
   // Handle prescription commit
-  // Parses notation to series when using local state, or calls server mutation
+  // Passes notation string to parent handler or calls server mutation
   const handleCommitPrescription = useCallback(
     (rowId: string, weekId: string, value: string) => {
       if (onPrescriptionChange) {
-        // Local state mode: parse notation to series array
-        const series = parsePrescriptionToSeries(value)
-        if (series !== null) {
-          // Pass the parsed series array to the parent handler
-          onPrescriptionChange(rowId, weekId, series)
-        }
-        // If parsing fails (returns null), don't update - the notation was invalid
+        // Local state mode: pass notation string to parent
+        // The grid store handles parsing internally
+        onPrescriptionChange(rowId, weekId, value)
       } else {
         // Server mutation mode (legacy)
         updatePrescription.mutate({

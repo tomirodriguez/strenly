@@ -2,7 +2,6 @@ import type {
   ExerciseGroupData,
   ExerciseRowWithPrescriptions,
   OrganizationContext,
-  Prescription,
   PrescriptionSeriesData,
   ProgramExerciseRow,
   ProgramFilters,
@@ -14,17 +13,13 @@ import type {
   SaveDraftInput,
   SessionWithRows,
 } from '@strenly/core'
-import { createPrescription, createProgram, isProgramStatus, type Program } from '@strenly/core'
+import { createProgram, isProgramStatus, type Program, type Series } from '@strenly/core'
+import { type Program as ProgramAggregate, reconstituteProgram } from '@strenly/core/domain/entities/program/program'
 import {
-  type Program as ProgramAggregate,
-  reconstituteProgram,
-} from '@strenly/core/domain/entities/program/program'
-import {
-  isProgramStatus as isAggregateStatus,
   type ExerciseGroup,
   type GroupItem,
   type IntensityType,
-  type Series,
+  isProgramStatus as isAggregateStatus,
   type Session,
   type Week,
 } from '@strenly/core/domain/entities/program/types'
@@ -147,59 +142,36 @@ function mapExerciseGroupToDomain(row: ExerciseGroupRow): ExerciseGroupData {
 }
 
 /**
- * Map series data from database to Prescription domain entity
- * Creates a legacy Prescription from the first series for backward compatibility
+ * Map database series to domain Series format
  */
-function mapSeriesToPrescription(series: DbPrescriptionSeriesData[], id: string): Prescription | null {
-  if (series.length === 0) return null
-
-  const firstSeries = series[0]
-  if (!firstSeries) return null
-
-  const result = createPrescription({
-    id,
-    sets: series.length,
-    repsMin: firstSeries.reps ?? 0,
-    repsMax: firstSeries.repsMax,
-    isAmrap: firstSeries.isAmrap,
-    isUnilateral: false, // Not used in series model
-    unilateralUnit: null,
-    intensityType: firstSeries.intensityType,
-    intensityValue: firstSeries.intensityValue,
-    tempo: firstSeries.tempo,
-  })
-
-  return result.isOk() ? result.value : null
+function mapDbSeriesToDomain(dbSeries: DbPrescriptionSeriesData[]): Series[] {
+  return dbSeries.map((s, i) => ({
+    orderIndex: i,
+    reps: s.reps,
+    repsMax: s.repsMax,
+    isAmrap: s.isAmrap,
+    intensityType: mapDbIntensityType(s.intensityType),
+    intensityValue: s.intensityValue,
+    tempo: s.tempo,
+    restSeconds: s.restSeconds,
+  }))
 }
 
 /**
- * Map Prescription domain entity to series array for database storage
+ * Map domain Series array to database format for storage
  */
-function mapPrescriptionToSeries(prescription: Prescription): DbPrescriptionSeriesData[] {
-  const series: DbPrescriptionSeriesData[] = []
-  for (let i = 0; i < prescription.sets; i++) {
-    series.push({
-      orderIndex: i,
-      reps: prescription.isAmrap ? null : prescription.repsMin,
-      repsMax: prescription.repsMax,
-      isAmrap: prescription.isAmrap,
-      intensityType: prescription.intensityType,
-      intensityValue: prescription.intensityValue,
-      intensityUnit:
-        prescription.intensityType === 'absolute'
-          ? 'kg'
-          : prescription.intensityType === 'percentage'
-            ? '%'
-            : prescription.intensityType === 'rpe'
-              ? 'rpe'
-              : prescription.intensityType === 'rir'
-                ? 'rir'
-                : null,
-      tempo: prescription.tempo,
-      restSeconds: null,
-    })
-  }
-  return series
+function mapSeriesToDb(series: Series[]): DbPrescriptionSeriesData[] {
+  return series.map((s, i) => ({
+    orderIndex: i,
+    reps: s.reps,
+    repsMax: s.repsMax,
+    isAmrap: s.isAmrap,
+    intensityType: s.intensityType,
+    intensityValue: s.intensityValue,
+    intensityUnit: mapIntensityTypeToUnit(s.intensityType),
+    tempo: s.tempo,
+    restSeconds: s.restSeconds,
+  }))
 }
 
 /**
@@ -903,16 +875,16 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           }
 
           // 6. Group prescriptions by exercise row ID
-          const prescriptionsByRowId = new Map<string, Map<string, Prescription>>()
+          const prescriptionsByRowId = new Map<string, Map<string, Series[]>>()
           for (const prescriptionRow of prescriptionRows) {
-            const prescription = mapSeriesToPrescription(prescriptionRow.series, prescriptionRow.id)
-            if (prescription) {
+            const series = mapDbSeriesToDomain(prescriptionRow.series)
+            if (series.length > 0) {
               let rowMap = prescriptionsByRowId.get(prescriptionRow.programExerciseId)
               if (!rowMap) {
                 rowMap = new Map()
                 prescriptionsByRowId.set(prescriptionRow.programExerciseId, rowMap)
               }
-              rowMap.set(prescriptionRow.weekId, prescription)
+              rowMap.set(prescriptionRow.weekId, series)
             }
           }
 
@@ -921,10 +893,10 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
 
           for (const { row, exerciseName } of exerciseRowResults) {
             const prescriptionMap = prescriptionsByRowId.get(row.id)
-            const prescriptionsByWeekId: Record<string, Prescription> = {}
+            const prescriptionsByWeekId: Record<string, Series[]> = {}
             if (prescriptionMap) {
-              for (const [weekId, prescription] of prescriptionMap) {
-                prescriptionsByWeekId[weekId] = prescription
+              for (const [weekId, series] of prescriptionMap) {
+                prescriptionsByWeekId[weekId] = series
               }
             }
 
@@ -1490,7 +1462,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       ctx: OrganizationContext,
       exerciseRowId: string,
       weekId: string,
-      prescription: Prescription | null,
+      series: Series[] | null,
     ): ResultAsync<void, ProgramRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
@@ -1506,18 +1478,18 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             return { ok: false, error: notFoundError('week', weekId) }
           }
 
-          if (prescription === null) {
+          if (series === null || series.length === 0) {
             // Delete the prescription
             await db
               .delete(prescriptions)
               .where(and(eq(prescriptions.programExerciseId, exerciseRowId), eq(prescriptions.weekId, weekId)))
           } else {
             // Upsert the prescription using ON CONFLICT
-            const seriesData = mapPrescriptionToSeries(prescription)
+            const seriesData = mapSeriesToDb(series)
             await db
               .insert(prescriptions)
               .values({
-                id: prescription.id,
+                id: `rx-${crypto.randomUUID()}`,
                 programExerciseId: exerciseRowId,
                 weekId,
                 series: seriesData,

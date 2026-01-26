@@ -166,7 +166,7 @@ export type SessionWithRows = ProgramSession & {
  * Full program with all nested data for grid view
  * @deprecated Use loadProgramAggregate which returns a full Program instead
  */
-export type ProgramWithDetails = Program & {
+export type ProgramWithDetails = Omit<Program, 'weeks'> & {
   readonly weeks: ProgramWeek[]
   readonly sessions: SessionWithRows[]
 }

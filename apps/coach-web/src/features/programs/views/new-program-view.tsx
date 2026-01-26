@@ -1,4 +1,4 @@
-import type { CreateProgramInput, Program, ProgramWithDetails } from '@strenly/contracts/programs/program'
+import type { CreateProgramInput, Program, ProgramAggregate } from '@strenly/contracts/programs/program'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -51,7 +51,7 @@ export function NewProgramView() {
           athleteId: data.athleteId,
         },
         {
-          onSuccess: (program: ProgramWithDetails) => {
+          onSuccess: (program: ProgramAggregate) => {
             navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
           },
         },

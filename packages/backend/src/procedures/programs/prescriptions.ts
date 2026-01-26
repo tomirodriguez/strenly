@@ -1,7 +1,17 @@
-import { parsedPrescriptionSchema, updatePrescriptionSchema } from '@strenly/contracts/programs'
+import { updatePrescriptionSchema } from '@strenly/contracts/programs'
+import { formatSeriesToNotation } from '@strenly/contracts/programs/prescription'
+import { z } from 'zod'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdatePrescription } from '../../use-cases/programs/update-prescription'
+
+/**
+ * Output schema for prescription update
+ * Returns the formatted notation for display
+ */
+const updatePrescriptionOutputSchema = z.object({
+  notation: z.string(),
+})
 
 /**
  * Update a prescription cell in the program grid
@@ -9,6 +19,8 @@ import { makeUpdatePrescription } from '../../use-cases/programs/update-prescrip
  *
  * Parses notation like "3x8@120kg" into structured data
  * Pass "-" or empty string to clear the cell
+ *
+ * @deprecated Use aggregate save via programs.prescriptions.saveDraft instead
  */
 export const updatePrescriptionProcedure = authProcedure
   .errors({
@@ -18,11 +30,10 @@ export const updatePrescriptionProcedure = authProcedure
     VALIDATION_ERROR: { message: 'Notacion de prescripcion invalida' },
   })
   .input(updatePrescriptionSchema)
-  .output(parsedPrescriptionSchema.nullable())
+  .output(updatePrescriptionOutputSchema.nullable())
   .handler(async ({ input, context, errors }) => {
     const useCase = makeUpdatePrescription({
       programRepository: createProgramRepository(context.db),
-      generateId: () => crypto.randomUUID(),
     })
 
     const result = await useCase({
@@ -51,30 +62,35 @@ export const updatePrescriptionProcedure = authProcedure
       }
     }
 
-    // Return null if prescription was cleared, otherwise return parsed data
-    const prescription = result.value
-    if (!prescription) {
+    // Return null if prescription was cleared, otherwise return formatted notation
+    const series = result.value
+    if (!series) {
       return null
     }
 
+    // Convert Series[] to PrescriptionSeriesInput[] format for formatting
+    const formattedNotation = formatSeriesToNotation(
+      series.map((s) => ({
+        orderIndex: s.orderIndex,
+        reps: s.reps,
+        repsMax: s.repsMax,
+        isAmrap: s.isAmrap,
+        intensityType: s.intensityType,
+        intensityValue: s.intensityValue,
+        intensityUnit: mapIntensityTypeToUnit(s.intensityType),
+        tempo: s.tempo,
+      })),
+    )
+
     return {
-      sets: prescription.sets,
-      repsMin: prescription.repsMin,
-      repsMax: prescription.repsMax,
-      isAmrap: prescription.isAmrap,
-      isUnilateral: prescription.isUnilateral,
-      unilateralUnit: prescription.unilateralUnit,
-      intensityType: prescription.intensityType,
-      intensityValue: prescription.intensityValue,
-      intensityUnit: mapIntensityUnit(prescription.intensityType),
-      tempo: prescription.tempo,
+      notation: formattedNotation,
     }
   })
 
 /**
- * Map intensity type to intensity unit for the parsed schema
+ * Map intensity type to intensity unit for formatting
  */
-function mapIntensityUnit(
+function mapIntensityTypeToUnit(
   intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null,
 ): 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null {
   if (!intensityType) return null

@@ -1,5 +1,5 @@
-import type { ProgramAggregate } from '@strenly/contracts/programs/program'
 import { formatSeriesToNotation } from '@strenly/contracts/programs/prescription'
+import type { ProgramAggregate } from '@strenly/contracts/programs/program'
 import type { GridColumn, GridData, GridRow, SupersetPosition } from './types'
 
 /**

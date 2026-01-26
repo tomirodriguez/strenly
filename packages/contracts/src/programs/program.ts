@@ -38,7 +38,10 @@ export const seriesSchema = z.object({
   isAmrap: z.boolean(),
   intensityType: aggregateIntensityTypeSchema.nullable(),
   intensityValue: z.number().nullable(),
-  tempo: z.string().regex(/^[\dX]{4}$/i).nullable(),
+  tempo: z
+    .string()
+    .regex(/^[\dX]{4}$/i)
+    .nullable(),
   restSeconds: z.number().int().min(0).nullable(),
 })
 
@@ -124,7 +127,11 @@ export const seriesInputSchema = z.object({
   isAmrap: z.boolean(),
   intensityType: aggregateIntensityTypeSchema.nullable().optional(),
   intensityValue: z.number().nullable().optional(),
-  tempo: z.string().regex(/^[\dX]{4}$/i).nullable().optional(),
+  tempo: z
+    .string()
+    .regex(/^[\dX]{4}$/i)
+    .nullable()
+    .optional(),
   restSeconds: z.number().int().min(0).nullable().optional(),
 })
 

@@ -1,4 +1,9 @@
-import { type AthleteRepositoryPort, hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import {
+  type AthleteRepositoryPort,
+  hasPermission,
+  type OrganizationContext,
+  type ProgramRepositoryPort,
+} from '@strenly/core'
 import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
 import type { SessionInput, WeekInput } from '@strenly/core/domain/entities/program/types'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
@@ -30,11 +35,7 @@ type Dependencies = {
  * Each week contains the same sessions (by structure, not by ID).
  * Sessions have exerciseGroups: [] (empty).
  */
-function generateDefaultWeeks(
-  weeksCount: number,
-  sessionsCount: number,
-  generateId: () => string,
-): WeekInput[] {
+function generateDefaultWeeks(weeksCount: number, sessionsCount: number, generateId: () => string): WeekInput[] {
   const weeks: WeekInput[] = []
 
   for (let w = 0; w < weeksCount; w++) {
