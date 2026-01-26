@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.2 - Prescription Data Structure Refactor (IN PROGRESS)
+**Current focus:** Phase 3.3 - Program Builder QA & Bug Fixes (NOT STARTED)
 
 ## Current Position
 
-Phase: 3.2 of 5 (Prescription Data Structure Refactor)
-Plan: 8/8 - Data Migration complete
-Status: PHASE COMPLETE
-Last activity: 2026-01-25 - Completed 03.2-08-PLAN.md (data migration)
+Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
+Plan: 0/? - Not yet planned
+Status: NOT STARTED
+Last activity: 2026-01-26 - Phase 3.3 inserted for QA and bug fixes
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE
 
-**Note:** Phase 3.1 replaced react-datasheet-grid with custom HTML table. Phase 3.2 refactored prescription data structure to series arrays with client-side state management.
+**Note:** Phase 3.3 inserted to complete client-side editing transition and fix UI bugs discovered during UAT.
 
 ## Performance Metrics
 
@@ -155,6 +155,7 @@ Recent decisions affecting current work:
 - **Multi-line display for varied series** - Prescription cells split on ' + ' delimiter to show each part on separate line
 - **Backward compatible grid props** - Optional gridData/onPrescriptionChange/onExerciseChange props; falls back to server mutations if not provided
 - **useShallow for Zustand selectors** - Selectors returning objects/arrays need useShallow to prevent reference inequality causing infinite loops
+- **Flexbox containment chain for scroll** - h-svh on wrapper, min-h-0 + overflow-hidden on flex container, min-h-0 + overflow-auto on scroll target
 
 ### Pending Todos
 
@@ -168,6 +169,8 @@ Recent decisions affecting current work:
 - Phase 3.1 inserted after Phase 3: Custom Program Grid (URGENT) - UAT revealed react-datasheet-grid doesn't match design system, need custom implementation
 - Phase 3.1 COMPLETE - Custom grid now matches design system
 - Phase 3.2 inserted after Phase 3.1: Prescription Data Structure Refactor (URGENT) - Current data model stores sets as single number, making variations complex; refactor to series-as-array model with exercise groups and client-side editing
+- Phase 3.2 COMPLETE - Series arrays and exercise groups implemented with client-side state
+- Phase 3.3 inserted after Phase 3.2: Program Builder QA & Bug Fixes (URGENT) - Complete client-side transition (still making server calls), fix UI bugs (edit mode triggers, text selection, superset menu missing, arrow key behavior), improve create program form
 
 ### Blockers/Concerns
 
@@ -199,6 +202,7 @@ None.
 | 019 | Remove hover on active sidebar items | 2026-01-25 | 2cfb380 | [019-remove-the-hover-on-active-items-in-the-](./quick/019-remove-the-hover-on-active-items-in-the-/) |
 | 020 | Fix collapsed sidebar layout and icon sizes | 2026-01-25 | 3d64977 | [020-fix-collapsed-sidebar-layout-and-icon-si](./quick/020-fix-collapsed-sidebar-layout-and-icon-si/) |
 | 021 | Cleanup deprecated Phase 3.2 code | 2026-01-25 | f9c8f47 | [021-cleanup-deprecated-phase-32-code](./quick/021-cleanup-deprecated-phase-32-code/) |
+| 022 | Fix app shell scroll containment | 2026-01-26 | f6f20f1 | [022-fix-app-shell-scroll-containment](./quick/022-fix-app-shell-scroll-containment/) |
 
 ## Phase 2 Progress
 
@@ -315,8 +319,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-25
-Stopped at: Completed 03.2-08-PLAN.md (data migration) - Phase 3.2 COMPLETE
+Last session: 2026-01-26
+Stopped at: Completed quick task 022 (app shell scroll containment)
 Resume file: None
 
 **Next:** Ready for next phase. Phase 3.2 Prescription Data Structure Refactor complete.
