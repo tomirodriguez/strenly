@@ -11,6 +11,7 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
+import { useDebounce } from '@/hooks/use-debounce'
 import { cn } from '@/lib/utils'
 
 interface ExerciseCellProps {
@@ -52,9 +53,11 @@ export function ExerciseCell({
   onCancel,
 }: ExerciseCellProps) {
   const [searchValue, setSearchValue] = useState('')
+  // Debounce search to prevent excessive API calls during rapid typing
+  const debouncedSearch = useDebounce(searchValue, 300)
 
   const { data: exercisesData } = useExercises({
-    search: searchValue || undefined,
+    search: debouncedSearch || undefined,
     limit: 10,
   })
 
