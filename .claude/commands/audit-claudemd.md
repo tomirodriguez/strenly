@@ -1,19 +1,22 @@
 ---
-description: Audit CLAUDE.md files for completeness, relevant skills, and rule propagation
+description: Audit CLAUDE.md files, sync skill references, propagate rules, and maintain skill inventory
 allowed-tools: Read, Write, Edit, Glob, Grep, Task, AskUserQuestion
 ---
 
 <objective>
-Audit all CLAUDE.md files in the project for completeness, accuracy, and consistency with the root CLAUDE.md.
+Audit all CLAUDE.md files in the project for completeness, accuracy, and consistency with:
+1. The root CLAUDE.md (source of truth for rules)
+2. The actual available skills in `.claude/skills/` (source of truth for skills)
 
 This ensures:
-1. All packages/apps have appropriate CLAUDE.md files with relevant skills
-2. Rules from root CLAUDE.md are propagated to internal files where applicable
-3. No outdated or missing documentation
+1. **Skill inventory is accurate** - Only existing skills are referenced
+2. **Stale skill references are updated** - Renamed/removed skills are fixed everywhere
+3. **Rules are propagated** - Root CLAUDE.md rules appear in relevant internal files
+4. **No orphaned documentation** - All packages/apps have appropriate CLAUDE.md files
 </objective>
 
 <context>
-Root CLAUDE.md (source of truth): @CLAUDE.md
+Root CLAUDE.md: @CLAUDE.md
 
 Project structure: !find . -type f -name "package.json" -not -path "*/node_modules/*" | head -20
 
@@ -22,109 +25,182 @@ Existing CLAUDE.md files: !find . -name "CLAUDE.md" -not -path "*/node_modules/*
 
 <process>
 
-## Step 1: Read Root CLAUDE.md
+## Phase 1: Parallel Analysis (Launch 3 Subagents)
 
-**CRITICAL**: Always read the root CLAUDE.md first using the Read tool, even if you think you know its contents. It may have been modified during this session.
+**CRITICAL**: Launch ALL THREE subagents in a SINGLE message using the Task tool with `subagent_type: claudemd-analyzer`. Run them in parallel for speed.
 
-Extract from root CLAUDE.md:
-- **MUST rules** - Rules that apply project-wide
-- **MUST NOT rules** - Prohibitions that apply project-wide
-- **Location-specific rules** - Rules that mention specific directories or file types
+### Subagent 1: Skill Inventory
+```
+Mode: skill-inventory
 
-## Step 2: Analyze Codebase Structure
+Scan these paths for SKILL.md files:
+- .claude/skills/
+- ~/.claude/skills/ (user-level skills)
 
-Use the Task tool with Explore subagent to:
-- Identify all packages and apps in the monorepo
-- Understand what each package/app does based on its contents
-- Note any packages/apps without CLAUDE.md files
+Build complete inventory of all available skills with their descriptions.
+Return JSON with mode, skills array, totalCount, and errors.
+```
 
-## Step 3: Review Existing CLAUDE.md Files
+### Subagent 2: Reference Scan (CLAUDE.md files)
+```
+Mode: reference-scan
 
-For each existing internal CLAUDE.md file:
-- Read the file
-- Compare against current package/app contents
-- Check if listed skills are still relevant
-- Check if new skills should be added
-- **Check if relevant rules from root CLAUDE.md are present in "Critical Rules" section**
+Search these paths for skill references (/skill-name patterns):
+- ./CLAUDE.md (root)
+- All CLAUDE.md files in subdirectories
+- .planning/ directory (if exists)
 
-## Step 4: Propagate Relevant Rules
+Return JSON with mode, references array, uniqueSkills, and errors.
+```
 
-When updating internal CLAUDE.md files, propagate rules from root based on:
+### Subagent 3: Rule Gap Analysis
+```
+Mode: rule-gap-analysis
 
-1. **Universal rules** - Rules like "no `as` casting", "no `!` assertions" apply everywhere
-2. **Location-matching rules** - If root CLAUDE.md mentions rules for a specific directory (e.g., "in packages/core", "for frontend apps"), propagate those to matching CLAUDE.md files
-3. **Technology-matching rules** - If a package uses React, propagate React-specific rules. If it uses a database, propagate database rules.
+For each internal CLAUDE.md file found in the project:
+- Compare against root CLAUDE.md rules
+- Identify applicable rules that are missing
+- Calculate coverage percentage
 
-**How to match rules to locations:**
-- Read the internal CLAUDE.md's "Purpose" section to understand what the package does
-- Find rules in root CLAUDE.md that apply to that type of code
-- Add missing applicable rules to the internal "Critical Rules" section
+Root file: ./CLAUDE.md
+Internal files: (list each CLAUDE.md in apps/ and packages/)
 
-## Step 5: Update Files
+Return JSON with rules array, summary, and errors.
+```
 
-For each file that needs updates:
-1. Preserve existing content structure
-2. Add missing skills to "Relevant Skills" section
-3. Add/update "Critical Rules" section with propagated rules from root
-4. Use AskUserQuestion before creating new CLAUDE.md files
+**Wait for all 3 subagents to complete before proceeding.**
 
-## Step 6: Determine Relevant Skills
+## Phase 2: Consolidate Findings
 
-For each package/app, determine relevant skills by:
-- Reading the package's purpose and structure
-- Checking which skills from the Skill tool match that domain
-- Comparing against skills already listed
+After all subagents complete, consolidate their JSON outputs:
+
+1. **Build skill status map**:
+   - Cross-reference inventory (Subagent 1) with references (Subagent 2)
+   - Mark each skill as: `active` (referenced), `unused` (exists but not referenced), or `stale` (referenced but doesn't exist)
+
+2. **Build stale reference list**:
+   - Skills referenced that don't exist in inventory
+   - For each stale reference, find similar skill names that might be replacements
+
+3. **Build rule gap list**:
+   - Rules that should be propagated to internal files
+   - Group by internal file for efficient updates
+
+4. **Build missing CLAUDE.md list**:
+   - Directories with package.json but no CLAUDE.md
+
+## Phase 3: Batch User Questions
+
+Present ALL questions to the user in a SINGLE AskUserQuestion call with multiple questions (max 4 per call). Group questions logically:
+
+**Question Group 1: Stale Reference Resolution**
+For each stale reference, ask which replacement to use:
+- "Skill `/old-name` is referenced in X files but doesn't exist. Replace with?"
+- Options: Similar skills from inventory, "Remove reference", "Skip"
+
+**Question Group 2: Update Scope**
+Ask what files to update:
+- "Update .planning/ files?" (historical files that may reference old skills)
+- "Create missing CLAUDE.md files?" (list directories without CLAUDE.md)
+
+**Question Group 3: Rule Propagation**
+For files with low coverage, ask:
+- "Propagate X missing rules to Y file?" (show rules and file)
+
+If more than 4 questions needed, use multiple AskUserQuestion calls, but batch as many as possible per call.
+
+## Phase 4: Execute Updates
+
+Based on user answers, execute all updates:
+
+1. **Fix stale references**:
+   - Use Edit tool to replace old skill names with approved replacements
+   - Update all files where the stale reference appears
+
+2. **Update skill tables in CLAUDE.md files**:
+   - Ensure "Relevant Skills" sections list correct skills
+   - Remove references to non-existent skills
+
+3. **Propagate rules**:
+   - Add missing applicable rules to internal CLAUDE.md files
+   - Use "Critical Rules" or similar section
+
+4. **Create missing CLAUDE.md files** (if approved):
+   - Use template from this command
+   - Include relevant skills for that directory's domain
+
+## Phase 5: Generate Summary Report
+
+Output structured report of all actions taken.
 
 </process>
 
 <success_criteria>
-- Root CLAUDE.md was read fresh using Read tool (not from memory)
-- All packages/apps have been checked
-- Missing CLAUDE.md files identified and optionally created (with user confirmation)
-- Rules from root CLAUDE.md propagated to relevant internal files
-- Skills are accurate and up-to-date for each location
+- All 3 analysis subagents completed successfully
+- User questions batched (not one-at-a-time)
+- All approved updates executed
+- Summary report generated
 </success_criteria>
 
 <output>
-Provide a summary of:
-- Files checked
-- Files updated (with what changed, including propagated rules)
-- Files created (with user confirmation)
-- Rules propagated (which rules went to which files)
-- Any issues found
+### Analysis Summary (from parallel subagents)
+
+**Skill Inventory**: X skills found
+**References Scanned**: Y references across Z files
+**Rule Coverage**: Average X% across internal files
+
+### Stale References Resolved
+| Old Reference | Resolution | Files Updated |
+|---------------|------------|---------------|
+| `/old-skill` | → `/new-skill` | file1.md, file2.md |
+
+### Rules Propagated
+| Rule | Propagated To |
+|------|---------------|
+| "Rule text" | packages/backend/CLAUDE.md |
+
+### Files Created
+- path/to/new/CLAUDE.md
+
+### Unused Skills (Informational)
+Skills that exist but aren't referenced anywhere:
+- `/skill-name` - Consider documenting or removing
+
+### Errors Encountered
+- (Any errors from subagents or updates)
 </output>
 
 ## CLAUDE.md Template
 
-When creating new CLAUDE.md files, follow this structure:
+When creating new CLAUDE.md files, use this structure:
 
 ```markdown
-# package-name/
+# directory-name/
 
-Brief description of what this package does.
+Brief description of what this directory contains.
 
 ## Purpose
 
-Explain the package's role in the architecture.
+Explain the directory's role in the project architecture.
 
 ## Structure
 
 ```
 src/
-  relevant-dirs/
+  relevant-subdirs/
 ```
 
 ## Relevant Skills
 
-| Skill | Description |
+| Skill | When to Use |
 |-------|-------------|
-| `/skill-name` | When to use this skill |
+| `/skill-name` | Description of when to use |
 
 ## Conventions
 
-Package-specific conventions and patterns.
+Directory-specific conventions and patterns.
 
 ## Critical Rules
 
-- Key rules for this package (propagated from root + package-specific)
+- Rules that apply to this directory (from root + local)
 ```
