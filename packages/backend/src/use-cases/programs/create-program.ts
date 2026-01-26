@@ -14,6 +14,7 @@ export type CreateProgramInput = OrganizationContext & {
   athleteId?: string | null
   isTemplate?: boolean
   weeksCount?: number
+  sessionsCount?: number
 }
 
 export type CreateProgramError =
@@ -115,24 +116,31 @@ export const makeCreateProgram =
             .andThen(() => createWeeksSequentially(index + 1))
         }
 
+        // 6. Create sessions ("Dia 1", "Dia 2", etc.)
+        const sessionsCount = input.sessionsCount ?? 3
+        const createSessionsSequentially = (index: number): ResultAsync<void, CreateProgramError> => {
+          if (index >= sessionsCount) {
+            return okAsync(undefined)
+          }
+          return deps.programRepository
+            .createSession(ctx, createdProgram.id, {
+              id: deps.generateId(),
+              name: `Dia ${index + 1}`,
+              orderIndex: index,
+              createdAt: now,
+              updatedAt: now,
+            })
+            .mapErr(
+              (e): CreateProgramError => ({
+                type: 'repository_error',
+                message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+              }),
+            )
+            .andThen(() => createSessionsSequentially(index + 1))
+        }
+
         return createWeeksSequentially(0)
-          .andThen(() =>
-            // 6. Create default session ("DIA 1")
-            deps.programRepository
-              .createSession(ctx, createdProgram.id, {
-                id: deps.generateId(),
-                name: 'DIA 1',
-                orderIndex: 0,
-                createdAt: now,
-                updatedAt: now,
-              })
-              .mapErr(
-                (e): CreateProgramError => ({
-                  type: 'repository_error',
-                  message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
-                }),
-              ),
-          )
+          .andThen(() => createSessionsSequentially(0))
           .map(() => createdProgram)
       })
   }
