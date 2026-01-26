@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.4 - Fix supersets and exercise search debounce
+**Current focus:** Phase 4 - Athlete PWA
 
 ## Current Position
 
-Phase: 3.4 of 5 (Superset & Search Fixes)
-Plan: 0/2 (not yet planned)
+Phase: 4 of 5 (Athlete PWA)
+Plan: 0/3 (not yet planned)
 Status: NOT STARTED
-Last activity: 2026-01-26 - Phase 3.3 closed as partial, deferred supersets/debounce to 3.4
+Last activity: 2026-01-26 - Phase 3.4 removed, moving to Phase 4
 
 Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL
 
-**Note:** Phase 3.3 achieved keyboard editing, client-side ops, sessions form. Supersets and debounce remain broken after 4+ revision cycles — deferred to fresh Phase 3.4.
+**Note:** Phase 3.3 achieved keyboard editing, client-side ops, sessions form. Supersets and debounce remain with minor issues but are functional enough to proceed.
 
 ## Performance Metrics
 
@@ -355,9 +355,9 @@ None.
 - Add week/session local state
 - Sessions count in create form
 
-**What's broken (deferred to 3.4):**
-- Superset group labels (all show A1)
-- Exercise search debounce (not working)
+**Known minor issues (not blocking):**
+- Superset group labels may need manual refresh
+- Exercise search debounce has edge cases
 
 **Key artifacts:**
 - `apps/coach-web/src/stores/grid-store.ts` - Client-side state with addWeek, addSession, addExercise
@@ -370,8 +370,4 @@ Last session: 2026-01-26
 Stopped at: Phase 3.3 closed as partial
 Resume file: None
 
-**Next:** Phase 3.4 (Superset & Search Fixes) — run `/gsd:discuss-phase 3.4` or `/gsd:plan-phase 3.4`
-
-**Known issues from 3.3:**
-- Supersets: Group labels not working correctly after multiple fix attempts
-- Debounce: Exercise search API calls not debounced despite implementation
+**Next:** Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
