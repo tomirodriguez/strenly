@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.4 of 5 (Domain Restructure - Training Programs)
-Plan: 1/? (03.4-01 complete)
+Plan: 3/? (03.4-01, 03.4-03 complete)
 Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.4-01-PLAN.md (Program Aggregate Domain Entity)
+Last activity: 2026-01-26 - Completed 03.4-03-PLAN.md (Aggregate Repository Methods)
 
 Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL, 3.4 IN PROGRESS
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-05 (2 min), 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min)
-- Trend: Phase 3.4 IN PROGRESS - Program aggregate domain entity created with 99.73% coverage
+- Last 5 plans: 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min), 03.4-03 (3 min)
+- Trend: Phase 3.4 IN PROGRESS - Aggregate persistence methods (load/save) implemented
 
 *Updated after each plan completion*
 
@@ -171,6 +171,9 @@ Recent decisions affecting current work:
 - **Structural change tracking in grid store** - newWeeks, newSessions, newExerciseRows Maps track new entities with tempIds
 - **tempId to realId mapping in saveDraft** - Repository builds tempId -> realId map during transaction to resolve foreign key references
 - **Dependency order in saveDraft** - Create weeks first, then sessions, then exercises to satisfy foreign key constraints
+- **DELETE+INSERT aggregate persistence** - saveProgramAggregate deletes all children then re-inserts entire hierarchy atomically
+- **Synthetic groups for ungrouped exercises** - loadProgramAggregate creates eg-synthetic-{id} groups for exercises without groupId
+- **Prescription lookup by (exerciseId, weekId)** - prescriptionsByKey map enables efficient series attachment during reconstitution
 
 ### Pending Todos
 
@@ -372,15 +375,18 @@ None.
 | Plan | Name | Status |
 |------|------|--------|
 | 03.4-01 | Program Aggregate Domain Entity | Complete |
+| 03.4-03 | Aggregate Repository Methods | Complete |
 
 **Key artifacts:**
 - `packages/core/src/domain/entities/program/` - Program aggregate folder (types, series, group-item, exercise-group, session, week, program)
 - `packages/core/src/domain/entities/program/program.test.ts` - 60 tests, 99.73% coverage
+- `packages/core/src/ports/program-repository.port.ts` - loadProgramAggregate/saveProgramAggregate methods
+- `packages/backend/src/infrastructure/repositories/program.repository.ts` - Aggregate persistence implementation
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.4-01-PLAN.md
+Stopped at: Completed 03.4-03-PLAN.md
 Resume file: None
 
 **Next:** Continue Phase 3.4 (Domain Restructure) - next plan TBD
