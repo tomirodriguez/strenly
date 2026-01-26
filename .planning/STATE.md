@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 2/4 complete
+Plan: 3/4 complete
 Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.3-04-PLAN.md (sessionsCount in create program form)
+Last activity: 2026-01-26 - Completed 03.3-02-PLAN.md (add exercise uses local state)
 
 Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 in progress
 
@@ -159,6 +159,7 @@ Recent decisions affecting current work:
 - **Digits only trigger edit mode** - Changed from any printable character to digits 0-9 only for Excel-like behavior
 - **Cursor at end on edit** - Use setSelectionRange(len, len) instead of select() for cursor positioning
 - **requestAnimationFrame for cursor** - Ensure DOM is ready before setting cursor position
+- **Add exercise local-only** - addExercise updates local state without persistence; saveDraft backend needs extension for structural changes
 
 ### Pending Todos
 
@@ -327,14 +328,14 @@ None.
 | Plan | Name | Status |
 |------|------|--------|
 | 03.3-01 | Prescription Cell Edit Mode | Complete |
-| 03.3-02 | Wire Grid to Use Store Actions | Pending |
+| 03.3-02 | Add Exercise Local State | Complete |
 | 03.3-03 | Superset Menu Fix | Pending |
 | 03.3-04 | Sessions Count in Create Program | Complete |
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.3-04-PLAN.md
+Stopped at: Completed 03.3-02-PLAN.md
 Resume file: None
 
-**Next:** Ready for 03.3-02: Wire grid to use store actions for add exercise.
+**Next:** Ready for 03.3-03: Superset menu fix.
