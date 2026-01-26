@@ -104,6 +104,23 @@ export const makeSaveDraft =
             // but the repository handles this differently via orderWithinGroup.
             // For now, we map the basic group updates.
           })),
+          // Map new structural changes
+          newWeeks: input.newWeeks?.map((w) => ({
+            tempId: w.tempId,
+            name: w.name,
+            orderIndex: w.orderIndex,
+          })),
+          newSessions: input.newSessions?.map((s) => ({
+            tempId: s.tempId,
+            name: s.name,
+            orderIndex: s.orderIndex,
+          })),
+          newExerciseRows: input.newExerciseRows?.map((r) => ({
+            tempId: r.tempId,
+            sessionId: r.sessionId,
+            exerciseId: r.exerciseId,
+            orderIndex: r.orderIndex,
+          })),
         }
 
         return deps.programRepository

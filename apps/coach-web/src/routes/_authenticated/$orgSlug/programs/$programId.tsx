@@ -54,9 +54,15 @@ function ProgramEditorPage() {
     const changes = actions.getChanges()
     saveMutation.mutate({
       programId,
+      // Existing changes
       prescriptions: changes.prescriptions,
       exerciseRows: changes.exerciseRows,
       groups: [],
+      // Structural changes
+      newWeeks: changes.newWeeks,
+      newSessions: changes.newSessions,
+      newExerciseRows: changes.newExerciseRows,
+      // Conflict detection
       lastLoadedAt: changes.lastLoadedAt ?? undefined,
     })
   }, [programId, actions, saveMutation])

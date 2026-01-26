@@ -98,6 +98,7 @@ export type PrescriptionSeriesData = {
  */
 export type SaveDraftInput = {
   readonly programId: string
+  // Existing changes
   readonly prescriptionUpdates?: ReadonlyArray<{
     readonly exerciseRowId: string
     readonly weekId: string
@@ -113,6 +114,23 @@ export type SaveDraftInput = {
     readonly groupId: string
     readonly name?: string | null
     readonly orderIndex?: number
+  }>
+  // Structural changes (new entities)
+  readonly newWeeks?: ReadonlyArray<{
+    readonly tempId: string
+    readonly name: string
+    readonly orderIndex: number
+  }>
+  readonly newSessions?: ReadonlyArray<{
+    readonly tempId: string
+    readonly name: string
+    readonly orderIndex: number
+  }>
+  readonly newExerciseRows?: ReadonlyArray<{
+    readonly tempId: string
+    readonly sessionId: string // May be tempId
+    readonly exerciseId: string
+    readonly orderIndex: number
   }>
 }
 

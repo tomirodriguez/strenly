@@ -1210,19 +1210,80 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           const updatedAt = new Date()
 
           await db.transaction(async (tx) => {
-            // Update prescriptions with series
+            // Build a map of tempId -> realId for resolving references
+            const tempIdMap = new Map<string, string>()
+
+            // 1. Create new weeks first (columns)
+            if (input.newWeeks && input.newWeeks.length > 0) {
+              for (const week of input.newWeeks) {
+                const realId = crypto.randomUUID()
+                tempIdMap.set(week.tempId, realId)
+
+                await tx.insert(programWeeks).values({
+                  id: realId,
+                  programId: input.programId,
+                  name: week.name,
+                  orderIndex: week.orderIndex,
+                  createdAt: updatedAt,
+                  updatedAt,
+                })
+              }
+            }
+
+            // 2. Create new sessions
+            if (input.newSessions && input.newSessions.length > 0) {
+              for (const session of input.newSessions) {
+                const realId = crypto.randomUUID()
+                tempIdMap.set(session.tempId, realId)
+
+                await tx.insert(programSessions).values({
+                  id: realId,
+                  programId: input.programId,
+                  name: session.name,
+                  orderIndex: session.orderIndex,
+                  createdAt: updatedAt,
+                  updatedAt,
+                })
+              }
+            }
+
+            // 3. Create new exercise rows (resolve session tempIds)
+            if (input.newExerciseRows && input.newExerciseRows.length > 0) {
+              for (const row of input.newExerciseRows) {
+                const realId = crypto.randomUUID()
+                tempIdMap.set(row.tempId, realId)
+
+                // Resolve sessionId (may be tempId from a new session)
+                const sessionId = tempIdMap.get(row.sessionId) ?? row.sessionId
+
+                await tx.insert(programExercises).values({
+                  id: realId,
+                  sessionId,
+                  exerciseId: row.exerciseId,
+                  orderIndex: row.orderIndex,
+                  groupId: null,
+                  orderWithinGroup: null,
+                  setTypeLabel: null,
+                  notes: null,
+                  restSeconds: null,
+                  createdAt: updatedAt,
+                  updatedAt,
+                })
+              }
+            }
+
+            // 4. Update prescriptions with series (resolve tempIds in exercise/week refs)
             if (input.prescriptionUpdates && input.prescriptionUpdates.length > 0) {
               for (const update of input.prescriptionUpdates) {
+                // Resolve tempIds to real IDs
+                const exerciseRowId = tempIdMap.get(update.exerciseRowId) ?? update.exerciseRowId
+                const weekId = tempIdMap.get(update.weekId) ?? update.weekId
+
                 if (update.series.length === 0) {
                   // Delete the prescription if series is empty
                   await tx
                     .delete(prescriptions)
-                    .where(
-                      and(
-                        eq(prescriptions.programExerciseId, update.exerciseRowId),
-                        eq(prescriptions.weekId, update.weekId),
-                      ),
-                    )
+                    .where(and(eq(prescriptions.programExerciseId, exerciseRowId), eq(prescriptions.weekId, weekId)))
                 } else {
                   // Store series directly
                   const seriesData = update.series.map((s, i) => ({
@@ -1241,8 +1302,8 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
                     .insert(prescriptions)
                     .values({
                       id: `rx-${crypto.randomUUID()}`,
-                      programExerciseId: update.exerciseRowId,
-                      weekId: update.weekId,
+                      programExerciseId: exerciseRowId,
+                      weekId,
                       series: seriesData,
                     })
                     .onConflictDoUpdate({
@@ -1256,9 +1317,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               }
             }
 
-            // Update exercise rows
+            // 5. Update exercise rows (resolve tempIds)
             if (input.exerciseRowUpdates && input.exerciseRowUpdates.length > 0) {
               for (const update of input.exerciseRowUpdates) {
+                const rowId = tempIdMap.get(update.rowId) ?? update.rowId
+
                 const updateData: Partial<{
                   exerciseId: string
                   groupId: string | null
@@ -1276,11 +1339,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
                   updateData.orderWithinGroup = update.orderWithinGroup
                 }
 
-                await tx.update(programExercises).set(updateData).where(eq(programExercises.id, update.rowId))
+                await tx.update(programExercises).set(updateData).where(eq(programExercises.id, rowId))
               }
             }
 
-            // Update groups
+            // 6. Update groups
             if (input.groupUpdates && input.groupUpdates.length > 0) {
               for (const update of input.groupUpdates) {
                 const updateData: Partial<{ name: string | null; orderIndex: number; updatedAt: Date }> = { updatedAt }
@@ -1296,7 +1359,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               }
             }
 
-            // Update program.updatedAt
+            // 7. Update program.updatedAt
             await tx.update(programs).set({ updatedAt }).where(eq(programs.id, input.programId))
           })
 

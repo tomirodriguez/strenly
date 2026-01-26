@@ -29,22 +29,55 @@ const groupUpdateSchema = z.object({
 })
 
 /**
+ * New week to create
+ */
+const newWeekSchema = z.object({
+  tempId: z.string(), // Client-generated ID for reference
+  name: z.string(),
+  orderIndex: z.number(),
+})
+
+/**
+ * New session to create
+ */
+const newSessionSchema = z.object({
+  tempId: z.string(),
+  name: z.string(),
+  orderIndex: z.number(),
+})
+
+/**
+ * New exercise row to create
+ */
+const newExerciseRowSchema = z.object({
+  tempId: z.string(),
+  sessionId: z.string(), // Can be a tempId if session is also new
+  exerciseId: z.string(),
+  orderIndex: z.number(),
+})
+
+/**
  * Save draft input - bulk program state update
  * Accepts all changes made client-side and persists atomically
  */
 export const saveDraftInputSchema = z.object({
   programId: z.string(),
-  // Prescription changes (most common)
+  // Existing changes
   prescriptions: z.array(prescriptionUpdateSchema).default([]),
-  // Exercise selection changes
   exerciseRows: z.array(exerciseRowUpdateSchema).default([]),
-  // Group membership changes
   groups: z.array(groupUpdateSchema).default([]),
-  // Timestamp for conflict detection (optional)
+  // Structural changes (new entities)
+  newWeeks: z.array(newWeekSchema).default([]),
+  newSessions: z.array(newSessionSchema).default([]),
+  newExerciseRows: z.array(newExerciseRowSchema).default([]),
+  // Conflict detection
   lastLoadedAt: z.coerce.date().optional(),
 })
 
 export type SaveDraftInput = z.infer<typeof saveDraftInputSchema>
+export type NewWeek = z.infer<typeof newWeekSchema>
+export type NewSession = z.infer<typeof newSessionSchema>
+export type NewExerciseRow = z.infer<typeof newExerciseRowSchema>
 
 /**
  * Save draft output
