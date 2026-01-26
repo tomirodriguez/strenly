@@ -17,9 +17,9 @@ import type {
 import { createPrescription, createProgram, isProgramStatus, type Program } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import {
+  type PrescriptionSeriesData as DbPrescriptionSeriesData,
   exerciseGroups,
   exercises,
-  type PrescriptionSeriesData as DbPrescriptionSeriesData,
   prescriptions,
   programExercises,
   programSessions,
@@ -172,15 +172,16 @@ function mapPrescriptionToSeries(prescription: Prescription): DbPrescriptionSeri
       isAmrap: prescription.isAmrap,
       intensityType: prescription.intensityType,
       intensityValue: prescription.intensityValue,
-      intensityUnit: prescription.intensityType === 'absolute'
-        ? 'kg'
-        : prescription.intensityType === 'percentage'
-          ? '%'
-          : prescription.intensityType === 'rpe'
-            ? 'rpe'
-            : prescription.intensityType === 'rir'
-              ? 'rir'
-              : null,
+      intensityUnit:
+        prescription.intensityType === 'absolute'
+          ? 'kg'
+          : prescription.intensityType === 'percentage'
+            ? '%'
+            : prescription.intensityType === 'rpe'
+              ? 'rpe'
+              : prescription.intensityType === 'rir'
+                ? 'rir'
+                : null,
       tempo: prescription.tempo,
       restSeconds: null,
     })

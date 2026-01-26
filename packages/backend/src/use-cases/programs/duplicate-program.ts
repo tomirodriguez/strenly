@@ -202,7 +202,7 @@ export const makeDuplicateProgram =
                   if (!newRowId) continue
 
                   // Map the groupId to the new group ID
-                  const newGroupId = row.groupId ? groupIdMap.get(row.groupId) ?? null : null
+                  const newGroupId = row.groupId ? (groupIdMap.get(row.groupId) ?? null) : null
 
                   const now = new Date()
                   result = result.andThen(() =>

@@ -20,10 +20,7 @@ type Dependencies = {
  * Ensures exercise groups are adjacent in the row order.
  * If a group is split, consolidates all members after the first occurrence.
  */
-function ensureGroupAdjacency(
-  rowIds: string[],
-  rowMetadata: Map<string, { groupId: string | null }>,
-): string[] {
+function ensureGroupAdjacency(rowIds: string[], rowMetadata: Map<string, { groupId: string | null }>): string[] {
   // Track which rows we've placed
   const placed = new Set<string>()
   const result: string[] = []
