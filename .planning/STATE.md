@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
 Plan: 0/? - Not yet planned
 Status: NOT STARTED
-Last activity: 2026-01-26 - Phase 3.3 inserted for QA and bug fixes
+Last activity: 2026-01-26 - Completed quick task 022: Fix app shell scroll containment
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE
 
