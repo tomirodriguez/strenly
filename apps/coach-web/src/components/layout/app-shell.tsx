@@ -27,7 +27,7 @@ export function AppShell({ children, authData, primaryAction }: AppShellProps) {
       <AppSidebar user={authData.user} />
       <SidebarInset>
         <AppHeader primaryAction={primaryAction} />
-        <main className="flex flex-1 flex-col p-4 md:p-8">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col overflow-auto p-4 md:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
