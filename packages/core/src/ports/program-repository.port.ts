@@ -1,6 +1,7 @@
 import type { ResultAsync } from 'neverthrow'
 import type { Prescription } from '../domain/entities/prescription'
-import type { Program, ProgramStatus } from '../domain/entities/program'
+import type { Program as LegacyProgram, ProgramStatus } from '../domain/entities/program'
+import type { Program as ProgramAggregate } from '../domain/entities/program/program'
 import type { OrganizationContext } from '../types/organization-context'
 
 // ============================================================================
@@ -165,8 +166,9 @@ export type SessionWithRows = ProgramSession & {
 
 /**
  * Full program with all nested data for grid view
+ * @deprecated Use loadProgramAggregate which returns a full ProgramAggregate instead
  */
-export type ProgramWithDetails = Program & {
+export type ProgramWithDetails = LegacyProgram & {
   readonly weeks: ProgramWeek[]
   readonly sessions: SessionWithRows[]
 }
@@ -177,41 +179,70 @@ export type ProgramWithDetails = Program & {
 
 export type ProgramRepositoryPort = {
   // ---------------------------------------------------------------------------
-  // Program CRUD
+  // Aggregate Operations (NEW - Primary Interface)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Load a complete program aggregate with full hierarchy
+   * Used for editing - returns Program with weeks/sessions/groups/items/series
+   */
+  loadProgramAggregate(
+    ctx: OrganizationContext,
+    programId: string,
+  ): ResultAsync<ProgramAggregate, ProgramRepositoryError>
+
+  /**
+   * Save a complete program aggregate (replace-on-save)
+   * Deletes all children and re-inserts the entire hierarchy atomically
+   * Used after client edits to persist the complete state
+   */
+  saveProgramAggregate(
+    ctx: OrganizationContext,
+    program: ProgramAggregate,
+  ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError>
+
+  // ---------------------------------------------------------------------------
+  // Program CRUD (Legacy - will be deprecated)
   // ---------------------------------------------------------------------------
 
   /**
    * Create a new program
+   * @deprecated Use saveProgramAggregate for new implementations
    */
-  create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
+  create(ctx: OrganizationContext, program: LegacyProgram): ResultAsync<LegacyProgram, ProgramRepositoryError>
 
   /**
    * Find a program by ID
+   * @deprecated Use loadProgramAggregate for new implementations
    */
-  findById(ctx: OrganizationContext, id: string): ResultAsync<Program, ProgramRepositoryError>
+  findById(ctx: OrganizationContext, id: string): ResultAsync<LegacyProgram, ProgramRepositoryError>
 
   /**
    * Update a program
+   * @deprecated Use saveProgramAggregate for new implementations
    */
-  update(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
+  update(ctx: OrganizationContext, program: LegacyProgram): ResultAsync<LegacyProgram, ProgramRepositoryError>
 
   /**
    * List programs with optional filters
+   * @deprecated Use loadProgramAggregate for individual programs
    */
   list(
     ctx: OrganizationContext,
     filters?: ProgramFilters,
-  ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
+  ): ResultAsync<{ items: LegacyProgram[]; totalCount: number }, ProgramRepositoryError>
 
   /**
    * Get full program with nested data for grid view
+   * @deprecated Use loadProgramAggregate which returns a full ProgramAggregate instead
    */
   findWithDetails(ctx: OrganizationContext, id: string): ResultAsync<ProgramWithDetails, ProgramRepositoryError>
 
   /**
    * List template programs
+   * @deprecated Use list with isTemplate filter
    */
-  listTemplates(ctx: OrganizationContext): ResultAsync<Program[], ProgramRepositoryError>
+  listTemplates(ctx: OrganizationContext): ResultAsync<LegacyProgram[], ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Week Operations
