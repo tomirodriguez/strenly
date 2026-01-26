@@ -16,7 +16,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 2.6: Design System & Visual Refresh** - Dark theme, blue accent, component styling (frontend, non-blocking)
 - [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
-- [ ] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
+- [x] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -210,14 +210,14 @@ Plans:
 - Reference: Current domain in `packages/core/src/domain/entities/`
 
 Plans:
-- [ ] 03.2-01-PLAN.md - Database schema: exercise_groups table, updated columns (Wave 1)
-- [ ] 03.2-02-PLAN.md - Domain entities: PrescriptionSeries, ExerciseGroup (Wave 2, TDD)
-- [ ] 03.2-03-PLAN.md - Parser update: multi-notation to series array (Wave 3, TDD)
-- [ ] 03.2-04-PLAN.md - Contracts + repository updates for groups/series (Wave 4)
-- [ ] 03.2-05-PLAN.md - saveDraft use case and procedure (Wave 5)
-- [ ] 03.2-06-PLAN.md - Frontend state: useGridState with immer (Wave 6)
-- [ ] 03.2-07-PLAN.md - Frontend UI: multi-series display, Guardar button (Wave 7)
-- [ ] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
+- [x] 03.2-01-PLAN.md - Database schema: exercise_groups table, updated columns (Wave 1)
+- [x] 03.2-02-PLAN.md - Domain entities: PrescriptionSeries, ExerciseGroup (Wave 2, TDD)
+- [x] 03.2-03-PLAN.md - Parser update: multi-notation to series array (Wave 3, TDD)
+- [x] 03.2-04-PLAN.md - Contracts + repository updates for groups/series (Wave 4)
+- [x] 03.2-05-PLAN.md - saveDraft use case and procedure (Wave 5)
+- [x] 03.2-06-PLAN.md - Frontend state: Zustand grid store (Wave 6)
+- [x] 03.2-07-PLAN.md - Frontend UI: multi-series display, Guardar button (Wave 7)
+- [x] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -265,10 +265,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 4 ->
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
-| 3.2. Prescription Data Structure Refactor (full-stack) | 0/8 | Not started | - |
+| 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.2 planned - 8 plans in 8 waves)*
+*Last updated: 2026-01-25 (Phase 3.2 complete - 8/8 plans executed)*
