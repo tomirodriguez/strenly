@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.4 of 5 (Domain Restructure - Training Programs)
-Plan: 4/? (03.4-01, 03.4-03, 03.4-04 complete)
+Plan: 5/? (03.4-01, 03.4-03, 03.4-04, 03.4-05 complete)
 Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.4-04-PLAN.md (Use Cases for Aggregate Pattern)
+Last activity: 2026-01-26 - Completed 03.4-05-PLAN.md (API Contracts and Procedures)
 
 Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL, 3.4 IN PROGRESS
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 55
+- Total plans completed: 56
 - Average duration: ~4 min
-- Total execution time: ~212 min
+- Total execution time: ~219 min
 
 **By Phase:**
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min), 03.4-03 (3 min), 03.4-04 (6 min)
-- Trend: Phase 3.4 IN PROGRESS - Use cases now use aggregate pattern
+- Last 5 plans: 03.3-08 (2 min), 03.4-01 (7 min), 03.4-03 (3 min), 03.4-04 (6 min), 03.4-05 (7 min)
+- Trend: Phase 3.4 IN PROGRESS - API contracts and procedures use aggregate pattern
 
 *Updated after each plan completion*
 
@@ -379,6 +379,7 @@ None.
 | 03.4-01 | Program Aggregate Domain Entity | Complete |
 | 03.4-03 | Aggregate Repository Methods | Complete |
 | 03.4-04 | Use Cases for Aggregate Pattern | Complete |
+| 03.4-05 | API Contracts and Procedures | Complete |
 
 **Key artifacts:**
 - `packages/core/src/domain/entities/program/` - Program aggregate folder (types, series, group-item, exercise-group, session, week, program)
@@ -389,11 +390,13 @@ None.
 - `packages/backend/src/use-cases/programs/get-program.ts` - Returns full Program aggregate
 - `packages/backend/src/use-cases/programs/create-program.ts` - Creates with default weeks/sessions
 - `packages/backend/src/use-cases/programs/duplicate-program.ts` - Clones aggregate with new IDs
+- `packages/contracts/src/programs/program.ts` - Aggregate Zod schemas (programAggregateSchema, weekAggregateSchema, etc.)
+- `packages/contracts/src/programs/save-draft.ts` - Aggregate input schema for saveDraft
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.4-04-PLAN.md
+Stopped at: Completed 03.4-05-PLAN.md
 Resume file: None
 
-**Next:** Continue Phase 3.4 (Domain Restructure) - 03.4-05 Delete Legacy Code
+**Next:** Continue Phase 3.4 (Domain Restructure) - 03.4-06 Frontend Updates for Aggregate Format
