@@ -1,6 +1,7 @@
 import { formatSeriesToNotation, type PrescriptionSeriesInput } from '@strenly/contracts/programs/prescription'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
+import { recalculateSessionGroups } from '@/components/programs/program-grid/transform-program'
 import type { GridData, GridRow } from '@/components/programs/program-grid/types'
 
 /**
@@ -225,8 +226,18 @@ export const useGridStore = create<GridStore>((set, get) => ({
         updatedRows.push(newRow)
       }
 
+      // Recalculate group labels for this session
+      const sessionExerciseRows = updatedRows.filter((row) => row.type === 'exercise' && row.sessionId === sessionId)
+      const recalculatedRows = recalculateSessionGroups(sessionExerciseRows)
+      const recalculatedMap = new Map(recalculatedRows.map((row) => [row.id, row]))
+
+      const finalRows = updatedRows.map((row) => {
+        const recalculated = recalculatedMap.get(row.id)
+        return recalculated ?? row
+      })
+
       return {
-        data: { ...state.data, rows: updatedRows },
+        data: { ...state.data, rows: finalRows },
         isDirty: true,
         // NOTE: We intentionally do NOT add to a tracking array here
         // because saveDraft backend does not yet support persisting new exercises.
@@ -245,15 +256,35 @@ export const useGridStore = create<GridStore>((set, get) => ({
     set((state) => {
       if (!state.data) return state
 
-      const updatedRows = state.data.rows.map((row) => {
+      // Find the row to get its sessionId
+      const targetRow = state.data.rows.find((row) => row.type === 'exercise' && row.id === rowId)
+      if (!targetRow) return state
+      const sessionId = targetRow.sessionId
+
+      // First, update the target row's supersetGroup
+      let updatedRows = state.data.rows.map((row) => {
         if (row.type === 'exercise' && row.id === rowId) {
           return {
             ...row,
             supersetGroup: groupLetter,
-            groupLetter: groupLetter ?? undefined,
           }
         }
         return row
+      })
+
+      // Get all exercise rows for this session (in order)
+      const sessionExerciseRows = updatedRows.filter((row) => row.type === 'exercise' && row.sessionId === sessionId)
+
+      // Recalculate group labels for entire session
+      const recalculatedRows = recalculateSessionGroups(sessionExerciseRows)
+
+      // Create a map for quick lookup
+      const recalculatedMap = new Map(recalculatedRows.map((row) => [row.id, row]))
+
+      // Merge recalculated rows back
+      updatedRows = updatedRows.map((row) => {
+        const recalculated = recalculatedMap.get(row.id)
+        return recalculated ?? row
       })
 
       return {

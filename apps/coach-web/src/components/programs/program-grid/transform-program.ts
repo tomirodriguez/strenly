@@ -53,6 +53,48 @@ function formatPrescriptionToNotation(prescription: Prescription): string {
 }
 
 /**
+ * Recalculate groupLetter and groupIndex for all exercise rows in a session.
+ *
+ * Rules:
+ * - Letter (A, B, C...) assigned sequentially as groups are encountered
+ * - Index (1, 2, 3...) is position within that group
+ * - Rows without supersetGroup get their own letter with index 1
+ * - Rows sharing supersetGroup share a letter, indices increment
+ *
+ * @param sessionRows - Exercise rows belonging to a single session (ordered)
+ * @returns Updated rows with groupLetter and groupIndex set
+ */
+export function recalculateSessionGroups(sessionRows: GridRow[]): GridRow[] {
+  const LETTER_A_CODE = 65
+  let letterIndex = 0
+  const groupLetters = new Map<string, string>()
+  const groupCounters = new Map<string, number>()
+
+  return sessionRows.map((row) => {
+    if (row.type !== 'exercise') return row
+
+    if (row.supersetGroup) {
+      // Named group (superset) - share letter, increment counter
+      let letter = groupLetters.get(row.supersetGroup)
+      if (!letter) {
+        letter = String.fromCharCode(LETTER_A_CODE + letterIndex)
+        groupLetters.set(row.supersetGroup, letter)
+        groupCounters.set(row.supersetGroup, 0)
+        letterIndex++
+      }
+      const counter = (groupCounters.get(row.supersetGroup) ?? 0) + 1
+      groupCounters.set(row.supersetGroup, counter)
+
+      return { ...row, groupLetter: letter, groupIndex: counter }
+    }
+    // Standalone exercise = implicit group of 1
+    const letter = String.fromCharCode(LETTER_A_CODE + letterIndex)
+    letterIndex++
+    return { ...row, groupLetter: letter, groupIndex: 1 }
+  })
+}
+
+/**
  * Transform API program data to grid-compatible format
  *
  * Builds:
