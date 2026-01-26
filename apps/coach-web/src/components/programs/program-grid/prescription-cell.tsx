@@ -96,8 +96,10 @@ export function PrescriptionCell({
           e.preventDefault()
           onCommit(editValue)
           onNavigate('left')
+        } else {
+          // Cursor not at boundary - stop propagation to prevent grid navigation
+          e.stopPropagation()
         }
-        // Otherwise, let browser handle cursor movement (don't preventDefault)
         break
       case 'ArrowRight':
         // Only navigate if cursor is at the very end
@@ -105,8 +107,10 @@ export function PrescriptionCell({
           e.preventDefault()
           onCommit(editValue)
           onNavigate('right')
+        } else {
+          // Cursor not at boundary - stop propagation to prevent grid navigation
+          e.stopPropagation()
         }
-        // Otherwise, let browser handle cursor movement
         break
     }
   }
