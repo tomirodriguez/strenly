@@ -80,43 +80,33 @@ export const prescriptionSchema = z.object({
 export type Prescription = z.infer<typeof prescriptionSchema>
 
 /**
- * Prescription with series array schema (new model)
+ * Prescription with series array schema
  * Contains series as individual set definitions
- * - series: Array of prescription series (one per set)
- * - prescription: Legacy flat prescription (deprecated, for backward compatibility)
  */
 export const prescriptionWithSeriesSchema = z.object({
   id: z.string(),
   weekId: z.string(),
-  // New series array (nullable during migration)
-  series: z.array(prescriptionSeriesInputSchema).nullable(),
-  // Legacy flat prescription (deprecated, for backward compatibility)
-  prescription: prescriptionSchema.nullable(),
+  series: z.array(prescriptionSeriesInputSchema),
   notes: z.string().nullable(),
 })
 
 export type PrescriptionWithSeries = z.infer<typeof prescriptionWithSeriesSchema>
 
 /**
- * Base exercise row schema (without subRows for recursion)
- * Extended with group-based fields for the new model
+ * Exercise row schema
+ * Represents an exercise row in the program grid
  */
-const baseExerciseRowSchema = z.object({
+export const exerciseRowWithPrescriptionsSchema = z.object({
   id: z.string(),
   sessionId: z.string(),
   exerciseId: z.string(),
   exerciseName: z.string(),
   orderIndex: z.number(),
-  // New group-based fields
-  groupId: z.string().nullable(), // null during migration
-  orderWithinGroup: z.number().int().min(0).nullable(), // null during migration
-  // Legacy superset fields (deprecated, for backward compatibility)
-  supersetGroup: z.string().nullable(),
-  supersetOrder: z.number().nullable(),
-  // Other existing fields
+  // Group-based fields
+  groupId: z.string().nullable(),
+  orderWithinGroup: z.number().int().min(0).nullable(),
+  // Other fields
   setTypeLabel: z.string().nullable(),
-  isSubRow: z.boolean(),
-  parentRowId: z.string().nullable(),
   notes: z.string().nullable(),
   restSeconds: z.number().nullable(),
   prescriptionsByWeekId: z.record(z.string(), prescriptionSchema),
@@ -124,28 +114,14 @@ const baseExerciseRowSchema = z.object({
   updatedAt: z.string(),
 })
 
-/**
- * Exercise row with prescriptions output schema
- * SubRows use the same structure (single level nesting)
- */
-export const exerciseRowWithPrescriptionsSchema: z.ZodType<ExerciseRowWithPrescriptions> = baseExerciseRowSchema.extend(
-  {
-    subRows: z.array(z.lazy(() => baseExerciseRowSchema.extend({ subRows: z.array(z.never()) }))),
-  },
-)
-
-export type ExerciseRowWithPrescriptions = z.infer<typeof baseExerciseRowSchema> & {
-  subRows: ExerciseRowWithPrescriptions[]
-}
+export type ExerciseRowWithPrescriptions = z.infer<typeof exerciseRowWithPrescriptionsSchema>
 
 /**
  * Session with rows output schema
- * Extended with exerciseGroups for the new model
  */
 export const sessionWithRowsSchema = programSessionSchema.extend({
   rows: z.array(exerciseRowWithPrescriptionsSchema),
-  // New: exercise groups within this session
-  exerciseGroups: z.array(exerciseGroupSchema).optional(), // Optional for backward compatibility
+  exerciseGroups: z.array(exerciseGroupSchema).optional(),
 })
 
 export type SessionWithRows = z.infer<typeof sessionWithRowsSchema>

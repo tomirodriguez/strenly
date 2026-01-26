@@ -17,7 +17,6 @@ interface GridBodyProps {
   onCommitPrescription: (rowId: string, weekId: string, value: string) => void
   onNavigate: (direction: 'up' | 'down' | 'left' | 'right' | 'tab' | 'shift-tab') => void
   onAddExercise: (sessionId: string, exerciseId: string, exerciseName: string) => void
-  onAddSplitRow: (rowId: string) => void
 }
 
 /**
@@ -47,12 +46,11 @@ export function GridBody({
   onCommitPrescription,
   onNavigate,
   onAddExercise,
-  onAddSplitRow,
 }: GridBodyProps) {
   // Group rows by session to get row IDs for each session
   // This is needed for reordering exercises within a session
   const sessionRowIds = new Map<string, string[]>()
-  // Also collect session rows with superset data for dynamic superset group calculation
+  // Also collect session rows with group data for dynamic group calculation
   const sessionRowsData = new Map<string, SessionRowData[]>()
 
   for (const row of rows) {
@@ -62,7 +60,7 @@ export function GridBody({
       sessionRowIds.set(row.sessionId, ids)
 
       const rowsData = sessionRowsData.get(row.sessionId) ?? []
-      rowsData.push({ id: row.id, supersetGroup: row.supersetGroup })
+      rowsData.push({ id: row.id, groupId: row.supersetGroup })
       sessionRowsData.set(row.sessionId, rowsData)
     }
   }
@@ -91,7 +89,6 @@ export function GridBody({
                 onCommitExercise={onCommitExercise}
                 onCommitPrescription={onCommitPrescription}
                 onNavigate={onNavigate}
-                onAddSplitRow={onAddSplitRow}
               />
             )
 

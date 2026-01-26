@@ -11,8 +11,7 @@ export type AddExerciseRowInput = OrganizationContext & {
   memberRole: Role
   sessionId: string
   exerciseId: string
-  supersetGroup?: string | null
-  supersetOrder?: number | null
+  groupId?: string | null
 }
 
 export type AddExerciseRowError =
@@ -54,16 +53,11 @@ export const makeAddExerciseRow =
           id: deps.generateId(),
           exerciseId: input.exerciseId,
           orderIndex: maxOrder + 1,
-          // New group-based fields
-          groupId: null, // null for legacy superset-based creation
+          // Group-based fields
+          groupId: input.groupId ?? null,
           orderWithinGroup: null,
-          // Legacy superset fields
-          supersetGroup: input.supersetGroup ?? null,
-          supersetOrder: input.supersetOrder ?? null,
           // Other fields
           setTypeLabel: null,
-          isSubRow: false,
-          parentRowId: null,
           notes: null,
           restSeconds: null,
           createdAt: now,

@@ -25,7 +25,6 @@ interface ExerciseCellProps {
   onStartEdit: () => void
   onCommit: (exerciseId: string, exerciseName: string) => void
   onCancel: () => void
-  onAddSplitRow: () => void
 }
 
 /**
@@ -33,9 +32,9 @@ interface ExerciseCellProps {
  *
  * Features:
  * - Displays exercise name with proper styling
- * - Shows set type badge for split rows (HEAVY SINGLES, BACK-OFF, etc.)
- * - Row prefix with superset indicator (A1, B2)
- * - Row actions menu on hover (delete, superset, move, split)
+ * - Shows set type badge for special row types
+ * - Row prefix with group indicator (A1, B2)
+ * - Row actions menu on hover (delete, move)
  * - Single click selects cell, double-click enters edit mode
  * - Sticky first column behavior (parent handles this via CSS)
  */
@@ -44,14 +43,12 @@ export function ExerciseCell({
   colId,
   programId,
   sessionRowIds,
-  sessionRows,
   isActive,
   isEditing,
   onSelect,
   onStartEdit,
   onCommit,
   onCancel,
-  onAddSplitRow,
 }: ExerciseCellProps) {
   const [searchValue, setSearchValue] = useState('')
 
@@ -147,7 +144,7 @@ export function ExerciseCell({
             {row.exercise?.exerciseName ?? 'Seleccionar ejercicio'}
           </span>
 
-          {/* Set type badge for split rows */}
+          {/* Set type badge for special rows */}
           {row.setTypeLabel && (
             <span className="ml-2 shrink-0 rounded bg-muted/50 px-1.5 py-0.5 font-bold text-[9px] text-muted-foreground uppercase">
               {row.setTypeLabel}
@@ -162,11 +159,7 @@ export function ExerciseCell({
             sessionId={row.sessionId}
             rowId={row.id}
             exerciseName={row.exercise?.exerciseName ?? ''}
-            supersetGroup={row.supersetGroup}
-            isSubRow={row.isSubRow}
             sessionRowIds={sessionRowIds}
-            sessionRows={sessionRows}
-            onAddSplitRow={onAddSplitRow}
           />
         </div>
       </div>

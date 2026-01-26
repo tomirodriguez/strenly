@@ -153,8 +153,8 @@ export function PrescriptionCell({
       const parts = displayValue.split(' + ')
       return (
         <div className="flex flex-col justify-center py-0.5">
-          {parts.map((part, i) => (
-            <span key={i} className="text-xs leading-tight">
+          {parts.map((part, index) => (
+            <span key={`${index}-${part}`} className="text-xs leading-tight">
               {part}
             </span>
           ))}

@@ -19,7 +19,7 @@ import type { DbClient } from '@strenly/database'
 import {
   exerciseGroups,
   exercises,
-  type ParsedPrescription,
+  type PrescriptionSeriesData as DbPrescriptionSeriesData,
   prescriptions,
   programExercises,
   programSessions,
@@ -110,16 +110,11 @@ function mapExerciseRowToDomain(row: ExerciseRowDb): ProgramExerciseRow {
     sessionId: row.sessionId,
     exerciseId: row.exerciseId,
     orderIndex: row.orderIndex,
-    // New group-based fields
+    // Group-based fields
     groupId: row.groupId,
     orderWithinGroup: row.orderWithinGroup,
-    // Legacy superset fields
-    supersetGroup: row.supersetGroup,
-    supersetOrder: row.supersetOrder,
     // Other fields
     setTypeLabel: row.setTypeLabel,
-    isSubRow: row.isSubRow,
-    parentRowId: row.parentRowId,
     notes: row.notes,
     restSeconds: row.restSeconds,
     createdAt: row.createdAt,
@@ -138,48 +133,59 @@ function mapExerciseGroupToDomain(row: ExerciseGroupRow): ExerciseGroupData {
   }
 }
 
-function mapPrescriptionToDomain(parsed: ParsedPrescription, id: string): Prescription | null {
+/**
+ * Map series data from database to Prescription domain entity
+ * Creates a legacy Prescription from the first series for backward compatibility
+ */
+function mapSeriesToPrescription(series: DbPrescriptionSeriesData[], id: string): Prescription | null {
+  if (series.length === 0) return null
+
+  const firstSeries = series[0]
+  if (!firstSeries) return null
+
   const result = createPrescription({
     id,
-    sets: parsed.sets,
-    repsMin: parsed.repsMin,
-    repsMax: parsed.repsMax,
-    isAmrap: parsed.isAmrap,
-    isUnilateral: parsed.isUnilateral,
-    unilateralUnit: parsed.unilateralUnit,
-    intensityType: parsed.intensityType,
-    intensityValue: parsed.intensityValue,
-    tempo: parsed.tempo,
+    sets: series.length,
+    repsMin: firstSeries.reps ?? 0,
+    repsMax: firstSeries.repsMax,
+    isAmrap: firstSeries.isAmrap,
+    isUnilateral: false, // Not used in series model
+    unilateralUnit: null,
+    intensityType: firstSeries.intensityType,
+    intensityValue: firstSeries.intensityValue,
+    tempo: firstSeries.tempo,
   })
 
   return result.isOk() ? result.value : null
 }
 
-function mapPrescriptionToDb(prescription: Prescription): ParsedPrescription {
-  // Map intensity type to unit
-  let intensityUnit: ParsedPrescription['intensityUnit'] = null
-  if (prescription.intensityType === 'absolute') {
-    intensityUnit = 'kg'
-  } else if (prescription.intensityType === 'percentage') {
-    intensityUnit = '%'
-  } else if (prescription.intensityType === 'rpe') {
-    intensityUnit = 'rpe'
-  } else if (prescription.intensityType === 'rir') {
-    intensityUnit = 'rir'
+/**
+ * Map Prescription domain entity to series array for database storage
+ */
+function mapPrescriptionToSeries(prescription: Prescription): DbPrescriptionSeriesData[] {
+  const series: DbPrescriptionSeriesData[] = []
+  for (let i = 0; i < prescription.sets; i++) {
+    series.push({
+      orderIndex: i,
+      reps: prescription.isAmrap ? null : prescription.repsMin,
+      repsMax: prescription.repsMax,
+      isAmrap: prescription.isAmrap,
+      intensityType: prescription.intensityType,
+      intensityValue: prescription.intensityValue,
+      intensityUnit: prescription.intensityType === 'absolute'
+        ? 'kg'
+        : prescription.intensityType === 'percentage'
+          ? '%'
+          : prescription.intensityType === 'rpe'
+            ? 'rpe'
+            : prescription.intensityType === 'rir'
+              ? 'rir'
+              : null,
+      tempo: prescription.tempo,
+      restSeconds: null,
+    })
   }
-
-  return {
-    sets: prescription.sets,
-    repsMin: prescription.repsMin,
-    repsMax: prescription.repsMax,
-    isAmrap: prescription.isAmrap,
-    isUnilateral: prescription.isUnilateral,
-    unilateralUnit: prescription.unilateralUnit,
-    intensityType: prescription.intensityType,
-    intensityValue: prescription.intensityValue,
-    intensityUnit,
-    tempo: prescription.tempo,
-  }
+  return series
 }
 
 // ============================================================================
@@ -480,7 +486,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           // 6. Group prescriptions by exercise row ID
           const prescriptionsByRowId = new Map<string, Map<string, Prescription>>()
           for (const prescriptionRow of prescriptionRows) {
-            const prescription = mapPrescriptionToDomain(prescriptionRow.prescription, prescriptionRow.id)
+            const prescription = mapSeriesToPrescription(prescriptionRow.series, prescriptionRow.id)
             if (prescription) {
               let rowMap = prescriptionsByRowId.get(prescriptionRow.programExerciseId)
               if (!rowMap) {
@@ -492,11 +498,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           }
 
           // 7. Build exercise rows with prescriptions
-          const exerciseRowsMap = new Map<
-            string,
-            ExerciseRowWithPrescriptions & { subRows: ExerciseRowWithPrescriptions[] }
-          >()
-          const subRowsByParent = new Map<string, ExerciseRowWithPrescriptions[]>()
+          const exerciseRowsMap = new Map<string, ExerciseRowWithPrescriptions>()
 
           for (const { row, exerciseName } of exerciseRowResults) {
             const prescriptionMap = prescriptionsByRowId.get(row.id)
@@ -511,27 +513,9 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               ...mapExerciseRowToDomain(row),
               exerciseName,
               prescriptionsByWeekId,
-              subRows: [],
             }
 
-            if (row.isSubRow && row.parentRowId) {
-              let subs = subRowsByParent.get(row.parentRowId)
-              if (!subs) {
-                subs = []
-                subRowsByParent.set(row.parentRowId, subs)
-              }
-              subs.push(exerciseRow)
-            } else {
-              exerciseRowsMap.set(row.id, { ...exerciseRow, subRows: [] })
-            }
-          }
-
-          // Attach sub-rows to parents
-          for (const [parentId, subs] of subRowsByParent) {
-            const parent = exerciseRowsMap.get(parentId)
-            if (parent) {
-              parent.subRows = subs
-            }
+            exerciseRowsMap.set(row.id, exerciseRow)
           }
 
           // 8. Group exercise rows by session
@@ -971,34 +955,6 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
-    getMaxSupersetOrder(
-      ctx: OrganizationContext,
-      sessionId: string,
-      supersetGroup: string,
-    ): ResultAsync<number, ProgramRepositoryError> {
-      return RA.fromPromise(
-        (async (): Promise<{ ok: true; data: number } | { ok: false; error: ProgramRepositoryError }> => {
-          const existingSession = await verifySessionAccess(ctx, sessionId)
-          if (!existingSession) {
-            return { ok: false, error: notFoundError('session', sessionId) }
-          }
-
-          const result = await db
-            .select({ maxOrder: sql<number>`COALESCE(MAX(${programExercises.supersetOrder}), 0)` })
-            .from(programExercises)
-            .where(and(eq(programExercises.sessionId, sessionId), eq(programExercises.supersetGroup, supersetGroup)))
-
-          return { ok: true, data: result[0]?.maxOrder ?? 0 }
-        })(),
-        wrapDbError,
-      ).andThen((result) => {
-        if (!result.ok) {
-          return err(result.error)
-        }
-        return ok(result.data)
-      })
-    },
-
     createExerciseRow(
       ctx: OrganizationContext,
       sessionId: string,
@@ -1018,16 +974,9 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               sessionId,
               exerciseId: row.exerciseId,
               orderIndex: row.orderIndex,
-              // New group-based fields
               groupId: row.groupId,
               orderWithinGroup: row.orderWithinGroup,
-              // Legacy superset fields
-              supersetGroup: row.supersetGroup,
-              supersetOrder: row.supersetOrder,
-              // Other fields
               setTypeLabel: row.setTypeLabel,
-              isSubRow: row.isSubRow,
-              parentRowId: row.parentRowId,
               notes: row.notes,
               restSeconds: row.restSeconds,
               createdAt: row.createdAt,
@@ -1067,16 +1016,9 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             .set({
               exerciseId: row.exerciseId,
               orderIndex: row.orderIndex,
-              // New group-based fields
               groupId: row.groupId,
               orderWithinGroup: row.orderWithinGroup,
-              // Legacy superset fields
-              supersetGroup: row.supersetGroup,
-              supersetOrder: row.supersetOrder,
-              // Other fields
               setTypeLabel: row.setTypeLabel,
-              isSubRow: row.isSubRow,
-              parentRowId: row.parentRowId,
               notes: row.notes,
               restSeconds: row.restSeconds,
               updatedAt: new Date(),
@@ -1121,36 +1063,6 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
-    findSubRows(
-      ctx: OrganizationContext,
-      parentRowId: string,
-    ): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError> {
-      return RA.fromPromise(
-        (async (): Promise<{ ok: true; data: ProgramExerciseRow[] } | { ok: false; error: ProgramRepositoryError }> => {
-          // First verify the parent row belongs to the organization
-          const parentRow = await verifyExerciseRowAccess(ctx, parentRowId)
-          if (!parentRow) {
-            return { ok: false, error: notFoundError('exercise_row', parentRowId) }
-          }
-
-          // Fetch all sub-rows for this parent
-          const rows = await db
-            .select()
-            .from(programExercises)
-            .where(eq(programExercises.parentRowId, parentRowId))
-            .orderBy(asc(programExercises.orderIndex))
-
-          return { ok: true, data: rows.map(mapExerciseRowToDomain) }
-        })(),
-        wrapDbError,
-      ).andThen((result) => {
-        if (!result.ok) {
-          return err(result.error)
-        }
-        return ok(result.data)
-      })
-    },
-
     // -------------------------------------------------------------------------
     // Prescription Operations (Cell Values)
     // -------------------------------------------------------------------------
@@ -1182,19 +1094,19 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               .where(and(eq(prescriptions.programExerciseId, exerciseRowId), eq(prescriptions.weekId, weekId)))
           } else {
             // Upsert the prescription using ON CONFLICT
-            const prescriptionData = mapPrescriptionToDb(prescription)
+            const seriesData = mapPrescriptionToSeries(prescription)
             await db
               .insert(prescriptions)
               .values({
                 id: prescription.id,
                 programExerciseId: exerciseRowId,
                 weekId,
-                prescription: prescriptionData,
+                series: seriesData,
               })
               .onConflictDoUpdate({
                 target: [prescriptions.programExerciseId, prescriptions.weekId],
                 set: {
-                  prescription: prescriptionData,
+                  series: seriesData,
                   updatedAt: new Date(),
                 },
               })
@@ -1237,21 +1149,18 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               .delete(prescriptions)
               .where(and(eq(prescriptions.programExerciseId, exerciseRowId), eq(prescriptions.weekId, weekId)))
           } else {
-            // Convert series to legacy prescription format for backward compatibility
-            // Calculate sets from series count, use first series for other values
-            const firstSeries = series[0]
-            const prescriptionData: ParsedPrescription = {
-              sets: series.length,
-              repsMin: firstSeries?.reps ?? 0,
-              repsMax: firstSeries?.repsMax ?? null,
-              isAmrap: firstSeries?.isAmrap ?? false,
-              isUnilateral: false, // Not used in series model
-              unilateralUnit: null,
-              intensityType: firstSeries?.intensityType ?? null,
-              intensityValue: firstSeries?.intensityValue ?? null,
-              intensityUnit: firstSeries?.intensityUnit ?? null,
-              tempo: firstSeries?.tempo ?? null,
-            }
+            // Store series directly
+            const seriesData = series.map((s, i) => ({
+              orderIndex: i,
+              reps: s.reps,
+              repsMax: s.repsMax,
+              isAmrap: s.isAmrap,
+              intensityType: s.intensityType,
+              intensityValue: s.intensityValue,
+              intensityUnit: s.intensityUnit,
+              tempo: s.tempo,
+              restSeconds: s.restSeconds,
+            }))
 
             await db
               .insert(prescriptions)
@@ -1259,14 +1168,12 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
                 id: `rx-${crypto.randomUUID()}`,
                 programExerciseId: exerciseRowId,
                 weekId,
-                prescription: prescriptionData,
-                // series: series, // TODO: Add series JSONB column in future
+                series: seriesData,
               })
               .onConflictDoUpdate({
                 target: [prescriptions.programExerciseId, prescriptions.weekId],
                 set: {
-                  prescription: prescriptionData,
-                  // series: series, // TODO: Add series JSONB column in future
+                  series: seriesData,
                   updatedAt: new Date(),
                 },
               })
@@ -1316,20 +1223,18 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
                       ),
                     )
                 } else {
-                  // Convert series to legacy prescription format
-                  const firstSeries = update.series[0]
-                  const prescriptionData: ParsedPrescription = {
-                    sets: update.series.length,
-                    repsMin: firstSeries?.reps ?? 0,
-                    repsMax: firstSeries?.repsMax ?? null,
-                    isAmrap: firstSeries?.isAmrap ?? false,
-                    isUnilateral: false,
-                    unilateralUnit: null,
-                    intensityType: firstSeries?.intensityType ?? null,
-                    intensityValue: firstSeries?.intensityValue ?? null,
-                    intensityUnit: firstSeries?.intensityUnit ?? null,
-                    tempo: firstSeries?.tempo ?? null,
-                  }
+                  // Store series directly
+                  const seriesData = update.series.map((s, i) => ({
+                    orderIndex: i,
+                    reps: s.reps,
+                    repsMax: s.repsMax,
+                    isAmrap: s.isAmrap,
+                    intensityType: s.intensityType,
+                    intensityValue: s.intensityValue,
+                    intensityUnit: s.intensityUnit,
+                    tempo: s.tempo,
+                    restSeconds: s.restSeconds,
+                  }))
 
                   await tx
                     .insert(prescriptions)
@@ -1337,12 +1242,12 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
                       id: `rx-${crypto.randomUUID()}`,
                       programExerciseId: update.exerciseRowId,
                       weekId: update.weekId,
-                      prescription: prescriptionData,
+                      series: seriesData,
                     })
                     .onConflictDoUpdate({
                       target: [prescriptions.programExerciseId, prescriptions.weekId],
                       set: {
-                        prescription: prescriptionData,
+                        series: seriesData,
                         updatedAt,
                       },
                     })
@@ -1486,7 +1391,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               id: `rx-${crypto.randomUUID()}`,
               programExerciseId: p.programExerciseId,
               weekId: newWeekId,
-              prescription: p.prescription,
+              series: p.series,
             }))
 
             await db.insert(prescriptions).values(newPrescriptions)
@@ -1500,90 +1405,6 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           return err(result.error)
         }
         return ok(mapWeekToDomain(result.data))
-      })
-    },
-
-    repositionRowToAfterSupersetGroup(
-      ctx: OrganizationContext,
-      sessionId: string,
-      rowId: string,
-      supersetGroup: string,
-    ): ResultAsync<void, ProgramRepositoryError> {
-      return RA.fromPromise(
-        (async (): Promise<{ ok: true } | { ok: false; error: ProgramRepositoryError }> => {
-          // Verify session access
-          const existingSession = await verifySessionAccess(ctx, sessionId)
-          if (!existingSession) {
-            return { ok: false, error: notFoundError('session', sessionId) }
-          }
-
-          // 1. Get all rows in session ordered by orderIndex
-          const sessionRows = await db
-            .select({
-              id: programExercises.id,
-              orderIndex: programExercises.orderIndex,
-              supersetGroup: programExercises.supersetGroup,
-            })
-            .from(programExercises)
-            .where(eq(programExercises.sessionId, sessionId))
-            .orderBy(asc(programExercises.orderIndex))
-
-          // 2. Find the last row in the target superset group (excluding the row being moved)
-          let lastGroupIndex = -1
-          for (let i = 0; i < sessionRows.length; i++) {
-            const row = sessionRows[i]
-            if (row && row.supersetGroup === supersetGroup && row.id !== rowId) {
-              lastGroupIndex = i
-            }
-          }
-
-          // 3. If no other members in group, no repositioning needed
-          if (lastGroupIndex === -1) {
-            return { ok: true }
-          }
-
-          // 4. Build new order: remove the row, insert it after lastGroupIndex
-          const currentIndex = sessionRows.findIndex((r) => r.id === rowId)
-          if (currentIndex === -1) {
-            return { ok: true } // Row not found, nothing to do
-          }
-
-          // If already in position (right after last group member), no change needed
-          if (currentIndex === lastGroupIndex + 1) {
-            return { ok: true }
-          }
-
-          // Create new order array
-          const currentRow = sessionRows[currentIndex]
-          if (!currentRow) {
-            return { ok: true }
-          }
-          const newOrder = sessionRows.filter((r) => r.id !== rowId)
-          // Insert after the last group member (adjust position if removing from before)
-          const insertPosition = lastGroupIndex < currentIndex ? lastGroupIndex + 1 : lastGroupIndex
-          newOrder.splice(insertPosition, 0, currentRow)
-
-          // 5. Update all orderIndex values
-          await db.transaction(async (tx) => {
-            for (let i = 0; i < newOrder.length; i++) {
-              const row = newOrder[i]
-              if (row) {
-                await tx
-                  .update(programExercises)
-                  .set({ orderIndex: i, updatedAt: new Date() })
-                  .where(eq(programExercises.id, row.id))
-              }
-            }
-          })
-
-          return { ok: true }
-        })(),
-        wrapDbError,
-      ).andThen((result) => {
-        if (!result.ok) {
-          return err(result.error)
-        }
-        return ok(undefined)
       })
     },
 

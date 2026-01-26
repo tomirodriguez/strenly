@@ -17,12 +17,12 @@ type Dependencies = {
 }
 
 /**
- * Ensures superset groups are adjacent in the row order.
- * If a superset group is split, consolidates all members after the first occurrence.
+ * Ensures exercise groups are adjacent in the row order.
+ * If a group is split, consolidates all members after the first occurrence.
  */
-function ensureSupersetAdjacency(
+function ensureGroupAdjacency(
   rowIds: string[],
-  rowMetadata: Map<string, { supersetGroup: string | null }>,
+  rowMetadata: Map<string, { groupId: string | null }>,
 ): string[] {
   // Track which rows we've placed
   const placed = new Set<string>()
@@ -32,13 +32,13 @@ function ensureSupersetAdjacency(
     if (placed.has(rowId)) continue
 
     const metadata = rowMetadata.get(rowId)
-    const group = metadata?.supersetGroup
+    const groupId = metadata?.groupId
 
-    if (group) {
-      // Find all rows in this superset group and place them together
+    if (groupId) {
+      // Find all rows in this group and place them together
       const groupMembers = rowIds.filter((id) => {
         const m = rowMetadata.get(id)
-        return m?.supersetGroup === group && !placed.has(id)
+        return m?.groupId === groupId && !placed.has(id)
       })
       for (const member of groupMembers) {
         result.push(member)
@@ -67,7 +67,7 @@ export const makeReorderExerciseRows =
 
     const ctx = { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole }
 
-    // 2. Fetch row metadata to check superset groups
+    // 2. Fetch row metadata to check groups
     return deps.programRepository
       .findExerciseRowsBySessionId(ctx, input.sessionId)
       .mapErr((e): ReorderExerciseRowsError => {
@@ -81,13 +81,13 @@ export const makeReorderExerciseRows =
       })
       .andThen((rows) => {
         // Build metadata map
-        const rowMetadata = new Map<string, { supersetGroup: string | null }>()
+        const rowMetadata = new Map<string, { groupId: string | null }>()
         for (const row of rows) {
-          rowMetadata.set(row.id, { supersetGroup: row.supersetGroup })
+          rowMetadata.set(row.id, { groupId: row.groupId })
         }
 
-        // Ensure superset adjacency
-        const validatedOrder = ensureSupersetAdjacency(input.rowIds, rowMetadata)
+        // Ensure group adjacency
+        const validatedOrder = ensureGroupAdjacency(input.rowIds, rowMetadata)
 
         // 3. Delegate to repository
         return deps.programRepository

@@ -55,16 +55,11 @@ export type ProgramExerciseRow = {
   readonly sessionId: string
   readonly exerciseId: string
   readonly orderIndex: number
-  // New group-based fields
-  readonly groupId: string | null // null during migration
-  readonly orderWithinGroup: number | null // null during migration
-  // Legacy superset fields (deprecated)
-  readonly supersetGroup: string | null
-  readonly supersetOrder: number | null
-  // Other existing fields
+  // Group-based fields
+  readonly groupId: string | null
+  readonly orderWithinGroup: number | null
+  // Other fields
   readonly setTypeLabel: string | null
-  readonly isSubRow: boolean
-  readonly parentRowId: string | null
   readonly notes: string | null
   readonly restSeconds: number | null
   readonly createdAt: Date
@@ -140,7 +135,6 @@ export type PrescriptionCell = {
 export type ExerciseRowWithPrescriptions = ProgramExerciseRow & {
   readonly exerciseName: string // Joined from exercises table
   readonly prescriptionsByWeekId: Record<string, Prescription>
-  readonly subRows: ExerciseRowWithPrescriptions[]
 }
 
 /**
@@ -253,7 +247,7 @@ export type ProgramRepositoryPort = {
   deleteSession(ctx: OrganizationContext, sessionId: string): ResultAsync<void, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
-  // Exercise Group Operations (new)
+  // Exercise Group Operations
   // ---------------------------------------------------------------------------
 
   /**
@@ -301,16 +295,6 @@ export type ProgramRepositoryPort = {
   getMaxExerciseRowOrderIndex(ctx: OrganizationContext, sessionId: string): ResultAsync<number, ProgramRepositoryError>
 
   /**
-   * Get the maximum superset order for a given group in a session
-   * Returns 0 if no rows exist in that group
-   */
-  getMaxSupersetOrder(
-    ctx: OrganizationContext,
-    sessionId: string,
-    supersetGroup: string,
-  ): ResultAsync<number, ProgramRepositoryError>
-
-  /**
    * Create an exercise row for a session
    */
   createExerciseRow(
@@ -332,11 +316,6 @@ export type ProgramRepositoryPort = {
    */
   deleteExerciseRow(ctx: OrganizationContext, rowId: string): ResultAsync<void, ProgramRepositoryError>
 
-  /**
-   * Find all sub-rows for a parent exercise row
-   */
-  findSubRows(ctx: OrganizationContext, parentRowId: string): ResultAsync<ProgramExerciseRow[], ProgramRepositoryError>
-
   // ---------------------------------------------------------------------------
   // Prescription Operations (Cell Values)
   // ---------------------------------------------------------------------------
@@ -353,7 +332,7 @@ export type ProgramRepositoryPort = {
   ): ResultAsync<void, ProgramRepositoryError>
 
   /**
-   * Update prescription with series array (new model)
+   * Update prescription with series array
    * Replaces the series array for a specific cell
    */
   updatePrescriptionSeries(
@@ -390,17 +369,6 @@ export type ProgramRepositoryPort = {
     weekId: string,
     newName: string,
   ): ResultAsync<ProgramWeek, ProgramRepositoryError>
-
-  /**
-   * Reposition a row to be immediately after the last member of a superset group.
-   * Used when adding a row to an existing superset to ensure adjacent placement.
-   */
-  repositionRowToAfterSupersetGroup(
-    ctx: OrganizationContext,
-    sessionId: string,
-    rowId: string,
-    supersetGroup: string,
-  ): ResultAsync<void, ProgramRepositoryError>
 
   /**
    * Reposition a row to the end of a session.

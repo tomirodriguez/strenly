@@ -6,6 +6,7 @@ import {
   saveAsTemplateInputSchema,
   templateWithDetailsOutputSchema,
 } from '@strenly/contracts/programs'
+import type { ExerciseRowWithPrescriptions } from '@strenly/core'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateFromTemplate } from '../../use-cases/programs/create-from-template'
@@ -250,7 +251,7 @@ export const listTemplatesProcedure = authProcedure
 /**
  * Maps an exercise row from domain to contract format
  */
-function mapExerciseRow(row: {
+function mapExerciseRow(row: ExerciseRowWithPrescriptions): {
   id: string
   sessionId: string
   exerciseId: string
@@ -258,11 +259,7 @@ function mapExerciseRow(row: {
   orderIndex: number
   groupId: string | null
   orderWithinGroup: number | null
-  supersetGroup: string | null
-  supersetOrder: number | null
   setTypeLabel: string | null
-  isSubRow: boolean
-  parentRowId: string | null
   notes: string | null
   restSeconds: number | null
   prescriptionsByWeekId: Record<
@@ -280,40 +277,6 @@ function mapExerciseRow(row: {
       tempo: string | null
     }
   >
-  subRows: (typeof row)[]
-  createdAt: Date
-  updatedAt: Date
-}): {
-  id: string
-  sessionId: string
-  exerciseId: string
-  exerciseName: string
-  orderIndex: number
-  groupId: string | null
-  orderWithinGroup: number | null
-  supersetGroup: string | null
-  supersetOrder: number | null
-  setTypeLabel: string | null
-  isSubRow: boolean
-  parentRowId: string | null
-  notes: string | null
-  restSeconds: number | null
-  prescriptionsByWeekId: Record<
-    string,
-    {
-      id: string
-      sets: number
-      repsMin: number
-      repsMax: number | null
-      isAmrap: boolean
-      isUnilateral: boolean
-      unilateralUnit: 'leg' | 'arm' | 'side' | null
-      intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
-      intensityValue: number | null
-      tempo: string | null
-    }
-  >
-  subRows: ReturnType<typeof mapExerciseRow>[]
   createdAt: string
   updatedAt: string
 } {
@@ -325,15 +288,10 @@ function mapExerciseRow(row: {
     orderIndex: row.orderIndex,
     groupId: row.groupId,
     orderWithinGroup: row.orderWithinGroup,
-    supersetGroup: row.supersetGroup,
-    supersetOrder: row.supersetOrder,
     setTypeLabel: row.setTypeLabel,
-    isSubRow: row.isSubRow,
-    parentRowId: row.parentRowId,
     notes: row.notes,
     restSeconds: row.restSeconds,
     prescriptionsByWeekId: row.prescriptionsByWeekId,
-    subRows: row.subRows.map((subRow) => mapExerciseRow(subRow)),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   }

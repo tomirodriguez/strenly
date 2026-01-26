@@ -11,8 +11,8 @@ export type UpdateExerciseRowInput = OrganizationContext & {
   memberRole: Role
   rowId: string
   exerciseId?: string
-  supersetGroup?: string | null
-  supersetOrder?: number | null
+  groupId?: string | null
+  orderWithinGroup?: number | null
   setTypeLabel?: string | null
   notes?: string | null
   restSeconds?: number | null
@@ -56,16 +56,11 @@ export const makeUpdateExerciseRow =
           sessionId: existing.sessionId,
           exerciseId: input.exerciseId ?? existing.exerciseId,
           orderIndex: existing.orderIndex,
-          // New group-based fields (preserve existing)
-          groupId: existing.groupId,
-          orderWithinGroup: existing.orderWithinGroup,
-          // Legacy superset fields
-          supersetGroup: input.supersetGroup !== undefined ? input.supersetGroup : existing.supersetGroup,
-          supersetOrder: input.supersetOrder !== undefined ? input.supersetOrder : existing.supersetOrder,
+          // Group-based fields
+          groupId: input.groupId !== undefined ? input.groupId : existing.groupId,
+          orderWithinGroup: input.orderWithinGroup !== undefined ? input.orderWithinGroup : existing.orderWithinGroup,
           // Other fields
           setTypeLabel: input.setTypeLabel !== undefined ? input.setTypeLabel : existing.setTypeLabel,
-          isSubRow: existing.isSubRow,
-          parentRowId: existing.parentRowId,
           notes: input.notes !== undefined ? input.notes : existing.notes,
           restSeconds: input.restSeconds !== undefined ? input.restSeconds : existing.restSeconds,
           createdAt: existing.createdAt,

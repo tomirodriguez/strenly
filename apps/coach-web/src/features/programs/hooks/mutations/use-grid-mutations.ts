@@ -139,46 +139,6 @@ export function useReorderExerciseRows(programId: string) {
   })
 }
 
-/**
- * Hook to add a split row (same exercise, different set config)
- */
-export function useAddSplitRow(programId: string) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...orpc.programs.exerciseRows.addSplit.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
-      })
-    },
-    onError: (error) => {
-      const message = error?.message ?? 'Error al agregar fila dividida'
-      toast.error(message)
-    },
-  })
-}
-
-/**
- * Hook to toggle superset grouping for an exercise row
- */
-export function useToggleSuperset(programId: string) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...orpc.programs.exerciseRows.toggleSuperset.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
-      })
-    },
-    onError: (error) => {
-      const message = error?.message ?? 'Error al cambiar superserie'
-      toast.error(message)
-    },
-  })
-}
-
 // ============================================================================
 // Week Operations
 // ============================================================================

@@ -1,7 +1,6 @@
 import { type PrescriptionSeriesInput, parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
 import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { SplitRowDialog } from '../split-row-dialog'
+import { useCallback, useMemo, useRef } from 'react'
 import { GridBody } from './grid-body'
 import { GridHeader } from './grid-header'
 import { transformProgramToGrid } from './transform-program'
@@ -11,7 +10,6 @@ import { useGridNavigation } from './use-grid-navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   useAddExerciseRow,
-  useToggleSuperset,
   useUpdateExerciseRow,
   useUpdatePrescription,
 } from '@/features/programs/hooks/mutations/use-grid-mutations'
@@ -44,14 +42,10 @@ interface ProgramGridProps {
  * Features:
  * - Keyboard navigation (arrow keys, tab, enter)
  * - Inline editing for exercises and prescriptions
- * - Superset toggle (S key)
- * - Split row (Shift+Enter)
  * - Sticky first column
  * - Optional local state management via props
  *
  * Keyboard shortcuts:
- * - S: Toggle superset grouping for current row
- * - Shift+Enter: Add split row for current exercise
  * - Arrow keys: Navigate between cells
  * - Tab/Shift+Tab: Navigate horizontally with wrap
  * - Enter/F2: Start editing current cell
@@ -65,7 +59,6 @@ export function ProgramGrid({
   onExerciseChange,
 }: ProgramGridProps) {
   const tableRef = useRef<HTMLTableElement>(null)
-  const [splitRowId, setSplitRowId] = useState<string | null>(null)
 
   // Transform program data for grid display (use provided gridData if available)
   const transformedData = useMemo(() => transformProgramToGrid(program), [program])
@@ -84,7 +77,6 @@ export function ProgramGrid({
   const updatePrescription = useUpdatePrescription(program.id)
   const updateExerciseRow = useUpdateExerciseRow(program.id)
   const addExerciseRow = useAddExerciseRow(program.id)
-  const toggleSuperset = useToggleSuperset(program.id)
 
   // Handle cell click
   const handleCellClick = (rowId: string, colId: string) => {
@@ -178,37 +170,8 @@ export function ProgramGrid({
     }
   }
 
-  // Handle split row dialog
-  const handleAddSplitRow = (rowId: string) => {
-    setSplitRowId(rowId)
-  }
-
   // Handle global keyboard shortcuts
   const handleTableKeyDown = (e: React.KeyboardEvent) => {
-    // S key for superset toggle (when not editing)
-    if (e.key === 's' && !editingCell && activeCell && !e.ctrlKey && !e.metaKey) {
-      const row = rows.find((r) => r.id === activeCell.rowId)
-      if (row && row.type === 'exercise') {
-        e.preventDefault()
-        const nextGroup = row.supersetGroup ? null : 'A'
-        toggleSuperset.mutate({
-          rowId: activeCell.rowId,
-          supersetGroup: nextGroup,
-        })
-      }
-      return
-    }
-
-    // Shift+Enter for split row (when not editing)
-    if (e.shiftKey && e.key === 'Enter' && !editingCell && activeCell) {
-      const row = rows.find((r) => r.id === activeCell.rowId)
-      if (row && row.type === 'exercise' && !row.isSubRow) {
-        e.preventDefault()
-        handleAddSplitRow(activeCell.rowId)
-      }
-      return
-    }
-
     // Pass to navigation handler
     handleKeyDown(e)
   }
@@ -246,18 +209,9 @@ export function ProgramGrid({
             onCommitPrescription={handleCommitPrescription}
             onNavigate={handleNavigate}
             onAddExercise={handleAddExercise}
-            onAddSplitRow={handleAddSplitRow}
           />
         </table>
       </div>
-
-      {/* Split row dialog */}
-      <SplitRowDialog
-        programId={program.id}
-        parentRowId={splitRowId}
-        open={splitRowId !== null}
-        onOpenChange={(open) => !open && setSplitRowId(null)}
-      />
     </div>
   )
 }

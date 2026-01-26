@@ -7,8 +7,7 @@ import { z } from 'zod'
 export const addExerciseRowSchema = z.object({
   sessionId: z.string(),
   exerciseId: z.string(),
-  supersetGroup: z.string().max(1).optional(), // 'A', 'B', 'C'
-  supersetOrder: z.number().min(1).optional(),
+  groupId: z.string().optional(), // Optional: assign to existing group
 })
 
 export type AddExerciseRowInput = z.infer<typeof addExerciseRowSchema>
@@ -20,8 +19,8 @@ export type AddExerciseRowInput = z.infer<typeof addExerciseRowSchema>
 export const updateExerciseRowSchema = z.object({
   rowId: z.string(),
   exerciseId: z.string().optional(),
-  supersetGroup: z.string().max(1).nullable().optional(),
-  supersetOrder: z.number().min(1).nullable().optional(),
+  groupId: z.string().nullable().optional(),
+  orderWithinGroup: z.number().int().min(0).nullable().optional(),
   setTypeLabel: z.string().max(30).nullable().optional(),
   notes: z.string().max(500).nullable().optional(),
   restSeconds: z.number().min(0).max(600).nullable().optional(),
@@ -50,28 +49,6 @@ export const reorderExerciseRowsSchema = z.object({
 export type ReorderExerciseRowsInput = z.infer<typeof reorderExerciseRowsSchema>
 
 /**
- * Add split row input schema
- * Creates a sub-row for the same exercise with different set configuration
- */
-export const addSplitRowSchema = z.object({
-  parentRowId: z.string(),
-  setTypeLabel: z.string().min(1).max(30), // "HEAVY SINGLES", "BACK-OFF"
-})
-
-export type AddSplitRowInput = z.infer<typeof addSplitRowSchema>
-
-/**
- * Toggle superset input schema
- * Adds or removes an exercise row from a superset group
- */
-export const toggleSupersetSchema = z.object({
-  rowId: z.string(),
-  supersetGroup: z.string().max(1).nullable(), // null to remove from superset
-})
-
-export type ToggleSupersetInput = z.infer<typeof toggleSupersetSchema>
-
-/**
  * Exercise row output schema
  * Represents a row in the session (an exercise with its configuration)
  */
@@ -81,11 +58,9 @@ export const exerciseRowOutputSchema = z.object({
   exerciseId: z.string(),
   exerciseName: z.string(),
   orderIndex: z.number(),
-  supersetGroup: z.string().nullable(),
-  supersetOrder: z.number().nullable(),
+  groupId: z.string().nullable(),
+  orderWithinGroup: z.number().nullable(),
   setTypeLabel: z.string().nullable(),
-  isSubRow: z.boolean(),
-  parentRowId: z.string().nullable(),
   notes: z.string().nullable(),
   restSeconds: z.number().nullable(),
 })

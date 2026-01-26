@@ -85,22 +85,25 @@ export const makeDuplicateProgram =
             const weekIdMap = new Map<string, string>()
             const sessionIdMap = new Map<string, string>()
             const exerciseRowIdMap = new Map<string, string>()
+            const groupIdMap = new Map<string, string>()
 
             // Generate new IDs for weeks
             for (const week of sourceProgram.weeks) {
               weekIdMap.set(week.id, deps.generateId())
             }
 
-            // Generate new IDs for sessions
+            // Generate new IDs for sessions and groups
             for (const session of sourceProgram.sessions) {
               sessionIdMap.set(session.id, deps.generateId())
-              // Generate new IDs for exercise rows in this session
+              // Generate new IDs for exercise groups
+              if (session.exerciseGroups) {
+                for (const group of session.exerciseGroups) {
+                  groupIdMap.set(group.id, deps.generateId())
+                }
+              }
+              // Generate new IDs for exercise rows
               for (const row of session.rows) {
                 exerciseRowIdMap.set(row.id, deps.generateId())
-                // Generate new IDs for sub-rows
-                for (const subRow of row.subRows) {
-                  exerciseRowIdMap.set(subRow.id, deps.generateId())
-                }
               }
             }
 
@@ -161,6 +164,26 @@ export const makeDuplicateProgram =
                     )
                     .map(() => undefined),
                 )
+
+                // Create exercise groups for this session
+                if (session.exerciseGroups) {
+                  for (const group of session.exerciseGroups) {
+                    const newGroupId = groupIdMap.get(group.id)
+                    if (!newGroupId) continue
+
+                    result = result.andThen(() =>
+                      deps.programRepository
+                        .createGroup(ctx, newSessionId, group.name)
+                        .mapErr(
+                          (e): DuplicateProgramError => ({
+                            type: 'repository_error',
+                            message: e.type === 'DATABASE_ERROR' ? e.message : `Group not found: ${e.id}`,
+                          }),
+                        )
+                        .map(() => undefined),
+                    )
+                  }
+                }
               }
 
               return result
@@ -178,6 +201,9 @@ export const makeDuplicateProgram =
                   const newRowId = exerciseRowIdMap.get(row.id)
                   if (!newRowId) continue
 
+                  // Map the groupId to the new group ID
+                  const newGroupId = row.groupId ? groupIdMap.get(row.groupId) ?? null : null
+
                   const now = new Date()
                   result = result.andThen(() =>
                     deps.programRepository
@@ -185,16 +211,11 @@ export const makeDuplicateProgram =
                         id: newRowId,
                         exerciseId: row.exerciseId,
                         orderIndex: row.orderIndex,
-                        // New group-based fields
-                        groupId: row.groupId,
+                        // Group-based fields (mapped to new IDs)
+                        groupId: newGroupId,
                         orderWithinGroup: row.orderWithinGroup,
-                        // Legacy superset fields
-                        supersetGroup: row.supersetGroup,
-                        supersetOrder: row.supersetOrder,
                         // Other fields
                         setTypeLabel: row.setTypeLabel,
-                        isSubRow: false,
-                        parentRowId: null,
                         notes: row.notes,
                         restSeconds: row.restSeconds,
                         createdAt: now,
@@ -228,63 +249,6 @@ export const makeDuplicateProgram =
                           }),
                         ),
                     )
-                  }
-
-                  // Create sub-rows
-                  for (const subRow of row.subRows) {
-                    const newSubRowId = exerciseRowIdMap.get(subRow.id)
-                    if (!newSubRowId) continue
-
-                    result = result.andThen(() =>
-                      deps.programRepository
-                        .createExerciseRow(ctx, newSessionId, {
-                          id: newSubRowId,
-                          exerciseId: subRow.exerciseId,
-                          orderIndex: subRow.orderIndex,
-                          // New group-based fields
-                          groupId: subRow.groupId,
-                          orderWithinGroup: subRow.orderWithinGroup,
-                          // Legacy superset fields
-                          supersetGroup: subRow.supersetGroup,
-                          supersetOrder: subRow.supersetOrder,
-                          // Other fields
-                          setTypeLabel: subRow.setTypeLabel,
-                          isSubRow: true,
-                          parentRowId: newRowId, // Link to new parent
-                          notes: subRow.notes,
-                          restSeconds: subRow.restSeconds,
-                          createdAt: now,
-                          updatedAt: now,
-                        })
-                        .mapErr(
-                          (e): DuplicateProgramError => ({
-                            type: 'repository_error',
-                            message: e.type === 'DATABASE_ERROR' ? e.message : `SubRow not found: ${e.id}`,
-                          }),
-                        )
-                        .map(() => undefined),
-                    )
-
-                    // Create prescriptions for sub-row
-                    for (const [weekId, prescription] of Object.entries(subRow.prescriptionsByWeekId)) {
-                      const newWeekId = weekIdMap.get(weekId)
-                      if (!newWeekId) continue
-
-                      const newPrescriptionId = deps.generateId()
-                      result = result.andThen(() =>
-                        deps.programRepository
-                          .upsertPrescription(ctx, newSubRowId, newWeekId, {
-                            ...prescription,
-                            id: newPrescriptionId,
-                          })
-                          .mapErr(
-                            (e): DuplicateProgramError => ({
-                              type: 'repository_error',
-                              message: e.type === 'DATABASE_ERROR' ? e.message : `Entity not found: ${e.id}`,
-                            }),
-                          ),
-                      )
-                    }
                   }
                 }
               }

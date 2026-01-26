@@ -3,10 +3,8 @@ import { createProgram } from './create'
 import { duplicateProgram } from './duplicate'
 import {
   addExerciseRowProcedure,
-  addSplitRowProcedure,
   deleteExerciseRowProcedure,
   reorderExerciseRowsProcedure,
-  toggleSupersetProcedure,
   updateExerciseRowProcedure,
 } from './exercise-rows'
 import { getProgram } from './get'
@@ -26,7 +24,7 @@ import { addWeekProcedure, deleteWeekProcedure, duplicateWeekProcedure, updateWe
  * - Root level: program CRUD (create, get, list, update, archive, duplicate)
  * - weeks: week management (add, update, delete, duplicate)
  * - sessions: session management (add, update, delete)
- * - exerciseRows: exercise row management (add, update, delete, reorder, split, superset)
+ * - exerciseRows: exercise row management (add, update, delete, reorder)
  * - prescriptions: prescription cell updates
  * - templates: template operations (list, saveAs, createFrom)
  */
@@ -60,8 +58,6 @@ export const programs = {
     update: updateExerciseRowProcedure,
     delete: deleteExerciseRowProcedure,
     reorder: reorderExerciseRowsProcedure,
-    addSplit: addSplitRowProcedure,
-    toggleSuperset: toggleSupersetProcedure,
   },
 
   // Prescription operations

@@ -60,8 +60,7 @@ function formatPrescriptionToNotation(prescription: Prescription): string {
  * - rows: session headers + exercise rows + add-exercise rows per session
  *
  * Handles:
- * - Superset position calculation for visual indicators
- * - Sub-row flattening (split rows become separate GridRows)
+ * - Group position calculation for visual indicators (supersets use exercise groups)
  * - Prescription formatting for display
  */
 export function transformProgramToGrid(program: ProgramWithDetails): GridData {
@@ -103,16 +102,14 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
     // Get exercise rows for this session sorted by orderIndex
     const sessionRows = [...session.rows].sort((a, b) => a.orderIndex - b.orderIndex)
 
-    // Build flat list of rows (parent + sub-rows)
+    // Build flat list of rows with group information
     interface FlatRow {
       id: string
       exerciseId: string
       exerciseName: string
       position: number
-      supersetGroup: string | null
-      supersetOrder: number | null
-      isSubRow: boolean
-      parentRowId: string | null
+      groupId: string | null
+      orderWithinGroup: number | null
       setTypeLabel: string | null
       prescriptionsByWeekId: Record<string, Prescription>
       // Logical group for unified display (calculated below)
@@ -122,79 +119,58 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
 
     const flatRows: FlatRow[] = []
     for (const row of sessionRows) {
-      // Add main row
+      // Add row
       flatRows.push({
         id: row.id,
         exerciseId: row.exerciseId,
         exerciseName: row.exerciseName,
         position: row.orderIndex,
-        supersetGroup: row.supersetGroup,
-        supersetOrder: row.supersetOrder,
-        isSubRow: row.isSubRow,
-        parentRowId: row.parentRowId,
+        groupId: row.groupId,
+        orderWithinGroup: row.orderWithinGroup,
         setTypeLabel: row.setTypeLabel,
         prescriptionsByWeekId: row.prescriptionsByWeekId,
       })
-
-      // Add sub-rows if any
-      if (row.subRows && row.subRows.length > 0) {
-        for (const subRow of row.subRows) {
-          flatRows.push({
-            id: subRow.id,
-            exerciseId: subRow.exerciseId,
-            exerciseName: subRow.exerciseName,
-            position: subRow.orderIndex,
-            supersetGroup: subRow.supersetGroup,
-            supersetOrder: subRow.supersetOrder,
-            isSubRow: true,
-            parentRowId: row.id,
-            setTypeLabel: subRow.setTypeLabel,
-            prescriptionsByWeekId: subRow.prescriptionsByWeekId,
-          })
-        }
-      }
     }
 
-    // Calculate superset positions for visual indicators
-    // Group exercises by supersetGroup
-    const supersetGroups = new Map<string, number[]>()
+    // Calculate group positions for visual indicators
+    // Group exercises by groupId
+    const exerciseGroups = new Map<string, number[]>()
     flatRows.forEach((row, idx) => {
-      if (row.supersetGroup) {
-        const group = supersetGroups.get(row.supersetGroup) ?? []
+      if (row.groupId) {
+        const group = exerciseGroups.get(row.groupId) ?? []
         group.push(idx)
-        supersetGroups.set(row.supersetGroup, group)
+        exerciseGroups.set(row.groupId, group)
       }
     })
 
-    // Calculate dynamic supersetOrder based on physical position within each group
-    // This replaces stored supersetOrder values which become stale after reordering
-    const dynamicSupersetOrder = new Map<number, number>() // flatRowIndex -> order (1-based)
-    for (const [, indices] of supersetGroups) {
+    // Calculate dynamic order based on physical position within each group
+    const dynamicGroupOrder = new Map<number, number>() // flatRowIndex -> order (1-based)
+    for (const [, indices] of exerciseGroups) {
       // indices are already in physical order (since we iterated flatRows in order)
       indices.forEach((idx, orderInGroup) => {
-        dynamicSupersetOrder.set(idx, orderInGroup + 1) // 1-based: A1, A2, A3
+        dynamicGroupOrder.set(idx, orderInGroup + 1) // 1-based: A1, A2, A3
       })
     }
 
     // Calculate logical groups - treating ALL exercises as groups
-    // Standalone = group of 1, Superset = group of N
+    // Standalone = group of 1, Grouped = group of N
     const LETTER_A_CODE = 65
     let letterIndex = 0
-    const supersetLetters = new Map<string, string>()
-    const supersetCounters = new Map<string, number>()
+    const groupLetters = new Map<string, string>()
+    const groupCounters = new Map<string, number>()
 
     for (const row of flatRows) {
-      if (row.supersetGroup) {
+      if (row.groupId) {
         // Named group (superset) - share letter, increment counter
-        let letter = supersetLetters.get(row.supersetGroup)
+        let letter = groupLetters.get(row.groupId)
         if (!letter) {
           letter = String.fromCharCode(LETTER_A_CODE + letterIndex)
-          supersetLetters.set(row.supersetGroup, letter)
-          supersetCounters.set(row.supersetGroup, 0)
+          groupLetters.set(row.groupId, letter)
+          groupCounters.set(row.groupId, 0)
           letterIndex++
         }
-        const counter = (supersetCounters.get(row.supersetGroup) ?? 0) + 1
-        supersetCounters.set(row.supersetGroup, counter)
+        const counter = (groupCounters.get(row.groupId) ?? 0) + 1
+        groupCounters.set(row.groupId, counter)
 
         row.groupLetter = letter
         row.groupIndex = counter
@@ -206,12 +182,12 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
       }
     }
 
-    // Add exercise rows with superset position
+    // Add exercise rows with group position
     flatRows.forEach((row, idx) => {
-      // Calculate superset position
+      // Calculate superset position (for visual line connector)
       let supersetPosition: SupersetPosition = null
-      if (row.supersetGroup) {
-        const groupIndices = supersetGroups.get(row.supersetGroup) ?? []
+      if (row.groupId) {
+        const groupIndices = exerciseGroups.get(row.groupId) ?? []
         const posInGroup = groupIndices.indexOf(idx)
         if (groupIndices.length === 1) {
           supersetPosition = null // Single item, no line
@@ -224,8 +200,8 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
         }
       }
 
-      // Use dynamic supersetOrder instead of stored value
-      const calculatedSupersetOrder = row.supersetGroup ? (dynamicSupersetOrder.get(idx) ?? null) : null
+      // Use dynamic order instead of stored value
+      const calculatedOrder = row.groupId ? (dynamicGroupOrder.get(idx) ?? null) : null
 
       // Build prescriptions map: weekId -> formatted notation
       const prescriptions: Record<string, string> = {}
@@ -243,13 +219,14 @@ export function transformProgramToGrid(program: ProgramWithDetails): GridData {
           exerciseName: row.exerciseName,
           position: row.position,
         },
-        supersetGroup: row.supersetGroup,
-        supersetOrder: calculatedSupersetOrder,
+        // Map groupId to supersetGroup for backward compatibility with UI
+        supersetGroup: row.groupId,
+        supersetOrder: calculatedOrder,
         supersetPosition,
         groupLetter: row.groupLetter,
         groupIndex: row.groupIndex,
-        isSubRow: row.isSubRow,
-        parentRowId: row.parentRowId,
+        isSubRow: false,
+        parentRowId: null,
         setTypeLabel: row.setTypeLabel,
         prescriptions,
       })

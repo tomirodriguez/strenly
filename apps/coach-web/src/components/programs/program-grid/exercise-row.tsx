@@ -8,7 +8,7 @@ interface ExerciseRowProps {
   columns: GridColumn[]
   programId: string
   sessionRowIds: string[]
-  /** All rows in this session with superset data for dynamic group calculation */
+  /** All rows in this session with group data for dynamic group calculation */
   sessionRows: SessionRowData[]
   activeCell: GridCell | null
   editingCell: GridCell | null
@@ -18,7 +18,6 @@ interface ExerciseRowProps {
   onCommitExercise: (rowId: string, exerciseId: string, exerciseName: string) => void
   onCommitPrescription: (rowId: string, weekId: string, value: string) => void
   onNavigate: (direction: 'up' | 'down' | 'left' | 'right' | 'tab' | 'shift-tab') => void
-  onAddSplitRow: (rowId: string) => void
 }
 
 /**
@@ -44,7 +43,6 @@ export function ExerciseRow({
   onCommitExercise,
   onCommitPrescription,
   onNavigate,
-  onAddSplitRow,
 }: ExerciseRowProps) {
   const isActiveRow = activeCell?.rowId === row.id
   const isEditingRow = editingCell?.rowId === row.id
@@ -73,7 +71,6 @@ export function ExerciseRow({
                 onStopEdit()
               }}
               onCancel={onStopEdit}
-              onAddSplitRow={() => onAddSplitRow(row.id)}
             />
           )
         }

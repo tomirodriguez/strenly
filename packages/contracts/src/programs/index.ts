@@ -16,17 +16,13 @@ export {
 // Exercise row operations
 export {
   type AddExerciseRowInput,
-  type AddSplitRowInput,
   addExerciseRowSchema,
-  addSplitRowSchema,
   type DeleteExerciseRowInput,
   deleteExerciseRowSchema,
   type ExerciseRowOutput,
   exerciseRowOutputSchema,
   type ReorderExerciseRowsInput,
   reorderExerciseRowsSchema,
-  type ToggleSupersetInput,
-  toggleSupersetSchema,
   type UpdateExerciseRowInput,
   updateExerciseRowSchema,
 } from './exercise-row'
