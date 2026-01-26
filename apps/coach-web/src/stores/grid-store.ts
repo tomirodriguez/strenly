@@ -182,9 +182,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
 
       // Find the session's existing exercise rows to determine position
-      const sessionRows = state.data.rows.filter(
-        (row) => row.type === 'exercise' && row.sessionId === sessionId,
-      )
+      const sessionRows = state.data.rows.filter((row) => row.type === 'exercise' && row.sessionId === sessionId)
       const orderIndex = sessionRows.length
 
       // Find session name from an existing row in this session
@@ -214,9 +212,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
 
       // Find where to insert (before the add-exercise row for this session)
-      const insertIndex = state.data.rows.findIndex(
-        (row) => row.type === 'add-exercise' && row.sessionId === sessionId,
-      )
+      const insertIndex = state.data.rows.findIndex((row) => row.type === 'add-exercise' && row.sessionId === sessionId)
 
       const updatedRows = [...state.data.rows]
       if (insertIndex >= 0) {
