@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 6/6 complete (includes gap closure plans 07-08)
+Plan: 7/7 complete (includes gap closure plans 06-08)
 Status: COMPLETE
-Last activity: 2026-01-26 - Completed 03.3-08-PLAN.md (exercise search debounce)
+Last activity: 2026-01-26 - Completed 03.3-06-PLAN.md (focus state sync, superset labeling)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
 
-**Note:** Phase 3.3 complete — all UAT gaps closed including exercise search debounce.
+**Note:** Phase 3.3 complete — all UAT gaps closed including focus state sync, superset labeling, and exercise search debounce.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 51
+- Total plans completed: 52
 - Average duration: ~4 min
-- Total execution time: ~188 min
+- Total execution time: ~194 min
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [███████████████████████
 | 2 | 11/11 | 30 min | 2.7 min |
 | 2.5 | 11/11 | ~20 min | ~2 min |
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
-| 3.3 | 6/6 | ~18 min | ~3 min |
+| 3.3 | 7/7 | ~24 min | ~3.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-03 (4 min), 03.3-04 (4 min), 03.3-05 (2 min), 03.3-08 (2 min)
-- Trend: Phase 3.3 COMPLETE - all UAT gaps closed including debounce
+- Last 5 plans: 03.3-04 (4 min), 03.3-05 (2 min), 03.3-06 (6 min), 03.3-08 (2 min)
+- Trend: Phase 3.3 COMPLETE - all UAT gaps closed
 
 *Updated after each plan completion*
 
@@ -166,6 +166,8 @@ Recent decisions affecting current work:
 - **stopPropagation for keyboard isolation** - Use e.stopPropagation() in child handlers to prevent bubbling to parent keyboard handlers (e.g., arrow keys in edit mode)
 - **Store actions before mutations** - Wire UI to store actions for immediate feedback, backend persistence is separate concern
 - **Reuse existing useDebounce hook** - apps/coach-web/src/hooks/use-debounce.ts for API-backed search inputs
+- **Focus restoration removed from stopEditing** - useGridNavigation handles DOM focus sync via activeCell state; focus restoration was interfering with boundary navigation
+- **Session-wide group recalculation** - recalculateSessionGroups() recalculates all exercise rows in session after superset mutations
 
 ### Pending Todos
 
@@ -338,6 +340,7 @@ None.
 | 03.3-03 | Superset Menu Fix | Complete |
 | 03.3-04 | Sessions Count in Create Program | Complete |
 | 03.3-05 | UAT Gap Closure | Complete |
+| 03.3-06 | Focus State Sync and Superset Labeling | Complete |
 | 03.3-08 | Exercise Search Debounce | Complete |
 
 **Key artifacts:**
@@ -349,7 +352,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 execution complete (6/6 plans including gap closure)
+Stopped at: Phase 3.3 execution complete (7/7 plans including gap closure)
 Resume file: None
 
 **Next:** Ready for Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
