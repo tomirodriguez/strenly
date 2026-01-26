@@ -60,11 +60,13 @@ export {
   type Prescription,
   // Output schemas
   type Program,
+  type ProgramAggregate,
   type ProgramSession,
   type ProgramStatus,
   type ProgramWeek,
   type ProgramWithDetails,
   prescriptionSchema,
+  programAggregateSchema,
   programSchema,
   programSessionSchema,
   programStatusSchema,

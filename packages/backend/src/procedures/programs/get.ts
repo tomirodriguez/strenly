@@ -1,12 +1,15 @@
-import { getProgramInputSchema, programWithDetailsSchema } from '@strenly/contracts/programs'
-import type { ExerciseRowWithPrescriptions } from '@strenly/core'
+import { getProgramInputSchema, programAggregateSchema } from '@strenly/contracts/programs'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetProgram } from '../../use-cases/programs/get-program'
 
 /**
- * Get a program with full details for grid view
- * Requires authentication and programs:read permission
+ * Get a program with full aggregate hierarchy.
+ *
+ * Returns the complete program aggregate with:
+ * weeks -> sessions -> exerciseGroups -> items -> series
+ *
+ * Requires authentication and programs:read permission.
  */
 export const getProgram = authProcedure
   .errors({
@@ -14,7 +17,7 @@ export const getProgram = authProcedure
     NOT_FOUND: { message: 'Program not found' },
   })
   .input(getProgramInputSchema)
-  .output(programWithDetailsSchema)
+  .output(programAggregateSchema)
   .handler(async ({ input, context, errors }) => {
     const getProgramUseCase = makeGetProgram({
       programRepository: createProgramRepository(context.db),
@@ -41,6 +44,7 @@ export const getProgram = authProcedure
 
     const program = result.value
 
+    // Map domain Program to contract ProgramAggregate
     return {
       id: program.id,
       organizationId: program.organizationId,
@@ -53,75 +57,32 @@ export const getProgram = authProcedure
       updatedAt: program.updatedAt.toISOString(),
       weeks: program.weeks.map((week) => ({
         id: week.id,
-        programId: week.programId,
         name: week.name,
         orderIndex: week.orderIndex,
-        createdAt: week.createdAt.toISOString(),
-        updatedAt: week.updatedAt.toISOString(),
-      })),
-      sessions: program.sessions.map((session) => ({
-        id: session.id,
-        programId: session.programId,
-        name: session.name,
-        orderIndex: session.orderIndex,
-        createdAt: session.createdAt.toISOString(),
-        updatedAt: session.updatedAt.toISOString(),
-        rows: session.rows.map((row) => mapExerciseRow(row)),
-        exerciseGroups: session.exerciseGroups?.map((group) => ({
-          id: group.id,
-          sessionId: group.sessionId,
-          orderIndex: group.orderIndex,
-          name: group.name,
+        sessions: week.sessions.map((session) => ({
+          id: session.id,
+          name: session.name,
+          orderIndex: session.orderIndex,
+          exerciseGroups: session.exerciseGroups.map((group) => ({
+            id: group.id,
+            orderIndex: group.orderIndex,
+            items: group.items.map((item) => ({
+              id: item.id,
+              exerciseId: item.exerciseId,
+              orderIndex: item.orderIndex,
+              series: item.series.map((s) => ({
+                orderIndex: s.orderIndex,
+                reps: s.reps,
+                repsMax: s.repsMax,
+                isAmrap: s.isAmrap,
+                intensityType: s.intensityType,
+                intensityValue: s.intensityValue,
+                tempo: s.tempo,
+                restSeconds: s.restSeconds,
+              })),
+            })),
+          })),
         })),
       })),
     }
   })
-
-/**
- * Maps an exercise row from domain to contract format
- */
-function mapExerciseRow(row: ExerciseRowWithPrescriptions): {
-  id: string
-  sessionId: string
-  exerciseId: string
-  exerciseName: string
-  orderIndex: number
-  groupId: string | null
-  orderWithinGroup: number | null
-  setTypeLabel: string | null
-  notes: string | null
-  restSeconds: number | null
-  prescriptionsByWeekId: Record<
-    string,
-    {
-      id: string
-      sets: number
-      repsMin: number
-      repsMax: number | null
-      isAmrap: boolean
-      isUnilateral: boolean
-      unilateralUnit: 'leg' | 'arm' | 'side' | null
-      intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
-      intensityValue: number | null
-      tempo: string | null
-    }
-  >
-  createdAt: string
-  updatedAt: string
-} {
-  return {
-    id: row.id,
-    sessionId: row.sessionId,
-    exerciseId: row.exerciseId,
-    exerciseName: row.exerciseName,
-    orderIndex: row.orderIndex,
-    groupId: row.groupId,
-    orderWithinGroup: row.orderWithinGroup,
-    setTypeLabel: row.setTypeLabel,
-    notes: row.notes,
-    restSeconds: row.restSeconds,
-    prescriptionsByWeekId: row.prescriptionsByWeekId,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-  }
-}

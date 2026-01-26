@@ -1,9 +1,5 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramWithDetails,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import type { Program } from '@strenly/core/domain/entities/program/program'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type GetProgramInput = OrganizationContext & {
@@ -19,9 +15,17 @@ type Dependencies = {
   programRepository: ProgramRepositoryPort
 }
 
+/**
+ * Get a program with full aggregate hierarchy.
+ *
+ * Uses loadProgramAggregate to return the complete program with:
+ * weeks -> sessions -> exerciseGroups -> items -> series
+ *
+ * The procedure is responsible for mapping this to the expected output format.
+ */
 export const makeGetProgram =
   (deps: Dependencies) =>
-  (input: GetProgramInput): ResultAsync<ProgramWithDetails, GetProgramError> => {
+  (input: GetProgramInput): ResultAsync<Program, GetProgramError> => {
     // 1. Authorization FIRST
     if (!hasPermission(input.memberRole, 'programs:read')) {
       return errAsync({
@@ -36,8 +40,8 @@ export const makeGetProgram =
       memberRole: input.memberRole,
     }
 
-    // 2. Fetch program with full details for grid rendering
-    return deps.programRepository.findWithDetails(ctx, input.programId).mapErr((e): GetProgramError => {
+    // 2. Load full program aggregate
+    return deps.programRepository.loadProgramAggregate(ctx, input.programId).mapErr((e): GetProgramError => {
       if (e.type === 'NOT_FOUND') {
         return { type: 'not_found', programId: input.programId }
       }
