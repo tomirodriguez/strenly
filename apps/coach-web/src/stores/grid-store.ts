@@ -2,7 +2,7 @@ import { formatSeriesToNotation, type PrescriptionSeriesInput } from '@strenly/c
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import { recalculateSessionGroups } from '@/components/programs/program-grid/transform-program'
-import type { GridData, GridRow } from '@/components/programs/program-grid/types'
+import type { GridColumn, GridData, GridRow } from '@/components/programs/program-grid/types'
 
 /**
  * Tracked prescription change for bulk save
@@ -22,6 +22,34 @@ interface ExerciseRowChange {
 }
 
 /**
+ * Tracked new week for bulk save
+ */
+interface NewWeek {
+  tempId: string // Client-generated ID (temp-week-xxx)
+  name: string
+  orderIndex: number
+}
+
+/**
+ * Tracked new session for bulk save
+ */
+interface NewSession {
+  tempId: string // Client-generated ID (temp-session-xxx)
+  name: string
+  orderIndex: number
+}
+
+/**
+ * Tracked new exercise row for bulk save
+ */
+interface NewExerciseRow {
+  tempId: string
+  sessionId: string // May be a tempId if session is also new
+  exerciseId: string
+  orderIndex: number
+}
+
+/**
  * Grid state interface
  */
 interface GridState {
@@ -36,6 +64,11 @@ interface GridState {
   // Change tracking for efficient save
   changedPrescriptions: Map<string, PrescriptionChange>
   changedExerciseRows: Map<string, ExerciseRowChange>
+
+  // Structural change tracking
+  newWeeks: Map<string, NewWeek>
+  newSessions: Map<string, NewSession>
+  newExerciseRows: Map<string, NewExerciseRow>
 }
 
 /**
@@ -51,8 +84,14 @@ interface GridActions {
   // Update an exercise selection
   updateExercise: (rowId: string, exerciseId: string, exerciseName: string) => void
 
-  // Add a new exercise row to a session (local-only, not persisted by saveDraft)
+  // Add a new exercise row to a session (tracked for persistence)
   addExercise: (sessionId: string, exerciseId: string, exerciseName: string) => void
+
+  // Add a new week (column) to the program
+  addWeek: () => void
+
+  // Add a new session (training day) to the program
+  addSession: (name: string) => void
 
   // Update a row's superset group (letters A, B, C - local only)
   updateSupersetGroup: (rowId: string, groupLetter: string | null) => void
@@ -67,6 +106,9 @@ interface GridActions {
   getChanges: () => {
     prescriptions: PrescriptionChange[]
     exerciseRows: ExerciseRowChange[]
+    newWeeks: NewWeek[]
+    newSessions: NewSession[]
+    newExerciseRows: NewExerciseRow[]
     lastLoadedAt: Date | null
   }
 }
@@ -87,6 +129,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
   lastLoadedAt: null,
   changedPrescriptions: new Map(),
   changedExerciseRows: new Map(),
+  newWeeks: new Map(),
+  newSessions: new Map(),
+  newExerciseRows: new Map(),
 
   // Actions
   initialize: (programId, data) =>
@@ -97,6 +142,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
       lastLoadedAt: new Date(),
       changedPrescriptions: new Map(),
       changedExerciseRows: new Map(),
+      newWeeks: new Map(),
+      newSessions: new Map(),
+      newExerciseRows: new Map(),
     }),
 
   updatePrescription: (exerciseRowId, weekId, series) =>
@@ -161,12 +209,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
     }),
 
   /**
-   * Add a new exercise row to a session (local-only).
+   * Add a new exercise row to a session.
    *
-   * NOTE: This is a known limitation - the row appears locally but saveDraft
-   * does NOT persist new exercises. Full structural changes require backend
-   * extension in a future phase. On save/refresh, only prescription and
-   * exercise row updates are persisted.
+   * The row is tracked for persistence via saveDraft.
    */
   addExercise: (sessionId, exerciseId, exerciseName) =>
     set((state) => {
@@ -236,12 +281,19 @@ export const useGridStore = create<GridStore>((set, get) => ({
         return recalculated ?? row
       })
 
+      // Track new exercise row for saveDraft
+      const newExerciseRows = new Map(state.newExerciseRows)
+      newExerciseRows.set(tempId, {
+        tempId,
+        sessionId,
+        exerciseId,
+        orderIndex,
+      })
+
       return {
         data: { ...state.data, rows: finalRows },
         isDirty: true,
-        // NOTE: We intentionally do NOT add to a tracking array here
-        // because saveDraft backend does not yet support persisting new exercises.
-        // This is a known limitation - the row appears locally but won't survive save/refresh.
+        newExerciseRows,
       }
     }),
 
@@ -293,6 +345,116 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  /**
+   * Add a new week (column) to the program.
+   * Local state only - persisted via saveDraft.
+   */
+  addWeek: () =>
+    set((state) => {
+      if (!state.data) return state
+
+      const tempId = `temp-week-${Date.now()}`
+      const orderIndex = state.data.columns.filter((c) => c.type === 'week').length
+      const name = `Semana ${orderIndex + 1}`
+
+      // Add column to grid data
+      const newColumn: GridColumn = {
+        id: tempId,
+        name,
+        type: 'week',
+        weekId: tempId,
+      }
+
+      // Add empty prescriptions for all exercise rows
+      const updatedRows = state.data.rows.map((row) => {
+        if (row.type === 'exercise') {
+          return {
+            ...row,
+            prescriptions: {
+              ...row.prescriptions,
+              [tempId]: '',
+            },
+          }
+        }
+        return row
+      })
+
+      // Track the new week
+      const newWeeks = new Map(state.newWeeks)
+      newWeeks.set(tempId, { tempId, name, orderIndex })
+
+      return {
+        data: {
+          ...state.data,
+          columns: [...state.data.columns, newColumn],
+          rows: updatedRows,
+        },
+        isDirty: true,
+        newWeeks,
+      }
+    }),
+
+  /**
+   * Add a new session (training day) to the program.
+   * Local state only - persisted via saveDraft.
+   */
+  addSession: (name: string) =>
+    set((state) => {
+      if (!state.data) return state
+
+      const tempId = `temp-session-${Date.now()}`
+
+      // Calculate order index (count existing sessions)
+      const existingSessionIds = new Set<string>()
+      for (const row of state.data.rows) {
+        if (row.sessionId) existingSessionIds.add(row.sessionId)
+      }
+      const orderIndex = existingSessionIds.size
+
+      // Create session header row
+      const sessionHeaderRow: GridRow = {
+        id: `session-header-${tempId}`,
+        type: 'session-header',
+        sessionId: tempId,
+        sessionName: name,
+        supersetGroup: null,
+        supersetOrder: null,
+        supersetPosition: null,
+        isSubRow: false,
+        parentRowId: null,
+        setTypeLabel: null,
+        prescriptions: {},
+      }
+
+      // Create add-exercise row for this session
+      const addExerciseRow: GridRow = {
+        id: `add-exercise-${tempId}`,
+        type: 'add-exercise',
+        sessionId: tempId,
+        sessionName: name,
+        supersetGroup: null,
+        supersetOrder: null,
+        supersetPosition: null,
+        isSubRow: false,
+        parentRowId: null,
+        setTypeLabel: null,
+        prescriptions: {},
+      }
+
+      // Track the new session
+      const newSessions = new Map(state.newSessions)
+      newSessions.set(tempId, { tempId, name, orderIndex })
+
+      return {
+        data: {
+          ...state.data,
+          rows: [...state.data.rows, sessionHeaderRow, addExerciseRow],
+        },
+        isDirty: true,
+        newSessions,
+      }
+    }),
+
   reset: (data) =>
     set({
       data,
@@ -300,6 +462,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
       lastLoadedAt: new Date(),
       changedPrescriptions: new Map(),
       changedExerciseRows: new Map(),
+      newWeeks: new Map(),
+      newSessions: new Map(),
+      newExerciseRows: new Map(),
     }),
 
   markSaved: () =>
@@ -307,6 +472,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
       isDirty: false,
       changedPrescriptions: new Map(),
       changedExerciseRows: new Map(),
+      newWeeks: new Map(),
+      newSessions: new Map(),
+      newExerciseRows: new Map(),
     }),
 
   getChanges: () => {
@@ -314,6 +482,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
     return {
       prescriptions: Array.from(state.changedPrescriptions.values()),
       exerciseRows: Array.from(state.changedExerciseRows.values()),
+      newWeeks: Array.from(state.newWeeks.values()),
+      newSessions: Array.from(state.newSessions.values()),
+      newExerciseRows: Array.from(state.newExerciseRows.values()),
       lastLoadedAt: state.lastLoadedAt,
     }
   },
@@ -331,6 +502,8 @@ export const useGridActions = () =>
       updatePrescription: state.updatePrescription,
       updateExercise: state.updateExercise,
       addExercise: state.addExercise,
+      addWeek: state.addWeek,
+      addSession: state.addSession,
       updateSupersetGroup: state.updateSupersetGroup,
       reset: state.reset,
       markSaved: state.markSaved,
