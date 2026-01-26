@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import type { GridData } from '@/components/programs/program-grid/types'
 import {
   formatSeriesToNotation,
@@ -191,11 +192,13 @@ export const useGridStore = create<GridStore>((set, get) => ({
 export const useGridData = () => useGridStore((state) => state.data)
 export const useGridIsDirty = () => useGridStore((state) => state.isDirty)
 export const useGridActions = () =>
-  useGridStore((state) => ({
-    initialize: state.initialize,
-    updatePrescription: state.updatePrescription,
-    updateExercise: state.updateExercise,
-    reset: state.reset,
-    markSaved: state.markSaved,
-    getChanges: state.getChanges,
-  }))
+  useGridStore(
+    useShallow((state) => ({
+      initialize: state.initialize,
+      updatePrescription: state.updatePrescription,
+      updateExercise: state.updateExercise,
+      reset: state.reset,
+      markSaved: state.markSaved,
+      getChanges: state.getChanges,
+    }))
+  )
