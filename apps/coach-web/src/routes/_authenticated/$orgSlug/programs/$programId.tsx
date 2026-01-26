@@ -86,6 +86,7 @@ function ProgramEditorPage() {
           gridData={gridData}
           onPrescriptionChange={actions.updatePrescription}
           onExerciseChange={actions.updateExercise}
+          onAddExercise={actions.addExercise}
         />
       </div>
 

@@ -33,6 +33,12 @@ interface ProgramGridProps {
    * When provided, local state is used instead of server mutations.
    */
   onExerciseChange?: (rowId: string, exerciseId: string, exerciseName: string) => void
+  /**
+   * Handler for adding exercises - receives sessionId, exerciseId, exerciseName.
+   * When provided, uses local state instead of server mutation.
+   * NOTE: Local-only until saveDraft backend supports structural changes.
+   */
+  onAddExercise?: (sessionId: string, exerciseId: string, exerciseName: string) => void
 }
 
 /**
@@ -57,6 +63,7 @@ export function ProgramGrid({
   gridData,
   onPrescriptionChange,
   onExerciseChange,
+  onAddExercise,
 }: ProgramGridProps) {
   const tableRef = useRef<HTMLTableElement>(null)
 
@@ -135,11 +142,17 @@ export function ProgramGrid({
   )
 
   // Handle add exercise
-  const handleAddExercise = (sessionId: string, exerciseId: string, _exerciseName: string) => {
-    addExerciseRow.mutate({
-      sessionId,
-      exerciseId,
-    })
+  const handleAddExercise = (sessionId: string, exerciseId: string, exerciseName: string) => {
+    if (onAddExercise) {
+      // Local state mode - use store action
+      onAddExercise(sessionId, exerciseId, exerciseName)
+    } else {
+      // Server mutation mode (legacy fallback)
+      addExerciseRow.mutate({
+        sessionId,
+        exerciseId,
+      })
+    }
   }
 
   // Handle navigation from cell (called by PrescriptionCell after committing)
