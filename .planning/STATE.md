@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 5/5 complete (includes gap closure plan)
+Plan: 6/6 complete (includes gap closure plans 07-08)
 Status: COMPLETE
-Last activity: 2026-01-26 - Completed 03.3-05-PLAN.md (UAT gap closure)
+Last activity: 2026-01-26 - Completed 03.3-08-PLAN.md (exercise search debounce)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
 
-**Note:** Phase 3.3 complete — all UAT gaps closed (arrow key cursor movement in edit mode, superset menu using client-side state with letters).
+**Note:** Phase 3.3 complete — all UAT gaps closed including exercise search debounce.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 50
+- Total plans completed: 51
 - Average duration: ~4 min
-- Total execution time: ~186 min
+- Total execution time: ~188 min
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [███████████████████████
 | 2 | 11/11 | 30 min | 2.7 min |
 | 2.5 | 11/11 | ~20 min | ~2 min |
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
-| 3.3 | 5/5 | ~16 min | ~3.2 min |
+| 3.3 | 6/6 | ~18 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-02 (4 min), 03.3-03 (4 min), 03.3-04 (4 min), 03.3-05 (2 min)
-- Trend: Phase 3.3 COMPLETE - all UAT gaps closed
+- Last 5 plans: 03.3-03 (4 min), 03.3-04 (4 min), 03.3-05 (2 min), 03.3-08 (2 min)
+- Trend: Phase 3.3 COMPLETE - all UAT gaps closed including debounce
 
 *Updated after each plan completion*
 
@@ -165,6 +165,7 @@ Recent decisions affecting current work:
 - **nextAvailableLetter uses all groups** - Calculate next letter using all groups in session (including current row) to avoid letter conflicts
 - **stopPropagation for keyboard isolation** - Use e.stopPropagation() in child handlers to prevent bubbling to parent keyboard handlers (e.g., arrow keys in edit mode)
 - **Store actions before mutations** - Wire UI to store actions for immediate feedback, backend persistence is separate concern
+- **Reuse existing useDebounce hook** - apps/coach-web/src/hooks/use-debounce.ts for API-backed search inputs
 
 ### Pending Todos
 
@@ -337,6 +338,7 @@ None.
 | 03.3-03 | Superset Menu Fix | Complete |
 | 03.3-04 | Sessions Count in Create Program | Complete |
 | 03.3-05 | UAT Gap Closure | Complete |
+| 03.3-08 | Exercise Search Debounce | Complete |
 
 **Key artifacts:**
 - `apps/coach-web/src/components/programs/exercise-row-actions.tsx` - Superset menu with existing group display, uses store action
@@ -347,7 +349,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 execution complete (5/5 plans including gap closure)
+Stopped at: Phase 3.3 execution complete (6/6 plans including gap closure)
 Resume file: None
 
 **Next:** Ready for Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
