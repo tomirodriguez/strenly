@@ -17,7 +17,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [x] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
-- [ ] **Phase 3.3: Program Builder QA & Bug Fixes** - Complete client-side transition, fix UI bugs (INSERTED)
+- [ ] **Phase 3.3: Program Builder QA & Bug Fixes** - Fix UI bugs, improve form UX (INSERTED)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -221,36 +221,30 @@ Plans:
 - [x] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
 
 ### Phase 3.3: Program Builder QA & Bug Fixes (INSERTED)
-**Goal**: Complete the client-side editing transition and fix remaining UI/UX bugs in the program builder grid
-**Depends on**: Phase 3.2 (client-side foundation exists but incomplete)
+**Goal**: Fix UI/UX bugs in the program builder grid and improve create program form
+**Depends on**: Phase 3.2 (client-side foundation exists but has bugs)
 **Requirements**: PRG-01 through PRG-13 (QA and polish of existing features)
 **Success Criteria** (what must be TRUE):
-  1. ALL grid operations (add week, add session, add exercise, change superset, update prescriptions) are 100% client-side with NO server calls until explicit "Guardar" button
-  2. Keyboard input in prescription cells only enters edit mode on: Enter, double-click, or numeric keys (0-9); other keys are ignored
-  3. Entering edit mode does NOT select all text; cursor is positioned at end of input
-  4. Superset functionality works: menu option visible, "S" key shortcut works for grouping exercises
-  5. Arrow key navigation while in edit mode moves cursor within input (does NOT change selected cell)
-  6. After blur/navigation from edited cell, subsequent edits happen in the NEW cell (not the previous one)
-  7. Create program form includes default session count selector (default: 3)
-  8. Create program form has improved compact layout (less scroll required)
-  9. All intermediate server mutation endpoints removed (cleanup of deprecated code)
+  1. Keyboard input in prescription cells only enters edit mode on: Enter, F2, double-click, or numeric keys (0-9); other keys are ignored
+  2. Entering edit mode does NOT select all text; cursor is positioned at end of input
+  3. Arrow key navigation while in edit mode moves cursor within input (does NOT change selected cell)
+  4. Superset menu shows existing groups and allows joining/creating groups
+  5. Add exercise operation updates local state immediately (no server call until save)
+  6. Create program form includes default session count selector (default: 3)
+  7. Create program form has improved compact layout (less scroll required)
 **Plans**: 4 plans in 1 wave
 
 **Context:**
-- Phase 3.2 established client-side state (Zustand store) and saveDraft endpoint, but many operations still make server calls
+- Phase 3.2 established client-side state (Zustand store) and saveDraft endpoint
 - UI bugs discovered during UAT: text selection on edit, keyboard input triggers, superset menu missing, arrow key behavior
 - Form UX improvements needed for program creation flow
 - This is a QA/polish phase - no new features, only completing the Phase 3.2 vision and fixing bugs
 
-**Known Issues:**
-1. Server calls still happening on: add week, add session, add exercise, update exercise, update prescription, change superset
-2. Prescription cell edit mode triggers on any key (should only be Enter, double-click, or numbers)
-3. Edit mode selects all text (should position cursor at end)
-4. Superset menu option disappeared from UI
-5. "S" key shortcut for superset not working
-6. Arrow keys in edit mode navigate cells instead of moving cursor in input
-7. After navigating away from edited cell, next edit opens in wrong cell
-8. Create program form too long (needs sessions selector and compact layout)
+**Known Limitations (Future Work):**
+- Add exercise is client-side only - new exercises appear in UI but are NOT persisted by saveDraft (temp ID issue)
+- Add week/session operations still use server mutations (not yet migrated to client-side)
+- Full client-side structural changes require saveDraft backend extension (Phase 3.4 or later)
+- Deprecated endpoint cleanup deferred until client-side operations are complete
 
 Plans:
 - [ ] 03.3-01-PLAN.md - Fix prescription cell edit mode behavior (Wave 1)
@@ -311,4 +305,4 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-26 (Phase 3.3 planned - 4 plans in 1 wave)*
+*Last updated: 2026-01-26 (Phase 3.3 revised - scoped to bug fixes and form UX)*
