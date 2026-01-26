@@ -53,6 +53,9 @@ interface GridActions {
   // Add a new exercise row to a session (local-only, not persisted by saveDraft)
   addExercise: (sessionId: string, exerciseId: string, exerciseName: string) => void
 
+  // Update a row's superset group (letters A, B, C - local only)
+  updateSupersetGroup: (rowId: string, groupLetter: string | null) => void
+
   // Reset to server state (e.g., after refetch)
   reset: (data: GridData) => void
 
@@ -231,6 +234,34 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  /**
+   * Update a row's superset group (local-only).
+   *
+   * NOTE: This updates local state only. The saveDraft endpoint does NOT
+   * currently persist superset groups - that's a known limitation for a
+   * future phase. The groupLetter is stored for visual display.
+   */
+  updateSupersetGroup: (rowId, groupLetter) =>
+    set((state) => {
+      if (!state.data) return state
+
+      const updatedRows = state.data.rows.map((row) => {
+        if (row.type === 'exercise' && row.id === rowId) {
+          return {
+            ...row,
+            supersetGroup: groupLetter,
+            groupLetter: groupLetter ?? undefined,
+          }
+        }
+        return row
+      })
+
+      return {
+        data: { ...state.data, rows: updatedRows },
+        isDirty: true,
+      }
+    }),
+
   reset: (data) =>
     set({
       data,
@@ -269,6 +300,7 @@ export const useGridActions = () =>
       updatePrescription: state.updatePrescription,
       updateExercise: state.updateExercise,
       addExercise: state.addExercise,
+      updateSupersetGroup: state.updateSupersetGroup,
       reset: state.reset,
       markSaved: state.markSaved,
       getChanges: state.getChanges,
