@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 4 - Athlete PWA
+**Current focus:** Phase 3.4 - Domain Restructure
 
 ## Current Position
 
-Phase: 4 of 5 (Athlete PWA)
-Plan: 0/3 (not yet planned)
-Status: NOT STARTED
-Last activity: 2026-01-26 - Phase 3.4 removed, moving to Phase 4
+Phase: 3.4 of 5 (Domain Restructure - Training Programs)
+Plan: 1/? (03.4-01 complete)
+Status: IN PROGRESS
+Last activity: 2026-01-26 - Completed 03.4-01-PLAN.md (Program Aggregate Domain Entity)
 
-Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL
+Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL, 3.4 IN PROGRESS
 
-**Note:** Phase 3.3 achieved keyboard editing, client-side ops, sessions form. Supersets and debounce remain with minor issues but are functional enough to proceed.
+**Note:** Phase 3.4 will restructure domain to correct model, delete legacy code, and align full stack before Phase 4.
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 53
+- Total plans completed: 54
 - Average duration: ~4 min
-- Total execution time: ~199 min
+- Total execution time: ~206 min
 
 **By Phase:**
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-04 (4 min), 03.3-05 (2 min), 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min)
-- Trend: Phase 3.3 COMPLETE - all client-side editing with saveDraft persistence
+- Last 5 plans: 03.3-05 (2 min), 03.3-06 (6 min), 03.3-07 (5 min), 03.3-08 (2 min), 03.4-01 (7 min)
+- Trend: Phase 3.4 IN PROGRESS - Program aggregate domain entity created with 99.73% coverage
 
 *Updated after each plan completion*
 
@@ -186,6 +186,7 @@ Recent decisions affecting current work:
 - Phase 3.2 inserted after Phase 3.1: Prescription Data Structure Refactor (URGENT) - Current data model stores sets as single number, making variations complex; refactor to series-as-array model with exercise groups and client-side editing
 - Phase 3.2 COMPLETE - Series arrays and exercise groups implemented with client-side state
 - Phase 3.3 inserted after Phase 3.2: Program Builder QA & Bug Fixes (URGENT) - Complete client-side transition (still making server calls), fix UI bugs (edit mode triggers, text selection, superset menu missing, arrow key behavior), improve create program form
+- Phase 3.4 inserted after Phase 3.3: Domain Restructure - Training Programs (URGENT/BLOCKING) - Core domain doesn't reflect 3.2/3.3 changes; ExerciseGroups not functioning; old Prescription entity still exists; legacy code not cleaned up. Full restructure needed before Phase 4.
 
 ### Blockers/Concerns
 
@@ -364,10 +365,22 @@ None.
 - `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Edit mode triggers
 - `packages/backend/src/infrastructure/repositories/program.repository.ts` - Structural change persistence
 
+## Phase 3.4 Progress
+
+**Domain Restructure - Training Programs IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 03.4-01 | Program Aggregate Domain Entity | Complete |
+
+**Key artifacts:**
+- `packages/core/src/domain/entities/program/` - Program aggregate folder (types, series, group-item, exercise-group, session, week, program)
+- `packages/core/src/domain/entities/program/program.test.ts` - 60 tests, 99.73% coverage
+
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 closed as partial
+Stopped at: Completed 03.4-01-PLAN.md
 Resume file: None
 
-**Next:** Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
+**Next:** Continue Phase 3.4 (Domain Restructure) - next plan TBD
