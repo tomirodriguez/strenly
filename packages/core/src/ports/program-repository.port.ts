@@ -1,7 +1,5 @@
 import type { ResultAsync } from 'neverthrow'
-import type { Prescription } from '../domain/entities/prescription'
-import type { Program as LegacyProgram, ProgramStatus } from '../domain/entities/program'
-import type { Program as ProgramAggregate } from '../domain/entities/program/program'
+import type { Program, ProgramStatus, Series } from '../domain/entities/program/types'
 import type { OrganizationContext } from '../types/organization-context'
 
 // ============================================================================
@@ -139,7 +137,7 @@ export type PrescriptionCell = {
   readonly id: string
   readonly programExerciseId: string
   readonly weekId: string
-  readonly prescription: Prescription
+  readonly series: Series[]
   readonly createdAt: Date
   readonly updatedAt: Date
 }
@@ -149,11 +147,11 @@ export type PrescriptionCell = {
 // ============================================================================
 
 /**
- * Exercise row with prescriptions keyed by week ID
+ * Exercise row with series keyed by week ID
  */
 export type ExerciseRowWithPrescriptions = ProgramExerciseRow & {
   readonly exerciseName: string // Joined from exercises table
-  readonly prescriptionsByWeekId: Record<string, Prescription>
+  readonly prescriptionsByWeekId: Record<string, Series[]>
 }
 
 /**
@@ -166,9 +164,9 @@ export type SessionWithRows = ProgramSession & {
 
 /**
  * Full program with all nested data for grid view
- * @deprecated Use loadProgramAggregate which returns a full ProgramAggregate instead
+ * @deprecated Use loadProgramAggregate which returns a full Program instead
  */
-export type ProgramWithDetails = LegacyProgram & {
+export type ProgramWithDetails = Program & {
   readonly weeks: ProgramWeek[]
   readonly sessions: SessionWithRows[]
 }
@@ -189,7 +187,7 @@ export type ProgramRepositoryPort = {
   loadProgramAggregate(
     ctx: OrganizationContext,
     programId: string,
-  ): ResultAsync<ProgramAggregate, ProgramRepositoryError>
+  ): ResultAsync<Program, ProgramRepositoryError>
 
   /**
    * Save a complete program aggregate (replace-on-save)
@@ -198,7 +196,7 @@ export type ProgramRepositoryPort = {
    */
   saveProgramAggregate(
     ctx: OrganizationContext,
-    program: ProgramAggregate,
+    program: Program,
   ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
@@ -209,19 +207,19 @@ export type ProgramRepositoryPort = {
    * Create a new program
    * @deprecated Use saveProgramAggregate for new implementations
    */
-  create(ctx: OrganizationContext, program: LegacyProgram): ResultAsync<LegacyProgram, ProgramRepositoryError>
+  create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
 
   /**
    * Find a program by ID
    * @deprecated Use loadProgramAggregate for new implementations
    */
-  findById(ctx: OrganizationContext, id: string): ResultAsync<LegacyProgram, ProgramRepositoryError>
+  findById(ctx: OrganizationContext, id: string): ResultAsync<Program, ProgramRepositoryError>
 
   /**
    * Update a program
    * @deprecated Use saveProgramAggregate for new implementations
    */
-  update(ctx: OrganizationContext, program: LegacyProgram): ResultAsync<LegacyProgram, ProgramRepositoryError>
+  update(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
 
   /**
    * List programs with optional filters
@@ -230,7 +228,7 @@ export type ProgramRepositoryPort = {
   list(
     ctx: OrganizationContext,
     filters?: ProgramFilters,
-  ): ResultAsync<{ items: LegacyProgram[]; totalCount: number }, ProgramRepositoryError>
+  ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
 
   /**
    * Get full program with nested data for grid view
@@ -242,7 +240,7 @@ export type ProgramRepositoryPort = {
    * List template programs
    * @deprecated Use list with isTemplate filter
    */
-  listTemplates(ctx: OrganizationContext): ResultAsync<LegacyProgram[], ProgramRepositoryError>
+  listTemplates(ctx: OrganizationContext): ResultAsync<Program[], ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Week Operations
@@ -371,13 +369,13 @@ export type ProgramRepositoryPort = {
 
   /**
    * Create or update a prescription for a specific cell (exercise row + week)
-   * Pass null prescription to delete the cell value
+   * Pass null series to delete the cell value
    */
   upsertPrescription(
     ctx: OrganizationContext,
     exerciseRowId: string,
     weekId: string,
-    prescription: Prescription | null,
+    series: Series[] | null,
   ): ResultAsync<void, ProgramRepositoryError>
 
   /**
