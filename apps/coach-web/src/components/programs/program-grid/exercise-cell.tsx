@@ -43,6 +43,7 @@ export function ExerciseCell({
   colId,
   programId,
   sessionRowIds,
+  sessionRows,
   isActive,
   isEditing,
   onSelect,
@@ -159,7 +160,9 @@ export function ExerciseCell({
             sessionId={row.sessionId}
             rowId={row.id}
             exerciseName={row.exercise?.exerciseName ?? ''}
+            supersetGroup={row.supersetGroup}
             sessionRowIds={sessionRowIds}
+            sessionRows={sessionRows}
           />
         </div>
       </div>
