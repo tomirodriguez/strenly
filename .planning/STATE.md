@@ -10,20 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 4/4 complete
+Plan: 5/5 complete (includes gap closure plan)
 Status: COMPLETE
-Last activity: 2026-01-26 - Completed 03.3-03-PLAN.md (superset menu fix)
+Last activity: 2026-01-26 - Completed 03.3-05-PLAN.md (UAT gap closure)
 
 Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
 
-**Note:** Phase 3.3 complete — edit mode triggers, cursor positioning, superset menu, add exercise local state, and sessions count form all fixed.
+**Note:** Phase 3.3 complete — all UAT gaps closed (arrow key cursor movement in edit mode, superset menu using client-side state with letters).
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 49
-- Average duration: 4 min
-- Total execution time: ~184 min
+- Total plans completed: 50
+- Average duration: ~4 min
+- Total execution time: ~186 min
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [███████████████████████
 | 2 | 11/11 | 30 min | 2.7 min |
 | 2.5 | 11/11 | ~20 min | ~2 min |
 | 3.1 | 17/17 | ~72 min | ~4.2 min |
-| 3.3 | 4/4 | ~14 min | ~3.5 min |
+| 3.3 | 5/5 | ~16 min | ~3.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.3-01 (2 min), 03.3-02 (4 min), 03.3-03 (4 min), 03.3-04 (4 min)
-- Trend: Phase 3.3 COMPLETE - UI bugs fixed, form UX improved
+- Last 5 plans: 03.3-02 (4 min), 03.3-03 (4 min), 03.3-04 (4 min), 03.3-05 (2 min)
+- Trend: Phase 3.3 COMPLETE - all UAT gaps closed
 
 *Updated after each plan completion*
 
@@ -163,6 +163,8 @@ Recent decisions affecting current work:
 - **Add exercise local-only** - addExercise updates local state without persistence; saveDraft backend needs extension for structural changes
 - **existingGroups excludes current row** - When calculating superset groups to join, exclude current row to prevent "join your own group"
 - **nextAvailableLetter uses all groups** - Calculate next letter using all groups in session (including current row) to avoid letter conflicts
+- **stopPropagation for keyboard isolation** - Use e.stopPropagation() in child handlers to prevent bubbling to parent keyboard handlers (e.g., arrow keys in edit mode)
+- **Store actions before mutations** - Wire UI to store actions for immediate feedback, backend persistence is separate concern
 
 ### Pending Todos
 
@@ -334,15 +336,18 @@ None.
 | 03.3-02 | Add Exercise Local State | Complete |
 | 03.3-03 | Superset Menu Fix | Complete |
 | 03.3-04 | Sessions Count in Create Program | Complete |
+| 03.3-05 | UAT Gap Closure | Complete |
 
 **Key artifacts:**
-- `apps/coach-web/src/components/programs/exercise-row-actions.tsx` - Superset menu with existing group display
+- `apps/coach-web/src/components/programs/exercise-row-actions.tsx` - Superset menu with existing group display, uses store action
 - `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - sessionRows prop chain to ExerciseRowActions
+- `apps/coach-web/src/components/programs/program-grid/prescription-cell.tsx` - Arrow key stopPropagation for edit mode cursor movement
+- `apps/coach-web/src/stores/grid-store.ts` - updateSupersetGroup action for local superset changes
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 3.3 execution complete (4/4 plans, verification passed)
+Stopped at: Phase 3.3 execution complete (5/5 plans including gap closure)
 Resume file: None
 
 **Next:** Ready for Phase 4 (Athlete PWA) — run `/gsd:discuss-phase 4` or `/gsd:plan-phase 4`
