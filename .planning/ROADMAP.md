@@ -17,6 +17,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 3: Program Builder** - Excel-like grid editing, prescription system, templates (full-stack)
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [x] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
+- [ ] **Phase 3.3: Program Builder QA & Bug Fixes** - Complete client-side transition, fix UI bugs (INSERTED)
 - [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
 
@@ -219,9 +220,47 @@ Plans:
 - [x] 03.2-07-PLAN.md - Frontend UI: multi-series display, Guardar button (Wave 7)
 - [x] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
 
+### Phase 3.3: Program Builder QA & Bug Fixes (INSERTED)
+**Goal**: Complete the client-side editing transition and fix remaining UI/UX bugs in the program builder grid
+**Depends on**: Phase 3.2 (client-side foundation exists but incomplete)
+**Requirements**: PRG-01 through PRG-13 (QA and polish of existing features)
+**Success Criteria** (what must be TRUE):
+  1. ALL grid operations (add week, add session, add exercise, change superset, update prescriptions) are 100% client-side with NO server calls until explicit "Guardar" button
+  2. Keyboard input in prescription cells only enters edit mode on: Enter, double-click, or numeric keys (0-9); other keys are ignored
+  3. Entering edit mode does NOT select all text; cursor is positioned at end of input
+  4. Superset functionality works: menu option visible, "S" key shortcut works for grouping exercises
+  5. Arrow key navigation while in edit mode moves cursor within input (does NOT change selected cell)
+  6. After blur/navigation from edited cell, subsequent edits happen in the NEW cell (not the previous one)
+  7. Create program form includes default session count selector (default: 3)
+  8. Create program form has improved compact layout (less scroll required)
+  9. All intermediate server mutation endpoints removed (cleanup of deprecated code)
+**Plans**: 4 plans in 1 wave
+
+**Context:**
+- Phase 3.2 established client-side state (Zustand store) and saveDraft endpoint, but many operations still make server calls
+- UI bugs discovered during UAT: text selection on edit, keyboard input triggers, superset menu missing, arrow key behavior
+- Form UX improvements needed for program creation flow
+- This is a QA/polish phase - no new features, only completing the Phase 3.2 vision and fixing bugs
+
+**Known Issues:**
+1. Server calls still happening on: add week, add session, add exercise, update exercise, update prescription, change superset
+2. Prescription cell edit mode triggers on any key (should only be Enter, double-click, or numbers)
+3. Edit mode selects all text (should position cursor at end)
+4. Superset menu option disappeared from UI
+5. "S" key shortcut for superset not working
+6. Arrow keys in edit mode navigate cells instead of moving cursor in input
+7. After navigating away from edited cell, next edit opens in wrong cell
+8. Create program form too long (needs sessions selector and compact layout)
+
+Plans:
+- [ ] 03.3-01-PLAN.md - Fix prescription cell edit mode behavior (Wave 1)
+- [ ] 03.3-02-PLAN.md - Complete client-side add exercise operation (Wave 1)
+- [ ] 03.3-03-PLAN.md - Fix superset menu visibility (Wave 1)
+- [ ] 03.3-04-PLAN.md - Add sessionsCount to create program form (Wave 1)
+
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
-**Depends on**: Phase 3.2
+**Depends on**: Phase 3.3
 **Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10, ATH-08
 **Success Criteria** (what must be TRUE):
   1. Athlete can view assigned program and see next/upcoming workout on mobile device
@@ -255,7 +294,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -266,9 +305,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 4 ->
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
+| 3.3. Program Builder QA & Bug Fixes (frontend) | 0/4 | Not started | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-25 (Phase 3.2 complete - 8/8 plans executed)*
+*Last updated: 2026-01-26 (Phase 3.3 planned - 4 plans in 1 wave)*
