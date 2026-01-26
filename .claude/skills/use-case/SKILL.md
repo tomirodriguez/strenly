@@ -271,7 +271,7 @@ import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 <success_criteria>
 Before creating a use case:
 
-- [ ] Does the domain entity exist? If not, create it first (see `/domain-entity` skill)
+- [ ] Does the domain entity exist? If not, create it first (see `/domain` skill)
 - [ ] Is `generateId` included in Dependencies?
 - [ ] Does the error union include `validation_error` for domain errors?
 - [ ] Is the domain entity used to validate data before persistence?

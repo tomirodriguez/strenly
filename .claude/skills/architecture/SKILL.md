@@ -15,7 +15,7 @@ Defines the mandatory inside-out development flow for backend features in Clean 
 <quick_start>
 For ANY backend feature, follow this order and invoke the corresponding skill:
 
-1. **Domain Entity** (`/domain-entity`) → `packages/core/src/domain/entities/`
+1. **Domain** (`/domain`) → `packages/core/src/domain/entities/`
 2. **Port** (`/port`) → `packages/core/src/ports/`
 3. **Repository** (`/repository`) → `packages/backend/src/infrastructure/repositories/`
 4. **Use Case** (`/use-case` + `/authorization`) → `packages/backend/src/use-cases/`
@@ -43,7 +43,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
 <development_flow>
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ 1. DOMAIN ENTITY (/domain-entity)                                   │
+│ 1. DOMAIN (/domain)                                                  │
 │    Location: packages/core/src/domain/entities/{entity}.ts          │
 │    - Factory function returns Result<Entity, DomainError>           │
 │    - All business validation rules live here                        │
@@ -184,7 +184,7 @@ findById: (ctx, id) => {
 <layer_reference>
 | What | Layer | Skill |
 |------|-------|-------|
-| Business validation rules | Domain Entity | `/domain-entity` |
+| Business validation rules | Domain | `/domain` |
 | Repository interfaces | Port | `/port` |
 | Database queries (Drizzle) | Repository | `/repository` |
 | Business logic orchestration | Use Case | `/use-case` |
@@ -196,7 +196,7 @@ findById: (ctx, id) => {
 <planning_checklist>
 For each new domain concept introduced by a phase, the plan MUST include tasks for:
 
-- [ ] **Domain Entity** task — `packages/core/src/domain/entities/{entity}.ts` — skill: `/domain-entity`
+- [ ] **Domain** task — `packages/core/src/domain/entities/{entity}.ts` — skill: `/domain`
 - [ ] **Domain Entity Tests** task — `packages/core/src/domain/entities/{entity}.test.ts` (90%+ coverage required)
 - [ ] **Port** task — `packages/core/src/ports/{entity}-repository.port.ts` — skill: `/port`
 - [ ] **Repository** task — `packages/backend/src/infrastructure/repositories/{entity}.repository.ts` — skill: `/repository`
@@ -209,7 +209,7 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 ```markdown
 <task type="auto">
   <name>Create Athlete Domain Entity</name>
-  <skills>/domain-entity</skills>
+  <skills>/domain</skills>
   <files>packages/core/src/domain/entities/athlete.ts</files>
   <action>...</action>
 </task>
@@ -229,7 +229,7 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 <skill_reference>
 | Layer | Skill | When Required |
 |-------|-------|---------------|
-| Domain | `/domain-entity` | Creating entities with business rules |
+| Domain | `/domain` | Creating entities, value objects, and aggregates |
 | Domain | `/port` | Defining repository interfaces |
 | Infrastructure | `/repository` | Implementing ports with Drizzle |
 | Application | `/use-case` | Business logic orchestration |

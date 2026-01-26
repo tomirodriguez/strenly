@@ -20,7 +20,7 @@ src/
 
 | Skill | Description |
 |-------|-------------|
-| `/domain-entity` | **Primary skill.** Guidance for creating domain entities with business validation rules, factory methods, and state machines. Use when creating or modifying entities in `domain/entities/`. |
+| `/domain` | **Primary skill.** Comprehensive guidance for DDD building blocks: entities, value objects, and aggregates. Helps distinguish concepts with identity (Entities), concepts defined by attributes (Value Objects), and consistency boundaries (Aggregates). Use when creating or modifying code in `domain/`. |
 | `/port` | Guidance for defining repository interfaces. Use when creating contracts in `ports/` that repositories must implement. |
 | `/authorization` | Guidance for implementing role-based access control (RBAC). Use when adding or modifying permission checks in `services/authorization.ts`. |
 

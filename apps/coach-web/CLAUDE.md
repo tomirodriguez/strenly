@@ -35,7 +35,6 @@ src/
 | `/orpc-query` | **Primary skill.** Creating query/mutation hooks with oRPC + TanStack Query. Use when building API integration, data fetching, and cache invalidation. |
 | `/form` | Creating forms with React Hook Form + shadcn Field component. Use when building any form with validation. |
 | `/data-table` | Building tables with the DataTable compound component. Use for paginated, filterable data displays. |
-| `/frontend-design` | Creating distinctive, production-grade UI. Use when building new pages or complex components. |
 | `/mutation-errors` | Handling errors in mutation hooks. Use when implementing error handling in components using mutations. |
 
 ## Conventions
@@ -128,6 +127,7 @@ export function AthleteForm() {
 - **Handle loading and error states** - Every data-fetching component needs them
 - **No `as` casting** - Fix actual type issues
 - **No `!` assertions** - Use optional chaining or guards
+- **Avoid `useEffect`** - Prefer callback functions, event handlers, or derived state
 - **Dark mode support** - Use CSS variables and Tailwind dark: variants
 
 ## Development

@@ -168,7 +168,7 @@ Run `/orpc-query` skill for API hooks, `/form` skill for forms, `/data-table` sk
 
 When implementing backend features, follow this order and invoke the corresponding skill:
 
-1. **Domain Entity** (`/domain-entity`) - `packages/core/src/domain/entities/`
+1. **Domain** (`/domain`) - `packages/core/src/domain/entities/` (entities, value objects, aggregates)
 2. **Port** (`/port`) - `packages/core/src/ports/`
 3. **Repository** (`/repository`) - `packages/backend/src/infrastructure/repositories/`
 4. **Use Case** (`/use-case` + `/authorization`) - `packages/backend/src/use-cases/`
@@ -184,7 +184,7 @@ When implementing backend features, follow this order and invoke the correspondi
 | Skill | When to Load | Location |
 |-------|--------------|----------|
 | `/architecture` | **ALWAYS FIRST** - Before planning or implementing any backend feature | Understanding flow |
-| `/domain-entity` | Creating entities with business validation rules | `packages/core/src/domain/entities/` |
+| `/domain` | Creating domain entities, value objects, and aggregates with business rules | `packages/core/src/domain/entities/` |
 | `/port` | Defining repository interfaces | `packages/core/src/ports/` |
 | `/repository` | Implementing ports with Drizzle ORM | `packages/backend/src/infrastructure/repositories/` |
 | `/authorization` | Adding permission checks to use cases | `packages/core/src/services/authorization.ts` |
@@ -200,7 +200,6 @@ When implementing backend features, follow this order and invoke the correspondi
 | `/mutation-errors` | Handling errors in mutation hooks | Components using mutations |
 | `/form` | Creating forms with React Hook Form + shadcn Field | Form components |
 | `/data-table` | Building tables with pagination, filtering | Table components |
-| `/frontend-design` | Creating new pages or complex UI components | `apps/*/src/routes/`, `apps/*/src/components/` |
 
 ### Frontend Patterns
 
@@ -258,7 +257,7 @@ When creating plans, each task MUST specify which skills to load:
 ```markdown
 <task type="auto">
   <name>Create Athlete Domain Entity</name>
-  <skills>/domain-entity</skills>  <!-- Required for this task -->
+  <skills>/domain</skills>  <!-- Required for this task -->
   <files>packages/core/src/domain/entities/athlete.ts</files>
   ...
 </task>
