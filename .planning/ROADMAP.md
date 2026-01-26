@@ -221,30 +221,25 @@ Plans:
 - [x] 03.2-08-PLAN.md - Database migration + human verification (Wave 8)
 
 ### Phase 3.3: Program Builder QA & Bug Fixes (INSERTED)
-**Goal**: Fix UI/UX bugs in the program builder grid and improve create program form
+**Goal**: Fix UI/UX bugs in the program builder grid and complete client-side editing transition
 **Depends on**: Phase 3.2 (client-side foundation exists but has bugs)
 **Requirements**: PRG-01 through PRG-13 (QA and polish of existing features)
 **Success Criteria** (what must be TRUE):
   1. Keyboard input in prescription cells only enters edit mode on: Enter, F2, double-click, or numeric keys (0-9); other keys are ignored
   2. Entering edit mode does NOT select all text; cursor is positioned at end of input
   3. Arrow key navigation while in edit mode moves cursor within input (does NOT change selected cell)
-  4. Superset menu shows existing groups and allows joining/creating groups
-  5. Add exercise operation updates local state immediately (no server call until save)
-  6. Create program form includes default session count selector (default: 3)
-  7. Create program form has improved compact layout (less scroll required)
-**Plans**: 6 plans in 1 wave
+  4. Superset menu shows existing groups and allows joining/creating groups with correct labeling
+  5. ALL builder operations (add week, add session, add exercise, superset changes, prescription edits) happen client-side only
+  6. NO API calls until user clicks "Guardar" - save persists all structural changes
+  7. Create program form includes default session count selector (default: 3)
+  8. Exercise combobox search is debounced to prevent excessive API calls
+**Plans**: 8 plans in 1 wave
 
 **Context:**
 - Phase 3.2 established client-side state (Zustand store) and saveDraft endpoint
 - UI bugs discovered during UAT: text selection on edit, keyboard input triggers, superset menu missing, arrow key behavior
 - Form UX improvements needed for program creation flow
-- This is a QA/polish phase - no new features, only completing the Phase 3.2 vision and fixing bugs
-
-**Known Limitations (Future Work):**
-- Add exercise is client-side only - new exercises appear in UI but are NOT persisted by saveDraft (temp ID issue)
-- Add week/session operations still use server mutations (not yet migrated to client-side)
-- Full client-side structural changes require saveDraft backend extension (Phase 3.4 or later)
-- Deprecated endpoint cleanup deferred until client-side operations are complete
+- Core requirement: ALL builder operations must be client-side with explicit save
 
 Plans:
 - [x] 03.3-01-PLAN.md - Fix prescription cell edit mode behavior (Wave 1)
@@ -253,6 +248,8 @@ Plans:
 - [x] 03.3-04-PLAN.md - Add sessionsCount to create program form (Wave 1)
 - [x] 03.3-05-PLAN.md - [GAP CLOSURE] Fix arrow keys and superset menu client state (Wave 1)
 - [ ] 03.3-06-PLAN.md - [GAP CLOSURE] Fix focus state sync and superset labeling (Wave 1)
+- [ ] 03.3-07-PLAN.md - [GAP CLOSURE] Client-side only operations for add week/session (Wave 1)
+- [ ] 03.3-08-PLAN.md - [GAP CLOSURE] Exercise combobox debounce (Wave 1)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -301,10 +298,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3. Program Builder (full-stack) | 15/16 | In progress | - |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
-| 3.3. Program Builder QA & Bug Fixes (frontend) | 5/6 | In progress | - |
+| 3.3. Program Builder QA & Bug Fixes (frontend) | 5/8 | In progress | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-26 (Phase 3.3 gap closure plan 06 added - focus state sync, superset labeling)*
+*Last updated: 2026-01-26 (Phase 3.3 gap closure plans 06-08 added - focus sync, client-side ops, debounce)*
