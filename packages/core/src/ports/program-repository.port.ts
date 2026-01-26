@@ -8,7 +8,11 @@ import type { OrganizationContext } from '../types/organization-context'
 // ============================================================================
 
 export type ProgramRepositoryError =
-  | { type: 'NOT_FOUND'; entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group'; id: string }
+  | {
+      type: 'NOT_FOUND'
+      entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group'
+      id: string
+    }
   | { type: 'DATABASE_ERROR'; message: string }
 
 // ============================================================================

@@ -39,7 +39,7 @@ const TEMPO_REGEX = /^[\dXx]{4}$/
 
 export function createPrescriptionSeries(
   input: CreatePrescriptionSeriesInput,
-  orderIndex: number
+  orderIndex: number,
 ): Result<PrescriptionSeries, PrescriptionSeriesError> {
   // Validate orderIndex
   if (orderIndex < 0) {

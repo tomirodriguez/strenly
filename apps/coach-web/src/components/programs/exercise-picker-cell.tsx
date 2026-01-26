@@ -16,13 +16,7 @@ export interface ExerciseCell {
  * Exercise picker cell component for react-datasheet-grid
  * Shows exercise name when not editing, opens search combobox on focus
  */
-const ExercisePickerCell: CellComponent<ExerciseCell> = ({
-  rowData,
-  setRowData,
-  focus,
-  stopEditing,
-  active,
-}) => {
+const ExercisePickerCell: CellComponent<ExerciseCell> = ({ rowData, setRowData, focus, stopEditing, active }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
@@ -169,9 +163,7 @@ const ExercisePickerCell: CellComponent<ExerciseCell> = ({
               onMouseEnter={() => setHighlightedIndex(index)}
             >
               <span className="flex-1 truncate">{exercise.name}</span>
-              {exercise.isCurated && (
-                <span className="ml-2 text-muted-foreground text-xs">Curado</span>
-              )}
+              {exercise.isCurated && <span className="ml-2 text-muted-foreground text-xs">Curado</span>}
             </button>
           ))}
         </div>

@@ -1,10 +1,7 @@
+import { formatSeriesToNotation, type PrescriptionSeriesInput } from '@strenly/contracts/programs/prescription'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import type { GridData } from '@/components/programs/program-grid/types'
-import {
-  formatSeriesToNotation,
-  type PrescriptionSeriesInput,
-} from '@strenly/contracts/programs/prescription'
 
 /**
  * Tracked prescription change for bulk save
@@ -48,11 +45,7 @@ interface GridActions {
   initialize: (programId: string, data: GridData) => void
 
   // Update a prescription (series array)
-  updatePrescription: (
-    exerciseRowId: string,
-    weekId: string,
-    series: PrescriptionSeriesInput[]
-  ) => void
+  updatePrescription: (exerciseRowId: string, weekId: string, series: PrescriptionSeriesInput[]) => void
 
   // Update an exercise selection
   updateExercise: (rowId: string, exerciseId: string, exerciseName: string) => void
@@ -200,5 +193,5 @@ export const useGridActions = () =>
       reset: state.reset,
       markSaved: state.markSaved,
       getChanges: state.getChanges,
-    }))
+    })),
   )

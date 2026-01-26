@@ -1,8 +1,5 @@
+import { type PrescriptionSeriesInput, parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
 import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
-import {
-  parsePrescriptionToSeries,
-  type PrescriptionSeriesInput,
-} from '@strenly/contracts/programs/prescription'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { SplitRowDialog } from '../split-row-dialog'
 import { GridBody } from './grid-body'

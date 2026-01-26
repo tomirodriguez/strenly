@@ -1,10 +1,10 @@
 import {
   formatPrescription,
-  parsePrescriptionNotation,
   type ParsedPrescription,
+  parsePrescriptionNotation,
 } from '@strenly/contracts/programs/prescription'
 import type { ProgramWeek, ProgramWithDetails } from '@strenly/contracts/programs/program'
-import { DataSheetGrid, type Column } from '@wasback/react-datasheet-grid'
+import { type Column, DataSheetGrid } from '@wasback/react-datasheet-grid'
 import '@wasback/react-datasheet-grid/dist/style.css'
 import { SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -280,9 +280,7 @@ function ExerciseCellComponent({
   // Session header display
   if (rowData.type === 'session-header') {
     return (
-      <div className="flex h-full w-full items-center bg-muted/50 px-3 font-medium text-sm">
-        {rowData.sessionName}
-      </div>
+      <div className="flex h-full w-full items-center bg-muted/50 px-3 font-medium text-sm">{rowData.sessionName}</div>
     )
   }
 
@@ -747,7 +745,7 @@ export function ProgramGrid({ programId }: ProgramGridProps) {
   }
 
   return (
-    <div className="flex h-full flex-col program-grid" ref={gridContainerRef}>
+    <div className="program-grid flex h-full flex-col" ref={gridContainerRef}>
       {/* Row actions toolbar - appears when a row is selected */}
       {selectedRowData && selectedRowData.rowId && (
         <div className="flex items-center justify-between border-border border-b bg-muted/30 px-4 py-2">

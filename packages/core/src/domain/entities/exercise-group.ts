@@ -19,9 +19,7 @@ type CreateExerciseGroupInput = {
   name?: string | null
 }
 
-export function createExerciseGroup(
-  input: CreateExerciseGroupInput
-): Result<ExerciseGroup, ExerciseGroupError> {
+export function createExerciseGroup(input: CreateExerciseGroupInput): Result<ExerciseGroup, ExerciseGroupError> {
   // Validate id
   const trimmedId = input.id.trim()
   if (!trimmedId) {

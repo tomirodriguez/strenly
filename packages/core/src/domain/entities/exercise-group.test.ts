@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  createExerciseGroup,
-  reconstituteExerciseGroup,
-  type ExerciseGroupError,
-} from './exercise-group'
+import { createExerciseGroup, type ExerciseGroupError, reconstituteExerciseGroup } from './exercise-group'
 
 describe('ExerciseGroup', () => {
   describe('createExerciseGroup', () => {
@@ -191,8 +187,7 @@ describe('ExerciseGroup', () => {
       expect(group.sessionId).toBe('s-1')
       expect(group.orderIndex).toBe(0)
       expect(group.name).toBe('Heavy Singles')
-    }
-    )
+    })
 
     it('reconstitutes group with null name', () => {
       const props = {

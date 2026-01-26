@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { type SaveAsTemplateInput, saveAsTemplateInputSchema } from '@strenly/contracts/programs'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSaveAsTemplate } from '../hooks/mutations/use-save-as-template'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -15,7 +16,6 @@ import {
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useSaveAsTemplate } from '../hooks/mutations/use-save-as-template'
 
 type SaveAsTemplateDialogProps = {
   programId: string
@@ -91,8 +91,8 @@ export function SaveAsTemplateDialog({
         <DialogHeader>
           <DialogTitle>Guardar como plantilla</DialogTitle>
           <DialogDescription>
-            Crea una plantilla reutilizable a partir de este programa. La plantilla incluira todas las semanas,
-            sesiones y ejercicios configurados.
+            Crea una plantilla reutilizable a partir de este programa. La plantilla incluira todas las semanas, sesiones
+            y ejercicios configurados.
           </DialogDescription>
         </DialogHeader>
 

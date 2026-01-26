@@ -2,14 +2,6 @@
  * Program contracts - API schemas for program CRUD operations
  */
 
-// Bulk save draft operation
-export {
-  type SaveDraftInput,
-  type SaveDraftOutput,
-  saveDraftInputSchema,
-  saveDraftOutputSchema,
-} from './save-draft'
-
 // Exercise group operations
 export {
   type CreateExerciseGroupInput,
@@ -87,6 +79,13 @@ export {
   type UpdateProgramInput,
   updateProgramInputSchema,
 } from './program'
+// Bulk save draft operation
+export {
+  type SaveDraftInput,
+  type SaveDraftOutput,
+  saveDraftInputSchema,
+  saveDraftOutputSchema,
+} from './save-draft'
 // Session operations
 export {
   type AddSessionInput,

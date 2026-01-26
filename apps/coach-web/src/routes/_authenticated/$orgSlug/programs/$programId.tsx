@@ -33,10 +33,7 @@ function ProgramEditorPage() {
   const actions = useGridActions()
 
   // Transform program to grid data when loaded
-  const transformedGridData = useMemo(
-    () => (program ? transformProgramToGrid(program) : null),
-    [program],
-  )
+  const transformedGridData = useMemo(() => (program ? transformProgramToGrid(program) : null), [program])
 
   // Initialize store when program loads
   useEffect(() => {
@@ -93,11 +90,7 @@ function ProgramEditorPage() {
       </div>
 
       {/* Footer with keyboard shortcuts help and save button */}
-      <ProgramFooter
-        isDirty={isDirty}
-        isPending={saveMutation.isPending}
-        onSave={handleSave}
-      />
+      <ProgramFooter isDirty={isDirty} isPending={saveMutation.isPending} onSave={handleSave} />
     </div>
   )
 }

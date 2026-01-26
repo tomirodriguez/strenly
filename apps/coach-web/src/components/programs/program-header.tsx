@@ -132,11 +132,7 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
       </div>
 
       {/* Grid toolbar row */}
-      <GridToolbar
-        programId={program.id}
-        weekCount={program.weeks.length}
-        sessionCount={program.sessions.length}
-      />
+      <GridToolbar programId={program.id} weekCount={program.weeks.length} sessionCount={program.sessions.length} />
     </header>
   )
 }

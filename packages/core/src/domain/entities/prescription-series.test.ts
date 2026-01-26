@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   createPrescriptionSeries,
-  reconstitutePrescriptionSeries,
   type PrescriptionSeriesError,
+  reconstitutePrescriptionSeries,
 } from './prescription-series'
 
 describe('PrescriptionSeries', () => {
@@ -45,10 +45,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with rep range', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, repsMax: 12, isAmrap: false },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, repsMax: 12, isAmrap: false }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -58,10 +55,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with same min and max reps', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, repsMax: 8, isAmrap: false },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, repsMax: 8, isAmrap: false }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -71,10 +65,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with valid tempo', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, isAmrap: false, tempo: '31X0' },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, isAmrap: false, tempo: '31X0' }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -83,10 +74,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('normalizes lowercase tempo to uppercase', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, isAmrap: false, tempo: '31x0' },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, isAmrap: false, tempo: '31x0' }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -97,7 +85,7 @@ describe('PrescriptionSeries', () => {
       it('creates series with percentage intensity', () => {
         const result = createPrescriptionSeries(
           { reps: 5, isAmrap: false, intensityType: 'percentage', intensityValue: 80 },
-          0
+          0,
         )
 
         expect(result.isOk()).toBe(true)
@@ -108,10 +96,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with RPE intensity', () => {
-        const result = createPrescriptionSeries(
-          { reps: 5, isAmrap: false, intensityType: 'rpe', intensityValue: 8 },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 5, isAmrap: false, intensityType: 'rpe', intensityValue: 8 }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -121,10 +106,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with RIR intensity', () => {
-        const result = createPrescriptionSeries(
-          { reps: 5, isAmrap: false, intensityType: 'rir', intensityValue: 2 },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 5, isAmrap: false, intensityType: 'rir', intensityValue: 2 }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -136,7 +118,7 @@ describe('PrescriptionSeries', () => {
       it('creates series with absolute intensity', () => {
         const result = createPrescriptionSeries(
           { reps: 5, isAmrap: false, intensityType: 'absolute', intensityValue: 120 },
-          0
+          0,
         )
 
         expect(result.isOk()).toBe(true)
@@ -147,10 +129,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('creates series with rest seconds', () => {
-        const result = createPrescriptionSeries(
-          { reps: 5, isAmrap: false, restSeconds: 30 },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 5, isAmrap: false, restSeconds: 30 }, 0)
 
         expect(result.isOk()).toBe(true)
         if (result.isOk()) {
@@ -188,10 +167,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('rejects repsMax less than reps', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, repsMax: 6, isAmrap: false },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, repsMax: 6, isAmrap: false }, 0)
 
         expect(result.isErr()).toBe(true)
         if (result.isErr()) {
@@ -202,7 +178,7 @@ describe('PrescriptionSeries', () => {
       it('rejects intensity type without value', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'rpe', intensityValue: null },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -214,7 +190,7 @@ describe('PrescriptionSeries', () => {
       it('rejects percentage over 100', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'percentage', intensityValue: 150 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -226,7 +202,7 @@ describe('PrescriptionSeries', () => {
       it('rejects percentage under 0', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'percentage', intensityValue: -10 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -238,7 +214,7 @@ describe('PrescriptionSeries', () => {
       it('rejects RPE over 10', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'rpe', intensityValue: 11 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -250,7 +226,7 @@ describe('PrescriptionSeries', () => {
       it('rejects RPE under 0', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'rpe', intensityValue: -1 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -262,7 +238,7 @@ describe('PrescriptionSeries', () => {
       it('rejects RIR over 10', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'rir', intensityValue: 11 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -274,7 +250,7 @@ describe('PrescriptionSeries', () => {
       it('rejects RIR under 0', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'rir', intensityValue: -1 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -286,7 +262,7 @@ describe('PrescriptionSeries', () => {
       it('rejects negative absolute intensity', () => {
         const result = createPrescriptionSeries(
           { reps: 8, isAmrap: false, intensityType: 'absolute', intensityValue: -50 },
-          0
+          0,
         )
 
         expect(result.isErr()).toBe(true)
@@ -296,10 +272,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('rejects invalid tempo format (too short)', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, isAmrap: false, tempo: 'ABC' },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, isAmrap: false, tempo: 'ABC' }, 0)
 
         expect(result.isErr()).toBe(true)
         if (result.isErr()) {
@@ -308,10 +281,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('rejects invalid tempo format (too long)', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, isAmrap: false, tempo: '31X00' },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, isAmrap: false, tempo: '31X00' }, 0)
 
         expect(result.isErr()).toBe(true)
         if (result.isErr()) {
@@ -320,10 +290,7 @@ describe('PrescriptionSeries', () => {
       })
 
       it('rejects invalid tempo format (invalid characters)', () => {
-        const result = createPrescriptionSeries(
-          { reps: 8, isAmrap: false, tempo: '31A0' },
-          0
-        )
+        const result = createPrescriptionSeries({ reps: 8, isAmrap: false, tempo: '31A0' }, 0)
 
         expect(result.isErr()).toBe(true)
         if (result.isErr()) {

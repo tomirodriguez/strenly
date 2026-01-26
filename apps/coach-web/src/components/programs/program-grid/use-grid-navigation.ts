@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type RefObject } from 'react'
+import { type RefObject, useCallback, useEffect, useState } from 'react'
 import type { GridCell, GridColumn, GridRow } from './types'
 
 interface UseGridNavigationOptions {

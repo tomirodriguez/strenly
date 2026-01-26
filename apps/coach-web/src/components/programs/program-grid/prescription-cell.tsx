@@ -125,7 +125,7 @@ export function PrescriptionCell({
           setEditValue(e.key) // Start with typed character
           onStartEdit()
         }
-        // Let arrow keys, Tab, etc. bubble to the grid for navigation
+      // Let arrow keys, Tab, etc. bubble to the grid for navigation
     }
   }
 
