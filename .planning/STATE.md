@@ -198,6 +198,7 @@ None.
 | 018 | Redirect, breadcrumbs, sidebar collapse | 2026-01-25 | 89a1b77 | [018-redirect-slug-dashboard-breadcrumb-sidebar](./quick/018-redirect-slug-dashboard-breadcrumb-sidebar/) |
 | 019 | Remove hover on active sidebar items | 2026-01-25 | 2cfb380 | [019-remove-the-hover-on-active-items-in-the-](./quick/019-remove-the-hover-on-active-items-in-the-/) |
 | 020 | Fix collapsed sidebar layout and icon sizes | 2026-01-25 | 3d64977 | [020-fix-collapsed-sidebar-layout-and-icon-si](./quick/020-fix-collapsed-sidebar-layout-and-icon-si/) |
+| 021 | Cleanup deprecated Phase 3.2 code | 2026-01-25 | f9c8f47 | [021-cleanup-deprecated-phase-32-code](./quick/021-cleanup-deprecated-phase-32-code/) |
 
 ## Phase 2 Progress
 
