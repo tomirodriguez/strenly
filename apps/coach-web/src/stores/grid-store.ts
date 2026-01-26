@@ -1,7 +1,7 @@
 import { formatSeriesToNotation, type PrescriptionSeriesInput } from '@strenly/contracts/programs/prescription'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
-import type { GridData } from '@/components/programs/program-grid/types'
+import type { GridData, GridRow } from '@/components/programs/program-grid/types'
 
 /**
  * Tracked prescription change for bulk save
@@ -49,6 +49,9 @@ interface GridActions {
 
   // Update an exercise selection
   updateExercise: (rowId: string, exerciseId: string, exerciseName: string) => void
+
+  // Add a new exercise row to a session (local-only, not persisted by saveDraft)
+  addExercise: (sessionId: string, exerciseId: string, exerciseName: string) => void
 
   // Reset to server state (e.g., after refetch)
   reset: (data: GridData) => void
@@ -153,6 +156,85 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  /**
+   * Add a new exercise row to a session (local-only).
+   *
+   * NOTE: This is a known limitation - the row appears locally but saveDraft
+   * does NOT persist new exercises. Full structural changes require backend
+   * extension in a future phase. On save/refresh, only prescription and
+   * exercise row updates are persisted.
+   */
+  addExercise: (sessionId, exerciseId, exerciseName) =>
+    set((state) => {
+      if (!state.data) return state
+
+      const tempId = `temp-row-${Date.now()}`
+
+      // Get all week IDs for creating empty prescriptions
+      const weekIds = state.data.columns
+        .filter((col) => col.type === 'week' && col.weekId)
+        .map((col) => col.weekId as string)
+
+      // Create empty prescriptions map
+      const prescriptions: Record<string, string> = {}
+      for (const weekId of weekIds) {
+        prescriptions[weekId] = ''
+      }
+
+      // Find the session's existing exercise rows to determine position
+      const sessionRows = state.data.rows.filter(
+        (row) => row.type === 'exercise' && row.sessionId === sessionId,
+      )
+      const orderIndex = sessionRows.length
+
+      // Find session name from an existing row in this session
+      const sessionRow = state.data.rows.find((row) => row.sessionId === sessionId)
+      const sessionName = sessionRow?.sessionName ?? ''
+
+      // Create new row
+      const newRow: GridRow = {
+        id: tempId,
+        type: 'exercise',
+        sessionId,
+        sessionName,
+        exercise: {
+          exerciseId,
+          exerciseName,
+          position: orderIndex,
+        },
+        supersetGroup: null,
+        supersetOrder: null,
+        supersetPosition: null,
+        groupLetter: undefined, // Will be calculated on next transform
+        groupIndex: undefined,
+        isSubRow: false,
+        parentRowId: null,
+        setTypeLabel: null,
+        prescriptions,
+      }
+
+      // Find where to insert (before the add-exercise row for this session)
+      const insertIndex = state.data.rows.findIndex(
+        (row) => row.type === 'add-exercise' && row.sessionId === sessionId,
+      )
+
+      const updatedRows = [...state.data.rows]
+      if (insertIndex >= 0) {
+        updatedRows.splice(insertIndex, 0, newRow)
+      } else {
+        // Fallback: add at end
+        updatedRows.push(newRow)
+      }
+
+      return {
+        data: { ...state.data, rows: updatedRows },
+        isDirty: true,
+        // NOTE: We intentionally do NOT add to a tracking array here
+        // because saveDraft backend does not yet support persisting new exercises.
+        // This is a known limitation - the row appears locally but won't survive save/refresh.
+      }
+    }),
+
   reset: (data) =>
     set({
       data,
@@ -190,6 +272,7 @@ export const useGridActions = () =>
       initialize: state.initialize,
       updatePrescription: state.updatePrescription,
       updateExercise: state.updateExercise,
+      addExercise: state.addExercise,
       reset: state.reset,
       markSaved: state.markSaved,
       getChanges: state.getChanges,
