@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 3.3 - Program Builder QA & Bug Fixes (IN PROGRESS)
+**Current focus:** Phase 3.3 - Program Builder QA & Bug Fixes (COMPLETE)
 
 ## Current Position
 
 Phase: 3.3 of 5 (Program Builder QA & Bug Fixes)
-Plan: 3/4 complete
-Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.3-02-PLAN.md (add exercise uses local state)
+Plan: 4/4 complete
+Status: COMPLETE
+Last activity: 2026-01-26 - Completed 03.3-03-PLAN.md (superset menu fix)
 
-Progress: [████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 in progress
+Progress: [████████████████████████████████] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3 COMPLETE
 
 **Note:** Phase 3.3 inserted to complete client-side editing transition and fix UI bugs discovered during UAT.
 
@@ -160,6 +160,8 @@ Recent decisions affecting current work:
 - **Cursor at end on edit** - Use setSelectionRange(len, len) instead of select() for cursor positioning
 - **requestAnimationFrame for cursor** - Ensure DOM is ready before setting cursor position
 - **Add exercise local-only** - addExercise updates local state without persistence; saveDraft backend needs extension for structural changes
+- **existingGroups excludes current row** - When calculating superset groups to join, exclude current row to prevent "join your own group"
+- **nextAvailableLetter uses all groups** - Calculate next letter using all groups in session (including current row) to avoid letter conflicts
 
 ### Pending Todos
 
@@ -323,19 +325,23 @@ None.
 
 ## Phase 3.3 Progress
 
-**Program Builder QA & Bug Fixes IN PROGRESS:**
+**Program Builder QA & Bug Fixes COMPLETE:**
 
 | Plan | Name | Status |
 |------|------|--------|
 | 03.3-01 | Prescription Cell Edit Mode | Complete |
 | 03.3-02 | Add Exercise Local State | Complete |
-| 03.3-03 | Superset Menu Fix | Pending |
+| 03.3-03 | Superset Menu Fix | Complete |
 | 03.3-04 | Sessions Count in Create Program | Complete |
+
+**Key artifacts:**
+- `apps/coach-web/src/components/programs/exercise-row-actions.tsx` - Superset menu with existing group display
+- `apps/coach-web/src/components/programs/program-grid/exercise-cell.tsx` - sessionRows prop chain to ExerciseRowActions
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.3-02-PLAN.md
+Stopped at: Completed 03.3-03-PLAN.md
 Resume file: None
 
-**Next:** Ready for 03.3-03: Superset menu fix.
+**Next:** Ready for Phase 4 or next quick task.
