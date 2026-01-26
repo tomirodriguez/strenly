@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { ArrowLeftIcon, FileDownIcon } from 'lucide-react'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
 import { ProgramGrid } from '@/components/programs/program-grid/program-grid'
 import { SaveButton } from '@/components/programs/program-grid/save-button'
-import { transformProgramToGrid } from '@/components/programs/program-grid/transform-program'
 import { ProgramHeader } from '@/components/programs/program-header'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSaveDraft } from '@/features/programs/hooks/mutations/use-save-draft'
+import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises-map'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
@@ -22,25 +22,31 @@ export const Route = createFileRoute('/_authenticated/$orgSlug/programs/$program
  * Full-height layout with header, grid, and footer.
  *
  * Uses Zustand store for local state management with explicit save.
+ * Fetches both program aggregate and exercises map for display.
  */
 function ProgramEditorPage() {
   const { orgSlug, programId } = useParams({ from: '/_authenticated/$orgSlug/programs/$programId' })
-  const { data: program, isLoading, error } = useProgram(programId)
+
+  // Fetch program aggregate
+  const { data: program, isLoading: programLoading, error: programError } = useProgram(programId)
+
+  // Fetch exercises for name lookup
+  const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
 
   // Zustand store - select only what you need
   const gridData = useGridData()
   const isDirty = useGridIsDirty()
   const actions = useGridActions()
 
-  // Transform program to grid data when loaded
-  const transformedGridData = useMemo(() => (program ? transformProgramToGrid(program) : null), [program])
-
-  // Initialize store when program loads
+  // Initialize store when program and exercises load
+  // Note: The program from useProgram is already typed as ProgramAggregate via oRPC output schema
   useEffect(() => {
-    if (transformedGridData && programId) {
-      actions.initialize(programId, transformedGridData)
+    if (program && exercisesMap.size > 0 && programId) {
+      // TypeScript may not infer the exact ProgramAggregate type from oRPC,
+      // but the runtime data structure matches the aggregate format
+      actions.initialize(programId, program, exercisesMap)
     }
-  }, [transformedGridData, programId, actions])
+  }, [program, exercisesMap, programId, actions])
 
   // Navigation guard - warn before leaving with unsaved changes
   useUnsavedChanges(isDirty)
@@ -51,27 +57,22 @@ function ProgramEditorPage() {
   })
 
   const handleSave = useCallback(() => {
-    const changes = actions.getChanges()
+    const aggregateData = actions.getAggregateForSave()
+    if (!aggregateData) return
+
     saveMutation.mutate({
       programId,
-      // Existing changes
-      prescriptions: changes.prescriptions,
-      exerciseRows: changes.exerciseRows,
-      groups: [],
-      // Structural changes
-      newWeeks: changes.newWeeks,
-      newSessions: changes.newSessions,
-      newExerciseRows: changes.newExerciseRows,
-      // Conflict detection
-      lastLoadedAt: changes.lastLoadedAt ?? undefined,
+      program: aggregateData.program,
+      lastLoadedAt: aggregateData.lastLoadedAt ?? undefined,
     })
   }, [programId, actions, saveMutation])
 
-  if (isLoading) {
+  // Loading state - wait for both program and exercises
+  if (programLoading || exercisesLoading) {
     return <ProgramEditorSkeleton />
   }
 
-  if (error || !program) {
+  if (programError || !program) {
     return <ProgramNotFound orgSlug={orgSlug} />
   }
 
