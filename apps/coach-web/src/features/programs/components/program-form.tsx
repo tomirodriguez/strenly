@@ -23,6 +23,8 @@ type ProgramFormProps = {
   defaultValues?: Partial<CreateProgramInput>
   /** Whether to show the weeks count field (hidden when creating from template) */
   showWeeksCount?: boolean
+  /** Whether to show the sessions count field (hidden when creating from template) */
+  showSessionsCount?: boolean
 }
 
 /**
@@ -30,7 +32,13 @@ type ProgramFormProps = {
  * Uses React Hook Form with Zod validation.
  * Accepts an optional id prop to link with external submit buttons.
  */
-export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true }: ProgramFormProps) {
+export function ProgramForm({
+  id,
+  onSubmit,
+  defaultValues,
+  showWeeksCount = true,
+  showSessionsCount = true,
+}: ProgramFormProps) {
   const {
     register,
     handleSubmit,
@@ -44,6 +52,7 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
       athleteId: undefined,
       isTemplate: false,
       weeksCount: 4,
+      sessionsCount: 3,
       ...defaultValues,
     },
   })
@@ -89,21 +98,42 @@ export function ProgramForm({ id, onSubmit, defaultValues, showWeeksCount = true
         </FieldContent>
       </Field>
 
-      {showWeeksCount && (
-        <Field>
-          <FieldLabel htmlFor="weeksCount">Semanas iniciales</FieldLabel>
-          <FieldContent>
-            <Input
-              id="weeksCount"
-              type="number"
-              min={1}
-              max={12}
-              {...register('weeksCount', { valueAsNumber: true })}
-            />
-            <FieldDescription>Cantidad de semanas para crear inicialmente (1-12)</FieldDescription>
-            <FieldError errors={[errors.weeksCount]} />
-          </FieldContent>
-        </Field>
+      {/* Weeks and Sessions in a compact grid */}
+      {(showWeeksCount || showSessionsCount) && (
+        <div className="grid grid-cols-2 gap-4">
+          {showWeeksCount && (
+            <Field>
+              <FieldLabel htmlFor="weeksCount">Semanas</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="weeksCount"
+                  type="number"
+                  min={1}
+                  max={12}
+                  {...register('weeksCount', { valueAsNumber: true })}
+                />
+                <FieldDescription>1-12 semanas</FieldDescription>
+                <FieldError errors={[errors.weeksCount]} />
+              </FieldContent>
+            </Field>
+          )}
+          {showSessionsCount && (
+            <Field>
+              <FieldLabel htmlFor="sessionsCount">Sesiones</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="sessionsCount"
+                  type="number"
+                  min={1}
+                  max={7}
+                  {...register('sessionsCount', { valueAsNumber: true })}
+                />
+                <FieldDescription>1-7 dias/semana</FieldDescription>
+                <FieldError errors={[errors.sessionsCount]} />
+              </FieldContent>
+            </Field>
+          )}
+        </div>
       )}
 
       <Field>
