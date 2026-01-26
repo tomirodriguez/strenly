@@ -98,11 +98,11 @@ export function useCellEditing(options: UseCellEditingOptions = {}) {
           startEditing(activeCell)
           return true
         }
-        // Any printable character starts editing (quick-edit mode)
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-          // Let the cell handle the character, but start editing
+        // Only digits (0-9) start editing - NOT letters (Excel convention for prescription cells)
+        if (/^[0-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          // Let the cell handle the digit, but start editing
           startEditing(activeCell)
-          return false // Don't prevent default, let the character go through
+          return false // Don't prevent default, let the digit go through
         }
       }
 

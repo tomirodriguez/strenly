@@ -21,11 +21,12 @@ interface PrescriptionCellProps {
  *
  * Features:
  * - Single click selects cell
- * - Double-click or Enter/F2 enters edit mode
- * - Type any key to start editing with that character
+ * - Double-click, Enter, or F2 enters edit mode
+ * - Typing digits (0-9) starts editing with that digit (Excel convention)
+ * - Letter keys and other characters do NOT trigger edit mode
  * - Enter commits, Escape cancels
  * - Tab/Shift+Tab commit and navigate horizontally
- * - Arrow keys commit and navigate (or bubble to grid when not editing)
+ * - Arrow keys move cursor within input; navigate only at text boundaries
  * - Em dash for empty values
  * - Sub-row values dimmed
  */
@@ -47,9 +48,15 @@ export function PrescriptionCell({
 
   // Focus input when entering edit mode
   useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus()
-      inputRef.current?.select()
+    if (isEditing && inputRef.current) {
+      const input = inputRef.current
+      input.focus()
+      // Position cursor at end instead of selecting all text
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        const len = input.value.length
+        input.setSelectionRange(len, len)
+      })
     }
   }, [isEditing])
 
@@ -77,34 +84,29 @@ export function PrescriptionCell({
         onNavigate(e.shiftKey ? 'shift-tab' : 'tab')
         break
       case 'ArrowUp':
-        if (!e.shiftKey) {
-          e.preventDefault()
-          onCommit(editValue)
-          onNavigate('up')
-        }
-        break
       case 'ArrowDown':
-        if (!e.shiftKey) {
-          e.preventDefault()
-          onCommit(editValue)
-          onNavigate('down')
-        }
+        // Always navigate for vertical - no cursor movement in single-line input
+        e.preventDefault()
+        onCommit(editValue)
+        onNavigate(e.key === 'ArrowUp' ? 'up' : 'down')
         break
       case 'ArrowLeft':
-        // Only navigate if cursor is at start
+        // Only navigate if cursor is at the very start (no selection)
         if (inputRef.current?.selectionStart === 0 && inputRef.current?.selectionEnd === 0) {
           e.preventDefault()
           onCommit(editValue)
           onNavigate('left')
         }
+        // Otherwise, let browser handle cursor movement (don't preventDefault)
         break
       case 'ArrowRight':
-        // Only navigate if cursor is at end
+        // Only navigate if cursor is at the very end
         if (inputRef.current?.selectionStart === editValue.length) {
           e.preventDefault()
           onCommit(editValue)
           onNavigate('right')
         }
+        // Otherwise, let browser handle cursor movement
         break
     }
   }
@@ -119,13 +121,13 @@ export function PrescriptionCell({
         onStartEdit()
         break
       default:
-        // Start editing on any printable character
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // Only start editing on numeric keys (0-9) - NOT letters
+        if (/^[0-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault()
-          setEditValue(e.key) // Start with typed character
+          setEditValue(e.key) // Start with typed digit
           onStartEdit()
         }
-      // Let arrow keys, Tab, etc. bubble to the grid for navigation
+      // All other keys (letters, symbols, arrows) bubble to grid for navigation
     }
   }
 
