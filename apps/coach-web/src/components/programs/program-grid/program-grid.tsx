@@ -72,13 +72,13 @@ export function ProgramGrid({
   const { rows, columns } = gridData ?? transformedData
 
   // Grid state hooks - pass tableRef for DOM focus management
-  const { activeCell, setActiveCell, handleKeyDown, focusCell } = useGridNavigation({
+  const { activeCell, setActiveCell, handleKeyDown } = useGridNavigation({
     rows,
     columns,
     tableRef,
   })
-  // Pass focusCell to useCellEditing for focus restoration on edit stop
-  const { editingCell, startEditing, stopEditing } = useCellEditing({ focusCell })
+  // Cell editing state - navigation keys in cells update activeCell before calling stopEditing
+  const { editingCell, startEditing, stopEditing } = useCellEditing()
 
   // Mutation hooks
   const updatePrescription = useUpdatePrescription(program.id)
