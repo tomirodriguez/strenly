@@ -282,39 +282,52 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<{ ok: true; data: { updatedAt: Date } } | { ok: false; error: ProgramRepositoryError }> => {
-          // 1. Verify program exists and belongs to organization
+          // 1. Check if program exists
           const existingProgram = await verifyProgramAccess(ctx, program.id)
-          if (!existingProgram) {
-            return { ok: false, error: notFoundError('program', program.id) }
-          }
+          const isCreate = !existingProgram
 
           const updatedAt = new Date()
 
           await db.transaction(async (tx) => {
-            // Get all session IDs for this program to delete their children
-            const sessionRows = await tx
-              .select({ id: programSessions.id })
-              .from(programSessions)
-              .where(eq(programSessions.programId, program.id))
-            const sessionIds = sessionRows.map((s) => s.id)
+            if (isCreate) {
+              // 2a. For CREATE: Insert the program row first
+              await tx.insert(programs).values({
+                id: program.id,
+                organizationId: ctx.organizationId,
+                name: program.name,
+                description: program.description,
+                athleteId: program.athleteId,
+                isTemplate: program.isTemplate,
+                status: program.status,
+                createdAt: updatedAt,
+                updatedAt,
+              })
+            } else {
+              // 2b. For UPDATE: Delete all children in reverse dependency order
+              // Get all session IDs for this program to delete their children
+              const sessionRows = await tx
+                .select({ id: programSessions.id })
+                .from(programSessions)
+                .where(eq(programSessions.programId, program.id))
+              const sessionIds = sessionRows.map((s) => s.id)
 
-            // Get all week IDs for this program
-            const weekRows = await tx
-              .select({ id: programWeeks.id })
-              .from(programWeeks)
-              .where(eq(programWeeks.programId, program.id))
-            const weekIds = weekRows.map((w) => w.id)
+              // Get all week IDs for this program
+              const weekRowsForDelete = await tx
+                .select({ id: programWeeks.id })
+                .from(programWeeks)
+                .where(eq(programWeeks.programId, program.id))
+              const weekIds = weekRowsForDelete.map((w) => w.id)
 
-            // 2. Delete all children in reverse dependency order
-            if (weekIds.length > 0) {
-              await tx.delete(prescriptions).where(inArray(prescriptions.weekId, weekIds))
+              if (weekIds.length > 0) {
+                await tx.delete(prescriptions).where(inArray(prescriptions.weekId, weekIds))
+              }
+              if (sessionIds.length > 0) {
+                await tx.delete(programExercises).where(inArray(programExercises.sessionId, sessionIds))
+                await tx.delete(exerciseGroups).where(inArray(exerciseGroups.sessionId, sessionIds))
+              }
+              await tx.delete(programSessions).where(eq(programSessions.programId, program.id))
+              await tx.delete(programWeeks).where(eq(programWeeks.programId, program.id))
             }
-            if (sessionIds.length > 0) {
-              await tx.delete(programExercises).where(inArray(programExercises.sessionId, sessionIds))
-              await tx.delete(exerciseGroups).where(inArray(exerciseGroups.sessionId, sessionIds))
-            }
-            await tx.delete(programSessions).where(eq(programSessions.programId, program.id))
-            await tx.delete(programWeeks).where(eq(programWeeks.programId, program.id))
 
             // 3. Insert weeks
             for (const week of program.weeks) {
@@ -407,18 +420,20 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               }
             }
 
-            // 8. Update program metadata
-            await tx
-              .update(programs)
-              .set({
-                name: program.name,
-                description: program.description,
-                athleteId: program.athleteId,
-                isTemplate: program.isTemplate,
-                status: program.status,
-                updatedAt,
-              })
-              .where(eq(programs.id, program.id))
+            // 8. Update program metadata (only for update, not create - already inserted above)
+            if (!isCreate) {
+              await tx
+                .update(programs)
+                .set({
+                  name: program.name,
+                  description: program.description,
+                  athleteId: program.athleteId,
+                  isTemplate: program.isTemplate,
+                  status: program.status,
+                  updatedAt,
+                })
+                .where(eq(programs.id, program.id))
+            }
           })
 
           return { ok: true, data: { updatedAt } }

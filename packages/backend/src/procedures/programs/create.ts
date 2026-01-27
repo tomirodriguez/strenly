@@ -31,6 +31,8 @@ export const createProgram = authProcedure
       description: input.description || null,
       athleteId: input.athleteId ?? null,
       isTemplate: input.isTemplate,
+      weeksCount: input.weeksCount,
+      sessionsCount: input.sessionsCount,
     })
 
     if (result.isErr()) {
