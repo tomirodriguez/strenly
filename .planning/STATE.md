@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 2/10 (04-02 complete)
+Plan: 2/10 (04-01, 04-02 complete)
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-02-PLAN.md (WorkoutLog Repository Port)
+Last activity: 2026-01-27 - Completed 04-01-PLAN.md (WorkoutLog Domain Entity & DB Schema)
 
 Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
@@ -414,7 +414,7 @@ None.
 
 | Plan | Name | Status |
 |------|------|--------|
-| 04-01 | WorkoutLog Aggregate Domain Entity | In Progress |
+| 04-01 | WorkoutLog Aggregate Domain Entity | Complete |
 | 04-02 | WorkoutLog Repository Port | Complete |
 | 04-03 | WorkoutLog Repository Implementation | Pending |
 | 04-04 | WorkoutLog Use Cases | Pending |
@@ -426,13 +426,17 @@ None.
 | 04-10 | Integration and Polish | Pending |
 
 **Key artifacts created:**
-- `packages/core/src/ports/workout-log-repository.port.ts` - Repository interface with CRUD operations
+- `packages/database/src/schema/workout-logs.ts` - workout_logs table with log_status enum
+- `packages/database/src/schema/logged-exercises.ts` - logged_exercises table with JSONB series
 - `packages/core/src/domain/entities/workout-log/types.ts` - Domain types (LogStatus, LoggedSeries, LoggedExercise, WorkoutLog)
+- `packages/core/src/domain/entities/workout-log/workout-log.ts` - Aggregate factory functions
+- `packages/core/src/domain/entities/workout-log/workout-log.test.ts` - 30 TDD tests (100% coverage)
+- `packages/core/src/ports/workout-log-repository.port.ts` - Repository interface with CRUD operations
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-02-PLAN.md
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-01 (domain entity) or 04-03 (repository implementation).
+**Next:** Continue with 04-03 (repository implementation).
