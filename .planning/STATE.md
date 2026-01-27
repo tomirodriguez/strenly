@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 3.4 of 6 (Domain Restructure - Training Programs) COMPLETE
-Plan: 8/8 (03.4-01 through 03.4-08 complete)
-Status: VERIFIED ✓
-Last activity: 2026-01-27 - Roadmap restructured
+Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
+Plan: 2/10 (04-02 complete)
+Status: In progress
+Last activity: 2026-01-27 - Completed 04-02-PLAN.md (WorkoutLog Repository Port)
 
-Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE
+Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
-**Next:** Phase 4 - Coach Workout Logging (coach can track and log athlete workouts)
+**Next:** Phase 4 plans 04-03 through 04-10 remaining (Repository, Use Cases, Contracts, Procedures, Frontend)
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -408,10 +408,31 @@ None.
 - `packages/contracts/src/programs/program.ts` - Aggregate Zod schemas (programAggregateSchema, weekAggregateSchema, etc.)
 - `packages/contracts/src/programs/save-draft.ts` - Aggregate input schema for saveDraft
 
+## Phase 4 Progress
+
+**Coach Workout Logging IN PROGRESS:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 04-01 | WorkoutLog Aggregate Domain Entity | In Progress |
+| 04-02 | WorkoutLog Repository Port | Complete |
+| 04-03 | WorkoutLog Repository Implementation | Pending |
+| 04-04 | WorkoutLog Use Cases | Pending |
+| 04-05 | WorkoutLog Contracts | Pending |
+| 04-06 | WorkoutLog Procedures | Pending |
+| 04-07 | Logging Dashboard Page | Pending |
+| 04-08 | Workout Log Entry Form | Pending |
+| 04-09 | Athlete Workout History | Pending |
+| 04-10 | Integration and Polish | Pending |
+
+**Key artifacts created:**
+- `packages/core/src/ports/workout-log-repository.port.ts` - Repository interface with CRUD operations
+- `packages/core/src/domain/entities/workout-log/types.ts` - Domain types (LogStatus, LoggedSeries, LoggedExercise, WorkoutLog)
+
 ## Session Continuity
 
-Last session: 2026-01-26
-Stopped at: Completed 03.4-08-PLAN.md
+Last session: 2026-01-27
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
 
-**Next:** Phase 3.4 COMPLETE. Ready for Phase 4 or final UAT.
+**Next:** Continue with 04-01 (domain entity) or 04-03 (repository implementation).
