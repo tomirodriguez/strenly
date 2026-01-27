@@ -1,12 +1,4 @@
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  Link2Icon,
-  Link2OffIcon,
-  MoreVerticalIcon,
-  PlusIcon,
-  Trash2Icon,
-} from 'lucide-react'
+import { ArrowDownIcon, ArrowUpIcon, ArrowUpToLineIcon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   AlertDialog,
@@ -29,23 +21,13 @@ import {
 import { useDeleteExerciseRow, useReorderExerciseRows } from '@/features/programs/hooks/mutations/use-grid-mutations'
 import { useGridStore } from '@/stores/grid-store'
 
-/** Minimal row data needed for group calculations */
-export interface SessionRowData {
-  id: string
-  groupId: string | null
-}
-
 interface ExerciseRowActionsProps {
   programId: string
   sessionId: string
   rowId: string
   exerciseName: string
-  /** Current row's superset group (null if not in a superset) */
-  supersetGroup: string | null
   /** All row IDs in this session, in order */
   sessionRowIds: string[]
-  /** All rows in this session with group data for dynamic group calculation */
-  sessionRows: SessionRowData[]
   onClose?: () => void
 }
 
@@ -60,9 +42,7 @@ export function ExerciseRowActions({
   sessionId,
   rowId,
   exerciseName,
-  supersetGroup,
   sessionRowIds,
-  sessionRows,
   onClose,
 }: ExerciseRowActionsProps) {
   const [open, setOpen] = useState(false)
@@ -70,38 +50,26 @@ export function ExerciseRowActions({
 
   const deleteExerciseRow = useDeleteExerciseRow(programId)
   const reorderRows = useReorderExerciseRows(programId)
-  const updateSupersetGroup = useGridStore((state) => state.updateSupersetGroup)
+  const groupWithAbove = useGridStore((state) => state.groupWithAbove)
 
   // Calculate current position in session
   const currentIndex = sessionRowIds.indexOf(rowId)
   const canMoveUp = currentIndex > 0
   const canMoveDown = currentIndex < sessionRowIds.length - 1 && currentIndex >= 0
 
-  // Derive existing superset groups from session rows (excluding current row)
-  const { existingGroups, nextAvailableLetter } = useMemo(() => {
-    const groups = new Set<string>()
-    for (const row of sessionRows) {
-      if (row.groupId && row.id !== rowId) {
-        groups.add(row.groupId)
-      }
-    }
-    const sortedGroups = Array.from(groups).sort()
+  // Determine if there's a group above to merge with
+  // First exercise row in session cannot group with above
+  const canGroupWithAbove = useMemo(() => {
+    // Find all exercise rows for this session in grid data
+    const gridData = useGridStore.getState().data
+    if (!gridData) return false
 
-    // Calculate next available letter (A, B, C, ...)
-    // Include current row's group in used letters to avoid reusing it
-    const allGroups = new Set<string>()
-    for (const row of sessionRows) {
-      if (row.groupId) {
-        allGroups.add(row.groupId)
-      }
-    }
-    let nextLetter = 'A'
-    while (allGroups.has(nextLetter) && nextLetter <= 'Z') {
-      nextLetter = String.fromCharCode(nextLetter.charCodeAt(0) + 1)
-    }
+    const sessionExerciseRows = gridData.rows.filter((row) => row.type === 'exercise' && row.sessionId === sessionId)
+    const rowIndex = sessionExerciseRows.findIndex((row) => row.id === rowId)
 
-    return { existingGroups: sortedGroups, nextAvailableLetter: nextLetter }
-  }, [sessionRows, rowId])
+    // Can't group if first exercise or not found
+    return rowIndex > 0
+  }, [sessionId, rowId])
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -128,8 +96,8 @@ export function ExerciseRowActions({
     setOpen(false)
   }
 
-  const handleSetSupersetGroup = (group: string | null) => {
-    updateSupersetGroup(rowId, group)
+  const handleGroupWithAbove = () => {
+    groupWithAbove(rowId, sessionId)
     setOpen(false)
   }
 
@@ -166,43 +134,10 @@ export function ExerciseRowActions({
 
           {/* Superset options */}
           <DropdownMenuGroup>
-            {supersetGroup ? (
-              <>
-                <DropdownMenuItem onClick={() => handleSetSupersetGroup(null)}>
-                  <Link2OffIcon className="size-4" />
-                  Quitar de superserie
-                </DropdownMenuItem>
-                {/* Change to existing groups (excluding current) */}
-                {existingGroups
-                  .filter((g) => g !== supersetGroup)
-                  .map((group) => (
-                    <DropdownMenuItem key={group} onClick={() => handleSetSupersetGroup(group)}>
-                      <Link2Icon className="size-4" />
-                      Cambiar a superserie {group}
-                    </DropdownMenuItem>
-                  ))}
-                {/* Create new group option */}
-                <DropdownMenuItem onClick={() => handleSetSupersetGroup(nextAvailableLetter)}>
-                  <PlusIcon className="size-4" />
-                  Crear superserie {nextAvailableLetter}
-                </DropdownMenuItem>
-              </>
-            ) : (
-              <>
-                {/* Add to existing groups */}
-                {existingGroups.map((group) => (
-                  <DropdownMenuItem key={group} onClick={() => handleSetSupersetGroup(group)}>
-                    <Link2Icon className="size-4" />
-                    Agregar a superserie {group}
-                  </DropdownMenuItem>
-                ))}
-                {/* Create new group */}
-                <DropdownMenuItem onClick={() => handleSetSupersetGroup(nextAvailableLetter)}>
-                  <PlusIcon className="size-4" />
-                  Crear superserie {nextAvailableLetter}
-                </DropdownMenuItem>
-              </>
-            )}
+            <DropdownMenuItem onClick={handleGroupWithAbove} disabled={!canGroupWithAbove}>
+              <ArrowUpToLineIcon className="size-4" />
+              Agrupar arriba
+            </DropdownMenuItem>
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator />

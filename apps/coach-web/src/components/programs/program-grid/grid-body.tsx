@@ -1,4 +1,3 @@
-import type { SessionRowData } from '../exercise-row-actions'
 import { AddExerciseRow } from './add-exercise-row'
 import { ExerciseRow } from './exercise-row'
 import { SessionHeaderRow } from './session-header-row'
@@ -50,18 +49,12 @@ export function GridBody({
   // Group rows by session to get row IDs for each session
   // This is needed for reordering exercises within a session
   const sessionRowIds = new Map<string, string[]>()
-  // Also collect session rows with group data for dynamic group calculation
-  const sessionRowsData = new Map<string, SessionRowData[]>()
 
   for (const row of rows) {
     if (row.type === 'exercise') {
       const ids = sessionRowIds.get(row.sessionId) ?? []
       ids.push(row.id)
       sessionRowIds.set(row.sessionId, ids)
-
-      const rowsData = sessionRowsData.get(row.sessionId) ?? []
-      rowsData.push({ id: row.id, groupId: row.supersetGroup })
-      sessionRowsData.set(row.sessionId, rowsData)
     }
   }
 
@@ -80,7 +73,6 @@ export function GridBody({
                 columns={columns}
                 programId={programId}
                 sessionRowIds={sessionRowIds.get(row.sessionId) ?? []}
-                sessionRows={sessionRowsData.get(row.sessionId) ?? []}
                 activeCell={activeCell}
                 editingCell={editingCell}
                 onCellClick={onCellClick}

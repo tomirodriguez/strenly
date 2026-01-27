@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ExerciseRowActions, type SessionRowData } from '../exercise-row-actions'
+import { ExerciseRowActions } from '../exercise-row-actions'
 import { ExerciseRowPrefix } from './exercise-row-prefix'
 import type { GridRow } from './types'
 import {
@@ -19,7 +19,6 @@ interface ExerciseCellProps {
   colId: string
   programId: string
   sessionRowIds: string[]
-  sessionRows: SessionRowData[]
   isActive: boolean
   isEditing: boolean
   onSelect: () => void
@@ -44,7 +43,6 @@ export function ExerciseCell({
   colId,
   programId,
   sessionRowIds,
-  sessionRows,
   isActive,
   isEditing,
   onSelect,
@@ -163,9 +161,7 @@ export function ExerciseCell({
             sessionId={row.sessionId}
             rowId={row.id}
             exerciseName={row.exercise?.exerciseName ?? ''}
-            supersetGroup={row.supersetGroup}
             sessionRowIds={sessionRowIds}
-            sessionRows={sessionRows}
           />
         </div>
       </div>

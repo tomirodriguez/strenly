@@ -66,6 +66,9 @@ interface GridActions {
   // Update a row's superset group (merges items into same group)
   updateSupersetGroup: (itemId: string, groupId: string | null) => void
 
+  // Group exercise with the one above it (aggregate-level superset manipulation)
+  groupWithAbove: (itemId: string, sessionId: string) => void
+
   // Reset to server state (e.g., after refetch)
   reset: (aggregate: ProgramAggregate, exercisesMap: Map<string, string>) => void
 
@@ -545,6 +548,101 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Group exercise with the one above it (aggregate-level superset manipulation)
+  groupWithAbove: (itemId, sessionId) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const newAggregate = deepClone(state.aggregate)
+
+      // Find the item and its current group in first week (canonical structure)
+      const firstWeek = newAggregate.weeks[0]
+      if (!firstWeek) return state
+
+      const session = firstWeek.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      // Sort groups by orderIndex to find "above"
+      const sortedGroups = [...session.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+
+      // Find current item's group
+      let currentGroupIndex = -1
+      let currentItemIndex = -1
+      let currentGroupId = ''
+      for (let gi = 0; gi < sortedGroups.length; gi++) {
+        const group = sortedGroups[gi]
+        if (!group) continue
+        const itemIdx = group.items.findIndex((i) => i.id === itemId)
+        if (itemIdx >= 0) {
+          currentGroupIndex = gi
+          currentItemIndex = itemIdx
+          currentGroupId = group.id
+          break
+        }
+      }
+
+      if (currentGroupIndex === -1) return state
+
+      // Check if there's a group above
+      if (currentGroupIndex === 0) {
+        // No group above - can't merge
+        return state
+      }
+
+      const currentGroup = sortedGroups[currentGroupIndex]
+      const targetGroup = sortedGroups[currentGroupIndex - 1]
+      if (!currentGroup || !targetGroup) return state
+
+      const currentItem = currentGroup.items[currentItemIndex]
+      if (!currentItem) return state
+
+      const targetGroupId = targetGroup.id
+
+      // Now apply the same change to ALL weeks
+      for (const week of newAggregate.weeks) {
+        const weekSession = week.sessions.find((s) => s.id === sessionId)
+        if (!weekSession) continue
+
+        const weekCurrentGroup = weekSession.exerciseGroups.find((g) => g.id === currentGroupId)
+        const weekTargetGroup = weekSession.exerciseGroups.find((g) => g.id === targetGroupId)
+        if (!weekCurrentGroup || !weekTargetGroup) continue
+
+        // Find and move the item
+        const weekItemIndex = weekCurrentGroup.items.findIndex((i) => i.id === itemId)
+        if (weekItemIndex === -1) continue
+
+        const [movedItem] = weekCurrentGroup.items.splice(weekItemIndex, 1)
+        if (!movedItem) continue
+
+        // Add to target group at end, update orderIndex
+        movedItem.orderIndex = weekTargetGroup.items.length
+        weekTargetGroup.items.push(movedItem)
+
+        // If current group is now empty, remove it
+        if (weekCurrentGroup.items.length === 0) {
+          const groupIdx = weekSession.exerciseGroups.findIndex((g) => g.id === weekCurrentGroup.id)
+          if (groupIdx >= 0) {
+            weekSession.exerciseGroups.splice(groupIdx, 1)
+          }
+        }
+
+        // Recalculate orderIndex for all groups in session
+        const weekSortedGroups = [...weekSession.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+        weekSortedGroups.forEach((g, idx) => {
+          g.orderIndex = idx
+        })
+      }
+
+      // Regenerate grid data
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+
+      return {
+        aggregate: newAggregate,
+        data: gridData,
+        isDirty: true,
+      }
+    }),
+
   // Reset to server state
   reset: (aggregate, exercisesMap) => {
     const gridData = aggregateToGridData(aggregate, exercisesMap)
@@ -625,6 +723,7 @@ export const useGridActions = () =>
       addWeek: state.addWeek,
       addSession: state.addSession,
       updateSupersetGroup: state.updateSupersetGroup,
+      groupWithAbove: state.groupWithAbove,
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,

@@ -1,4 +1,3 @@
-import type { SessionRowData } from '../exercise-row-actions'
 import { ExerciseCell } from './exercise-cell'
 import { PrescriptionCell } from './prescription-cell'
 import type { GridCell, GridColumn, GridRow } from './types'
@@ -8,8 +7,6 @@ interface ExerciseRowProps {
   columns: GridColumn[]
   programId: string
   sessionRowIds: string[]
-  /** All rows in this session with group data for dynamic group calculation */
-  sessionRows: SessionRowData[]
   activeCell: GridCell | null
   editingCell: GridCell | null
   onCellClick: (rowId: string, colId: string) => void
@@ -34,7 +31,6 @@ export function ExerciseRow({
   columns,
   programId,
   sessionRowIds,
-  sessionRows,
   activeCell,
   editingCell,
   onCellClick,
@@ -61,7 +57,6 @@ export function ExerciseRow({
               colId={col.id}
               programId={programId}
               sessionRowIds={sessionRowIds}
-              sessionRows={sessionRows}
               isActive={isActiveCell}
               isEditing={isEditingCell}
               onSelect={() => onCellClick(row.id, col.id)}
