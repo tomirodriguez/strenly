@@ -183,6 +183,8 @@ Recent decisions affecting current work:
 - Generate BETTER_AUTH_SECRET
 - Set DATABASE_URL for database operations
 - Consider removing old program-grid.tsx (react-datasheet-grid version)
+- **[Phase 3.4 end]** Improve error propagation in procedures - currently `repository_error` throws generic "Internal error" which swallows actual error messages. Errors should propagate to frontend for debugging (at minimum in dev mode). Affects all procedures with repository errors.
+- **[Phase 3.4 end]** Fetch exercises on-demand - Currently `useExercisesMap` fetches all exercises on program load. Should only fetch when user wants to add an exercise (lazy load in exercise combobox). See TODO in `apps/coach-web/src/features/programs/hooks/queries/use-exercises-map.ts`.
 
 ### Roadmap Evolution
 
