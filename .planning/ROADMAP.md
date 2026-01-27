@@ -2,7 +2,7 @@
 
 ## Overview
 
-Strenly delivers a training planning platform where coaches can create programs as fast as in Excel, while athletes get a mobile-first experience for viewing workouts and logging execution. The roadmap builds from foundation (auth, multi-tenancy) through data management (exercises, athletes) to the core differentiator (Excel-like grid), then enables athlete participation (PWA), and finally surfaces insights (dashboard analytics).
+Strenly delivers a training planning platform where coaches can create programs as fast as in Excel, while athletes get a mobile-first experience for viewing workouts and logging execution. The roadmap builds from foundation (auth, multi-tenancy) through data management (exercises, athletes) to the core differentiator (Excel-like grid), then enables workout tracking (coach-side logging), surfaces insights (dashboard analytics), and finally delivers the athlete mobile experience (PWA).
 
 ## Phases
 
@@ -18,9 +18,10 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 3.1: Custom Program Grid** - Native HTML table replacing react-datasheet-grid (frontend)
 - [x] **Phase 3.2: Prescription Data Structure Refactor** - Series arrays, exercise groups, client-side editing (full-stack)
 - [x] **Phase 3.3: Program Builder QA & Bug Fixes** - Fix UI bugs, improve form UX (INSERTED)
-- [ ] **Phase 3.4: Domain Restructure - Training Programs** - Correct domain model, eliminate legacy, full-stack alignment (INSERTED)
-- [ ] **Phase 4: Athlete PWA** - Mobile app for viewing programs and logging workouts (full-stack)
-- [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, data export (full-stack)
+- [x] **Phase 3.4: Domain Restructure - Training Programs** - Correct domain model, eliminate legacy, full-stack alignment (INSERTED)
+- [ ] **Phase 4: Coach Workout Logging** - Coach can track and log athlete workouts in coach-web (full-stack)
+- [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, Plan vs Log comparison, data export (full-stack)
+- [ ] **Phase 6: Athlete PWA** - Mobile app for athletes to view programs and log their own workouts (full-stack)
 
 ## Phase Details
 
@@ -308,16 +309,17 @@ Plans:
 - [x] 03.4-07-PLAN.md - Integration and UAT verification (Wave 5)
 - [ ] 03.4-08-PLAN.md - [GAP CLOSURE] Fix prescription unit, superset UX, Base UI warning (Wave 6)
 
-### Phase 4: Athlete PWA
-**Goal**: Athletes can view assigned programs and log workout execution on mobile
+### Phase 4: Coach Workout Logging
+**Goal**: Coaches can track and log athlete workout execution directly from the coach web app
 **Depends on**: Phase 3.4
-**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10, ATH-08
+**Requirements**: ATH-08, LOG-01, LOG-02, LOG-03, LOG-04, LOG-05, LOG-06, LOG-07
 **Success Criteria** (what must be TRUE):
-  1. Athlete can view assigned program and see next/upcoming workout on mobile device
-  2. Athlete can log workout execution with pre-filled planned values (one-tap if matching plan)
-  3. Athlete can modify logged values when actual differs from plan and add comments
-  4. System maintains clear separation between plan (what coach prescribed) and log (what athlete did)
-  5. Athlete can view past workout logs, use rest timer between sets, and view exercise demo videos
+  1. Coach can view an athlete's assigned program with current week's workouts
+  2. Coach can log workout execution on behalf of an athlete (sets, reps, weight performed)
+  3. System maintains clear separation between plan (what coach prescribed) and log (what athlete did)
+  4. Coach can modify logged values and add comments per exercise or session
+  5. Coach can view past workout logs for any athlete
+  6. Workout log is pre-filled with planned prescription for quick logging
 **Plans**: TBD
 
 Plans:
@@ -328,23 +330,45 @@ Plans:
 ### Phase 5: Dashboard & Analytics
 **Goal**: Coaches can view centralized dashboard with athlete compliance, pending items, and plan vs log comparison
 **Depends on**: Phase 4
-**Requirements**: DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, EXP-01, EXP-02, ADM-01, ADM-02, ADM-03
+**Requirements**: DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, EXP-01, EXP-02
 **Success Criteria** (what must be TRUE):
   1. Coach can view dashboard showing athletes needing updated programs, recent activity, and pending items
   2. Coach can navigate from dashboard directly to athlete profiles and programs
   3. Coach can view Plan vs Log comparison showing what was prescribed vs what athlete actually did
   4. Coach can export program data as CSV or JSON
-  5. Platform admin can view platform-wide metrics and manage subscription plans
+  5. Dashboard shows workout compliance metrics per athlete
 **Plans**: TBD
 
 Plans:
 - [ ] 05-01: TBD
 - [ ] 05-02: TBD
 
+### Phase 6: Athlete PWA
+**Goal**: Athletes can view their assigned programs and log their own workout execution on mobile
+**Depends on**: Phase 4 (workout logging infrastructure), Phase 5 (optional, for seeing their own analytics)
+**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05, PWA-06, PWA-07, PWA-08, PWA-09, PWA-10
+**Success Criteria** (what must be TRUE):
+  1. Athlete can view assigned program and see next/upcoming workout on mobile device
+  2. Athlete can log workout execution with pre-filled planned values (one-tap if matching plan)
+  3. Athlete can modify logged values when actual differs from plan and add comments
+  4. Athlete can view past workout logs and use rest timer between sets
+  5. Athlete can view exercise demo videos (links)
+**Plans**: TBD
+
+**Context:**
+- Workout logging infrastructure built in Phase 4 (coach-side)
+- Athlete PWA reuses the same logging domain/API with different UI
+- Simplified scope: mobile-first read + log experience
+
+Plans:
+- [ ] 06-01: TBD
+- [ ] 06-02: TBD
+- [ ] 06-03: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 3.4 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 -> 3.4 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -352,14 +376,15 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 2. Exercise Library & Athlete Management (backend) | 11/11 | Complete | 2026-01-24 |
 | 2.5. Coach Web Foundation (frontend) | 11/11 | Complete | 2026-01-25 |
 | 2.6. Design System & Visual Refresh (frontend) | 4/4 | Complete | 2026-01-25 |
-| 3. Program Builder (full-stack) | 15/16 | In progress | - |
+| 3. Program Builder (full-stack) | 16/16 | Complete | 2026-01-25 |
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
-| 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Partial | 2026-01-26 |
+| 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Complete | 2026-01-26 |
 | 3.4. Domain Restructure (full-stack) | 8/8 | Complete | 2026-01-27 |
-| 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
+| 4. Coach Workout Logging (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
+| 6. Athlete PWA (full-stack) | 0/3 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-27 (Phase 3.4 complete)*
+*Last updated: 2026-01-27 (Roadmap restructured: Phase 4 Coach Workout Logging, Phase 5 Dashboard, Phase 6 Athlete PWA)*

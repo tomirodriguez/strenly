@@ -5,18 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Coaches can create and edit training programs as fast as they can in Excel
-**Current focus:** Phase 4 - Athlete PWA (ready to start)
+**Current focus:** Phase 4 - Coach Workout Logging (ready to start)
 
 ## Current Position
 
-Phase: 3.4 of 5 (Domain Restructure - Training Programs) COMPLETE
+Phase: 3.4 of 6 (Domain Restructure - Training Programs) COMPLETE
 Plan: 8/8 (03.4-01 through 03.4-08 complete)
 Status: VERIFIED ✓
-Last activity: 2026-01-27 - Phase 3.4 verified and approved
+Last activity: 2026-01-27 - Roadmap restructured
 
-Progress: [████████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2, 3.3, 3.4 COMPLETE
+Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE
 
-**Next:** Phase 4 - Athlete PWA (mobile app for viewing programs and logging workouts)
+**Next:** Phase 4 - Coach Workout Logging (coach can track and log athlete workouts)
+
+**Roadmap Change (2026-01-27):**
+- NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
+- Phase 5: Dashboard & Analytics (can now show Plan vs Log with coach-entered data)
+- Phase 6: Athlete PWA (moved to last, simplified - reuses logging infrastructure)
 
 ## Performance Metrics
 

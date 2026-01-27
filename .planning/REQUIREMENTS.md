@@ -90,6 +90,16 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TPL-03**: Templates can have metadata (name, description, days/week)
 - [x] **TPL-04**: Templates are private to organization
 
+### Workout Logging (Coach-Side)
+
+- [ ] **LOG-01**: Coach can view athlete's current program with upcoming workouts
+- [ ] **LOG-02**: Coach can log workout execution on behalf of athlete (sets, reps, weight)
+- [ ] **LOG-03**: Workout log is pre-filled with planned prescription values
+- [ ] **LOG-04**: Coach can modify logged values when actual differs from plan
+- [ ] **LOG-05**: Coach can add comments per exercise or session
+- [ ] **LOG-06**: System maintains clear separation between plan and log
+- [ ] **LOG-07**: Coach can view past workout logs for any athlete
+
 ### Dashboard & Compliance
 
 - [ ] **DSH-01**: Coach can view dashboard with centralized information
@@ -242,21 +252,18 @@ Phase mappings for all v1 requirements.
 | TPL-03 | Templates can have metadata | Complete |
 | TPL-04 | Templates are private to organization | Complete |
 
-### Phase 4: Athlete PWA
+### Phase 4: Coach Workout Logging
 
 | Requirement | Description | Status |
 |-------------|-------------|--------|
-| PWA-01 | Athlete can view assigned program | Pending |
-| PWA-02 | Athlete can view next/upcoming workout | Pending |
-| PWA-03 | Athlete can log workout execution | Pending |
-| PWA-04 | Workout log pre-filled with plan | Pending |
-| PWA-05 | Athlete can modify logged values | Pending |
-| PWA-06 | Athlete can add comments | Pending |
-| PWA-07 | System maintains plan vs log separation | Pending |
-| PWA-08 | Athlete can view past workout logs | Pending |
-| PWA-09 | Athlete can use rest timer | Pending |
-| PWA-10 | Athlete can view exercise demo videos | Pending |
 | ATH-08 | Coach can log workouts on behalf of athletes | Pending |
+| LOG-01 | Coach can view athlete's current program with upcoming workouts | Pending |
+| LOG-02 | Coach can log workout execution on behalf of athlete | Pending |
+| LOG-03 | Workout log is pre-filled with planned prescription | Pending |
+| LOG-04 | Coach can modify logged values when actual differs from plan | Pending |
+| LOG-05 | Coach can add comments per exercise or session | Pending |
+| LOG-06 | System maintains clear separation between plan and log | Pending |
+| LOG-07 | Coach can view past workout logs for any athlete | Pending |
 
 ### Phase 5: Dashboard & Analytics
 
@@ -270,9 +277,29 @@ Phase mappings for all v1 requirements.
 | DSH-06 | Coach can view Plan vs Log comparison | Pending |
 | EXP-01 | Coach can export program data as CSV | Pending |
 | EXP-02 | Coach can export program data as JSON | Pending |
-| ADM-01 | Platform admin can view metrics | Pending |
-| ADM-02 | Platform admin can create/edit plans | Pending |
-| ADM-03 | Platform admin can modify plan pricing | Pending |
+
+### Phase 6: Athlete PWA
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| PWA-01 | Athlete can view assigned program | Pending |
+| PWA-02 | Athlete can view next/upcoming workout | Pending |
+| PWA-03 | Athlete can log workout execution | Pending |
+| PWA-04 | Workout log pre-filled with plan | Pending |
+| PWA-05 | Athlete can modify logged values | Pending |
+| PWA-06 | Athlete can add comments | Pending |
+| PWA-07 | System maintains plan vs log separation | Pending |
+| PWA-08 | Athlete can view past workout logs | Pending |
+| PWA-09 | Athlete can use rest timer | Pending |
+| PWA-10 | Athlete can view exercise demo videos | Pending |
+
+### Future: Platform Admin
+
+| Requirement | Description | Status |
+|-------------|-------------|--------|
+| ADM-01 | Platform admin can view metrics | Deferred |
+| ADM-02 | Platform admin can create/edit plans | Deferred |
+| ADM-03 | Platform admin can modify plan pricing | Deferred |
 
 ### Coverage Summary
 
@@ -281,15 +308,17 @@ Phase mappings for all v1 requirements.
 | Phase 1 | AUTH-01 to AUTH-05, ORG-01 to ORG-07, SUB-01 to SUB-05 | 17 |
 | Phase 2 | ATH-01 to ATH-07, EXR-01 to EXR-06 | 13 |
 | Phase 3 | PRG-01 to PRG-13, RX-01 to RX-11, TPL-01 to TPL-04 | 28 |
-| Phase 4 | PWA-01 to PWA-10, ATH-08 | 11 |
-| Phase 5 | DSH-01 to DSH-06, EXP-01 to EXP-02, ADM-01 to ADM-03 | 11 |
-| **Total** | | **80** |
+| Phase 4 | ATH-08, LOG-01 to LOG-07 | 8 |
+| Phase 5 | DSH-01 to DSH-06, EXP-01 to EXP-02 | 8 |
+| Phase 6 | PWA-01 to PWA-10 | 10 |
+| Future | ADM-01 to ADM-03 | 3 |
+| **Total** | | **87** |
 
 **Coverage:**
-- v1 requirements: 80 total
-- Mapped to phases: 80
-- Unmapped: 0
+- v1 requirements: 87 total (80 original + 7 new LOG requirements)
+- Mapped to phases: 84
+- Deferred (Future): 3
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-27 after Phase 3.4 completion*
+*Last updated: 2026-01-27 (Roadmap restructured: Phase 4 Coach Workout Logging, Phase 5 Dashboard, Phase 6 Athlete PWA)*
