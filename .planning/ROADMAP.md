@@ -320,12 +320,27 @@ Plans:
   4. Coach can modify logged values and add comments per exercise or session
   5. Coach can view past workout logs for any athlete
   6. Workout log is pre-filled with planned prescription for quick logging
-**Plans**: TBD
+**Plans**: 10 plans in 6 waves
+
+**Context:**
+- Extends the Program aggregate with a new WorkoutLog aggregate (Plan vs Log separation)
+- Logs reference program sessions but store independent data
+- Client-side editing + single save endpoint (same pattern as program builder)
+- Pre-fill from prescription, snapshot prescribed values for deviation display
+- Reference: `.planning/phases/04-coach-workout-logging/04-CONTEXT.md` (user decisions)
+- Reference: `.planning/phases/04-coach-workout-logging/04-RESEARCH.md` (architecture patterns)
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md - Database schema + WorkoutLog domain entity (TDD) (Wave 1)
+- [ ] 04-02-PLAN.md - WorkoutLogRepository port (Wave 1)
+- [ ] 04-03-PLAN.md - WorkoutLogRepository implementation (Wave 2)
+- [ ] 04-04-PLAN.md - Use cases: createLog, saveLog, getLog (Wave 2)
+- [ ] 04-05-PLAN.md - Use cases: listAthleteLogs, listPendingWorkouts, deleteLog (Wave 2)
+- [ ] 04-06-PLAN.md - Contracts + procedures for workout logs (Wave 3)
+- [ ] 04-07-PLAN.md - Frontend: log store + API hooks (Wave 4)
+- [ ] 04-08-PLAN.md - Frontend: logging dashboard view (Wave 5)
+- [ ] 04-09-PLAN.md - Frontend: session logging view (Wave 5)
+- [ ] 04-10-PLAN.md - Frontend: log history + UAT verification (Wave 6)
 
 ### Phase 5: Dashboard & Analytics
 **Goal**: Coaches can view centralized dashboard with athlete compliance, pending items, and plan vs log comparison
@@ -381,10 +396,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
 | 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Complete | 2026-01-26 |
 | 3.4. Domain Restructure (full-stack) | 8/8 | Complete | 2026-01-27 |
-| 4. Coach Workout Logging (full-stack) | 0/3 | Not started | - |
+| 4. Coach Workout Logging (full-stack) | 0/10 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 | 6. Athlete PWA (full-stack) | 0/3 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-27 (Roadmap restructured: Phase 4 Coach Workout Logging, Phase 5 Dashboard, Phase 6 Athlete PWA)*
+*Last updated: 2026-01-27 (Phase 4 plans created: 10 plans in 6 waves)*
