@@ -1,5 +1,6 @@
 import type { DbClient } from '../client'
 import { plans } from '../schema/plans'
+import { subscriptions } from '../schema/subscriptions'
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL) {
@@ -114,6 +115,9 @@ const defaultPlans = [
 
 export async function seedPlans(db: DbClient): Promise<void> {
   console.log('Seeding subscription plans...')
+
+  // Delete subscriptions first (FK constraint: subscriptions reference plans)
+  await db.delete(subscriptions)
 
   // Delete existing plans (for clean re-seed)
   await db.delete(plans)
