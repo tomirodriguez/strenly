@@ -1,8 +1,15 @@
-import type { PendingWorkout } from '@strenly/contracts/workout-logs/list-logs'
 import { Link, useParams } from '@tanstack/react-router'
-import { Play } from 'lucide-react'
+import type { PendingWorkout } from '@strenly/contracts/workout-logs/list-logs'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Play } from 'lucide-react'
 
 interface PendingWorkoutsTableProps {
   items: PendingWorkout[]
@@ -24,7 +31,7 @@ export function PendingWorkoutsTable({ items }: PendingWorkoutsTableProps) {
       acc[item.athleteId].workouts.push(item)
       return acc
     },
-    {} as Record<string, { athleteId: string; athleteName: string; workouts: PendingWorkout[] }>,
+    {} as Record<string, { athleteId: string; athleteName: string; workouts: PendingWorkout[] }>
   )
 
   const athletes = Object.values(groupedByAthlete)
@@ -34,9 +41,11 @@ export function PendingWorkoutsTable({ items }: PendingWorkoutsTableProps) {
       {athletes.map((athlete) => (
         <div key={athlete.athleteId}>
           {/* Athlete header */}
-          <div className="mb-2 flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-2">
             <h3 className="font-semibold">{athlete.athleteName}</h3>
-            <span className="text-muted-foreground text-sm">({athlete.workouts.length} pendientes)</span>
+            <span className="text-sm text-muted-foreground">
+              ({athlete.workouts.length} pendientes)
+            </span>
           </div>
 
           {/* Workouts table */}
@@ -73,7 +82,7 @@ export function PendingWorkoutsTable({ items }: PendingWorkoutsTableProps) {
                         />
                       }
                     >
-                      <Play className="mr-1 h-4 w-4" />
+                      <Play className="h-4 w-4 mr-1" />
                       Registrar
                     </Button>
                   </TableCell>
