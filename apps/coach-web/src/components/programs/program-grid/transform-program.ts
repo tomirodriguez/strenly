@@ -1,4 +1,4 @@
-import { formatSeriesToNotation } from '@strenly/contracts/programs/prescription'
+import { formatSeriesToNotation, mapIntensityTypeToUnit } from '@strenly/contracts/programs/prescription'
 import type { ProgramAggregate } from '@strenly/contracts/programs/program'
 import type { GridColumn, GridData, GridRow, SupersetPosition } from './types'
 
@@ -123,7 +123,7 @@ export function transformProgramToGrid(program: ProgramAggregate, exercisesMap: 
               isAmrap: s.isAmrap,
               intensityType: s.intensityType,
               intensityValue: s.intensityValue,
-              intensityUnit: null, // Aggregate doesn't store unit separately
+              intensityUnit: mapIntensityTypeToUnit(s.intensityType), // Derive from type
               tempo: s.tempo,
             }))
             prescriptions[week.id] = formatSeriesToNotation(seriesInput)

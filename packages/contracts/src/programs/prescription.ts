@@ -19,6 +19,26 @@ export const intensityUnitSchema = z.enum(['kg', 'lb', '%', 'rpe', 'rir'])
 export type IntensityUnit = z.infer<typeof intensityUnitSchema>
 
 /**
+ * Derive intensity unit from intensity type.
+ * Used when aggregate data only has type but not unit.
+ */
+export function mapIntensityTypeToUnit(type: IntensityType | null | undefined): IntensityUnit | null {
+  if (!type) return null
+  switch (type) {
+    case 'absolute':
+      return 'kg' // Default to kg for absolute weights
+    case 'percentage':
+      return '%'
+    case 'rpe':
+      return 'rpe'
+    case 'rir':
+      return 'rir'
+    default:
+      return null
+  }
+}
+
+/**
  * Units for unilateral exercises
  */
 export const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'])
