@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 3/10 (04-01, 04-02, 04-03 complete)
+Plan: 5/10 (04-01 through 04-05 complete)
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-03-PLAN.md (WorkoutLog Repository Implementation)
+Last activity: 2026-01-27 - Completed 04-05-PLAN.md (Remaining Workout Log Use Cases)
 
 Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
-**Next:** Phase 4 plans 04-03 through 04-10 remaining (Repository, Use Cases, Contracts, Procedures, Frontend)
+**Next:** Phase 4 plans 04-06 through 04-10 remaining (Contracts, Procedures, Frontend)
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -417,12 +417,12 @@ None.
 | 04-01 | WorkoutLog Aggregate Domain Entity | Complete |
 | 04-02 | WorkoutLog Repository Port | Complete |
 | 04-03 | WorkoutLog Repository Implementation | Complete |
-| 04-04 | WorkoutLog Use Cases | Pending |
-| 04-05 | WorkoutLog Contracts | Pending |
-| 04-06 | WorkoutLog Procedures | Pending |
-| 04-07 | Logging Dashboard Page | Pending |
-| 04-08 | Workout Log Entry Form | Pending |
-| 04-09 | Athlete Workout History | Pending |
+| 04-04 | WorkoutLog Use Cases (create, get, save) | Complete |
+| 04-05 | WorkoutLog Use Cases (list, delete) + Permissions | Complete |
+| 04-06 | WorkoutLog Contracts | Pending |
+| 04-07 | WorkoutLog Procedures | Pending |
+| 04-08 | Logging Dashboard Page | Pending |
+| 04-09 | Workout Log Entry Form | Pending |
 | 04-10 | Integration and Polish | Pending |
 
 **Key artifacts created:**
@@ -432,12 +432,19 @@ None.
 - `packages/core/src/domain/entities/workout-log/workout-log.ts` - Aggregate factory functions
 - `packages/core/src/domain/entities/workout-log/workout-log.test.ts` - 30 TDD tests (100% coverage)
 - `packages/core/src/ports/workout-log-repository.port.ts` - Repository interface with CRUD operations
+- `packages/core/src/services/authorization.ts` - Added workout_log:create/read/update/delete permissions
 - `packages/backend/src/infrastructure/repositories/workout-log.repository.ts` - Full repository implementation (523 lines)
+- `packages/backend/src/use-cases/workout-logs/create-log.ts` - Create log with prescription pre-fill
+- `packages/backend/src/use-cases/workout-logs/get-log.ts` - Get log by ID
+- `packages/backend/src/use-cases/workout-logs/save-log.ts` - Save log updates
+- `packages/backend/src/use-cases/workout-logs/list-athlete-logs.ts` - Paginated athlete history
+- `packages/backend/src/use-cases/workout-logs/list-pending-workouts.ts` - Dashboard pending sessions
+- `packages/backend/src/use-cases/workout-logs/delete-log.ts` - Delete with existence check
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-03-PLAN.md
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-04 (WorkoutLog Use Cases).
+**Next:** Continue with 04-06 (WorkoutLog Contracts).
