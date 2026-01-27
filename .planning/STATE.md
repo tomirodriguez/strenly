@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 6/10 (04-01 through 04-06 complete)
+Plan: 7/10 (04-01 through 04-07 complete)
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-06-PLAN.md (Contracts and Procedures)
+Last activity: 2026-01-27 - Completed 04-07-PLAN.md (State Management and API Hooks)
 
 Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
-**Next:** Phase 4 plans 04-07 through 04-10 remaining (Frontend)
+**Next:** Phase 4 plans 04-08 through 04-10 remaining (Frontend UI)
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -26,9 +26,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 60
+- Total plans completed: 61
 - Average duration: ~4 min
-- Total execution time: ~239 min
+- Total execution time: ~242 min
 
 **By Phase:**
 
@@ -420,8 +420,8 @@ None.
 | 04-04 | WorkoutLog Use Cases (create, get, save) | Complete |
 | 04-05 | WorkoutLog Use Cases (list, delete) + Permissions | Complete |
 | 04-06 | Contracts and Procedures | Complete |
-| 04-07 | Logging Dashboard Page | Pending |
-| 04-08 | Logging Dashboard Page | Pending |
+| 04-07 | State Management and API Hooks | Complete |
+| 04-08 | Log Editor Page | Pending |
 | 04-09 | Workout Log Entry Form | Pending |
 | 04-10 | Integration and Polish | Pending |
 
@@ -446,11 +446,18 @@ None.
 - `packages/contracts/src/workout-logs/list-logs.ts` - List/get/delete schemas + pendingWorkoutSchema
 - `packages/contracts/src/workout-logs/index.ts` - Package exports
 - `packages/backend/src/procedures/workout-logs/router.ts` - All workout log procedures (create, save, get, listByAthlete, listPending, delete)
+- `apps/coach-web/src/stores/log-store.ts` - Zustand store for workout log editing (316 lines)
+- `apps/coach-web/src/features/workout-logs/hooks/queries/use-workout-log.ts` - Fetch single log by ID
+- `apps/coach-web/src/features/workout-logs/hooks/queries/use-athlete-logs.ts` - Paginated athlete history
+- `apps/coach-web/src/features/workout-logs/hooks/queries/use-pending-workouts.ts` - Sessions without logs
+- `apps/coach-web/src/features/workout-logs/hooks/mutations/use-create-log.ts` - Create pre-filled log
+- `apps/coach-web/src/features/workout-logs/hooks/mutations/use-save-log.ts` - Save with cache invalidation
+- `apps/coach-web/src/features/workout-logs/hooks/mutations/use-delete-log.ts` - Delete with cache invalidation
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-06-PLAN.md
+Stopped at: Completed 04-07-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-07 (Logging Dashboard Page).
+**Next:** Continue with 04-08 (Log Editor Page).
