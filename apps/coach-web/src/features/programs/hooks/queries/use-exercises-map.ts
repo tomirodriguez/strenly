@@ -11,7 +11,7 @@ import { orpc } from '@/lib/api-client'
 export function useExercisesMap() {
   const { data: exercises, ...rest } = useQuery({
     ...orpc.exercises.list.queryOptions({
-      input: { limit: 1000 }, // Fetch all exercises (usually < 500)
+      input: { limit: 100 }, // API max is 100; sufficient for most programs
     }),
     staleTime: 5 * 60 * 1000, // 5 minutes - exercises don't change often
   })
