@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 3.4 of 5 (Domain Restructure - Training Programs)
-Plan: 7/? (03.4-01, 03.4-02, 03.4-03, 03.4-04, 03.4-05, 03.4-06 complete)
-Status: IN PROGRESS
-Last activity: 2026-01-26 - Completed 03.4-06-PLAN.md (Frontend Aggregate Integration)
+Plan: 8/8 (03.4-01 through 03.4-08 complete)
+Status: COMPLETE
+Last activity: 2026-01-26 - Completed 03.4-08-PLAN.md (Gap Closure)
 
 Progress: [██████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3.1, 3.2 COMPLETE, 3.3 PARTIAL, 3.4 IN PROGRESS
 
@@ -21,9 +21,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 58
+- Total plans completed: 59
 - Average duration: ~4 min
-- Total execution time: ~227 min
+- Total execution time: ~235 min
 
 **By Phase:**
 
@@ -36,8 +36,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.4-03 (3 min), 03.4-04 (6 min), 03.4-05 (7 min), 03.4-02 (3 min), 03.4-06 (5 min)
-- Trend: Phase 3.4 IN PROGRESS - Frontend now uses aggregate pattern for programs
+- Last 5 plans: 03.4-04 (6 min), 03.4-05 (7 min), 03.4-02 (3 min), 03.4-06 (5 min), 03.4-08 (8 min)
+- Trend: Phase 3.4 COMPLETE - Program builder ready for production
 
 *Updated after each plan completion*
 
@@ -176,6 +176,10 @@ Recent decisions affecting current work:
 - **Prescription lookup by (exerciseId, weekId)** - prescriptionsByKey map enables efficient series attachment during reconstitution
 - **saveDraft receives full aggregate** - Frontend sends complete program state, not delta changes; simpler validation via domain factory
 - **Procedures return programAggregateSchema** - Full hierarchy (weeks > sessions > groups > items > series) for frontend rendering
+- **mapIntensityTypeToUnit derives unit from type** - absolute->kg, percentage->%, rpe->rpe, rir->rir
+- **Simplified superset UX to 'Agrupar arriba' button** - Single action merges exercise into group above
+- **groupWithAbove operates on aggregate** - Manipulates aggregate across all weeks, persists on save
+- **nativeButton={false} on DropdownMenuTrigger** - Prevents warning when trigger wraps non-native button elements
 
 ### Pending Todos
 
@@ -374,7 +378,7 @@ None.
 
 ## Phase 3.4 Progress
 
-**Domain Restructure - Training Programs IN PROGRESS:**
+**Domain Restructure - Training Programs COMPLETE:**
 
 | Plan | Name | Status |
 |------|------|--------|
@@ -382,6 +386,9 @@ None.
 | 03.4-03 | Aggregate Repository Methods | Complete |
 | 03.4-04 | Use Cases for Aggregate Pattern | Complete |
 | 03.4-05 | API Contracts and Procedures | Complete |
+| 03.4-06 | Frontend Aggregate Integration | Complete |
+| 03.4-07 | Program Editor Aggregate | Complete |
+| 03.4-08 | Gap Closure | Complete |
 
 **Key artifacts:**
 - `packages/core/src/domain/entities/program/` - Program aggregate folder (types, series, group-item, exercise-group, session, week, program)
@@ -398,7 +405,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 03.4-05-PLAN.md
+Stopped at: Completed 03.4-08-PLAN.md
 Resume file: None
 
-**Next:** Continue Phase 3.4 (Domain Restructure) - 03.4-06 Frontend Updates for Aggregate Format
+**Next:** Phase 3.4 COMPLETE. Ready for Phase 4 or final UAT.
