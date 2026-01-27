@@ -24,6 +24,11 @@ export type Permission =
   // Exercises
   | 'exercises:read'
   | 'exercises:write'
+  // Workout Logs
+  | 'workout_log:create'
+  | 'workout_log:read'
+  | 'workout_log:update'
+  | 'workout_log:delete'
 
 const ROLE_HIERARCHY: Record<Role, number> = {
   owner: 100,
@@ -56,6 +61,11 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     // Exercises
     'exercises:read',
     'exercises:write',
+    // Workout Logs
+    'workout_log:create',
+    'workout_log:read',
+    'workout_log:update',
+    'workout_log:delete',
   ],
   admin: [
     // Organization (no delete)
@@ -78,6 +88,11 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     // Exercises
     'exercises:read',
     'exercises:write',
+    // Workout Logs
+    'workout_log:create',
+    'workout_log:read',
+    'workout_log:update',
+    'workout_log:delete',
   ],
   member: [
     // Organization (read only)
@@ -93,6 +108,11 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     // Exercises
     'exercises:read',
     'exercises:write',
+    // Workout Logs (members/coaches can log workouts)
+    'workout_log:create',
+    'workout_log:read',
+    'workout_log:update',
+    'workout_log:delete',
   ],
 }
 
