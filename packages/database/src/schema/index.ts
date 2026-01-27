@@ -26,3 +26,6 @@ export * from './program-weeks'
 export * from './programs'
 // Organization subscriptions
 export * from './subscriptions'
+// Workout logging
+export * from './logged-exercises'
+export * from './workout-logs'
