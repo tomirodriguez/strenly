@@ -608,6 +608,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
 /**
  * Selector hooks for common patterns
  */
+export const useGridProgramId = () => useGridStore((state) => state.programId)
 export const useGridData = () => useGridStore((state) => state.data)
 export const useGridIsDirty = () => useGridStore((state) => state.isDirty)
 export const useGridActions = () =>

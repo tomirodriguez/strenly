@@ -10,7 +10,7 @@ import { useSaveDraft } from '@/features/programs/hooks/mutations/use-save-draft
 import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises-map'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
-import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
+import { useGridActions, useGridData, useGridIsDirty, useGridProgramId } from '@/stores/grid-store'
 import '@/styles/program-grid.css'
 
 export const Route = createFileRoute('/_authenticated/$orgSlug/programs/$programId')({
@@ -34,19 +34,18 @@ function ProgramEditorPage() {
   const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
 
   // Zustand store - select only what you need
+  const storeProgramId = useGridProgramId()
   const gridData = useGridData()
   const isDirty = useGridIsDirty()
   const actions = useGridActions()
 
   // Initialize store when program and exercises load
-  // Note: The program from useProgram is already typed as ProgramAggregate via oRPC output schema
+  // Only initialize if not already initialized with the same programId
   useEffect(() => {
-    if (program && exercisesMap.size > 0 && programId) {
-      // TypeScript may not infer the exact ProgramAggregate type from oRPC,
-      // but the runtime data structure matches the aggregate format
+    if (program && exercisesMap.size > 0 && programId && storeProgramId !== programId) {
       actions.initialize(programId, program, exercisesMap)
     }
-  }, [program, exercisesMap, programId, actions])
+  }, [program, exercisesMap, programId, storeProgramId, actions.initialize])
 
   // Navigation guard - warn before leaving with unsaved changes
   useUnsavedChanges(isDirty)
