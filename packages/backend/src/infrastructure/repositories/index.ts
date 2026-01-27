@@ -17,3 +17,4 @@ export {
 export { createPlanRepository } from './plan.repository'
 export { createProgramRepository } from './program.repository'
 export { createSubscriptionRepository } from './subscription.repository'
+export { createWorkoutLogRepository } from './workout-log.repository'
