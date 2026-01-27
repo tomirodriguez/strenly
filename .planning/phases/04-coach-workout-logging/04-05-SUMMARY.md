@@ -66,8 +66,8 @@ completed: 2026-01-27
 
 Each task was committed atomically (note: Task 3 executed first due to blocking dependency):
 
-1. **Task 3: Add workout_log Permissions** - `d6ed257` (feat)
-2. **Task 1: Create listAthleteLogs Use Case** - `14ad273` (feat)
+1. **Task 3: Add workout_log Permissions** - `3fc837e` (feat)
+2. **Task 1: Create listAthleteLogs Use Case** - `32bc9fd` (feat)
 3. **Task 2: Create listPendingWorkouts and deleteLog** - `d85f129` (feat)
 
 ## Files Created/Modified
@@ -90,7 +90,7 @@ Each task was committed atomically (note: Task 3 executed first due to blocking 
 - **Issue:** `workout_log:read` permission not in Permission type, TypeScript compilation failed
 - **Fix:** Executed Task 3 first to add permissions, then Tasks 1 and 2
 - **Impact:** No functional impact, commits reordered
-- **Committed in:** d6ed257 (Task 3)
+- **Committed in:** 3fc837e (Task 3)
 
 ---
 
