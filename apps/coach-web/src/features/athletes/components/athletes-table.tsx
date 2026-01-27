@@ -1,7 +1,8 @@
 import type { Athlete } from '@strenly/contracts/athletes/athlete'
 import type { ColumnDef } from '@tanstack/react-table'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
-import { Edit, Mail, Trash } from 'lucide-react'
+import { Edit, History, Mail, Trash } from 'lucide-react'
 import { InvitationStatus } from './invitation-status'
 import { DataTable } from '@/components/data-table/data-table'
 import { DataTableRowActions, type RowAction } from '@/components/data-table/data-table-row-actions'
@@ -34,6 +35,17 @@ export function AthletesTable({
   onArchive,
   onInvitation,
 }: AthletesTableProps) {
+  const params = useParams({ strict: false })
+  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const navigate = useNavigate()
+
+  const handleViewHistory = (athlete: Athlete) => {
+    navigate({
+      to: '/$orgSlug/athletes/$athleteId/logs',
+      params: { orgSlug, athleteId: athlete.id },
+    })
+  }
+
   const columns: ColumnDef<Athlete>[] = [
     {
       accessorKey: 'name',
@@ -85,6 +97,11 @@ export function AthletesTable({
             label: 'Invitacion',
             icon: Mail,
             onClick: onInvitation,
+          },
+          {
+            label: 'Ver Historial',
+            icon: History,
+            onClick: handleViewHistory,
           },
           {
             label: 'Archivar',
