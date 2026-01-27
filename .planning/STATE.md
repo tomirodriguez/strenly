@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 7/10 (04-01 through 04-07 complete)
+Plan: 8/10 (04-01 through 04-08 complete)
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-07-PLAN.md (State Management and API Hooks)
+Last activity: 2026-01-27 - Completed 04-08-PLAN.md (Logging Dashboard)
 
-Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
+Progress: [█████████████████████████████████░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
-**Next:** Phase 4 plans 04-08 through 04-10 remaining (Frontend UI)
+**Next:** Phase 4 plans 04-09, 04-10 remaining (Session Logging View, Integration)
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -26,9 +26,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 61
+- Total plans completed: 62
 - Average duration: ~4 min
-- Total execution time: ~242 min
+- Total execution time: ~249 min
 
 **By Phase:**
 
@@ -41,8 +41,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.4-04 (6 min), 03.4-05 (7 min), 03.4-02 (3 min), 03.4-06 (5 min), 03.4-08 (8 min)
-- Trend: Phase 3.4 COMPLETE - Program builder ready for production
+- Last 5 plans: 03.4-05 (7 min), 03.4-06 (5 min), 03.4-08 (8 min), 04-07 (5 min), 04-08 (7 min)
+- Trend: Phase 4 progressing - workout logging dashboard complete
 
 *Updated after each plan completion*
 
@@ -421,9 +421,9 @@ None.
 | 04-05 | WorkoutLog Use Cases (list, delete) + Permissions | Complete |
 | 04-06 | Contracts and Procedures | Complete |
 | 04-07 | State Management and API Hooks | Complete |
-| 04-08 | Log Editor Page | Pending |
-| 04-09 | Workout Log Entry Form | Pending |
-| 04-10 | Integration and Polish | Pending |
+| 04-08 | Logging Dashboard | Complete |
+| 04-09 | Session Logging View | Pending |
+| 04-10 | Log History and Integration | Pending |
 
 **Key artifacts created:**
 - `packages/database/src/schema/workout-logs.ts` - workout_logs table with log_status enum
@@ -453,11 +453,14 @@ None.
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-create-log.ts` - Create pre-filled log
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-save-log.ts` - Save with cache invalidation
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-delete-log.ts` - Delete with cache invalidation
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/logging/index.tsx` - Logging dashboard route
+- `apps/coach-web/src/features/workout-logs/views/logging-dashboard-view.tsx` - Dashboard with pending workouts
+- `apps/coach-web/src/features/workout-logs/components/pending-workouts-table.tsx` - Athlete-grouped pending sessions table
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-07-PLAN.md
+Stopped at: Completed 04-08-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-08 (Log Editor Page).
+**Next:** Continue with 04-09 (Session Logging View).
