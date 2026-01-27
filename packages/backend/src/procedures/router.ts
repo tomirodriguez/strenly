@@ -3,6 +3,7 @@ import { exercises } from './exercises'
 import { health } from './health/health'
 import { programs } from './programs'
 import { subscriptions } from './subscriptions'
+import { workoutLogs } from './workout-logs/router'
 
 /**
  * Main oRPC router
@@ -20,6 +21,7 @@ export const router = {
   health,
   programs,
   subscriptions,
+  workoutLogs,
 }
 
 export type Router = typeof router
