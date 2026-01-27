@@ -55,40 +55,40 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Program Creation (Excel-Like Experience)
 
-- [ ] **PRG-01**: Coach can create training programs
-- [ ] **PRG-02**: Coach can assign programs to athletes
-- [ ] **PRG-03**: Coach can edit programs using inline editing (click to edit, no modals)
-- [ ] **PRG-04**: Coach can navigate grid with keyboard (arrow keys, tab, enter)
-- [ ] **PRG-05**: Coach can see full cycle view (4-6 weeks at once)
-- [ ] **PRG-06**: Coach can view 3+ prescription params per exercise (sets, reps, weight, intensity, rest)
-- [ ] **PRG-07**: Coach can type natural notation that parses to structure (`3x8@120kg`, `3x8@RIR2`, `4x6-8@75%`)
-- [ ] **PRG-08**: Coach can duplicate entire programs
-- [ ] **PRG-09**: Coach can duplicate weeks within programs
-- [ ] **PRG-10**: Coach can add sessions (training days) to programs
-- [ ] **PRG-11**: Coach can add exercises to sessions
-- [ ] **PRG-12**: Programs remain editable at any time (living documents)
-- [ ] **PRG-13**: Changes to programs are visible to athletes quickly
+- [x] **PRG-01**: Coach can create training programs
+- [x] **PRG-02**: Coach can assign programs to athletes
+- [x] **PRG-03**: Coach can edit programs using inline editing (click to edit, no modals)
+- [x] **PRG-04**: Coach can navigate grid with keyboard (arrow keys, tab, enter)
+- [x] **PRG-05**: Coach can see full cycle view (4-6 weeks at once)
+- [x] **PRG-06**: Coach can view 3+ prescription params per exercise (sets, reps, weight, intensity, rest)
+- [x] **PRG-07**: Coach can type natural notation that parses to structure (`3x8@120kg`, `3x8@RIR2`, `4x6-8@75%`)
+- [x] **PRG-08**: Coach can duplicate entire programs
+- [x] **PRG-09**: Coach can duplicate weeks within programs
+- [x] **PRG-10**: Coach can add sessions (training days) to programs
+- [x] **PRG-11**: Coach can add exercises to sessions
+- [x] **PRG-12**: Programs remain editable at any time (living documents)
+- [x] **PRG-13**: Changes to programs are visible to athletes quickly
 
 ### Prescription System
 
-- [ ] **RX-01**: Coach can specify sets (number)
-- [ ] **RX-02**: Coach can specify reps (fixed number or range: 8-12)
-- [ ] **RX-03**: Coach can specify AMRAP sets
-- [ ] **RX-04**: Coach can specify intensity via RIR (Reps in Reserve)
-- [ ] **RX-05**: Coach can specify intensity via RPE
-- [ ] **RX-06**: Coach can specify intensity via %1RM or %TM
-- [ ] **RX-07**: Coach can specify absolute weight (kg)
-- [ ] **RX-08**: Coach can specify rest periods (seconds)
-- [ ] **RX-09**: Coach can specify tempo (optional, 4-digit ECCC notation)
-- [ ] **RX-10**: Coach can group exercises as supersets (A1/A2 notation)
-- [ ] **RX-11**: Coach can add notes/cues per exercise
+- [x] **RX-01**: Coach can specify sets (number)
+- [x] **RX-02**: Coach can specify reps (fixed number or range: 8-12)
+- [x] **RX-03**: Coach can specify AMRAP sets
+- [x] **RX-04**: Coach can specify intensity via RIR (Reps in Reserve)
+- [x] **RX-05**: Coach can specify intensity via RPE
+- [x] **RX-06**: Coach can specify intensity via %1RM or %TM
+- [x] **RX-07**: Coach can specify absolute weight (kg)
+- [x] **RX-08**: Coach can specify rest periods (seconds)
+- [x] **RX-09**: Coach can specify tempo (optional, 4-digit ECCC notation)
+- [x] **RX-10**: Coach can group exercises as supersets (A1/A2 notation)
+- [x] **RX-11**: Coach can add notes/cues per exercise
 
 ### Templates
 
-- [ ] **TPL-01**: Coach can save programs as templates
-- [ ] **TPL-02**: Coach can create new programs from templates
-- [ ] **TPL-03**: Templates can have metadata (name, description, days/week)
-- [ ] **TPL-04**: Templates are private to organization
+- [x] **TPL-01**: Coach can save programs as templates
+- [x] **TPL-02**: Coach can create new programs from templates
+- [x] **TPL-03**: Templates can have metadata (name, description, days/week)
+- [x] **TPL-04**: Templates are private to organization
 
 ### Dashboard & Compliance
 
@@ -213,34 +213,34 @@ Phase mappings for all v1 requirements.
 
 | Requirement | Description | Status |
 |-------------|-------------|--------|
-| PRG-01 | Coach can create training programs | Pending |
-| PRG-02 | Coach can assign programs to athletes | Pending |
-| PRG-03 | Coach can edit programs using inline editing | Pending |
-| PRG-04 | Coach can navigate grid with keyboard | Pending |
-| PRG-05 | Coach can see full cycle view | Pending |
-| PRG-06 | Coach can view 3+ prescription params | Pending |
-| PRG-07 | Coach can type natural notation | Pending |
-| PRG-08 | Coach can duplicate entire programs | Pending |
-| PRG-09 | Coach can duplicate weeks | Pending |
-| PRG-10 | Coach can add sessions to programs | Pending |
-| PRG-11 | Coach can add exercises to sessions | Pending |
-| PRG-12 | Programs remain editable at any time | Pending |
-| PRG-13 | Changes visible to athletes quickly | Pending |
-| RX-01 | Coach can specify sets | Pending |
-| RX-02 | Coach can specify reps (fixed or range) | Pending |
-| RX-03 | Coach can specify AMRAP sets | Pending |
-| RX-04 | Coach can specify intensity via RIR | Pending |
-| RX-05 | Coach can specify intensity via RPE | Pending |
-| RX-06 | Coach can specify intensity via %1RM or %TM | Pending |
-| RX-07 | Coach can specify absolute weight | Pending |
-| RX-08 | Coach can specify rest periods | Pending |
-| RX-09 | Coach can specify tempo | Pending |
-| RX-10 | Coach can group exercises as supersets | Pending |
-| RX-11 | Coach can add notes/cues per exercise | Pending |
-| TPL-01 | Coach can save programs as templates | Pending |
-| TPL-02 | Coach can create programs from templates | Pending |
-| TPL-03 | Templates can have metadata | Pending |
-| TPL-04 | Templates are private to organization | Pending |
+| PRG-01 | Coach can create training programs | Complete |
+| PRG-02 | Coach can assign programs to athletes | Complete |
+| PRG-03 | Coach can edit programs using inline editing | Complete |
+| PRG-04 | Coach can navigate grid with keyboard | Complete |
+| PRG-05 | Coach can see full cycle view | Complete |
+| PRG-06 | Coach can view 3+ prescription params | Complete |
+| PRG-07 | Coach can type natural notation | Complete |
+| PRG-08 | Coach can duplicate entire programs | Complete |
+| PRG-09 | Coach can duplicate weeks | Complete |
+| PRG-10 | Coach can add sessions to programs | Complete |
+| PRG-11 | Coach can add exercises to sessions | Complete |
+| PRG-12 | Programs remain editable at any time | Complete |
+| PRG-13 | Changes visible to athletes quickly | Complete |
+| RX-01 | Coach can specify sets | Complete |
+| RX-02 | Coach can specify reps (fixed or range) | Complete |
+| RX-03 | Coach can specify AMRAP sets | Complete |
+| RX-04 | Coach can specify intensity via RIR | Complete |
+| RX-05 | Coach can specify intensity via RPE | Complete |
+| RX-06 | Coach can specify intensity via %1RM or %TM | Complete |
+| RX-07 | Coach can specify absolute weight | Complete |
+| RX-08 | Coach can specify rest periods | Complete |
+| RX-09 | Coach can specify tempo | Complete |
+| RX-10 | Coach can group exercises as supersets | Complete |
+| RX-11 | Coach can add notes/cues per exercise | Complete |
+| TPL-01 | Coach can save programs as templates | Complete |
+| TPL-02 | Coach can create programs from templates | Complete |
+| TPL-03 | Templates can have metadata | Complete |
+| TPL-04 | Templates are private to organization | Complete |
 
 ### Phase 4: Athlete PWA
 
@@ -292,4 +292,4 @@ Phase mappings for all v1 requirements.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-24 after Phase 1 completion*
+*Last updated: 2026-01-27 after Phase 3.4 completion*
