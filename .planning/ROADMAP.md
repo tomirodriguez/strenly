@@ -265,7 +265,7 @@ Plans:
   6. All legacy entities/files removed: old Prescription entity, unused types, deprecated code
   7. Frontend grid uses new domain model with full replace-on-save strategy
   8. 90%+ test coverage on Program aggregate and all domain entities
-**Plans**: 7 plans in 5 waves
+**Plans**: 8 plans in 6 waves
 
 **Context:**
 - Phase 3.2/3.3 made changes that aren't reflected in core domain
@@ -299,13 +299,14 @@ Program (Aggregate Root)
 ```
 
 Plans:
-- [ ] 03.4-01-PLAN.md - Program aggregate domain entity (TDD) (Wave 1)
-- [ ] 03.4-02-PLAN.md - Delete legacy domain code, update port imports (Wave 2)
-- [ ] 03.4-03-PLAN.md - Repository: saveProgramAggregate + loadProgramAggregate (Wave 2)
-- [ ] 03.4-04-PLAN.md - Use case updates for aggregate pattern (Wave 3)
-- [ ] 03.4-05-PLAN.md - Contracts and procedures for aggregate API (Wave 3)
-- [ ] 03.4-06-PLAN.md - Frontend store and hooks for aggregate (Wave 4)
-- [ ] 03.4-07-PLAN.md - Integration and UAT verification (Wave 5)
+- [x] 03.4-01-PLAN.md - Program aggregate domain entity (TDD) (Wave 1)
+- [x] 03.4-02-PLAN.md - Delete legacy domain code, update port imports (Wave 2)
+- [x] 03.4-03-PLAN.md - Repository: saveProgramAggregate + loadProgramAggregate (Wave 2)
+- [x] 03.4-04-PLAN.md - Use case updates for aggregate pattern (Wave 3)
+- [x] 03.4-05-PLAN.md - Contracts and procedures for aggregate API (Wave 3)
+- [x] 03.4-06-PLAN.md - Frontend store and hooks for aggregate (Wave 4)
+- [x] 03.4-07-PLAN.md - Integration and UAT verification (Wave 5)
+- [ ] 03.4-08-PLAN.md - [GAP CLOSURE] Fix prescription unit, superset UX, Base UI warning (Wave 6)
 
 ### Phase 4: Athlete PWA
 **Goal**: Athletes can view assigned programs and log workout execution on mobile
@@ -355,10 +356,10 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3.1. Custom Program Grid (frontend) | 17/17 | Complete | 2026-01-25 |
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
 | 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Partial | 2026-01-26 |
-| 3.4. Domain Restructure (full-stack) | 0/7 | Not started | - |
+| 3.4. Domain Restructure (full-stack) | 7/8 | In progress | - |
 | 4. Athlete PWA (full-stack) | 0/3 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-26 (Phase 3.4 planned with 7 plans in 5 waves)*
+*Last updated: 2026-01-26 (Phase 3.4 gap closure plan added)*
