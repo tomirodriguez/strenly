@@ -25,6 +25,7 @@
     "db:seed:plans": "tsx scripts/seed-plans.ts"
   },
   "dependencies": {
+    "better-auth": "^1.4.17",
     "drizzle-orm": "^0.44.7",
     "postgres": "^3.4.8"
   },

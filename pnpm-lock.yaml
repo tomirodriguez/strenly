@@ -323,6 +323,9 @@ importers:
 
   packages/database:
     dependencies:
+      better-auth:
+        specifier: ^1.4.17
+        version: 1.4.17(@prisma/client@5.22.0)(better-sqlite3@12.6.2)(drizzle-kit@0.31.8)(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20260123.0)(@neondatabase/serverless@0.10.4)(@prisma/client@5.22.0)(@types/pg@8.16.0)(better-sqlite3@12.6.2)(kysely@0.28.10)(pg@8.17.2)(postgres@3.4.8))(pg@8.17.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vitest@3.2.4(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)(msw@2.12.7(@types/node@25.0.10)(typescript@5.9.3))(terser@5.46.0)(tsx@4.21.0))
       drizzle-orm:
         specifier: ^0.44.7
         version: 0.44.7(@cloudflare/workers-types@4.20260123.0)(@neondatabase/serverless@0.10.4)(@prisma/client@5.22.0)(@types/pg@8.16.0)(better-sqlite3@12.6.2)(kysely@0.28.10)(pg@8.17.2)(postgres@3.4.8)
