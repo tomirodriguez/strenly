@@ -25,12 +25,10 @@ export function SessionLoggingView({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Registrar Entrenamiento</h1>
-        <p className="text-muted-foreground">
-          Esta vista se implementara en el Plan 04-09
-        </p>
+        <h1 className="font-bold text-2xl tracking-tight">Registrar Entrenamiento</h1>
+        <p className="text-muted-foreground">Esta vista se implementara en el Plan 04-09</p>
       </div>
-      <div className="text-sm text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         <p>Organizacion: {orgSlug}</p>
         <p>Atleta: {athleteId}</p>
         <p>Sesion: {sessionId}</p>
