@@ -22,7 +22,12 @@
     "./programs/week": "./src/programs/week.ts",
     "./programs/session": "./src/programs/session.ts",
     "./programs/exercise-row": "./src/programs/exercise-row.ts",
-    "./programs/save-draft": "./src/programs/save-draft.ts"
+    "./programs/save-draft": "./src/programs/save-draft.ts",
+    "./workout-logs": "./src/workout-logs/index.ts",
+    "./workout-logs/workout-log": "./src/workout-logs/workout-log.ts",
+    "./workout-logs/create-log": "./src/workout-logs/create-log.ts",
+    "./workout-logs/save-log": "./src/workout-logs/save-log.ts",
+    "./workout-logs/list-logs": "./src/workout-logs/list-logs.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
