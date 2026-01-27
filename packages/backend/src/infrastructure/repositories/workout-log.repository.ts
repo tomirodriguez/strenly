@@ -27,7 +27,7 @@ import {
   programWeeks,
   workoutLogs,
 } from '@strenly/database/schema'
-import { and, count, desc, eq, isNotNull, isNull, sql, gte, lte } from 'drizzle-orm'
+import { and, count, desc, eq, sql, gte, lte } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
 // ============================================================================
