@@ -1,4 +1,5 @@
 import type { DbClient } from '../client'
+import { seedAthletesAndPrograms } from './athletes-programs'
 import { seedExercises } from './exercises'
 import { seedMuscleGroups } from './muscle-groups'
 import { seedPlans } from './seed-plans'
@@ -18,9 +19,14 @@ export async function seed(db: DbClient): Promise<void> {
   await seedMuscleGroups(db)
   await seedExercises(db)
 
+  // Seed athletes and programs for workout logging testing
+  // Note: Requires organization 'org-seed-test-001' to exist
+  await seedAthletesAndPrograms(db)
+
   console.log('\nDatabase seed complete!')
 }
 
 // Re-export individual seed functions for granular use
+export { SEED_ORGANIZATION_ID, seedAthletesAndPrograms } from './athletes-programs'
 export { seedExercises } from './exercises'
 export { seedMuscleGroups } from './muscle-groups'
