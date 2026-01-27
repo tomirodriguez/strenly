@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 5/10 (04-01 through 04-05 complete)
+Plan: 6/10 (04-01 through 04-06 complete)
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-05-PLAN.md (Remaining Workout Log Use Cases)
+Last activity: 2026-01-27 - Completed 04-06-PLAN.md (Contracts and Procedures)
 
 Progress: [██████████████████████████████░░░░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
 
-**Next:** Phase 4 plans 04-06 through 04-10 remaining (Contracts, Procedures, Frontend)
+**Next:** Phase 4 plans 04-07 through 04-10 remaining (Frontend)
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -26,9 +26,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 59
+- Total plans completed: 60
 - Average duration: ~4 min
-- Total execution time: ~235 min
+- Total execution time: ~239 min
 
 **By Phase:**
 
@@ -419,8 +419,8 @@ None.
 | 04-03 | WorkoutLog Repository Implementation | Complete |
 | 04-04 | WorkoutLog Use Cases (create, get, save) | Complete |
 | 04-05 | WorkoutLog Use Cases (list, delete) + Permissions | Complete |
-| 04-06 | WorkoutLog Contracts | Pending |
-| 04-07 | WorkoutLog Procedures | Pending |
+| 04-06 | Contracts and Procedures | Complete |
+| 04-07 | Logging Dashboard Page | Pending |
 | 04-08 | Logging Dashboard Page | Pending |
 | 04-09 | Workout Log Entry Form | Pending |
 | 04-10 | Integration and Polish | Pending |
@@ -440,11 +440,17 @@ None.
 - `packages/backend/src/use-cases/workout-logs/list-athlete-logs.ts` - Paginated athlete history
 - `packages/backend/src/use-cases/workout-logs/list-pending-workouts.ts` - Dashboard pending sessions
 - `packages/backend/src/use-cases/workout-logs/delete-log.ts` - Delete with existence check
+- `packages/contracts/src/workout-logs/workout-log.ts` - Core log schemas (loggedSeriesSchema, loggedExerciseSchema, workoutLogAggregateSchema)
+- `packages/contracts/src/workout-logs/create-log.ts` - Create log input/output schemas
+- `packages/contracts/src/workout-logs/save-log.ts` - Save log input/output schemas
+- `packages/contracts/src/workout-logs/list-logs.ts` - List/get/delete schemas + pendingWorkoutSchema
+- `packages/contracts/src/workout-logs/index.ts` - Package exports
+- `packages/backend/src/procedures/workout-logs/router.ts` - All workout log procedures (create, save, get, listByAthlete, listPending, delete)
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-05-PLAN.md
+Stopped at: Completed 04-06-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-06 (WorkoutLog Contracts).
+**Next:** Continue with 04-07 (Logging Dashboard Page).
