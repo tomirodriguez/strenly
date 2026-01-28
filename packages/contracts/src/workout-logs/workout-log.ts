@@ -33,6 +33,13 @@ export const loggedSeriesSchema = z.object({
   // Snapshot of prescription for deviation display
   prescribedReps: z.number().int().min(0).nullable(),
   prescribedWeight: z.number().min(0).nullable(),
+  // Extended prescription snapshot for display
+  prescribedRepsMax: z.number().int().min(0).nullable(),
+  prescribedIsAmrap: z.boolean(),
+  prescribedIntensityType: z.enum(['absolute', 'percentage', 'rpe', 'rir']).nullable(),
+  prescribedIntensityValue: z.number().nullable(),
+  prescribedTempo: z.string().nullable(),
+  prescribedRestSeconds: z.number().int().min(0).nullable(),
 })
 
 export type LoggedSeries = z.infer<typeof loggedSeriesSchema>
@@ -48,6 +55,13 @@ export const loggedSeriesInputSchema = z.object({
   skipped: z.boolean().optional(),
   prescribedReps: z.number().int().min(0).nullable().optional(),
   prescribedWeight: z.number().min(0).nullable().optional(),
+  // Extended prescription snapshot
+  prescribedRepsMax: z.number().int().min(0).nullable().optional(),
+  prescribedIsAmrap: z.boolean().optional(),
+  prescribedIntensityType: z.enum(['absolute', 'percentage', 'rpe', 'rir']).nullable().optional(),
+  prescribedIntensityValue: z.number().nullable().optional(),
+  prescribedTempo: z.string().nullable().optional(),
+  prescribedRestSeconds: z.number().int().min(0).nullable().optional(),
 })
 
 export type LoggedSeriesInput = z.infer<typeof loggedSeriesInputSchema>
@@ -67,6 +81,9 @@ export const loggedExerciseSchema = z.object({
   notes: z.string().nullable(),
   skipped: z.boolean(),
   series: z.array(loggedSeriesSchema),
+  // Group display info
+  groupLabel: z.string().nullable(),
+  groupOrder: z.number().int().min(0),
 })
 
 export type LoggedExercise = z.infer<typeof loggedExerciseSchema>
@@ -82,6 +99,9 @@ export const loggedExerciseInputSchema = z.object({
   notes: z.string().nullable().optional(),
   skipped: z.boolean().optional(),
   series: z.array(loggedSeriesInputSchema).optional(),
+  // Group display info
+  groupLabel: z.string().nullable().optional(),
+  groupOrder: z.number().int().min(0).optional(),
 })
 
 export type LoggedExerciseInput = z.infer<typeof loggedExerciseInputSchema>

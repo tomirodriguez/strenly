@@ -54,6 +54,8 @@ function mapLogToOutput(log: {
     orderIndex: number
     notes: string | null
     skipped: boolean
+    groupLabel: string | null
+    groupOrder: number
     series: ReadonlyArray<{
       orderIndex: number
       repsPerformed: number | null
@@ -62,6 +64,12 @@ function mapLogToOutput(log: {
       skipped: boolean
       prescribedReps: number | null
       prescribedWeight: number | null
+      prescribedRepsMax: number | null
+      prescribedIsAmrap: boolean
+      prescribedIntensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+      prescribedIntensityValue: number | null
+      prescribedTempo: string | null
+      prescribedRestSeconds: number | null
     }>
   }>
   createdAt: Date
@@ -85,6 +93,8 @@ function mapLogToOutput(log: {
       orderIndex: ex.orderIndex,
       notes: ex.notes,
       skipped: ex.skipped,
+      groupLabel: ex.groupLabel,
+      groupOrder: ex.groupOrder,
       series: ex.series.map((s) => ({
         orderIndex: s.orderIndex,
         repsPerformed: s.repsPerformed,
@@ -93,6 +103,12 @@ function mapLogToOutput(log: {
         skipped: s.skipped,
         prescribedReps: s.prescribedReps,
         prescribedWeight: s.prescribedWeight,
+        prescribedRepsMax: s.prescribedRepsMax,
+        prescribedIsAmrap: s.prescribedIsAmrap,
+        prescribedIntensityType: s.prescribedIntensityType,
+        prescribedIntensityValue: s.prescribedIntensityValue,
+        prescribedTempo: s.prescribedTempo,
+        prescribedRestSeconds: s.prescribedRestSeconds,
       })),
     })),
     createdAt: log.createdAt.toISOString(),

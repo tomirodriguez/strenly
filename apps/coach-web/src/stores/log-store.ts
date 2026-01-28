@@ -246,6 +246,13 @@ export const useLogStore = create<LogStore>((set, get) => ({
         skipped: s.skipped,
         prescribedReps: s.prescribedReps,
         prescribedWeight: s.prescribedWeight,
+        // Extended prescription snapshot
+        prescribedRepsMax: s.prescribedRepsMax,
+        prescribedIsAmrap: s.prescribedIsAmrap,
+        prescribedIntensityType: s.prescribedIntensityType,
+        prescribedIntensityValue: s.prescribedIntensityValue,
+        prescribedTempo: s.prescribedTempo,
+        prescribedRestSeconds: s.prescribedRestSeconds,
       }))
 
       return {
@@ -256,6 +263,9 @@ export const useLogStore = create<LogStore>((set, get) => ({
         notes: ex.notes,
         skipped: ex.skipped,
         series,
+        // Group display info
+        groupLabel: ex.groupLabel,
+        groupOrder: ex.groupOrder,
       }
     })
 

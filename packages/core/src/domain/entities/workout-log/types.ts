@@ -26,6 +26,13 @@ export type LoggedSeries = {
   // Snapshot of prescription for deviation display
   readonly prescribedReps: number | null
   readonly prescribedWeight: number | null
+  // Extended prescription snapshot for display
+  readonly prescribedRepsMax: number | null // For rep ranges like 8-10
+  readonly prescribedIsAmrap: boolean
+  readonly prescribedIntensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  readonly prescribedIntensityValue: number | null
+  readonly prescribedTempo: string | null // "3010"
+  readonly prescribedRestSeconds: number | null // 90
 }
 
 export type LoggedExercise = {
@@ -36,6 +43,9 @@ export type LoggedExercise = {
   readonly notes: string | null
   readonly skipped: boolean
   readonly series: ReadonlyArray<LoggedSeries>
+  // Group display info
+  readonly groupLabel: string | null // "A", "B", "C"...
+  readonly groupOrder: number // 1, 2, 3... (position within group)
 }
 
 export type WorkoutLog = {
@@ -62,6 +72,13 @@ export type LoggedSeriesInput = {
   skipped?: boolean
   prescribedReps?: number | null
   prescribedWeight?: number | null
+  // Extended prescription snapshot
+  prescribedRepsMax?: number | null
+  prescribedIsAmrap?: boolean
+  prescribedIntensityType?: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  prescribedIntensityValue?: number | null
+  prescribedTempo?: string | null
+  prescribedRestSeconds?: number | null
 }
 
 export type LoggedExerciseInput = {
@@ -72,6 +89,9 @@ export type LoggedExerciseInput = {
   notes?: string | null
   skipped?: boolean
   series?: LoggedSeriesInput[]
+  // Group display info
+  groupLabel?: string | null
+  groupOrder?: number
 }
 
 export type CreateWorkoutLogInput = {

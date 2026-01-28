@@ -67,5 +67,8 @@ export function validateLoggedExercise(input: LoggedExerciseInput, exerciseIndex
     notes: input.notes ?? null,
     skipped: exerciseSkipped,
     series: validatedSeries,
+    // Group display info
+    groupLabel: input.groupLabel ?? null,
+    groupOrder: input.groupOrder ?? 0,
   })
 }

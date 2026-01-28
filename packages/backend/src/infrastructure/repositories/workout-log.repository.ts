@@ -77,6 +77,13 @@ function mapDbSeriesToDomain(dbSeries: LoggedSeriesData[]): LoggedSeries[] {
     skipped: s.skipped,
     prescribedReps: s.prescribedReps,
     prescribedWeight: s.prescribedWeight,
+    // Extended prescription snapshot
+    prescribedRepsMax: s.prescribedRepsMax ?? null,
+    prescribedIsAmrap: s.prescribedIsAmrap ?? false,
+    prescribedIntensityType: s.prescribedIntensityType ?? null,
+    prescribedIntensityValue: s.prescribedIntensityValue ?? null,
+    prescribedTempo: s.prescribedTempo ?? null,
+    prescribedRestSeconds: s.prescribedRestSeconds ?? null,
   }))
 }
 
@@ -92,6 +99,13 @@ function mapSeriesToDb(series: ReadonlyArray<LoggedSeries>): LoggedSeriesData[] 
     skipped: s.skipped,
     prescribedReps: s.prescribedReps,
     prescribedWeight: s.prescribedWeight,
+    // Extended prescription snapshot
+    prescribedRepsMax: s.prescribedRepsMax,
+    prescribedIsAmrap: s.prescribedIsAmrap,
+    prescribedIntensityType: s.prescribedIntensityType,
+    prescribedIntensityValue: s.prescribedIntensityValue,
+    prescribedTempo: s.prescribedTempo,
+    prescribedRestSeconds: s.prescribedRestSeconds,
   }))
 }
 
@@ -107,6 +121,9 @@ function mapExerciseRowToDomain(row: LoggedExerciseRow): LoggedExercise {
     notes: row.notes,
     skipped: row.skipped,
     series: mapDbSeriesToDomain(row.series),
+    // Group display info
+    groupLabel: row.groupLabel,
+    groupOrder: row.groupOrder,
   }
 }
 
@@ -216,6 +233,9 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
                 notes: exercise.notes,
                 skipped: exercise.skipped,
                 series: mapSeriesToDb(exercise.series),
+                // Group display info
+                groupLabel: exercise.groupLabel,
+                groupOrder: exercise.groupOrder,
                 createdAt: now,
                 updatedAt: now,
               })

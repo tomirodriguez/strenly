@@ -46,5 +46,12 @@ export function validateLoggedSeries(
     skipped,
     prescribedReps: input.prescribedReps ?? null,
     prescribedWeight: input.prescribedWeight ?? null,
+    // Extended prescription snapshot
+    prescribedRepsMax: input.prescribedRepsMax ?? null,
+    prescribedIsAmrap: input.prescribedIsAmrap ?? false,
+    prescribedIntensityType: input.prescribedIntensityType ?? null,
+    prescribedIntensityValue: input.prescribedIntensityValue ?? null,
+    prescribedTempo: input.prescribedTempo ?? null,
+    prescribedRestSeconds: input.prescribedRestSeconds ?? null,
   })
 }

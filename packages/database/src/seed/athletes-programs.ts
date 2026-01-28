@@ -718,6 +718,13 @@ function createLoggedSeries(
     skipped: set.skipped ?? false,
     prescribedReps: set.prescribedReps ?? null,
     prescribedWeight: set.prescribedWeight ?? null,
+    // Extended prescription snapshot - defaults for seed data
+    prescribedRepsMax: null,
+    prescribedIsAmrap: false,
+    prescribedIntensityType: 'absolute',
+    prescribedIntensityValue: set.prescribedWeight ?? null,
+    prescribedTempo: null,
+    prescribedRestSeconds: null,
   }))
 }
 

@@ -16,6 +16,13 @@ export interface LoggedSeriesData {
   // Snapshot of prescription for deviation display
   prescribedReps: number | null
   prescribedWeight: number | null
+  // Extended prescription snapshot for display
+  prescribedRepsMax: number | null
+  prescribedIsAmrap: boolean
+  prescribedIntensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  prescribedIntensityValue: number | null
+  prescribedTempo: string | null
+  prescribedRestSeconds: number | null
 }
 
 /**
@@ -37,6 +44,9 @@ export const loggedExercises = pgTable(
     notes: text('notes'), // Nullable
     skipped: boolean('skipped').default(false).notNull(),
     series: jsonb('series').$type<LoggedSeriesData[]>().notNull(),
+    // Group display info
+    groupLabel: text('group_label'), // "A", "B", "C"...
+    groupOrder: integer('group_order').default(0).notNull(), // Position within group (1, 2, 3...)
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()
