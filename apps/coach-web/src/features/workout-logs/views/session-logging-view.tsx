@@ -15,7 +15,7 @@
 import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { LoggedExerciseCard } from '../components/logged-exercise-card'
 import { SessionSummaryCard } from '../components/session-summary-card'
 import { Button } from '@/components/ui/button'
@@ -85,10 +85,18 @@ export function SessionLoggingView({
     })
   })
 
+  // Track if we've initialized to prevent infinite loops
+  const hasInitialized = useRef(false)
+  const hasTriggeredCreate = useRef(false)
+
   // Initialize store with log data
   useEffect(() => {
+    // Skip if already initialized
+    if (hasInitialized.current) return
+
     // Case 1: Direct navigation with logId - use the fetched log
     if (logId && existingLogById) {
+      hasInitialized.current = true
       actions.initialize(existingLogById)
       return
     }
@@ -97,12 +105,14 @@ export function SessionLoggingView({
     if (!logId && existingLogBySessionSuccess) {
       // If log exists for this athlete/session/week, use it
       if (existingLogBySession) {
+        hasInitialized.current = true
         actions.initialize(existingLogBySession)
         return
       }
 
       // If no log exists and we haven't started creating one, create it
-      if (!logData && !createLogMutation.isPending && !createLogMutation.data && !createLogMutation.error) {
+      if (!hasTriggeredCreate.current) {
+        hasTriggeredCreate.current = true
         createLogMutation.mutate({
           athleteId,
           programId,
@@ -116,7 +126,6 @@ export function SessionLoggingView({
     existingLogById,
     existingLogBySession,
     existingLogBySessionSuccess,
-    logData,
     athleteId,
     programId,
     sessionId,
@@ -127,14 +136,17 @@ export function SessionLoggingView({
 
   // Initialize store when create mutation succeeds
   useEffect(() => {
-    if (createLogMutation.data && !logData) {
+    if (createLogMutation.data && !hasInitialized.current) {
+      hasInitialized.current = true
       actions.initialize(createLogMutation.data)
     }
-  }, [createLogMutation.data, logData, actions])
+  }, [createLogMutation.data, actions])
 
   // Cleanup store on unmount
   useEffect(() => {
     return () => {
+      hasInitialized.current = false
+      hasTriggeredCreate.current = false
       actions.reset()
     }
   }, [actions])
