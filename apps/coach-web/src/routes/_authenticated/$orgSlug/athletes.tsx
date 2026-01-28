@@ -1,6 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { AthletesListView } from '@/features/athletes/views/athletes-list-view'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/$orgSlug/athletes')({
-  component: AthletesListView,
+  component: AthletesLayout,
 })
+
+function AthletesLayout() {
+  return <Outlet />
+}
