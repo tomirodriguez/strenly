@@ -13,8 +13,12 @@ export {
 export {
   type DeleteLogInput,
   deleteLogInputSchema,
+  type GetLogBySessionInput,
+  type GetLogBySessionOutput,
   type GetLogInput,
   type GetLogOutput,
+  getLogBySessionInputSchema,
+  getLogBySessionOutputSchema,
   getLogInputSchema,
   getLogOutputSchema,
   type ListAthleteLogsInput,

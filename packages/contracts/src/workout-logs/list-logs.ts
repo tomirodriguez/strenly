@@ -111,6 +111,29 @@ export const getLogOutputSchema = workoutLogAggregateSchema
 export type GetLogOutput = z.infer<typeof getLogOutputSchema>
 
 // ============================================================================
+// Get Log By Session Input/Output
+// ============================================================================
+
+/**
+ * Input for getting a workout log by athlete, session, and week combination.
+ * Used to check if a log already exists before creating a new one.
+ */
+export const getLogBySessionInputSchema = z.object({
+  athleteId: z.string().min(1, { message: 'Athlete ID is required' }),
+  sessionId: z.string().min(1, { message: 'Session ID is required' }),
+  weekId: z.string().min(1, { message: 'Week ID is required' }),
+})
+
+export type GetLogBySessionInput = z.infer<typeof getLogBySessionInputSchema>
+
+/**
+ * Output is the full workout log aggregate or null if not found.
+ */
+export const getLogBySessionOutputSchema = workoutLogAggregateSchema.nullable()
+
+export type GetLogBySessionOutput = z.infer<typeof getLogBySessionOutputSchema>
+
+// ============================================================================
 // Delete Log Input
 // ============================================================================
 

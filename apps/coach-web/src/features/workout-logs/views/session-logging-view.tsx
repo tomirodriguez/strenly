@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises-map'
 import { useCreateLog } from '@/features/workout-logs/hooks/mutations/use-create-log'
 import { useSaveLog } from '@/features/workout-logs/hooks/mutations/use-save-log'
+import { useLogBySession } from '@/features/workout-logs/hooks/queries/use-log-by-session'
 import { useWorkoutLog } from '@/features/workout-logs/hooks/queries/use-workout-log'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { useLogActions, useLogData, useLogIsDirty } from '@/stores/log-store'
@@ -54,11 +55,26 @@ export function SessionLoggingView({
   // Exercises map for name lookup
   const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
 
-  // Create log mutation - used when no logId is provided
+  // Create log mutation - used when no log exists
   const createLogMutation = useCreateLog()
 
-  // Fetch existing log if logId is provided
-  const { data: existingLog, isLoading: existingLogLoading, error: existingLogError } = useWorkoutLog(logId ?? '')
+  // Fetch existing log if logId is provided (direct navigation to known log)
+  const {
+    data: existingLogById,
+    isLoading: existingLogByIdLoading,
+    error: existingLogByIdError,
+  } = useWorkoutLog(logId ?? '')
+
+  // Check if log already exists by athlete/session/week (for get-or-create flow)
+  const {
+    data: existingLogBySession,
+    isLoading: existingLogBySessionLoading,
+    isSuccess: existingLogBySessionSuccess,
+  } = useLogBySession({
+    athleteId,
+    sessionId,
+    weekId,
+  })
 
   // Save mutation
   const saveLogMutation = useSaveLog(() => {
@@ -71,23 +87,43 @@ export function SessionLoggingView({
 
   // Initialize store with log data
   useEffect(() => {
-    // If we have a logId and existing log loaded, initialize
-    if (logId && existingLog) {
-      actions.initialize(existingLog)
+    // Case 1: Direct navigation with logId - use the fetched log
+    if (logId && existingLogById) {
+      actions.initialize(existingLogById)
       return
     }
 
-    // If no logId (new log), create from prescription
-    // Don't retry if there's already an error (prevents infinite loop)
-    if (!logId && !logData && !createLogMutation.isPending && !createLogMutation.data && !createLogMutation.error) {
-      createLogMutation.mutate({
-        athleteId,
-        programId,
-        sessionId,
-        weekId,
-      })
+    // Case 2: No logId - implement get-or-create logic
+    if (!logId && existingLogBySessionSuccess) {
+      // If log exists for this athlete/session/week, use it
+      if (existingLogBySession) {
+        actions.initialize(existingLogBySession)
+        return
+      }
+
+      // If no log exists and we haven't started creating one, create it
+      if (!logData && !createLogMutation.isPending && !createLogMutation.data && !createLogMutation.error) {
+        createLogMutation.mutate({
+          athleteId,
+          programId,
+          sessionId,
+          weekId,
+        })
+      }
     }
-  }, [logId, existingLog, logData, athleteId, programId, sessionId, weekId, actions, createLogMutation])
+  }, [
+    logId,
+    existingLogById,
+    existingLogBySession,
+    existingLogBySessionSuccess,
+    logData,
+    athleteId,
+    programId,
+    sessionId,
+    weekId,
+    actions,
+    createLogMutation,
+  ])
 
   // Initialize store when create mutation succeeds
   useEffect(() => {
@@ -115,14 +151,18 @@ export function SessionLoggingView({
   }, [actions, saveLogMutation])
 
   // Loading states
-  const isLoading = exercisesLoading || (logId ? existingLogLoading : createLogMutation.isPending)
+  // When logId is provided: wait for log fetch
+  // When no logId: wait for session check, then for create mutation if needed
+  const isLoading =
+    exercisesLoading ||
+    (logId ? existingLogByIdLoading : existingLogBySessionLoading || createLogMutation.isPending)
 
   if (isLoading) {
     return <SessionLoggingSkeleton />
   }
 
   // Error states
-  if (logId && existingLogError) {
+  if (logId && existingLogByIdError) {
     return <SessionLogNotFound orgSlug={orgSlug} />
   }
 
