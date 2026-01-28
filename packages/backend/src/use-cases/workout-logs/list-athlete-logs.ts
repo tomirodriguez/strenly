@@ -52,8 +52,10 @@ export const makeListAthleteLogs =
         input.athleteId,
         filters,
       )
-      .mapErr((e): ListAthleteLogsError => ({
-        type: 'repository_error',
-        message: e.message,
-      }))
+      .mapErr(
+        (e): ListAthleteLogsError => ({
+          type: 'repository_error',
+          message: e.message,
+        }),
+      )
   }

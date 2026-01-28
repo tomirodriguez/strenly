@@ -37,26 +37,32 @@ export const makeDeleteLog =
     }
 
     // 2. Verify log exists before deleting
-    return deps.workoutLogRepository
-      .findById(ctx, input.logId)
-      .mapErr((e): DeleteLogError => ({
-        type: 'repository_error',
-        message: e.message,
-      }))
-      .andThen((log) => {
-        if (!log) {
-          return errAsync<void, DeleteLogError>({
-            type: 'not_found',
-            logId: input.logId,
-          })
-        }
-        return okAsync(undefined)
-      })
-      // 3. Delete the log
-      .andThen(() =>
-        deps.workoutLogRepository.delete(ctx, input.logId).mapErr((e): DeleteLogError => ({
-          type: 'repository_error',
-          message: e.message,
-        })),
-      )
+    return (
+      deps.workoutLogRepository
+        .findById(ctx, input.logId)
+        .mapErr(
+          (e): DeleteLogError => ({
+            type: 'repository_error',
+            message: e.message,
+          }),
+        )
+        .andThen((log) => {
+          if (!log) {
+            return errAsync<void, DeleteLogError>({
+              type: 'not_found',
+              logId: input.logId,
+            })
+          }
+          return okAsync(undefined)
+        })
+        // 3. Delete the log
+        .andThen(() =>
+          deps.workoutLogRepository.delete(ctx, input.logId).mapErr(
+            (e): DeleteLogError => ({
+              type: 'repository_error',
+              message: e.message,
+            }),
+          ),
+        )
+    )
   }

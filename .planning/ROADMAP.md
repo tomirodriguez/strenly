@@ -20,6 +20,7 @@ Strenly delivers a training planning platform where coaches can create programs 
 - [x] **Phase 3.3: Program Builder QA & Bug Fixes** - Fix UI bugs, improve form UX (INSERTED)
 - [x] **Phase 3.4: Domain Restructure - Training Programs** - Correct domain model, eliminate legacy, full-stack alignment (INSERTED)
 - [ ] **Phase 4: Coach Workout Logging** - Coach can track and log athlete workouts in coach-web (full-stack)
+- [ ] **Phase 4.1: Workout Logging UX Fix** - Fix frontend flow: athlete detail page, proper routing (INSERTED)
 - [ ] **Phase 5: Dashboard & Analytics** - Coach dashboard, compliance tracking, Plan vs Log comparison, data export (full-stack)
 - [ ] **Phase 6: Athlete PWA** - Mobile app for athletes to view programs and log their own workouts (full-stack)
 
@@ -342,6 +343,27 @@ Plans:
 - [ ] 04-09-PLAN.md - Frontend: session logging view (Wave 5)
 - [ ] 04-10-PLAN.md - Frontend: log history + UAT verification (Wave 6)
 
+### Phase 4.1: Workout Logging UX Fix (INSERTED)
+**Goal**: Fix the frontend flow for workout logging - create athlete detail page, fix route structure
+**Depends on**: Phase 4
+**Requirements**: Same as Phase 4 (UX fix, no new requirements)
+**Success Criteria** (what must be TRUE):
+  1. Athletes list at /athletes with proper child route rendering
+  2. Athlete detail page at /athletes/$athleteId showing athlete info and their program
+  3. Session logging accessible from athlete detail page
+  4. Complete navigation flow works: Athletes → Detail → Log → History
+  5. "Registro" sidebar item removed (concept doesn't work without scheduling)
+**Plans**: 1 plan in 1 wave
+
+**Context:**
+- Phase 4 backend is complete and correct
+- Frontend routing was broken: athletes.tsx lacked Outlet, child routes couldn't render
+- "Pending workouts" concept doesn't work without scheduled dates
+- Fix: athlete-centric flow (Athlete → Program → Log)
+
+Plans:
+- [ ] 04.1-01-PLAN.md - Route restructure + athlete detail page + cleanup (Wave 1)
+
 ### Phase 5: Dashboard & Analytics
 **Goal**: Coaches can view centralized dashboard with athlete compliance, pending items, and plan vs log comparison
 **Depends on**: Phase 4
@@ -396,7 +418,8 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3.2. Prescription Data Structure Refactor (full-stack) | 8/8 | Complete | 2026-01-25 |
 | 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Complete | 2026-01-26 |
 | 3.4. Domain Restructure (full-stack) | 8/8 | Complete | 2026-01-27 |
-| 4. Coach Workout Logging (full-stack) | 0/10 | Not started | - |
+| 4. Coach Workout Logging (full-stack) | 10/10 | Complete | 2026-01-28 |
+| 4.1. Workout Logging UX Fix (frontend) | 0/1 | Not started | - |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 | 6. Athlete PWA (full-stack) | 0/3 | Not started | - |
 

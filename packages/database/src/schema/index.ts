@@ -14,6 +14,8 @@ export * from './exercise-groups'
 export * from './exercise-muscles'
 export * from './exercise-progressions'
 export * from './exercises'
+// Workout logging
+export * from './logged-exercises'
 // Exercise library
 export * from './muscle-groups'
 // Subscription plans
@@ -26,6 +28,4 @@ export * from './program-weeks'
 export * from './programs'
 // Organization subscriptions
 export * from './subscriptions'
-// Workout logging
-export * from './logged-exercises'
 export * from './workout-logs'

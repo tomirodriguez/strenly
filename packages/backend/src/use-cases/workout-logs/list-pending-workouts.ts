@@ -44,8 +44,10 @@ export const makeListPendingWorkouts =
           offset: input.offset ?? 0,
         },
       )
-      .mapErr((e): ListPendingWorkoutsError => ({
-        type: 'repository_error',
-        message: e.message,
-      }))
+      .mapErr(
+        (e): ListPendingWorkoutsError => ({
+          type: 'repository_error',
+          message: e.message,
+        }),
+      )
   }

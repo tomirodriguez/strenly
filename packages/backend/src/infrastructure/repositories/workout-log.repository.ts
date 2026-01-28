@@ -8,9 +8,9 @@
  */
 
 import type { OrganizationContext } from '@strenly/core'
-import { reconstituteWorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type { LoggedExercise, LoggedSeries, WorkoutLog } from '@strenly/core/domain/entities/workout-log/types'
 import { isLogStatus } from '@strenly/core/domain/entities/workout-log/types'
+import { reconstituteWorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type {
   PendingWorkout,
   WorkoutLogFilters,
@@ -22,12 +22,12 @@ import {
   athletes,
   type LoggedSeriesData,
   loggedExercises,
-  programs,
   programSessions,
+  programs,
   programWeeks,
   workoutLogs,
 } from '@strenly/database/schema'
-import { and, count, desc, eq, sql, gte, lte } from 'drizzle-orm'
+import { and, count, desc, eq, gte, lte, sql } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
 // ============================================================================
@@ -168,11 +168,7 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
    * Helper to load exercises for a workout log
    */
   async function loadExercisesForLog(logId: string): Promise<LoggedExerciseRow[]> {
-    return db
-      .select()
-      .from(loggedExercises)
-      .where(eq(loggedExercises.logId, logId))
-      .orderBy(loggedExercises.orderIndex)
+    return db.select().from(loggedExercises).where(eq(loggedExercises.logId, logId)).orderBy(loggedExercises.orderIndex)
   }
 
   return {
@@ -321,7 +317,8 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
     ): ResultAsync<{ items: WorkoutLog[]; totalCount: number }, WorkoutLogRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<
-          { ok: true; data: { items: WorkoutLog[]; totalCount: number } } | { ok: false; error: WorkoutLogRepositoryError }
+          | { ok: true; data: { items: WorkoutLog[]; totalCount: number } }
+          | { ok: false; error: WorkoutLogRepositoryError }
         > => {
           // Build conditions
           const conditions = [eq(workoutLogs.organizationId, ctx.organizationId), eq(workoutLogs.athleteId, athleteId)]
@@ -369,7 +366,12 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
           const allExercises = await db
             .select()
             .from(loggedExercises)
-            .where(sql`${loggedExercises.logId} IN (${sql.join(logIds.map((id) => sql`${id}`), sql`, `)})`)
+            .where(
+              sql`${loggedExercises.logId} IN (${sql.join(
+                logIds.map((id) => sql`${id}`),
+                sql`, `,
+              )})`,
+            )
             .orderBy(loggedExercises.orderIndex)
 
           // Group exercises by log ID
@@ -407,7 +409,8 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
     ): ResultAsync<{ items: PendingWorkout[]; totalCount: number }, WorkoutLogRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<
-          { ok: true; data: { items: PendingWorkout[]; totalCount: number } } | { ok: false; error: WorkoutLogRepositoryError }
+          | { ok: true; data: { items: PendingWorkout[]; totalCount: number } }
+          | { ok: false; error: WorkoutLogRepositoryError }
         > => {
           const limit = filters?.limit ?? 50
           const offset = filters?.offset ?? 0

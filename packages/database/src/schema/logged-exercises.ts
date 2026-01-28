@@ -43,7 +43,10 @@ export const loggedExercises = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index('logged_exercises_log_id_idx').on(table.logId), index('logged_exercises_exercise_id_idx').on(table.exerciseId)],
+  (table) => [
+    index('logged_exercises_log_id_idx').on(table.logId),
+    index('logged_exercises_exercise_id_idx').on(table.exerciseId),
+  ],
 )
 
 /**

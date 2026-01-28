@@ -1,8 +1,8 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
-import type { WorkoutLogRepository } from '@strenly/core/ports/workout-log-repository.port'
-import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
-import type { LoggedExerciseInput, LoggedSeriesInput } from '@strenly/core/domain/entities/workout-log/types'
 import type { Program, Series, Session } from '@strenly/core/domain/entities/program/types'
+import type { LoggedExerciseInput, LoggedSeriesInput } from '@strenly/core/domain/entities/workout-log/types'
+import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
+import type { WorkoutLogRepository } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateLogInput = OrganizationContext & {
@@ -187,14 +187,12 @@ export const makeCreateLog =
         }
 
         // 3. Load program aggregate to get prescription data
-        return deps.programRepository.loadProgramAggregate(ctx, input.programId).mapErr(
-          (e): CreateLogError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'program_not_found', programId: input.programId }
-            }
-            return { type: 'repository_error', message: e.message }
-          },
-        )
+        return deps.programRepository.loadProgramAggregate(ctx, input.programId).mapErr((e): CreateLogError => {
+          if (e.type === 'NOT_FOUND') {
+            return { type: 'program_not_found', programId: input.programId }
+          }
+          return { type: 'repository_error', message: e.message }
+        })
       })
       .andThen((program) => buildWorkoutLogFromProgram(input, program, deps.generateId))
   }
