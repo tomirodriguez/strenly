@@ -1,6 +1,5 @@
 import { Link, useMatchRoute, useNavigate, useParams } from '@tanstack/react-router'
 import {
-  ClipboardListIcon,
   CopyIcon,
   DumbbellIcon,
   FileTextIcon,
@@ -48,7 +47,6 @@ const mainNavItems = [
   { path: 'athletes', label: 'Atletas', icon: UsersIcon },
   { path: 'programs', label: 'Programas', icon: FileTextIcon },
   { path: 'exercises', label: 'Ejercicios', icon: DumbbellIcon },
-  { path: 'logging', label: 'Registro', icon: ClipboardListIcon },
   { path: 'templates', label: 'Plantillas', icon: CopyIcon },
 ]
 
