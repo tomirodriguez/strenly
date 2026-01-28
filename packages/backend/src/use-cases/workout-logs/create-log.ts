@@ -224,9 +224,7 @@ export const makeCreateLog =
         )
 
         // Combine results
-        return programResult.andThen((program) =>
-          athleteResult.map((athlete) => ({ program, athlete })),
-        )
+        return programResult.andThen((program) => athleteResult.map((athlete) => ({ program, athlete })))
       })
       .andThen(({ program, athlete }) => {
         // 4. Find week and session
