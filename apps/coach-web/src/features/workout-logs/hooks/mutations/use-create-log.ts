@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
+import { toast } from '@/lib/toast'
 
 /**
  * Hook to create a new workout log from prescription.
@@ -14,9 +15,15 @@ export function useCreateLog() {
 
   return useMutation({
     ...orpc.workoutLogs.create.mutationOptions(),
+    // Disable retry to prevent infinite loops on error
+    retry: false,
     onSuccess: () => {
       // Invalidate pending workouts since this may remove one
       queryClient.invalidateQueries({ queryKey: orpc.workoutLogs.listPending.key() })
+    },
+    onError: (error) => {
+      const message = error?.message ?? 'Error al crear el log de entrenamiento'
+      toast.error(message)
     },
   })
 }

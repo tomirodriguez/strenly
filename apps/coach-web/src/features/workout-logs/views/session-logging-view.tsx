@@ -78,7 +78,8 @@ export function SessionLoggingView({
     }
 
     // If no logId (new log), create from prescription
-    if (!logId && !logData && !createLogMutation.isPending && !createLogMutation.data) {
+    // Don't retry if there's already an error (prevents infinite loop)
+    if (!logId && !logData && !createLogMutation.isPending && !createLogMutation.data && !createLogMutation.error) {
       createLogMutation.mutate({
         athleteId,
         programId,

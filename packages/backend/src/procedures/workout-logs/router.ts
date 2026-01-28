@@ -113,6 +113,7 @@ const create = authProcedure
     SESSION_NOT_FOUND: { message: 'Session not found' },
     WEEK_NOT_FOUND: { message: 'Week not found' },
     VALIDATION_ERROR: { message: 'Invalid log data' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(createLogInputSchema)
   .output(createLogOutputSchema)
@@ -154,7 +155,7 @@ const create = authProcedure
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in createLog:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
       }
     }
 
@@ -169,6 +170,7 @@ const save = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to save workout logs' },
     VALIDATION_ERROR: { message: 'Invalid log data' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(saveLogInputSchema)
   .output(saveLogOutputSchema)
@@ -215,7 +217,7 @@ const save = authProcedure
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in saveLog:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al guardar en la base de datos' })
       }
     }
 
@@ -229,6 +231,7 @@ const get = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to view workout logs' },
     NOT_FOUND: { message: 'Workout log not found' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(getLogInputSchema)
   .output(getLogOutputSchema)
@@ -252,7 +255,7 @@ const get = authProcedure
           throw errors.NOT_FOUND({ message: `Workout log ${result.error.logId} not found` })
         case 'repository_error':
           console.error('Repository error in getLog:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
       }
     }
 
@@ -265,6 +268,7 @@ const get = authProcedure
 const listByAthlete = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to view workout logs' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(listAthleteLogsInputSchema)
   .output(listAthleteLogsOutputSchema)
@@ -291,7 +295,7 @@ const listByAthlete = authProcedure
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in listAthleteLogs:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
       }
     }
 
@@ -308,6 +312,7 @@ const listByAthlete = authProcedure
 const listPending = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to view workout logs' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(listPendingWorkoutsInputSchema)
   .output(listPendingWorkoutsOutputSchema)
@@ -330,7 +335,7 @@ const listPending = authProcedure
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in listPendingWorkouts:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
       }
     }
 
@@ -344,6 +349,7 @@ const deleteLog = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to delete workout logs' },
     NOT_FOUND: { message: 'Workout log not found' },
+    INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(deleteLogInputSchema)
   .output(z.object({ success: z.boolean() }))
@@ -367,7 +373,7 @@ const deleteLog = authProcedure
           throw errors.NOT_FOUND({ message: `Workout log ${result.error.logId} not found` })
         case 'repository_error':
           console.error('Repository error in deleteLog:', result.error.message)
-          throw new Error('Internal error')
+          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
       }
     }
 
