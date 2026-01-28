@@ -1,8 +1,8 @@
 import type { Athlete } from '@strenly/contracts/athletes/athlete'
 import type { ColumnDef } from '@tanstack/react-table'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
-import { Edit, History, Mail, Trash } from 'lucide-react'
+import { Edit, Eye, History, Mail, Trash } from 'lucide-react'
 import { InvitationStatus } from './invitation-status'
 import { DataTable } from '@/components/data-table/data-table'
 import { DataTableRowActions, type RowAction } from '@/components/data-table/data-table-row-actions'
@@ -39,6 +39,13 @@ export function AthletesTable({
   const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
   const navigate = useNavigate()
 
+  const handleViewAthlete = (athlete: Athlete) => {
+    navigate({
+      to: '/$orgSlug/athletes/$athleteId',
+      params: { orgSlug, athleteId: athlete.id },
+    })
+  }
+
   const handleViewHistory = (athlete: Athlete) => {
     navigate({
       to: '/$orgSlug/athletes/$athleteId/logs',
@@ -50,7 +57,15 @@ export function AthletesTable({
     {
       accessorKey: 'name',
       header: 'Nombre',
-      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+      cell: ({ row }) => (
+        <Link
+          to="/$orgSlug/athletes/$athleteId"
+          params={{ orgSlug, athleteId: row.original.id }}
+          className="font-medium text-primary hover:underline"
+        >
+          {row.original.name}
+        </Link>
+      ),
     },
     {
       accessorKey: 'email',
@@ -89,6 +104,16 @@ export function AthletesTable({
       cell: ({ row }) => {
         const actions: RowAction<Athlete>[] = [
           {
+            label: 'Ver Atleta',
+            icon: Eye,
+            onClick: handleViewAthlete,
+          },
+          {
+            label: 'Ver Historial',
+            icon: History,
+            onClick: handleViewHistory,
+          },
+          {
             label: 'Editar',
             icon: Edit,
             onClick: onEdit,
@@ -97,11 +122,6 @@ export function AthletesTable({
             label: 'Invitacion',
             icon: Mail,
             onClick: onInvitation,
-          },
-          {
-            label: 'Ver Historial',
-            icon: History,
-            onClick: handleViewHistory,
           },
           {
             label: 'Archivar',
