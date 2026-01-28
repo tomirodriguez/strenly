@@ -32,7 +32,7 @@ type Dependencies = {
  * Pre-fill series from prescription values.
  * Pre-fills repsPerformed and weightUsed from prescription.
  * Never pre-fills RPE (athlete-specific).
- * Snapshots prescribed values for deviation display.
+ * Snapshots all prescribed values for deviation display.
  */
 function buildLoggedSeries(prescribedSeries: ReadonlyArray<Series>): LoggedSeriesInput[] {
   return prescribedSeries.map((series) => {
@@ -54,6 +54,13 @@ function buildLoggedSeries(prescribedSeries: ReadonlyArray<Series>): LoggedSerie
       skipped: false,
       prescribedReps,
       prescribedWeight,
+      // Extended prescription snapshot for display
+      prescribedRepsMax: series.repsMax,
+      prescribedIsAmrap: series.isAmrap,
+      prescribedIntensityType: series.intensityType,
+      prescribedIntensityValue: series.intensityValue,
+      prescribedTempo: series.tempo,
+      prescribedRestSeconds: series.restSeconds,
     }
   })
 }
@@ -61,13 +68,20 @@ function buildLoggedSeries(prescribedSeries: ReadonlyArray<Series>): LoggedSerie
 /**
  * Build logged exercises from session prescription data.
  * Creates LoggedExercise array with series pre-filled from prescription.
+ * Calculates group labels (A, B, C...) and group order (1, 2, 3...) for display.
  */
 function buildLoggedExercises(session: Session, generateId: () => string): LoggedExerciseInput[] {
   const exercises: LoggedExerciseInput[] = []
   let orderIndex = 0
 
   for (const group of session.exerciseGroups) {
+    // Calculate group label: A, B, C... based on group's orderIndex
+    const groupLabel = String.fromCharCode(65 + group.orderIndex) // 0->A, 1->B, 2->C
+
     for (const item of group.items) {
+      // Calculate group order: position within group (1-based)
+      const groupOrder = item.orderIndex + 1
+
       exercises.push({
         id: generateId(),
         exerciseId: item.exerciseId,
@@ -76,6 +90,9 @@ function buildLoggedExercises(session: Session, generateId: () => string): Logge
         notes: null,
         skipped: false,
         series: buildLoggedSeries(item.series),
+        // Group display info
+        groupLabel,
+        groupOrder,
       })
     }
   }
