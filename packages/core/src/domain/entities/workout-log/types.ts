@@ -62,6 +62,11 @@ export type WorkoutLog = {
   readonly exercises: ReadonlyArray<LoggedExercise>
   readonly createdAt: Date
   readonly updatedAt: Date
+  // Display context (denormalized snapshots)
+  readonly programName: string | null
+  readonly weekName: string | null
+  readonly sessionName: string | null
+  readonly athleteName: string | null
 }
 
 // Input Types - Used for createWorkoutLog()
@@ -108,6 +113,11 @@ export type CreateWorkoutLogInput = {
   exercises?: LoggedExerciseInput[]
   createdAt?: Date
   updatedAt?: Date
+  // Display context (denormalized snapshots)
+  programName?: string | null
+  weekName?: string | null
+  sessionName?: string | null
+  athleteName?: string | null
 }
 
 // Error Types - Discriminated union with context

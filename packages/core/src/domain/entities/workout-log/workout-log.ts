@@ -104,6 +104,11 @@ export function createWorkoutLog(input: CreateWorkoutLogInput): Result<WorkoutLo
     exercises: validatedExercises,
     createdAt: input.createdAt ?? now,
     updatedAt: input.updatedAt ?? now,
+    // Display context
+    programName: input.programName ?? null,
+    weekName: input.weekName ?? null,
+    sessionName: input.sessionName ?? null,
+    athleteName: input.athleteName ?? null,
   })
 }
 

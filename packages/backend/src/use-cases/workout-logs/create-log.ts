@@ -1,7 +1,9 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
-import type { Program, Series, Session } from '@strenly/core/domain/entities/program/types'
+import type { Athlete } from '@strenly/core/domain/entities/athlete'
+import type { Program, Series, Session, Week } from '@strenly/core/domain/entities/program/types'
 import type { LoggedExerciseInput, LoggedSeriesInput } from '@strenly/core/domain/entities/workout-log/types'
 import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
+import type { AthleteRepositoryPort } from '@strenly/core/ports/athlete-repository.port'
 import type { WorkoutLogRepository } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
@@ -25,6 +27,7 @@ export type CreateLogError =
 type Dependencies = {
   workoutLogRepository: WorkoutLogRepository
   programRepository: ProgramRepositoryPort
+  athleteRepository: AthleteRepositoryPort
   generateId: () => string
 }
 
@@ -101,30 +104,24 @@ function buildLoggedExercises(session: Session, generateId: () => string): Logge
 }
 
 /**
- * Build workout log from program prescription.
+ * Context for display names
+ */
+type DisplayContext = {
+  program: Program
+  week: Week
+  session: Session
+  athlete: Athlete
+}
+
+/**
+ * Build workout log from program prescription with display context.
  */
 function buildWorkoutLogFromProgram(
   input: CreateLogInput,
-  program: Program,
+  context: DisplayContext,
   generateId: () => string,
 ): ResultAsync<WorkoutLog, CreateLogError> {
-  // Find the week
-  const week = program.weeks.find((w) => w.id === input.weekId)
-  if (!week) {
-    return errAsync({
-      type: 'week_not_found',
-      weekId: input.weekId,
-    })
-  }
-
-  // Find the session within the week
-  const session = week.sessions.find((s) => s.id === input.sessionId)
-  if (!session) {
-    return errAsync({
-      type: 'session_not_found',
-      sessionId: input.sessionId,
-    })
-  }
+  const { program, week, session, athlete } = context
 
   // Build logged exercises with pre-filled values from prescription
   const exercises = buildLoggedExercises(session, generateId)
@@ -142,6 +139,11 @@ function buildWorkoutLogFromProgram(
     sessionRpe: null,
     sessionNotes: null,
     exercises,
+    // Display context
+    programName: program.name,
+    weekName: week.name,
+    sessionName: session.name,
+    athleteName: athlete.name,
   })
 
   if (logResult.isErr()) {
@@ -161,9 +163,10 @@ function buildWorkoutLogFromProgram(
  * 1. Checks authorization
  * 2. Checks if log already exists for athlete/session/week (returns error if so)
  * 3. Loads program aggregate to get prescription data
- * 4. Extracts session and pre-fills exercises from prescription
- * 5. Creates domain entity via createWorkoutLog (validates)
- * 6. Returns pre-filled log for client-side editing (does NOT persist)
+ * 4. Loads athlete for display name
+ * 5. Extracts session and pre-fills exercises from prescription
+ * 6. Creates domain entity via createWorkoutLog (validates)
+ * 7. Returns pre-filled log for client-side editing (does NOT persist)
  *
  * The client will call saveLog after editing to persist.
  */
@@ -193,7 +196,7 @@ export const makeCreateLog =
           message: e.message,
         }),
       )
-      .andThen((existingLog): ResultAsync<Program, CreateLogError> => {
+      .andThen((existingLog): ResultAsync<{ program: Program; athlete: Athlete }, CreateLogError> => {
         if (existingLog !== null) {
           return errAsync({
             type: 'log_already_exists',
@@ -203,13 +206,47 @@ export const makeCreateLog =
           })
         }
 
-        // 3. Load program aggregate to get prescription data
-        return deps.programRepository.loadProgramAggregate(ctx, input.programId).mapErr((e): CreateLogError => {
-          if (e.type === 'NOT_FOUND') {
-            return { type: 'program_not_found', programId: input.programId }
-          }
-          return { type: 'repository_error', message: e.message }
-        })
+        // 3. Load program and athlete in parallel for display context
+        const programResult = deps.programRepository
+          .loadProgramAggregate(ctx, input.programId)
+          .mapErr((e): CreateLogError => {
+            if (e.type === 'NOT_FOUND') {
+              return { type: 'program_not_found', programId: input.programId }
+            }
+            return { type: 'repository_error', message: e.message }
+          })
+
+        const athleteResult = deps.athleteRepository.findById(ctx, input.athleteId).mapErr(
+          (): CreateLogError => ({
+            type: 'repository_error',
+            message: 'Failed to load athlete',
+          }),
+        )
+
+        // Combine results
+        return programResult.andThen((program) =>
+          athleteResult.map((athlete) => ({ program, athlete })),
+        )
       })
-      .andThen((program) => buildWorkoutLogFromProgram(input, program, deps.generateId))
+      .andThen(({ program, athlete }) => {
+        // 4. Find week and session
+        const week = program.weeks.find((w) => w.id === input.weekId)
+        if (!week) {
+          return errAsync<WorkoutLog, CreateLogError>({
+            type: 'week_not_found',
+            weekId: input.weekId,
+          })
+        }
+
+        const session = week.sessions.find((s) => s.id === input.sessionId)
+        if (!session) {
+          return errAsync<WorkoutLog, CreateLogError>({
+            type: 'session_not_found',
+            sessionId: input.sessionId,
+          })
+        }
+
+        // 5. Build log with display context
+        return buildWorkoutLogFromProgram(input, { program, week, session, athlete }, deps.generateId)
+      })
   }

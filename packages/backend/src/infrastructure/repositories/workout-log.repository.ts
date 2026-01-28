@@ -147,6 +147,11 @@ function mapToDomain(logRow: WorkoutLogRow, exerciseRows: LoggedExerciseRow[]): 
     exercises: exerciseRows.map(mapExerciseRowToDomain),
     createdAt: logRow.createdAt,
     updatedAt: logRow.updatedAt,
+    // Display context
+    programName: logRow.programName,
+    weekName: logRow.weekName,
+    sessionName: logRow.sessionName,
+    athleteName: logRow.athleteName,
   })
 }
 
@@ -218,6 +223,11 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
               status: log.status,
               sessionRpe: log.sessionRpe,
               sessionNotes: log.sessionNotes,
+              // Display context
+              programName: log.programName,
+              weekName: log.weekName,
+              sessionName: log.sessionName,
+              athleteName: log.athleteName,
               createdAt: log.createdAt ?? now,
               updatedAt: now,
             })

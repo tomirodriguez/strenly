@@ -128,6 +128,11 @@ export const workoutLogAggregateSchema = z.object({
   exercises: z.array(loggedExerciseSchema),
   createdAt: z.string(),
   updatedAt: z.string(),
+  // Display context (denormalized snapshots)
+  programName: z.string().nullable(),
+  weekName: z.string().nullable(),
+  sessionName: z.string().nullable(),
+  athleteName: z.string().nullable(),
 })
 
 export type WorkoutLogAggregate = z.infer<typeof workoutLogAggregateSchema>

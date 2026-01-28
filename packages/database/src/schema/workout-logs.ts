@@ -36,6 +36,11 @@ export const workoutLogs = pgTable(
     status: logStatusEnum('status').default('partial').notNull(),
     sessionRpe: integer('session_rpe'), // 1-10 scale, nullable
     sessionNotes: text('session_notes'), // Nullable
+    // Display context (denormalized snapshots)
+    programName: text('program_name'),
+    weekName: text('week_name'),
+    sessionName: text('session_name'),
+    athleteName: text('athlete_name'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()

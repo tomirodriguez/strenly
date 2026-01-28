@@ -1,13 +1,15 @@
 /**
- * Session Logging View
+ * Session Logging View - Redesigned
  *
  * Main view for logging a workout session. Coaches enter actual
  * workout data: reps performed, weight used, RPE.
  *
  * Features:
- * - Pre-filled from prescription values
- * - Deviation highlighting (amber border when actual differs from planned)
- * - Skip functionality for exercises and individual series
+ * - Context header with program, week, session, athlete names
+ * - Compact grid layout with prescription column
+ * - Exercise groups with visual connection (A1, A2, B1...)
+ * - Deviation highlighting (amber border when actual differs)
+ * - Skip functionality for exercises and series
  * - Session-level RPE and notes
  * - Unsaved changes guard
  */
@@ -16,7 +18,7 @@ import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { LoggedExerciseCard } from '../components/logged-exercise-card'
+import { LoggingGrid } from '../components/logging-grid'
 import { SessionSummaryCard } from '../components/session-summary-card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -152,7 +154,10 @@ export function SessionLoggingView({
   }, [actions])
 
   // Unsaved changes guard
-  useUnsavedChanges(isDirty, 'Tienes cambios sin guardar. Estas seguro de que quieres salir?')
+  useUnsavedChanges(
+    isDirty,
+    'Tienes cambios sin guardar. Estas seguro de que quieres salir?',
+  )
 
   // Handle save
   const handleSave = useCallback(() => {
@@ -163,11 +168,11 @@ export function SessionLoggingView({
   }, [actions, saveLogMutation])
 
   // Loading states
-  // When logId is provided: wait for log fetch
-  // When no logId: wait for session check, then for create mutation if needed
   const isLoading =
     exercisesLoading ||
-    (logId ? existingLogByIdLoading : existingLogBySessionLoading || createLogMutation.isPending)
+    (logId
+      ? existingLogByIdLoading
+      : existingLogBySessionLoading || createLogMutation.isPending)
 
   if (isLoading) {
     return <SessionLoggingSkeleton />
@@ -181,8 +186,13 @@ export function SessionLoggingView({
   if (createLogMutation.error) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Error al crear el log: {createLogMutation.error.message}</p>
-        <Button variant="outline" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
+        <p className="text-muted-foreground">
+          Error al crear el log: {createLogMutation.error.message}
+        </p>
+        <Button
+          variant="outline"
+          render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
+        >
           <ArrowLeftIcon className="h-4 w-4" />
           Volver
         </Button>
@@ -197,7 +207,7 @@ export function SessionLoggingView({
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      {/* Header */}
+      {/* Header with context */}
       <SessionLoggingHeader
         log={logData}
         orgSlug={orgSlug}
@@ -209,14 +219,8 @@ export function SessionLoggingView({
       {/* Main content - scrollable */}
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl space-y-4 p-4">
-          {/* Exercises */}
-          {logData.exercises.map((exercise) => (
-            <LoggedExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              exerciseName={exercisesMap.get(exercise.exerciseId) ?? 'Ejercicio'}
-            />
-          ))}
+          {/* Exercise groups grid */}
+          <LoggingGrid exercises={logData.exercises} exercisesMap={exercisesMap} />
 
           {/* Session summary (RPE, notes) */}
           <SessionSummaryCard />
@@ -224,13 +228,17 @@ export function SessionLoggingView({
       </div>
 
       {/* Footer with save button */}
-      <SessionLoggingFooter isDirty={isDirty} isPending={saveLogMutation.isPending} onSave={handleSave} />
+      <SessionLoggingFooter
+        isDirty={isDirty}
+        isPending={saveLogMutation.isPending}
+        onSave={handleSave}
+      />
     </div>
   )
 }
 
 // ============================================================================
-// Header Component
+// Header Component - Now with context (program, week, session, athlete names)
 // ============================================================================
 
 interface SessionLoggingHeaderProps {
@@ -241,29 +249,59 @@ interface SessionLoggingHeaderProps {
   onSave: () => void
 }
 
-function SessionLoggingHeader({ log, orgSlug, isDirty, isPending, onSave }: SessionLoggingHeaderProps) {
+function SessionLoggingHeader({
+  log,
+  orgSlug,
+  isDirty,
+  isPending,
+  onSave,
+}: SessionLoggingHeaderProps) {
   const logDate = new Date(log.logDate).toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
+    weekday: 'short',
+    month: 'short',
     day: 'numeric',
   })
 
+  // Context: Program > Week > Session for Athlete
+  const programName = log.programName ?? 'Programa'
+  const weekName = log.weekName ?? 'Semana'
+  const sessionName = log.sessionName ?? 'Sesion'
+  const athleteName = log.athleteName ?? 'Atleta'
+
   return (
-    <header className="flex shrink-0 items-center justify-between border-border border-b bg-background px-6 py-4">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
+    <header className="flex shrink-0 items-center justify-between border-border border-b bg-background px-4 py-3">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
+        >
           <ArrowLeftIcon className="h-4 w-4" />
         </Button>
-        <div>
-          <h1 className="font-semibold text-lg">Registro de Entrenamiento</h1>
-          <p className="text-muted-foreground text-sm capitalize">{logDate}</p>
+
+        <div className="min-w-0">
+          {/* Primary: Session name + Athlete */}
+          <h1 className="truncate font-semibold text-sm">
+            {sessionName}{' '}
+            <span className="text-muted-foreground">- {athleteName}</span>
+          </h1>
+
+          {/* Secondary: Program > Week + Date */}
+          <p className="flex items-center gap-2 text-muted-foreground text-xs">
+            <span className="truncate">
+              {programName} / {weekName}
+            </span>
+            <span className="text-muted-foreground/50">|</span>
+            <span className="capitalize">{logDate}</span>
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {isDirty && <span className="text-muted-foreground text-xs">Sin guardar</span>}
-        <Button onClick={onSave} disabled={!isDirty || isPending}>
+      <div className="flex shrink-0 items-center gap-2">
+        {isDirty && (
+          <span className="text-muted-foreground text-xs">Sin guardar</span>
+        )}
+        <Button size="sm" onClick={onSave} disabled={!isDirty || isPending}>
           <SaveIcon className="h-4 w-4" />
           {isPending ? 'Guardando...' : 'Guardar'}
         </Button>
@@ -282,14 +320,20 @@ interface SessionLoggingFooterProps {
   onSave: () => void
 }
 
-function SessionLoggingFooter({ isDirty, isPending, onSave }: SessionLoggingFooterProps) {
+function SessionLoggingFooter({
+  isDirty,
+  isPending,
+  onSave,
+}: SessionLoggingFooterProps) {
   return (
-    <footer className="flex shrink-0 items-center justify-between border-border border-t bg-background px-6 py-4">
+    <footer className="flex shrink-0 items-center justify-between border-border border-t bg-background px-4 py-3">
       <div className="text-muted-foreground text-xs">
-        <span className="hidden sm:inline">Los cambios son locales hasta que guardes.</span>
+        <span className="hidden sm:inline">
+          Los cambios son locales hasta que guardes.
+        </span>
       </div>
 
-      <Button onClick={onSave} disabled={!isDirty || isPending}>
+      <Button size="sm" onClick={onSave} disabled={!isDirty || isPending}>
         <SaveIcon className="h-4 w-4" />
         {isPending ? 'Guardando...' : 'Guardar'}
       </Button>
@@ -305,30 +349,30 @@ function SessionLoggingSkeleton() {
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
       {/* Header skeleton */}
-      <div className="flex shrink-0 items-center justify-between border-border border-b px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-9 w-9" />
+      <div className="flex shrink-0 items-center justify-between border-border border-b px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-8 w-8" />
           <div>
-            <Skeleton className="mb-1 h-6 w-48" />
-            <Skeleton className="h-4 w-32" />
+            <Skeleton className="mb-1 h-4 w-48" />
+            <Skeleton className="h-3 w-32" />
           </div>
         </div>
-        <Skeleton className="h-9 w-24" />
+        <Skeleton className="h-8 w-20" />
       </div>
 
       {/* Content skeleton */}
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl space-y-4 p-4">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-24 w-full" />
         </div>
       </div>
 
       {/* Footer skeleton */}
-      <div className="flex shrink-0 items-center justify-between border-border border-t px-6 py-4">
-        <Skeleton className="h-4 w-64" />
-        <Skeleton className="h-9 w-24" />
+      <div className="flex shrink-0 items-center justify-between border-border border-t px-4 py-3">
+        <Skeleton className="h-3 w-48" />
+        <Skeleton className="h-8 w-20" />
       </div>
     </div>
   )
@@ -341,8 +385,13 @@ function SessionLoggingSkeleton() {
 function SessionLogNotFound({ orgSlug }: { orgSlug: string }) {
   return (
     <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-      <p className="text-muted-foreground">No se encontro el registro de entrenamiento</p>
-      <Button variant="outline" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
+      <p className="text-muted-foreground">
+        No se encontro el registro de entrenamiento
+      </p>
+      <Button
+        variant="outline"
+        render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
+      >
         <ArrowLeftIcon className="h-4 w-4" />
         Volver
       </Button>

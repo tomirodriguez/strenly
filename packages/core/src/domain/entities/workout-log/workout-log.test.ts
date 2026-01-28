@@ -514,6 +514,11 @@ describe('WorkoutLog Aggregate', () => {
         ],
         createdAt: new Date('2024-01-15T10:00:00Z'),
         updatedAt: new Date('2024-01-15T10:30:00Z'),
+        // Display context
+        programName: 'Test Program',
+        weekName: 'Week 1',
+        sessionName: 'Day 1',
+        athleteName: 'Test Athlete',
       }
 
       const log = reconstituteWorkoutLog(dbProps)
@@ -523,6 +528,8 @@ describe('WorkoutLog Aggregate', () => {
       expect(log.sessionRpe).toBe(8)
       expect(log.exercises.length).toBe(1)
       expect(log.createdAt).toEqual(new Date('2024-01-15T10:00:00Z'))
+      expect(log.programName).toBe('Test Program')
+      expect(log.athleteName).toBe('Test Athlete')
     })
 
     it('should preserve all nested data', () => {
@@ -583,6 +590,11 @@ describe('WorkoutLog Aggregate', () => {
         ],
         createdAt: new Date(),
         updatedAt: new Date(),
+        // Display context
+        programName: null,
+        weekName: null,
+        sessionName: null,
+        athleteName: null,
       }
 
       const log = reconstituteWorkoutLog(dbProps)

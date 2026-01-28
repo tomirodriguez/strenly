@@ -21,6 +21,7 @@ import {
   saveLogOutputSchema,
 } from '@strenly/contracts/workout-logs'
 import { z } from 'zod'
+import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -74,6 +75,11 @@ function mapLogToOutput(log: {
   }>
   createdAt: Date
   updatedAt: Date
+  // Display context
+  programName: string | null
+  weekName: string | null
+  sessionName: string | null
+  athleteName: string | null
 }) {
   return {
     id: log.id,
@@ -113,6 +119,11 @@ function mapLogToOutput(log: {
     })),
     createdAt: log.createdAt.toISOString(),
     updatedAt: log.updatedAt.toISOString(),
+    // Display context
+    programName: log.programName,
+    weekName: log.weekName,
+    sessionName: log.sessionName,
+    athleteName: log.athleteName,
   }
 }
 
@@ -140,6 +151,7 @@ const create = authProcedure
     const useCase = makeCreateLog({
       workoutLogRepository: createWorkoutLogRepository(context.db),
       programRepository: createProgramRepository(context.db),
+      athleteRepository: createAthleteRepository(context.db),
       generateId: () => crypto.randomUUID(),
     })
 
