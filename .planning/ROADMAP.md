@@ -419,7 +419,7 @@ Phases execute in numeric order: 1 -> 2 -> 2.5 -> 2.6 -> 3 -> 3.1 -> 3.2 -> 3.3 
 | 3.3. Program Builder QA & Bug Fixes (frontend) | 8/8 | Complete | 2026-01-26 |
 | 3.4. Domain Restructure (full-stack) | 8/8 | Complete | 2026-01-27 |
 | 4. Coach Workout Logging (full-stack) | 10/10 | Complete | 2026-01-28 |
-| 4.1. Workout Logging UX Fix (frontend) | 0/1 | Not started | - |
+| 4.1. Workout Logging UX Fix (frontend) | 2/2 | Complete | 2026-01-28 |
 | 5. Dashboard & Analytics (full-stack) | 0/2 | Not started | - |
 | 6. Athlete PWA (full-stack) | 0/3 | Not started | - |
 
