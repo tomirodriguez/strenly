@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 ## Current Position
 
-Phase: 4 of 6 (Coach Workout Logging) IN PROGRESS
-Plan: 9/10 (04-01 through 04-09 complete)
-Status: In progress
-Last activity: 2026-01-27 - Completed 04-09-PLAN.md (Session Logging UI)
+Phase: 4.1 of 6 (Workout Logging UX Fix) COMPLETE
+Plan: 1/1 (04.1-01 complete)
+Status: Complete
+Last activity: 2026-01-28 - Completed 04.1-01-PLAN.md (Workout Logging UX Fix)
 
-Progress: [██████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4 COMPLETE + Phase 4 in progress
+Progress: [██████████████████████████████████░] Phases 1, 2, 2.5, 2.6, 3, 3.1, 3.2, 3.3, 3.4, 4, 4.1 COMPLETE
 
-**Next:** Phase 4 plan 04-10 remaining (History View)
+**Next:** Phase 4 plan 04-10 remaining (History View) or Phase 5 Dashboard & Analytics
 
 **Roadmap Change (2026-01-27):**
 - NEW Phase 4: Coach Workout Logging (coach logs workouts for athletes)
@@ -26,9 +26,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 63
+- Total plans completed: 64
 - Average duration: ~4 min
-- Total execution time: ~258 min
+- Total execution time: ~263 min
 
 **By Phase:**
 
@@ -41,8 +41,8 @@ Progress: [███████████████████████
 | 3.3 | 8/8 | ~29 min | ~3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.4-06 (5 min), 03.4-08 (8 min), 04-07 (5 min), 04-08 (7 min), 04-09 (9 min)
-- Trend: Phase 4 progressing - session logging UI complete
+- Last 5 plans: 03.4-08 (8 min), 04-07 (5 min), 04-08 (7 min), 04-09 (9 min), 04.1-01 (5 min)
+- Trend: Phase 4.1 complete - workout logging flow fully working
 
 *Updated after each plan completion*
 
@@ -453,14 +453,30 @@ None.
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-create-log.ts` - Create pre-filled log
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-save-log.ts` - Save with cache invalidation
 - `apps/coach-web/src/features/workout-logs/hooks/mutations/use-delete-log.ts` - Delete with cache invalidation
-- `apps/coach-web/src/routes/_authenticated/$orgSlug/logging/index.tsx` - Logging dashboard route
-- `apps/coach-web/src/features/workout-logs/views/logging-dashboard-view.tsx` - Dashboard with pending workouts
-- `apps/coach-web/src/features/workout-logs/components/pending-workouts-table.tsx` - Athlete-grouped pending sessions table
+- ~~`apps/coach-web/src/routes/_authenticated/$orgSlug/logging/index.tsx`~~ - Deleted in 04.1-01
+- ~~`apps/coach-web/src/features/workout-logs/views/logging-dashboard-view.tsx`~~ - Deleted in 04.1-01
+- ~~`apps/coach-web/src/features/workout-logs/components/pending-workouts-table.tsx`~~ - Deleted in 04.1-01
+- ~~`apps/coach-web/src/features/workout-logs/hooks/queries/use-pending-workouts.ts`~~ - Deleted in 04.1-01
+
+## Phase 4.1 Progress
+
+**Workout Logging UX Fix COMPLETE:**
+
+| Plan | Name | Status |
+|------|------|--------|
+| 04.1-01 | Fix Routing and Create Athlete Detail Page | Complete |
+
+**Key artifacts:**
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/athletes.tsx` - Layout route with Outlet
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/athletes/index.tsx` - Athletes list route
+- `apps/coach-web/src/routes/_authenticated/$orgSlug/athletes/$athleteId/index.tsx` - Athlete detail route
+- `apps/coach-web/src/features/athletes/views/athlete-detail-view.tsx` - Athlete detail view with program
+- `apps/coach-web/src/features/athletes/hooks/queries/use-athlete.ts` - Single athlete hook
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed 04-08-PLAN.md
+Last session: 2026-01-28
+Stopped at: Completed 04.1-01-PLAN.md
 Resume file: None
 
-**Next:** Continue with 04-09 (Session Logging View).
+**Next:** Phase 4 plan 04-10 (History View) or Phase 5 Dashboard & Analytics.
