@@ -39,12 +39,7 @@ export function ProgramForm({
   showWeeksCount = true,
   showSessionsCount = true,
 }: ProgramFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm<CreateProgramInput>({
+  const { handleSubmit, control } = useForm<CreateProgramInput>({
     resolver: zodResolver(createProgramInputSchema),
     defaultValues: {
       name: '',
@@ -74,92 +69,113 @@ export function ProgramForm({
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <Field>
-        <FieldLabel htmlFor="name">
-          Nombre <span className="text-destructive">*</span>
-        </FieldLabel>
-        <FieldContent>
-          <Input id="name" {...register('name')} placeholder="Ej: Fuerza Maxima - Mesociclo 1" />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">
+              Nombre <span className="text-destructive">*</span>
+            </FieldLabel>
+            <FieldContent>
+              <Input id="name" placeholder="Ej: Fuerza Maxima - Mesociclo 1" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="description">Descripcion</FieldLabel>
-        <FieldContent>
-          <Textarea
-            id="description"
-            {...register('description')}
-            placeholder="Descripcion opcional del programa..."
-            rows={3}
-          />
-          <FieldDescription>Maximo 500 caracteres</FieldDescription>
-          <FieldError errors={[errors.description]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="description"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="description">Descripcion</FieldLabel>
+            <FieldContent>
+              <Textarea id="description" placeholder="Descripcion opcional del programa..." rows={3} {...field} />
+              <FieldDescription>Maximo 500 caracteres</FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       {/* Weeks and Sessions in a compact grid */}
       {(showWeeksCount || showSessionsCount) && (
         <div className="grid grid-cols-2 gap-4">
           {showWeeksCount && (
-            <Field>
-              <FieldLabel htmlFor="weeksCount">Semanas</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="weeksCount"
-                  type="number"
-                  min={1}
-                  max={12}
-                  {...register('weeksCount', { valueAsNumber: true })}
-                />
-                <FieldDescription>1-12 semanas</FieldDescription>
-                <FieldError errors={[errors.weeksCount]} />
-              </FieldContent>
-            </Field>
+            <Controller
+              name="weeksCount"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="weeksCount">Semanas</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="weeksCount"
+                      type="number"
+                      min={1}
+                      max={12}
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
+                    />
+                    <FieldDescription>1-12 semanas</FieldDescription>
+                    <FieldError errors={[fieldState.error]} />
+                  </FieldContent>
+                </Field>
+              )}
+            />
           )}
           {showSessionsCount && (
-            <Field>
-              <FieldLabel htmlFor="sessionsCount">Sesiones</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="sessionsCount"
-                  type="number"
-                  min={1}
-                  max={7}
-                  {...register('sessionsCount', { valueAsNumber: true })}
-                />
-                <FieldDescription>1-7 dias/semana</FieldDescription>
-                <FieldError errors={[errors.sessionsCount]} />
-              </FieldContent>
-            </Field>
+            <Controller
+              name="sessionsCount"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="sessionsCount">Sesiones</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="sessionsCount"
+                      type="number"
+                      min={1}
+                      max={7}
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
+                    />
+                    <FieldDescription>1-7 dias/semana</FieldDescription>
+                    <FieldError errors={[fieldState.error]} />
+                  </FieldContent>
+                </Field>
+              )}
+            />
           )}
         </div>
       )}
 
-      <Field>
-        <FieldLabel htmlFor="athlete">Atleta</FieldLabel>
-        <FieldContent>
-          <Controller
-            control={control}
-            name="athleteId"
-            render={({ field }) => {
-              const handleSelect = (value: string | null) => {
-                if (value === '' || value === null) {
-                  // Clear selection
-                  field.onChange(undefined)
-                  setSelectedAthleteName('')
-                } else {
-                  // Select athlete
-                  const athlete = athletes.find((a) => a.id === value)
-                  if (athlete) {
-                    field.onChange(athlete.id)
-                    setSelectedAthleteName(athlete.name)
-                  }
-                }
-                setAthleteSearch('')
+      <Controller
+        name="athleteId"
+        control={control}
+        render={({ field, fieldState }) => {
+          const handleSelect = (value: string | null) => {
+            if (value === '' || value === null) {
+              // Clear selection
+              field.onChange(undefined)
+              setSelectedAthleteName('')
+            } else {
+              // Select athlete
+              const athlete = athletes.find((a) => a.id === value)
+              if (athlete) {
+                field.onChange(athlete.id)
+                setSelectedAthleteName(athlete.name)
               }
+            }
+            setAthleteSearch('')
+          }
 
-              return (
+          return (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="athlete">Atleta</FieldLabel>
+              <FieldContent>
                 <Combobox value={field.value ?? ''} onValueChange={handleSelect}>
                   <ComboboxInput
                     id="athlete"
@@ -191,15 +207,15 @@ export function ProgramForm({
                     </ComboboxList>
                   </ComboboxContent>
                 </Combobox>
-              )
-            }}
-          />
-          <FieldDescription>
-            Asigna el programa a un atleta. Dejalo vacio para crear una plantilla reutilizable.
-          </FieldDescription>
-          <FieldError errors={[errors.athleteId]} />
-        </FieldContent>
-      </Field>
+                <FieldDescription>
+                  Asigna el programa a un atleta. Dejalo vacio para crear una plantilla reutilizable.
+                </FieldDescription>
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )
+        }}
+      />
     </form>
   )
 }

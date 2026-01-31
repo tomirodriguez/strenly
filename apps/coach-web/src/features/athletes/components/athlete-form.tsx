@@ -25,61 +25,80 @@ type AthleteFormProps = {
  * Accepts an optional id prop to link with external submit buttons.
  */
 export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm<CreateAthleteInput>({
+  const { handleSubmit, control } = useForm<CreateAthleteInput>({
     resolver: zodResolver(createAthleteInputSchema),
     defaultValues,
   })
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <Field>
-        <FieldLabel htmlFor="name">
-          Nombre <span className="text-destructive">*</span>
-        </FieldLabel>
-        <FieldContent>
-          <Input id="name" {...register('name')} placeholder="Ingresa el nombre del atleta" />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">
+              Nombre <span className="text-destructive">*</span>
+            </FieldLabel>
+            <FieldContent>
+              <Input id="name" placeholder="Ingresa el nombre del atleta" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
-        <FieldContent>
-          <Input id="email" type="email" {...register('email')} placeholder="atleta@ejemplo.com" />
-          <FieldDescription>Opcional. Se usa para enviar invitaciones a la app de atletas.</FieldDescription>
-          <FieldError errors={[errors.email]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
+            <FieldContent>
+              <Input id="email" type="email" placeholder="atleta@ejemplo.com" {...field} />
+              <FieldDescription>Opcional. Se usa para enviar invitaciones a la app de atletas.</FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="phone">Telefono</FieldLabel>
-        <FieldContent>
-          <Input id="phone" {...register('phone')} placeholder="+1 (555) 000-0000" />
-          <FieldError errors={[errors.phone]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="phone"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="phone">Telefono</FieldLabel>
+            <FieldContent>
+              <Input id="phone" placeholder="+1 (555) 000-0000" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="birthdate">Fecha de nacimiento</FieldLabel>
-        <FieldContent>
-          <Input id="birthdate" type="date" {...register('birthdate')} />
-          <FieldError errors={[errors.birthdate]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="birthdate"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="birthdate">Fecha de nacimiento</FieldLabel>
+            <FieldContent>
+              <Input id="birthdate" type="date" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="gender">Genero</FieldLabel>
-        <FieldContent>
-          <Controller
-            control={control}
-            name="gender"
-            render={({ field }) => (
-              <Select items={GENDER_OPTIONS} value={field.value ?? ''} onValueChange={field.onChange}>
+      <Controller
+        name="gender"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="gender">Genero</FieldLabel>
+            <FieldContent>
+              <Select value={field.value ?? ''} onValueChange={field.onChange}>
                 <SelectTrigger id="gender">
                   <SelectValue placeholder="Seleccionar genero" />
                 </SelectTrigger>
@@ -91,19 +110,25 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
                   ))}
                 </SelectContent>
               </Select>
-            )}
-          />
-          <FieldError errors={[errors.gender]} />
-        </FieldContent>
-      </Field>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="notes">Notas</FieldLabel>
-        <FieldContent>
-          <Textarea id="notes" {...register('notes')} placeholder="Notas adicionales sobre el atleta..." rows={4} />
-          <FieldError errors={[errors.notes]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="notes"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="notes">Notas</FieldLabel>
+            <FieldContent>
+              <Textarea id="notes" placeholder="Notas adicionales sobre el atleta..." rows={4} {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
     </form>
   )
 }

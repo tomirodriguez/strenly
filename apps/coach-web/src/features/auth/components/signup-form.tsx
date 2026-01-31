@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type SignupInput, signupInputSchema } from '@strenly/contracts'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -11,11 +11,7 @@ type SignupFormProps = {
 }
 
 export function SignupForm({ onSubmit, isSubmitting }: SignupFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignupInput>({
+  const { handleSubmit, control } = useForm<SignupInput>({
     resolver: zodResolver(signupInputSchema),
     defaultValues: {
       name: '',
@@ -26,35 +22,47 @@ export function SignupForm({ onSubmit, isSubmitting }: SignupFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <Field>
-        <FieldLabel htmlFor="name">Nombre</FieldLabel>
-        <FieldContent>
-          <Input id="name" type="text" autoComplete="name" aria-invalid={!!errors.name} {...register('name')} />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">Nombre</FieldLabel>
+            <FieldContent>
+              <Input id="name" type="text" autoComplete="name" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
-        <FieldContent>
-          <Input id="email" type="email" autoComplete="email" aria-invalid={!!errors.email} {...register('email')} />
-          <FieldError errors={[errors.email]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
+            <FieldContent>
+              <Input id="email" type="email" autoComplete="email" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="password">Contrasena</FieldLabel>
-        <FieldContent>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            aria-invalid={!!errors.password}
-            {...register('password')}
-          />
-          <FieldError errors={[errors.password]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="password"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="password">Contrasena</FieldLabel>
+            <FieldContent>
+              <Input id="password" type="password" autoComplete="new-password" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (

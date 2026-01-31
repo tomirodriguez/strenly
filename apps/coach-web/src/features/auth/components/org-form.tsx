@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -33,13 +33,7 @@ function generateSlug(name: string): string {
 
 export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
   const userEditedSlug = useRef(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<OrgFormData>({
+  const { handleSubmit, control, setValue } = useForm<OrgFormData>({
     resolver: standardSchemaResolver(orgFormSchema),
     defaultValues: {
       name: '',
@@ -47,50 +41,59 @@ export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
     },
   })
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
-    // Auto-generate slug if user hasn't manually edited it
-    if (!userEditedSlug.current) {
-      setValue('slug', generateSlug(newName))
-    }
-  }
-
-  const handleSlugChange = () => {
-    userEditedSlug.current = true
-  }
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Field>
-        <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
-        <FieldContent>
-          <Input
-            id="name"
-            type="text"
-            placeholder="Mi Gimnasio"
-            aria-invalid={!!errors.name}
-            {...register('name', { onChange: handleNameChange })}
-          />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
+            <FieldContent>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Mi Gimnasio"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e)
+                  // Auto-generate slug if user hasn't manually edited it
+                  if (!userEditedSlug.current) {
+                    setValue('slug', generateSlug(e.target.value))
+                  }
+                }}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
-        <FieldContent>
-          <Input
-            id="slug"
-            type="text"
-            placeholder="mi-gimnasio"
-            aria-invalid={!!errors.slug}
-            {...register('slug', { onChange: handleSlugChange })}
-          />
-          <FieldDescription>
-            Se usara en la URL de tu organizacion. Solo se permiten letras minusculas, numeros y guiones.
-          </FieldDescription>
-          <FieldError errors={[errors.slug]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="slug"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
+            <FieldContent>
+              <Input
+                id="slug"
+                type="text"
+                placeholder="mi-gimnasio"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e)
+                  userEditedSlug.current = true
+                }}
+              />
+              <FieldDescription>
+                Se usara en la URL de tu organizacion. Solo se permiten letras minusculas, numeros y guiones.
+              </FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (

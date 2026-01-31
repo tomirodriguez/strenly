@@ -12,12 +12,7 @@ type LoginFormProps = {
 }
 
 export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm<LoginInput>({
+  const { handleSubmit, control } = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: {
       email: '',
@@ -28,38 +23,46 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <Field>
-        <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
-        <FieldContent>
-          <Input id="email" type="email" autoComplete="email" aria-invalid={!!errors.email} {...register('email')} />
-          <FieldError errors={[errors.email]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
+            <FieldContent>
+              <Input id="email" type="email" autoComplete="email" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="password">Contrasena</FieldLabel>
-        <FieldContent>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            aria-invalid={!!errors.password}
-            {...register('password')}
-          />
-          <FieldError errors={[errors.password]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="password"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="password">Contrasena</FieldLabel>
+            <FieldContent>
+              <Input id="password" type="password" autoComplete="current-password" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field orientation="horizontal">
-        <FieldLabel htmlFor="rememberMe" className="flex cursor-pointer items-center gap-2">
-          <Controller
-            control={control}
-            name="rememberMe"
-            render={({ field }) => <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />}
-          />
-          <span className="text-sm">Recordarme</span>
-        </FieldLabel>
-      </Field>
+      <Controller
+        name="rememberMe"
+        control={control}
+        render={({ field }) => (
+          <Field orientation="horizontal">
+            <FieldLabel htmlFor="rememberMe" className="flex cursor-pointer items-center gap-2">
+              <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />
+              <span className="text-sm">Recordarme</span>
+            </FieldLabel>
+          </Field>
+        )}
+      />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (
