@@ -4,6 +4,8 @@
 
 This guide covers the correct patterns for creating forms using React Hook Form with shadcn/ui's **Field** component following the [official shadcn/ui documentation](https://ui.shadcn.com/docs/forms/react-hook-form). Forms must be **pure UI components** - they handle presentation and validation, but delegate data operations to their parent.
 
+**IMPORTANT**: Always use `Controller` for ALL fields. Never use `register()`. This ensures proper integration with shadcn/ui's `data-invalid` styling and access to `fieldState`.
+
 ---
 
 ## 1. Core Principle: Forms Are Pure UI
@@ -72,7 +74,7 @@ import {
 
 ```tsx
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import {
   Field,
@@ -101,7 +103,7 @@ type CreateUserFormProps = {
   defaultValues?: Partial<CreateUserFormData>
 }
 
-// 3. Pure UI form component
+// 3. Pure UI form component using Controller pattern
 export function CreateUserForm({
   id,
   onSubmit,
@@ -109,37 +111,45 @@ export function CreateUserForm({
   isSubmitting = false,
   defaultValues,
 }: CreateUserFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CreateUserFormData>({
+  const { control, handleSubmit } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues,
   })
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <Field>
-        <FieldLabel htmlFor="name">
-          Nombre <span className="text-destructive">*</span>
-        </FieldLabel>
-        <FieldContent>
-          <Input id="name" placeholder="Juan Pérez" {...register('name')} />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">
+              Nombre <span className="text-destructive">*</span>
+            </FieldLabel>
+            <FieldContent>
+              <Input id="name" placeholder="Juan Pérez" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="email">Email</FieldLabel>
-        <FieldContent>
-          <Input id="email" placeholder="juan@ejemplo.com" {...register('email')} />
-          <FieldDescription>
-            Usaremos este email para notificaciones
-          </FieldDescription>
-          <FieldError errors={[errors.email]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldContent>
+              <Input id="email" placeholder="juan@ejemplo.com" {...field} />
+              <FieldDescription>
+                Usaremos este email para notificaciones
+              </FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <div className="flex gap-2 justify-end">
         {onCancel && (
@@ -173,23 +183,29 @@ export function CreateUserForm({
 | `FieldLegend` | Title for a FieldSet |
 | `FieldGroup` | Container for multiple fields |
 
-### Basic Field
+### Basic Field (with Controller)
 
 ```tsx
-<Field>
-  <FieldLabel htmlFor="fieldName">Label</FieldLabel>
-  <FieldContent>
-    <Input id="fieldName" {...register('fieldName')} />
-    <FieldDescription>Optional help text</FieldDescription>
-    <FieldError errors={[errors.fieldName]} />
-  </FieldContent>
-</Field>
+<Controller
+  name="fieldName"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <FieldLabel htmlFor="fieldName">Label</FieldLabel>
+      <FieldContent>
+        <Input id="fieldName" {...field} />
+        <FieldDescription>Optional help text</FieldDescription>
+        <FieldError errors={[fieldState.error]} />
+      </FieldContent>
+    </Field>
+  )}
+/>
 ```
 
 ### FieldError accepts array of error objects
 
 ```tsx
-<FieldError errors={[errors.fieldName]} />
+<FieldError errors={[fieldState.error]} />
 ```
 
 ### FieldSet for Grouping
@@ -200,20 +216,32 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 <FieldSet>
   <FieldLegend>Información Personal</FieldLegend>
   <FieldGroup>
-    <Field>
-      <FieldLabel htmlFor="name">Nombre</FieldLabel>
-      <FieldContent>
-        <Input id="name" {...register('name')} />
-        <FieldError errors={[errors.name]} />
-      </FieldContent>
-    </Field>
-    <Field>
-      <FieldLabel htmlFor="email">Email</FieldLabel>
-      <FieldContent>
-        <Input id="email" {...register('email')} />
-        <FieldError errors={[errors.email]} />
-      </FieldContent>
-    </Field>
+    <Controller
+      name="name"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor="name">Nombre</FieldLabel>
+          <FieldContent>
+            <Input id="name" {...field} />
+            <FieldError errors={[fieldState.error]} />
+          </FieldContent>
+        </Field>
+      )}
+    />
+    <Controller
+      name="email"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldContent>
+            <Input id="email" {...field} />
+            <FieldError errors={[fieldState.error]} />
+          </FieldContent>
+        </Field>
+      )}
+    />
   </FieldGroup>
 </FieldSet>
 ```
@@ -446,13 +474,19 @@ function OrderForm({ onSubmit }: Props) {
 
       {/* Conditional field - only show when delivery */}
       {deliveryType === 'delivery' && (
-        <Field>
-          <FieldLabel htmlFor="address">Dirección</FieldLabel>
-          <FieldContent>
-            <Input id="address" {...register('address')} />
-            <FieldError errors={[errors.address]} />
-          </FieldContent>
-        </Field>
+        <Controller
+          name="address"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="address">Dirección</FieldLabel>
+              <FieldContent>
+                <Input id="address" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
       )}
 
       <Button type="submit">Confirmar</Button>
@@ -464,15 +498,10 @@ function OrderForm({ onSubmit }: Props) {
 ### Dynamic Fields (Arrays)
 
 ```tsx
-import { useFieldArray } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 function TeamForm({ onSubmit }: Props) {
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TeamFormData>({
+  const { control, handleSubmit } = useForm<TeamFormData>({
     resolver: zodResolver(teamSchema),
     defaultValues: {
       name: '',
@@ -487,27 +516,36 @@ function TeamForm({ onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Field>
-        <FieldLabel htmlFor="teamName">Nombre del equipo</FieldLabel>
-        <FieldContent>
-          <Input id="teamName" {...register('name')} />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="teamName">Nombre del equipo</FieldLabel>
+            <FieldContent>
+              <Input id="teamName" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <div className="space-y-2">
         <FieldLabel>Miembros</FieldLabel>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-2">
-            <Field className="flex-1">
-              <FieldContent>
-                <Input
-                  placeholder="email@ejemplo.com"
-                  {...register(`members.${index}.email`)}
-                />
-                <FieldError errors={[errors.members?.[index]?.email]} />
-              </FieldContent>
-            </Field>
+        {fields.map((arrayField, index) => (
+          <div key={arrayField.id} className="flex gap-2">
+            <Controller
+              name={`members.${index}.email`}
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field className="flex-1" data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <Input placeholder="email@ejemplo.com" {...field} />
+                    <FieldError errors={[fieldState.error]} />
+                  </FieldContent>
+                </Field>
+              )}
+            />
             {fields.length > 1 && (
               <Button
                 type="button"
@@ -642,8 +680,9 @@ const schema = z.object({
 - Keep forms as pure UI components
 - Pass `onSubmit` callback from parent
 - Pass `isSubmitting` state from parent's mutation
-- Use `register` for simple inputs
-- Use `Controller` for complex components (Select, Checkbox, etc.)
+- Use `Controller` for ALL fields (never use `register`)
+- Set `data-invalid={fieldState.invalid}` on `Field` component
+- Use `fieldState.error` for error display (not `errors.fieldName`)
 - Use `reset()` to sync with external data
 - Watch only specific fields when needed
 - Use matching `id` and `htmlFor` attributes

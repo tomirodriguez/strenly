@@ -5,33 +5,38 @@ description: |
   Use this skill when creating forms with validation, refactoring existing forms to use the Field pattern,
   or working with controlled components (Select, Checkbox) and field arrays.
   Do NOT load for general React questions, state management, or non-form UI components.
-version: 2.0.0
 ---
 
 <objective>
-Creates forms using React Hook Form + shadcn/ui Field components following the official shadcn/ui documentation. Forms are pure UI components that receive callbacks from parents - they never contain mutations.
+Creates forms using React Hook Form + shadcn/ui Field components following the official shadcn/ui documentation. Forms are pure UI components that receive callbacks from parents - they never contain mutations. ALL fields use Controller - never use register().
 </objective>
 
 <quick_start>
 ```tsx
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-const { register, handleSubmit, formState: { errors } } = useForm({
+const { control, handleSubmit } = useForm({
   resolver: zodResolver(schema),
   defaultValues: { name: '', email: '' },
 })
 
 <form onSubmit={handleSubmit(onSubmit)}>
-  <Field>
-    <FieldLabel htmlFor="name">Nombre</FieldLabel>
-    <FieldContent>
-      <Input id="name" {...register('name')} />
-      <FieldError errors={[errors.name]} />
-    </FieldContent>
-  </Field>
+  <Controller
+    name="name"
+    control={control}
+    render={({ field, fieldState }) => (
+      <Field data-invalid={fieldState.invalid}>
+        <FieldLabel htmlFor="name">Nombre</FieldLabel>
+        <FieldContent>
+          <Input id="name" {...field} />
+          <FieldError errors={[fieldState.error]} />
+        </FieldContent>
+      </Field>
+    )}
+  />
 </form>
 ```
 </quick_start>
@@ -64,8 +69,9 @@ function BadForm() {
 
 ```tsx
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
 
-const { register, handleSubmit, formState: { errors } } = useForm({
+const { control, handleSubmit } = useForm({
   resolver: zodResolver(schema),
   defaultValues: { ... },
 })
@@ -73,20 +79,33 @@ const { register, handleSubmit, formState: { errors } } = useForm({
 
 > **Fallback**: If you encounter edge cases where `zodResolver` doesn't work with Zod 4, use `standardSchemaResolver` from `@hookform/resolvers/standard-schema` as a fallback.
 
-**3. Use Field Component Structure**
+**3. ALWAYS Use Controller - Never use register()**
 
-shadcn/ui uses a compound component pattern with `Field`, `FieldLabel`, `FieldContent`, and `FieldError`:
+The shadcn/ui pattern uses `Controller` for ALL fields. This provides access to `fieldState` for proper error styling on the `Field` component.
 
 ```tsx
+import { Controller } from 'react-hook-form'
 import { Field, FieldContent, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field'
 
+// CORRECT - Controller pattern
+<Controller
+  name="fieldName"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <FieldLabel htmlFor="fieldName">Label</FieldLabel>
+      <FieldContent>
+        <Input id="fieldName" {...field} />
+        <FieldDescription>Optional help text</FieldDescription>
+        <FieldError errors={[fieldState.error]} />
+      </FieldContent>
+    </Field>
+  )}
+/>
+
+// WRONG - register pattern (do NOT use)
 <Field>
-  <FieldLabel htmlFor="fieldName">Label</FieldLabel>
-  <FieldContent>
-    <Input id="fieldName" {...register('fieldName')} />
-    <FieldDescription>Optional help text</FieldDescription>
-    <FieldError errors={[errors.fieldName]} />
-  </FieldContent>
+  <Input {...register('fieldName')} /> {/* NO! */}
 </Field>
 ```
 </core_rules>
@@ -94,7 +113,7 @@ import { Field, FieldContent, FieldLabel, FieldDescription, FieldError } from '@
 <template>
 ```tsx
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -122,35 +141,43 @@ export function MyForm({
   isSubmitting = false,
   defaultValues,
 }: Props) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { control, handleSubmit } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues,
   })
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <Field>
-        <FieldLabel htmlFor="name">
-          Nombre <span className="text-destructive">*</span>
-        </FieldLabel>
-        <FieldContent>
-          <Input id="name" {...register('name')} placeholder="Ingresa el nombre" />
-          <FieldError errors={[errors.name]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="name"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="name">
+              Nombre <span className="text-destructive">*</span>
+            </FieldLabel>
+            <FieldContent>
+              <Input id="name" placeholder="Ingresa el nombre" {...field} />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="email">Email</FieldLabel>
-        <FieldContent>
-          <Input id="email" type="email" {...register('email')} placeholder="ejemplo@correo.com" />
-          <FieldDescription>Usaremos este email para notificaciones</FieldDescription>
-          <FieldError errors={[errors.email]} />
-        </FieldContent>
-      </Field>
+      <Controller
+        name="email"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldContent>
+              <Input id="email" type="email" placeholder="ejemplo@correo.com" {...field} />
+              <FieldDescription>Usaremos este email para notificaciones</FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        )}
+      />
 
       <div className="flex gap-2 justify-end">
         {onCancel && (
@@ -197,6 +224,24 @@ function CreateUserDialog({ open, onOpenChange }: Props) {
 </mutation_usage>
 
 <anti_patterns>
+**DON'T: Use register() - ALWAYS use Controller**
+```tsx
+// BAD - register pattern
+<Input {...register('name')} />
+
+// GOOD - Controller pattern
+<Controller
+  name="name"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <Input {...field} />
+      <FieldError errors={[fieldState.error]} />
+    </Field>
+  )}
+/>
+```
+
 **DON'T: useEffect for field sync**
 ```tsx
 // BAD
@@ -227,7 +272,7 @@ Forms receive `onSubmit` and `isSubmitting` from parent.
 </anti_patterns>
 
 <controlled_components>
-**Select (with Controller)**
+**Select**
 ```tsx
 import { Controller } from 'react-hook-form'
 
@@ -236,14 +281,14 @@ const OPTIONS = [
   { value: 'user', label: 'Usuario' },
 ]
 
-<Field>
-  <FieldLabel htmlFor="role">Rol</FieldLabel>
-  <FieldContent>
-    <Controller
-      control={control}
-      name="role"
-      render={({ field }) => (
-        <Select items={OPTIONS} value={field.value ?? ''} onValueChange={field.onChange}>
+<Controller
+  name="role"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <FieldLabel htmlFor="role">Rol</FieldLabel>
+      <FieldContent>
+        <Select value={field.value ?? ''} onValueChange={field.onChange}>
           <SelectTrigger id="role">
             <SelectValue placeholder="Seleccionar rol" />
           </SelectTrigger>
@@ -255,43 +300,49 @@ const OPTIONS = [
             ))}
           </SelectContent>
         </Select>
-      )}
-    />
-    <FieldError errors={[errors.role]} />
-  </FieldContent>
-</Field>
+        <FieldError errors={[fieldState.error]} />
+      </FieldContent>
+    </Field>
+  )}
+/>
 ```
 
-**Checkbox (with Controller)**
+**Checkbox**
 ```tsx
-<Field>
-  <div className="flex items-center gap-2">
-    <Controller
-      control={control}
-      name="terms"
-      render={({ field }) => (
+<Controller
+  name="terms"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <div className="flex items-center gap-2">
         <Checkbox
           id="terms"
           checked={field.value}
           onCheckedChange={field.onChange}
         />
-      )}
-    />
-    <FieldLabel htmlFor="terms" className="!mt-0">Acepto los términos</FieldLabel>
-  </div>
-  <FieldError errors={[errors.terms]} />
-</Field>
+        <FieldLabel htmlFor="terms" className="!mt-0">Acepto los términos</FieldLabel>
+      </div>
+      <FieldError errors={[fieldState.error]} />
+    </Field>
+  )}
+/>
 ```
 
 **Textarea**
 ```tsx
-<Field>
-  <FieldLabel htmlFor="description">Descripción</FieldLabel>
-  <FieldContent>
-    <Textarea id="description" rows={4} {...register('description')} />
-    <FieldError errors={[errors.description]} />
-  </FieldContent>
-</Field>
+<Controller
+  name="description"
+  control={control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <FieldLabel htmlFor="description">Descripción</FieldLabel>
+      <FieldContent>
+        <Textarea id="description" rows={4} {...field} />
+        <FieldError errors={[fieldState.error]} />
+      </FieldContent>
+    </Field>
+  )}
+/>
 ```
 </controlled_components>
 
@@ -300,33 +351,46 @@ const OPTIONS = [
 const type = watch('type')
 
 {type === 'advanced' && (
-  <Field>
-    <FieldLabel htmlFor="advancedOption">Opción avanzada</FieldLabel>
-    <FieldContent>
-      <Input id="advancedOption" {...register('advancedOption')} />
-      <FieldError errors={[errors.advancedOption]} />
-    </FieldContent>
-  </Field>
+  <Controller
+    name="advancedOption"
+    control={control}
+    render={({ field, fieldState }) => (
+      <Field data-invalid={fieldState.invalid}>
+        <FieldLabel htmlFor="advancedOption">Opción avanzada</FieldLabel>
+        <FieldContent>
+          <Input id="advancedOption" {...field} />
+          <FieldError errors={[fieldState.error]} />
+        </FieldContent>
+      </Field>
+    )}
+  />
 )}
 ```
 </conditional_fields>
 
 <field_arrays>
 ```tsx
-import { useFieldArray } from 'react-hook-form'
+import { Controller, useFieldArray } from 'react-hook-form'
 
 const { fields, append, remove } = useFieldArray({
   control,
   name: 'items',
 })
 
-{fields.map((field, index) => (
-  <Field key={field.id}>
-    <FieldContent>
-      <Input {...register(`items.${index}.value`)} />
-      <FieldError errors={[errors.items?.[index]?.value]} />
-    </FieldContent>
-  </Field>
+{fields.map((arrayField, index) => (
+  <Controller
+    key={arrayField.id}
+    name={`items.${index}.value`}
+    control={control}
+    render={({ field, fieldState }) => (
+      <Field data-invalid={fieldState.invalid}>
+        <FieldContent>
+          <Input {...field} />
+          <FieldError errors={[fieldState.error]} />
+        </FieldContent>
+      </Field>
+    )}
+  />
 ))}
 
 <Button type="button" onClick={() => append({ value: '' })}>
@@ -342,20 +406,32 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 <FieldSet>
   <FieldLegend>Información Personal</FieldLegend>
   <FieldGroup>
-    <Field>
-      <FieldLabel htmlFor="name">Nombre</FieldLabel>
-      <FieldContent>
-        <Input id="name" {...register('name')} />
-        <FieldError errors={[errors.name]} />
-      </FieldContent>
-    </Field>
-    <Field>
-      <FieldLabel htmlFor="email">Email</FieldLabel>
-      <FieldContent>
-        <Input id="email" {...register('email')} />
-        <FieldError errors={[errors.email]} />
-      </FieldContent>
-    </Field>
+    <Controller
+      name="name"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor="name">Nombre</FieldLabel>
+          <FieldContent>
+            <Input id="name" {...field} />
+            <FieldError errors={[fieldState.error]} />
+          </FieldContent>
+        </Field>
+      )}
+    />
+    <Controller
+      name="email"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldContent>
+            <Input id="email" {...field} />
+            <FieldError errors={[fieldState.error]} />
+          </FieldContent>
+        </Field>
+      )}
+    />
   </FieldGroup>
 </FieldSet>
 ```
@@ -386,11 +462,12 @@ When creating a form:
 
 - [ ] Form receives `onSubmit`, `onCancel`, `isSubmitting`, `defaultValues` as props
 - [ ] Uses `zodResolver` with Zod schema (fallback to `standardSchemaResolver` if needed)
-- [ ] Uses `Field` > `FieldLabel` + `FieldContent` > `Input` + `FieldError` structure
+- [ ] ALL fields use `Controller` - never use `register()`
+- [ ] `Field` has `data-invalid={fieldState.invalid}` for error styling
+- [ ] Uses `fieldState.error` (not `errors.fieldName`) for error display
 - [ ] All inputs have matching `id` and `htmlFor` attributes
 - [ ] No mutations inside the form component
-- [ ] Controlled components use `Controller` from react-hook-form
-- [ ] Error messages display correctly with `<FieldError errors={[errors.fieldName]} />`
+- [ ] Error messages display with `<FieldError errors={[fieldState.error]} />`
 </success_criteria>
 
 <resources>
