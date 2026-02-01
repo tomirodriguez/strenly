@@ -33,17 +33,25 @@ export const makeArchiveExercise =
       })
     }
 
-    // 2. Fetch exercise to verify ownership
+    // 2. Fetch exercise to verify ownership (repository handles org scope)
     return deps.exerciseRepository
-      .findById(input.exerciseId)
+      .findById(input.organizationId, input.exerciseId)
       .mapErr(
-        (e): ArchiveExerciseError =>
-          e.type === 'NOT_FOUND'
-            ? { type: 'not_found', exerciseId: input.exerciseId }
-            : { type: 'repository_error', message: e.message },
+        (e): ArchiveExerciseError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Database error',
+        }),
       )
       .andThen((exercise) => {
-        // 3. Check if archivable - cannot archive curated or other org's exercises
+        // 3. Check if found
+        if (exercise === null) {
+          return errAsync<void, ArchiveExerciseError>({
+            type: 'not_found',
+            exerciseId: input.exerciseId,
+          })
+        }
+
+        // 4. Cannot archive curated exercises
         if (isCurated(exercise)) {
           return errAsync<void, ArchiveExerciseError>({
             type: 'cannot_archive_curated',
@@ -51,14 +59,7 @@ export const makeArchiveExercise =
           })
         }
 
-        if (exercise.organizationId !== input.organizationId) {
-          return errAsync<void, ArchiveExerciseError>({
-            type: 'not_found',
-            exerciseId: input.exerciseId,
-          })
-        }
-
-        // 4. Archive the exercise (soft delete via archivedAt timestamp)
+        // 5. Archive the exercise (soft delete via archivedAt timestamp)
         return deps.exerciseRepository.archive(input.exerciseId).mapErr(
           (e): ArchiveExerciseError => ({
             type: 'repository_error',

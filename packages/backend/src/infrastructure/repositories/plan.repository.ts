@@ -69,7 +69,7 @@ function mapToDomain(row: typeof plans.$inferSelect): Plan | null {
 
 export function createPlanRepository(db: DbClient): PlanRepositoryPort {
   return {
-    findById(id: string): ResultAsync<Plan, PlanRepositoryError> {
+    findById(id: string): ResultAsync<Plan | null, PlanRepositoryError> {
       return ResultAsync.fromPromise(
         db
           .select()
@@ -79,7 +79,7 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
         wrapDbError,
       ).andThen((row) => {
         if (!row) {
-          return err({ type: 'NOT_FOUND', planId: id } as const)
+          return ok(null)
         }
         const plan = mapToDomain(row)
         if (!plan) {
@@ -89,7 +89,7 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
       })
     },
 
-    findBySlug(slug: string): ResultAsync<Plan, PlanRepositoryError> {
+    findBySlug(slug: string): ResultAsync<Plan | null, PlanRepositoryError> {
       return ResultAsync.fromPromise(
         db
           .select()
@@ -99,7 +99,7 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
         wrapDbError,
       ).andThen((row) => {
         if (!row) {
-          return err({ type: 'NOT_FOUND', planId: slug } as const)
+          return ok(null)
         }
         const plan = mapToDomain(row)
         if (!plan) {
@@ -109,16 +109,16 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
       })
     },
 
-    findAll(options?: ListPlansOptions): ResultAsync<{ items: Plan[]; totalCount: number }, PlanRepositoryError> {
+    findAll(options: ListPlansOptions): ResultAsync<{ items: Plan[]; totalCount: number }, PlanRepositoryError> {
       return ResultAsync.fromPromise(
         (async () => {
           const conditions = []
 
-          if (options?.activeOnly !== false) {
+          if (options.activeOnly !== false) {
             conditions.push(eq(plans.isActive, true))
           }
 
-          if (options?.organizationType) {
+          if (options.organizationType) {
             conditions.push(eq(plans.organizationType, options.organizationType))
           }
 
@@ -126,7 +126,13 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
 
           const [countResult, rows] = await Promise.all([
             db.select({ count: count() }).from(plans).where(whereClause),
-            db.select().from(plans).where(whereClause).orderBy(plans.priceMonthly),
+            db
+              .select()
+              .from(plans)
+              .where(whereClause)
+              .orderBy(plans.priceMonthly)
+              .limit(options.limit ?? 100)
+              .offset(options.offset ?? 0),
           ])
 
           const items = rows.map(mapToDomain).filter((p): p is Plan => p !== null)

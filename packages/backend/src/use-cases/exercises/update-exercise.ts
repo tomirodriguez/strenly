@@ -46,17 +46,25 @@ export const makeUpdateExercise =
       })
     }
 
-    // 2. Fetch existing exercise
+    // 2. Fetch existing exercise (repository handles org scope)
     return deps.exerciseRepository
-      .findById(input.exerciseId)
+      .findById(input.organizationId, input.exerciseId)
       .mapErr(
-        (e): UpdateExerciseError =>
-          e.type === 'NOT_FOUND'
-            ? { type: 'not_found', exerciseId: input.exerciseId }
-            : { type: 'repository_error', message: e.message },
+        (e): UpdateExerciseError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Database error',
+        }),
       )
       .andThen((existing) => {
-        // 3. Check if editable - cannot edit curated or other org's exercises
+        // 3. Check if found
+        if (existing === null) {
+          return errAsync<Exercise, UpdateExerciseError>({
+            type: 'not_found',
+            exerciseId: input.exerciseId,
+          })
+        }
+
+        // 4. Cannot edit curated exercises
         if (isCurated(existing)) {
           return errAsync<Exercise, UpdateExerciseError>({
             type: 'cannot_edit_curated',
@@ -64,14 +72,7 @@ export const makeUpdateExercise =
           })
         }
 
-        if (existing.organizationId !== input.organizationId) {
-          return errAsync<Exercise, UpdateExerciseError>({
-            type: 'not_found',
-            exerciseId: input.exerciseId,
-          })
-        }
-
-        // 4. Merge updates with existing
+        // 5. Merge updates with existing
         const updatedResult = createExercise({
           id: existing.id,
           organizationId: existing.organizationId,
@@ -95,7 +96,7 @@ export const makeUpdateExercise =
           })
         }
 
-        // 5. Persist update
+        // 6. Persist update
         return deps.exerciseRepository.update(updatedResult.value).mapErr(
           (e): UpdateExerciseError => ({
             type: 'repository_error',

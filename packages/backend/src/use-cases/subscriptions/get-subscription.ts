@@ -7,7 +7,7 @@ import {
   type Subscription,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetSubscriptionInput = OrganizationContext & {
   memberRole: Role
@@ -53,15 +53,13 @@ export const makeGetSubscription =
         // 3. Get plan
         deps.planRepository
           .findById(subscription.planId)
-          .mapErr((e): GetSubscriptionError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'plan_not_found', planId: subscription.planId }
+          .mapErr((e): GetSubscriptionError => ({ type: 'repository_error', message: e.message }))
+          .andThen((plan) => {
+            // Check if plan was found
+            if (plan === null) {
+              return errAsync({ type: 'plan_not_found', planId: subscription.planId } as GetSubscriptionError)
             }
-            return { type: 'repository_error', message: e.message }
-          })
-          .map((plan) => ({
-            subscription,
-            plan,
-          })),
+            return okAsync({ subscription, plan })
+          }),
       )
   }

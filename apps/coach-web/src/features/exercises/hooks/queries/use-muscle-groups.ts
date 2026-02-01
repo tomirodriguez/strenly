@@ -2,14 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
 /**
- * Query keys factory for muscle groups
- */
-export const muscleGroupKeys = {
-  all: ['muscle-groups'] as const,
-}
-
-/**
- * Hook to query all muscle groups for filter dropdowns
+ * Hook to query all muscle groups for filter dropdowns.
+ * Uses oRPC's built-in key factory via orpc.exercises.key() for cache invalidation.
  */
 export function useMuscleGroups() {
   return useQuery(orpc.exercises.muscleGroups.queryOptions({}))

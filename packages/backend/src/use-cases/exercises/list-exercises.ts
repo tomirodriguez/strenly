@@ -49,8 +49,8 @@ export const makeListExercises =
         muscleGroup: input.muscleGroup,
         search: input.search,
         includeArchived: input.includeArchived,
-        limit: input.limit,
-        offset: input.offset,
+        limit: input.limit ?? 10,
+        offset: input.offset ?? 0,
       })
       .mapErr(
         (e): ListExercisesError => ({

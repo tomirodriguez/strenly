@@ -50,13 +50,13 @@ export const makeCheckFeatureAccess =
         // 3. Get plan
         deps.planRepository
           .findById(subscription.planId)
-          .mapErr((e): CheckFeatureAccessError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'plan_not_found', planId: subscription.planId }
-            }
-            return { type: 'repository_error', message: e.message }
-          })
+          .mapErr((e): CheckFeatureAccessError => ({ type: 'repository_error', message: e.message }))
           .andThen((plan) => {
+            // Check if plan was found
+            if (plan === null) {
+              return errAsync({ type: 'plan_not_found', planId: subscription.planId } as CheckFeatureAccessError)
+            }
+
             // 4. Use domain helper
             if (!hasFeature(plan, input.feature)) {
               return errAsync({

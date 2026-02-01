@@ -56,8 +56,8 @@ export const addExerciseRowProcedure = authProcedure
 
     const row = result.value
 
-    // Fetch exercise name
-    const exerciseResult = await exerciseRepository.findById(row.exerciseId)
+    // Fetch exercise name (pass organizationId to get curated or org-specific exercises)
+    const exerciseResult = await exerciseRepository.findById(context.organization.id, row.exerciseId)
     const exerciseName = exerciseResult.isOk() ? (exerciseResult.value?.name ?? 'Unknown') : 'Unknown'
 
     return {
@@ -119,8 +119,8 @@ export const updateExerciseRowProcedure = authProcedure
 
     const row = result.value
 
-    // Fetch exercise name
-    const exerciseResult = await exerciseRepository.findById(row.exerciseId)
+    // Fetch exercise name (pass organizationId to get curated or org-specific exercises)
+    const exerciseResult = await exerciseRepository.findById(context.organization.id, row.exerciseId)
     const exerciseName = exerciseResult.isOk() ? (exerciseResult.value?.name ?? 'Unknown') : 'Unknown'
 
     return {

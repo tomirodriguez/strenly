@@ -19,9 +19,15 @@ export type ListExercisesOptions = {
 }
 
 export type ExerciseRepositoryPort = {
-  findById(id: string): ResultAsync<Exercise, ExerciseRepositoryError>
+  /**
+   * Find exercise by ID with organization scope.
+   * Returns exercise if it's curated (organizationId is null) OR belongs to the specified organization.
+   * @param organizationId - The organization to scope the query to (null returns only curated)
+   * @param id - The exercise ID to find
+   */
+  findById(organizationId: string | null, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError>
   findAll(
-    options?: ListExercisesOptions,
+    options: ListExercisesOptions,
   ): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError>
   create(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>
   update(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>

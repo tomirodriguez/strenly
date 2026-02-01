@@ -20,20 +20,25 @@ const listPlansOutputSchema = z.object({
  * Can filter by organization type (coach_solo or gym)
  */
 export const listPlans = publicProcedure
+  .errors({
+    INTERNAL_ERROR: { message: 'Failed to load subscription plans' },
+  })
   .input(listPlansInputSchema)
   .output(listPlansOutputSchema)
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, context, errors }) => {
     const planRepository = createPlanRepository(context.db)
 
     const result = await planRepository.findAll({
       organizationType: input?.organizationType,
       activeOnly: true,
+      limit: 100, // Plans are typically few, fetch all
+      offset: 0,
     })
 
     if (result.isErr()) {
-      // Log and throw generic error for public endpoint
+      // Log and throw typed error for public endpoint
       console.error('Failed to list plans:', result.error)
-      throw new Error('Failed to load subscription plans')
+      throw errors.INTERNAL_ERROR()
     }
 
     return {

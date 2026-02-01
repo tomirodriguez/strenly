@@ -6,7 +6,7 @@ import {
   type Role,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CheckAthleteLimitInput = OrganizationContext & {
   memberRole: Role
@@ -54,23 +54,23 @@ export const makeCheckAthleteLimit =
         // 3. Get plan for limit
         deps.planRepository
           .findById(subscription.planId)
-          .mapErr((e): CheckAthleteLimitError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'plan_not_found', planId: subscription.planId }
+          .mapErr((e): CheckAthleteLimitError => ({ type: 'repository_error', message: e.message }))
+          .andThen((plan) => {
+            // Check if plan was found
+            if (plan === null) {
+              return errAsync({ type: 'plan_not_found', planId: subscription.planId } as CheckAthleteLimitError)
             }
-            return { type: 'repository_error', message: e.message }
-          })
-          .map((plan) => {
+
             // 4. Use domain helper
             const canAdd = canAddAthlete(plan, subscription.athleteCount)
             const remaining = plan.athleteLimit - subscription.athleteCount
 
-            return {
+            return okAsync({
               canAdd,
               currentCount: subscription.athleteCount,
               limit: plan.athleteLimit,
               remaining: Math.max(0, remaining),
-            }
+            })
           }),
       )
   }

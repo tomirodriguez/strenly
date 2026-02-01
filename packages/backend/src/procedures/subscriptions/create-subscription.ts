@@ -47,10 +47,14 @@ export const createSubscription = sessionProcedure
     const planResult = await planRepository.findById(subscription.planId)
 
     if (planResult.isErr()) {
+      console.error('Failed to fetch plan:', planResult.error.message)
       throw errors.PLAN_NOT_FOUND()
     }
 
     const plan = planResult.value
+    if (plan === null) {
+      throw errors.PLAN_NOT_FOUND()
+    }
 
     return {
       id: subscription.id,

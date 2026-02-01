@@ -32,13 +32,13 @@ export function makeCreateSubscription(deps: Dependencies) {
     // 1. Validate plan exists
     return deps.planRepository
       .findById(input.planId)
-      .mapErr((error) => {
-        if (error.type === 'NOT_FOUND') {
-          return { type: 'plan_not_found', planId: input.planId } as const
-        }
-        return { type: 'repository_error', message: error.message } as const
-      })
+      .mapErr((error) => ({ type: 'repository_error', message: error.message }) as const)
       .andThen((plan) => {
+        // Check if plan was found
+        if (plan === null) {
+          return errAsync({ type: 'plan_not_found', planId: input.planId } as const)
+        }
+
         // 2. Create subscription entity with 30-day period
         const now = new Date()
         const periodEnd = new Date(now)

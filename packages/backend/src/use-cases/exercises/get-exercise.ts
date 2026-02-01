@@ -2,7 +2,6 @@ import {
   type Exercise,
   type ExerciseRepositoryPort,
   hasPermission,
-  isCurated,
   type OrganizationContext,
   type Role,
 } from '@strenly/core'
@@ -33,18 +32,18 @@ export const makeGetExercise =
       })
     }
 
-    // 2. Fetch exercise
+    // 2. Fetch exercise with organization scope (repository handles access control)
     return deps.exerciseRepository
-      .findById(input.exerciseId)
+      .findById(input.organizationId, input.exerciseId)
       .mapErr(
-        (e): GetExerciseError =>
-          e.type === 'NOT_FOUND'
-            ? { type: 'not_found', exerciseId: input.exerciseId }
-            : { type: 'repository_error', message: e.message },
+        (e): GetExerciseError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Database error',
+        }),
       )
       .andThen((exercise) => {
-        // 3. Verify access - exercise is curated OR belongs to org
-        if (!isCurated(exercise) && exercise.organizationId !== input.organizationId) {
+        // 3. Check if found (null means not found or no access)
+        if (exercise === null) {
           return errAsync<Exercise, GetExerciseError>({
             type: 'not_found',
             exerciseId: input.exerciseId,

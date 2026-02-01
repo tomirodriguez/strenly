@@ -3,7 +3,6 @@ import {
   type Exercise,
   type ExerciseRepositoryPort,
   hasPermission,
-  isCurated,
   type OrganizationContext,
   type Role,
 } from '@strenly/core'
@@ -37,18 +36,18 @@ export const makeCloneExercise =
       })
     }
 
-    // 2. Fetch source exercise
+    // 2. Fetch source exercise with organization scope (repository handles access control)
     return deps.exerciseRepository
-      .findById(input.sourceExerciseId)
+      .findById(input.organizationId, input.sourceExerciseId)
       .mapErr(
-        (e): CloneExerciseError =>
-          e.type === 'NOT_FOUND'
-            ? { type: 'source_not_found', exerciseId: input.sourceExerciseId }
-            : { type: 'repository_error', message: e.type === 'DATABASE_ERROR' ? e.message : `Unknown error` },
+        (e): CloneExerciseError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Database error',
+        }),
       )
       .andThen((source) => {
-        // 3. Verify access - can only clone curated or own custom exercises
-        if (!isCurated(source) && source.organizationId !== input.organizationId) {
+        // 3. Check if found (null means not found or no access)
+        if (source === null) {
           return errAsync<Exercise, CloneExerciseError>({
             type: 'source_not_found',
             exerciseId: input.sourceExerciseId,

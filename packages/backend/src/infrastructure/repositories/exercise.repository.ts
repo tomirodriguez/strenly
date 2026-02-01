@@ -84,13 +84,24 @@ function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercis
 
 export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
   return {
-    findById(id: string): ResultAsync<Exercise, ExerciseRepositoryError> {
+    findById(organizationId: string | null, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         (async () => {
+          // Build where clause: match ID AND (curated OR belongs to org)
+          const whereClause =
+            organizationId === null
+              ? // Only return curated exercises when organizationId is null
+                and(eq(exercises.id, id), isNull(exercises.organizationId))
+              : // Return exercise if curated OR belongs to the organization
+                and(
+                  eq(exercises.id, id),
+                  or(isNull(exercises.organizationId), eq(exercises.organizationId, organizationId)),
+                )
+
           const row = await db
             .select()
             .from(exercises)
-            .where(eq(exercises.id, id))
+            .where(whereClause)
             .then((rows) => rows[0])
 
           if (!row) {
@@ -103,7 +114,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
         wrapDbError,
       ).andThen((data) => {
         if (!data) {
-          return err({ type: 'NOT_FOUND', exerciseId: id } as const)
+          return ok(null)
         }
 
         const exercise = mapToDomain(data.row, data.muscleMappings)
@@ -116,7 +127,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
     },
 
     findAll(
-      options?: ListExercisesOptions,
+      options: ListExercisesOptions,
     ): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         (async () => {
@@ -189,8 +200,8 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
               .from(exercises)
               .where(finalWhereClause)
               .orderBy(exercises.name)
-              .limit(options?.limit ?? 100)
-              .offset(options?.offset ?? 0),
+              .limit(options.limit ?? 100)
+              .offset(options.offset ?? 0),
           ])
 
           // Fetch muscle mappings for all exercises
