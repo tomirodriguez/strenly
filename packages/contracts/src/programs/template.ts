@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { paginationQuerySchema } from '../common/pagination'
 import { programSchema, programWithDetailsSchema } from './program'
 
 // ============================================================================
@@ -9,16 +10,12 @@ import { programSchema, programWithDetailsSchema } from './program'
  * Save program as template input schema
  */
 export const saveAsTemplateInputSchema = z.object({
-  programId: z.string(),
+  programId: z.string().min(1, 'ID de programa requerido'),
   name: z
     .string()
-    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
-  description: z
-    .string()
-    .max(500, { message: 'La descripcion no puede superar los 500 caracteres' })
-    .optional()
-    .or(z.literal('')),
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
 })
 
 export type SaveAsTemplateInput = z.infer<typeof saveAsTemplateInputSchema>
@@ -27,11 +24,11 @@ export type SaveAsTemplateInput = z.infer<typeof saveAsTemplateInputSchema>
  * Create program from template input schema
  */
 export const createFromTemplateInputSchema = z.object({
-  templateId: z.string(),
+  templateId: z.string().min(1, 'ID de plantilla requerido'),
   name: z
     .string()
-    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
   athleteId: z.string().optional(),
 })
 
@@ -39,16 +36,13 @@ export type CreateFromTemplateInput = z.infer<typeof createFromTemplateInputSche
 
 /**
  * List templates input schema - filters for templates only
+ * Uses common pagination schema
  */
-export const listTemplatesInputSchema = z.object({
-  search: z.string().optional(),
-  limit: z
-    .number()
-    .min(1, { message: 'El limite debe ser al menos 1' })
-    .max(100, { message: 'El limite no puede superar 100' })
-    .optional(),
-  offset: z.number().min(0, { message: 'El offset no puede ser negativo' }).optional(),
-})
+export const listTemplatesInputSchema = paginationQuerySchema
+  .extend({
+    search: z.string().optional(),
+  })
+  .partial()
 
 export type ListTemplatesInput = z.infer<typeof listTemplatesInputSchema>
 

@@ -1,34 +1,41 @@
 import { z } from 'zod'
+import { emailSchema } from '../common/email'
+import { paginationQuerySchema } from '../common/pagination'
 
 /**
  * Athlete status schema
  * active - currently training
  * inactive - archived/paused
  */
-export const athleteStatusSchema = z.enum(['active', 'inactive'])
+export const athleteStatusSchema = z.enum(['active', 'inactive'], {
+  errorMap: () => ({ message: 'Estado de atleta inválido' }),
+})
 
 export type AthleteStatus = z.infer<typeof athleteStatusSchema>
 
 /**
  * Athlete gender schema
  */
-export const genderSchema = z.enum(['male', 'female', 'other'])
+export const genderSchema = z.enum(['male', 'female', 'other'], {
+  errorMap: () => ({ message: 'Género inválido' }),
+})
 
 export type AthleteGender = z.infer<typeof genderSchema>
 
 /**
- * Athlete output schema
- * Full athlete representation for API responses
+ * Athlete entity schema (TRUE source of truth)
+ * All validation rules and Spanish messages defined here.
+ * Input schemas derive from this via .pick()
  */
 export const athleteSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
-  name: z.string(),
-  email: z.string().nullable(),
-  phone: z.string().nullable(),
+  name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede superar los 100 caracteres'),
+  email: emailSchema.nullable(),
+  phone: z.string().max(20, 'El teléfono no puede superar los 20 caracteres').nullable(),
   birthdate: z.string().nullable(), // ISO date string
   gender: genderSchema.nullable(),
-  notes: z.string().nullable(),
+  notes: z.string().max(1000, 'Las notas no pueden superar los 1000 caracteres').nullable(),
   status: athleteStatusSchema,
   linkedUserId: z.string().nullable(),
   isLinked: z.boolean(), // Computed from linkedUserId
@@ -40,23 +47,25 @@ export type Athlete = z.infer<typeof athleteSchema>
 
 /**
  * Create athlete input schema
- * Used when creating a new athlete
+ * Derives from entity via .pick() - validation inherited automatically
  */
-export const createAthleteInputSchema = z.object({
-  name: z
-    .string()
-    .min(1, { message: 'El nombre es obligatorio' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
-  email: z.string().email({ message: 'Por favor ingresa un correo electronico valido' }).optional().or(z.literal('')),
-  phone: z.string().optional().or(z.literal('')),
-  birthdate: z.string().optional().or(z.literal('')),
-  gender: genderSchema.optional(),
-  notes: z
-    .string()
-    .max(1000, { message: 'Las notas no pueden superar los 1000 caracteres' })
-    .optional()
-    .or(z.literal('')),
-})
+export const createAthleteInputSchema = athleteSchema
+  .pick({
+    name: true,
+    email: true,
+    phone: true,
+    birthdate: true,
+    gender: true,
+    notes: true,
+  })
+  .extend({
+    // Override to allow optional/empty strings for form handling
+    email: emailSchema.optional().or(z.literal('')),
+    phone: z.string().max(20, 'El teléfono no puede superar los 20 caracteres').optional().or(z.literal('')),
+    birthdate: z.string().optional().or(z.literal('')),
+    gender: genderSchema.optional(),
+    notes: z.string().max(1000, 'Las notas no pueden superar los 1000 caracteres').optional().or(z.literal('')),
+  })
 
 export type CreateAthleteInput = z.infer<typeof createAthleteInputSchema>
 
@@ -65,7 +74,7 @@ export type CreateAthleteInput = z.infer<typeof createAthleteInputSchema>
  * Partial updates with required athleteId
  */
 export const updateAthleteInputSchema = createAthleteInputSchema.partial().extend({
-  athleteId: z.string(),
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
   status: athleteStatusSchema.optional(),
 })
 
@@ -73,18 +82,14 @@ export type UpdateAthleteInput = z.infer<typeof updateAthleteInputSchema>
 
 /**
  * List athletes input schema
- * Supports filtering, search, and pagination
+ * Uses common pagination schema with domain-specific filters
  */
-export const listAthletesInputSchema = z.object({
-  status: athleteStatusSchema.optional(),
-  search: z.string().optional(),
-  limit: z
-    .number()
-    .min(1, { message: 'El limite debe ser al menos 1' })
-    .max(100, { message: 'El limite no puede superar 100' })
-    .optional(),
-  offset: z.number().min(0, { message: 'El offset no puede ser negativo' }).optional(),
-})
+export const listAthletesInputSchema = paginationQuerySchema
+  .extend({
+    status: athleteStatusSchema.optional(),
+    search: z.string().optional(),
+  })
+  .partial() // Make limit/offset optional (use defaults)
 
 export type ListAthletesInput = z.infer<typeof listAthletesInputSchema>
 

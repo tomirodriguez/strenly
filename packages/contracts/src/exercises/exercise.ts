@@ -1,16 +1,18 @@
 import { z } from 'zod'
+import { paginationQuerySchema } from '../common/pagination'
 import { movementPatternSchema, muscleGroupSchema } from './muscle-group'
 
 /**
- * Exercise schema - output representation of an exercise
+ * Exercise entity schema (TRUE source of truth)
+ * All validation rules and Spanish messages defined here.
  */
 export const exerciseSchema = z.object({
   id: z.string(),
   organizationId: z.string().nullable(),
-  name: z.string(),
-  description: z.string().nullable(),
-  instructions: z.string().nullable(),
-  videoUrl: z.string().nullable(),
+  name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede superar los 100 caracteres'),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').nullable(),
+  instructions: z.string().max(2000, 'Las instrucciones no pueden superar los 2000 caracteres').nullable(),
+  videoUrl: z.string().url('URL de video inválida').nullable(),
   movementPattern: movementPatternSchema.nullable(),
   isUnilateral: z.boolean(),
   isCurated: z.boolean(),
@@ -26,12 +28,13 @@ export type Exercise = z.infer<typeof exerciseSchema>
 
 /**
  * Create exercise input schema
+ * Derives validation from entity
  */
 export const createExerciseInputSchema = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().optional(),
-  instructions: z.string().optional(),
-  videoUrl: z.string().url().optional(),
+  name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede superar los 100 caracteres'),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional(),
+  instructions: z.string().max(2000, 'Las instrucciones no pueden superar los 2000 caracteres').optional(),
+  videoUrl: z.string().url('URL de video inválida').optional(),
   movementPattern: movementPatternSchema.optional(),
   isUnilateral: z.boolean().optional(),
   primaryMuscles: z.array(muscleGroupSchema).optional(),
@@ -44,22 +47,23 @@ export type CreateExerciseInput = z.infer<typeof createExerciseInputSchema>
  * Update exercise input schema
  */
 export const updateExerciseInputSchema = createExerciseInputSchema.partial().extend({
-  exerciseId: z.string(),
+  exerciseId: z.string().min(1, 'ID de ejercicio requerido'),
 })
 
 export type UpdateExerciseInput = z.infer<typeof updateExerciseInputSchema>
 
 /**
- * List exercises input schema - filtering and pagination
+ * List exercises input schema
+ * Uses common pagination with domain-specific filters
  */
-export const listExercisesInputSchema = z.object({
-  movementPattern: movementPatternSchema.optional(),
-  muscleGroup: muscleGroupSchema.optional(),
-  search: z.string().optional(),
-  includeArchived: z.boolean().optional(),
-  limit: z.number().min(1).max(100).optional(),
-  offset: z.number().min(0).optional(),
-})
+export const listExercisesInputSchema = paginationQuerySchema
+  .extend({
+    movementPattern: movementPatternSchema.optional(),
+    muscleGroup: muscleGroupSchema.optional(),
+    search: z.string().optional(),
+    includeArchived: z.boolean().optional(),
+  })
+  .partial()
 
 export type ListExercisesInput = z.infer<typeof listExercisesInputSchema>
 
@@ -77,8 +81,12 @@ export type ListExercisesOutput = z.infer<typeof listExercisesOutputSchema>
  * Clone exercise input schema
  */
 export const cloneExerciseInputSchema = z.object({
-  sourceExerciseId: z.string(),
-  name: z.string().min(1).max(100).optional(),
+  sourceExerciseId: z.string().min(1, 'ID de ejercicio origen requerido'),
+  name: z
+    .string()
+    .min(1, 'El nombre es obligatorio')
+    .max(100, 'El nombre no puede superar los 100 caracteres')
+    .optional(),
 })
 
 export type CloneExerciseInput = z.infer<typeof cloneExerciseInputSchema>
@@ -87,7 +95,7 @@ export type CloneExerciseInput = z.infer<typeof cloneExerciseInputSchema>
  * Get exercise input schema
  */
 export const getExerciseInputSchema = z.object({
-  exerciseId: z.string(),
+  exerciseId: z.string().min(1, 'ID de ejercicio requerido'),
 })
 
 export type GetExerciseInput = z.infer<typeof getExerciseInputSchema>
@@ -96,7 +104,7 @@ export type GetExerciseInput = z.infer<typeof getExerciseInputSchema>
  * Archive exercise input schema
  */
 export const archiveExerciseInputSchema = z.object({
-  exerciseId: z.string(),
+  exerciseId: z.string().min(1, 'ID de ejercicio requerido'),
 })
 
 export type ArchiveExerciseInput = z.infer<typeof archiveExerciseInputSchema>

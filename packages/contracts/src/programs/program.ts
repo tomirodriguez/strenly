@@ -1,6 +1,7 @@
 import { z } from 'zod'
+import { paginationQuerySchema } from '../common/pagination'
 import { exerciseGroupSchema } from './exercise-group'
-import { prescriptionSeriesInputSchema } from './prescription'
+import { intensityTypeSchema, prescriptionSeriesInputSchema } from './prescription'
 
 /**
  * Program status schema
@@ -8,23 +9,14 @@ import { prescriptionSeriesInputSchema } from './prescription'
  * active - in use by athlete
  * archived - no longer active
  */
-export const programStatusSchema = z.enum(['draft', 'active', 'archived'])
+export const programStatusSchema = z.enum(['draft', 'active', 'archived'], {
+  errorMap: () => ({ message: 'Estado de programa inválido' }),
+})
 
 export type ProgramStatus = z.infer<typeof programStatusSchema>
 
-/**
- * Intensity type schema for aggregate
- * - absolute: Weight in kg/lb
- * - percentage: Percentage of 1RM
- * - rpe: Rate of Perceived Exertion
- * - rir: Reps in Reserve
- */
-export const aggregateIntensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'])
-
-export type AggregateIntensityType = z.infer<typeof aggregateIntensityTypeSchema>
-
 // ============================================================================
-// Aggregate Schemas (NEW - for full program hierarchy)
+// Aggregate Schemas (for full program hierarchy)
 // ============================================================================
 
 /**
@@ -36,11 +28,11 @@ export const seriesSchema = z.object({
   reps: z.number().int().min(0).nullable(),
   repsMax: z.number().int().min(0).nullable(),
   isAmrap: z.boolean(),
-  intensityType: aggregateIntensityTypeSchema.nullable(),
+  intensityType: intensityTypeSchema.nullable(),
   intensityValue: z.number().nullable(),
   tempo: z
     .string()
-    .regex(/^[\dX]{4}$/i)
+    .regex(/^[\dX]{4}$/i, 'Formato de tempo inválido (ej: 3110)')
     .nullable(),
   restSeconds: z.number().int().min(0).nullable(),
 })
@@ -125,11 +117,11 @@ export const seriesInputSchema = z.object({
   reps: z.number().int().min(0).nullable(),
   repsMax: z.number().int().min(0).nullable().optional(),
   isAmrap: z.boolean(),
-  intensityType: aggregateIntensityTypeSchema.nullable().optional(),
+  intensityType: intensityTypeSchema.nullable().optional(),
   intensityValue: z.number().nullable().optional(),
   tempo: z
     .string()
-    .regex(/^[\dX]{4}$/i)
+    .regex(/^[\dX]{4}$/i, 'Formato de tempo inválido (ej: 3110)')
     .nullable()
     .optional(),
   restSeconds: z.number().int().min(0).nullable().optional(),
@@ -189,13 +181,17 @@ export type WeekInput = z.infer<typeof weekInputSchema>
 // ============================================================================
 
 /**
- * Program output schema - basic program representation
+ * Program entity schema (TRUE source of truth)
+ * All validation rules and Spanish messages defined here.
  */
 export const programSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
+  name: z
+    .string()
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').nullable(),
   athleteId: z.string().nullable(),
   isTemplate: z.boolean(),
   status: programStatusSchema,
@@ -244,7 +240,7 @@ export const prescriptionSchema = z.object({
   isAmrap: z.boolean(),
   isUnilateral: z.boolean(),
   unilateralUnit: z.enum(['leg', 'arm', 'side']).nullable(),
-  intensityType: z.enum(['absolute', 'percentage', 'rpe', 'rir']).nullable(),
+  intensityType: intensityTypeSchema.nullable(),
   intensityValue: z.number().nullable(),
   tempo: z.string().nullable(),
 })
@@ -314,32 +310,29 @@ export type ProgramWithDetails = z.infer<typeof programWithDetailsSchema>
 
 /**
  * Create program input schema
+ * Uses .pick() pattern with extensions for creation-specific fields
  * @property weeksCount - Number of initial weeks to create (1-12). Defaults to 4 if not provided.
  * @property sessionsCount - Number of initial sessions to create (1-7). Defaults to 3 if not provided.
  */
 export const createProgramInputSchema = z.object({
   name: z
     .string()
-    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
-  description: z
-    .string()
-    .max(500, { message: 'La descripcion no puede superar los 500 caracteres' })
-    .optional()
-    .or(z.literal('')),
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
   athleteId: z.string().optional(),
   isTemplate: z.boolean().optional(),
   weeksCount: z
     .number()
-    .int({ message: 'El numero de semanas debe ser entero' })
-    .min(1, { message: 'El programa debe tener al menos 1 semana' })
-    .max(12, { message: 'El programa no puede tener mas de 12 semanas' })
+    .int('El número de semanas debe ser entero')
+    .min(1, 'El programa debe tener al menos 1 semana')
+    .max(12, 'El programa no puede tener más de 12 semanas')
     .optional(),
   sessionsCount: z
     .number()
-    .int({ message: 'El numero de sesiones debe ser entero' })
-    .min(1, { message: 'El programa debe tener al menos 1 sesion' })
-    .max(7, { message: 'El programa no puede tener mas de 7 sesiones por semana' })
+    .int('El número de sesiones debe ser entero')
+    .min(1, 'El programa debe tener al menos 1 sesión')
+    .max(7, 'El programa no puede tener más de 7 sesiones por semana')
     .optional(),
 })
 
@@ -347,19 +340,16 @@ export type CreateProgramInput = z.infer<typeof createProgramInputSchema>
 
 /**
  * Update program input schema
+ * Uses .partial() for optional updates
  */
 export const updateProgramInputSchema = z.object({
-  programId: z.string(),
+  programId: z.string().min(1, 'ID de programa requerido'),
   name: z
     .string()
-    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' })
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres')
     .optional(),
-  description: z
-    .string()
-    .max(500, { message: 'La descripcion no puede superar los 500 caracteres' })
-    .optional()
-    .or(z.literal('')),
+  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
 })
 
 export type UpdateProgramInput = z.infer<typeof updateProgramInputSchema>
@@ -368,26 +358,23 @@ export type UpdateProgramInput = z.infer<typeof updateProgramInputSchema>
  * Get program input schema
  */
 export const getProgramInputSchema = z.object({
-  programId: z.string(),
+  programId: z.string().min(1, 'ID de programa requerido'),
 })
 
 export type GetProgramInput = z.infer<typeof getProgramInputSchema>
 
 /**
  * List programs input schema
+ * Uses common pagination with domain-specific filters
  */
-export const listProgramsInputSchema = z.object({
-  athleteId: z.string().optional(),
-  isTemplate: z.boolean().optional(),
-  status: programStatusSchema.optional(),
-  search: z.string().optional(),
-  limit: z
-    .number()
-    .min(1, { message: 'El limite debe ser al menos 1' })
-    .max(100, { message: 'El limite no puede superar 100' })
-    .optional(),
-  offset: z.number().min(0, { message: 'El offset no puede ser negativo' }).optional(),
-})
+export const listProgramsInputSchema = paginationQuerySchema
+  .extend({
+    athleteId: z.string().optional(),
+    isTemplate: z.boolean().optional(),
+    status: programStatusSchema.optional(),
+    search: z.string().optional(),
+  })
+  .partial()
 
 export type ListProgramsInput = z.infer<typeof listProgramsInputSchema>
 
@@ -405,7 +392,7 @@ export type ListProgramsOutput = z.infer<typeof listProgramsOutputSchema>
  * Archive program input schema
  */
 export const archiveProgramInputSchema = z.object({
-  programId: z.string(),
+  programId: z.string().min(1, 'ID de programa requerido'),
 })
 
 export type ArchiveProgramInput = z.infer<typeof archiveProgramInputSchema>
@@ -414,11 +401,11 @@ export type ArchiveProgramInput = z.infer<typeof archiveProgramInputSchema>
  * Duplicate program input schema
  */
 export const duplicateProgramInputSchema = z.object({
-  sourceProgramId: z.string(),
+  sourceProgramId: z.string().min(1, 'ID de programa origen requerido'),
   name: z
     .string()
-    .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .max(100, { message: 'El nombre no puede superar los 100 caracteres' }),
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
   athleteId: z.string().optional(),
   isTemplate: z.boolean().optional(),
 })

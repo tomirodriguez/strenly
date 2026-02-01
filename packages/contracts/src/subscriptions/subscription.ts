@@ -5,12 +5,14 @@ import { planSchema } from './plan'
  * Subscription status schema
  * Tracks the state of an organization's subscription
  */
-export const subscriptionStatusSchema = z.enum(['active', 'canceled', 'past_due'])
+export const subscriptionStatusSchema = z.enum(['active', 'canceled', 'past_due'], {
+  errorMap: () => ({ message: 'Estado de suscripción inválido' }),
+})
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>
 
 /**
- * Subscription schema
+ * Subscription entity schema (TRUE source of truth)
  * Links organizations to their subscription plans
  */
 export const subscriptionSchema = z.object({
@@ -18,8 +20,8 @@ export const subscriptionSchema = z.object({
   organizationId: z.string(),
   plan: planSchema,
   status: subscriptionStatusSchema,
-  athleteCount: z.number(),
-  athleteLimit: z.number(), // denormalized from plan for convenience
+  athleteCount: z.number().int().min(0, 'El conteo de atletas no puede ser negativo'),
+  athleteLimit: z.number().int().min(0, 'El límite de atletas no puede ser negativo'), // denormalized from plan for convenience
   currentPeriodStart: z.string(),
   currentPeriodEnd: z.string(),
   createdAt: z.string(),

@@ -18,14 +18,14 @@ import { loggedExerciseInputSchema, workoutLogAggregateSchema } from './workout-
  * Status is calculated automatically from exercise states.
  */
 export const saveLogInputSchema = z.object({
-  id: z.string().min(1, { message: 'Log ID is required' }),
-  athleteId: z.string().min(1, { message: 'Athlete ID is required' }),
-  programId: z.string().min(1, { message: 'Program ID is required' }),
-  sessionId: z.string().min(1, { message: 'Session ID is required' }),
-  weekId: z.string().min(1, { message: 'Week ID is required' }),
-  logDate: z.string().min(1, { message: 'Log date is required' }), // ISO date string
-  sessionRpe: z.number().min(1).max(10).nullable().optional(),
-  sessionNotes: z.string().nullable().optional(),
+  id: z.string().min(1, 'ID de registro requerido'),
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+  programId: z.string().min(1, 'ID de programa requerido'),
+  sessionId: z.string().min(1, 'ID de sesión requerido'),
+  weekId: z.string().min(1, 'ID de semana requerido'),
+  logDate: z.string().min(1, 'Fecha de registro requerida'), // ISO date string
+  sessionRpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable().optional(),
+  sessionNotes: z.string().max(1000, 'Las notas de sesión no pueden superar los 1000 caracteres').nullable().optional(),
   exercises: z.array(loggedExerciseInputSchema),
 })
 

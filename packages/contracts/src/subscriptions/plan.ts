@@ -5,7 +5,9 @@ import { z } from 'zod'
  * Distinguishes between solo coaches and gym organizations
  * Defined here since organizations module was removed in favor of Better-Auth
  */
-export const organizationTypeSchema = z.enum(['coach_solo', 'gym'])
+export const organizationTypeSchema = z.enum(['coach_solo', 'gym'], {
+  errorMap: () => ({ message: 'Tipo de organización inválido' }),
+})
 export type OrganizationType = z.infer<typeof organizationTypeSchema>
 
 /**
@@ -23,19 +25,19 @@ export const planFeaturesSchema = z.object({
 export type PlanFeatures = z.infer<typeof planFeaturesSchema>
 
 /**
- * Plan schema
+ * Plan entity schema (TRUE source of truth)
  * Defines subscription plan with limits and pricing
  */
 export const planSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  slug: z.string(),
+  name: z.string().min(1, 'El nombre del plan es obligatorio'),
+  slug: z.string().min(1, 'El slug del plan es obligatorio'),
   organizationType: organizationTypeSchema,
-  athleteLimit: z.number(),
-  coachLimit: z.number().nullable(), // null = unlimited
+  athleteLimit: z.number().int().min(0, 'El límite de atletas no puede ser negativo'),
+  coachLimit: z.number().int().min(0, 'El límite de coaches no puede ser negativo').nullable(), // null = unlimited
   features: planFeaturesSchema,
-  priceMonthly: z.number(), // cents
-  priceYearly: z.number(), // cents
+  priceMonthly: z.number().int().min(0, 'El precio mensual no puede ser negativo'), // cents
+  priceYearly: z.number().int().min(0, 'El precio anual no puede ser negativo'), // cents
   isActive: z.boolean(),
 })
 

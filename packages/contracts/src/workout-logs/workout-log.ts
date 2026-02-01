@@ -8,12 +8,15 @@
  */
 
 import { z } from 'zod'
+import { intensityTypeSchema } from '../programs/prescription'
 
 // ============================================================================
 // Log Status
 // ============================================================================
 
-export const logStatusSchema = z.enum(['completed', 'partial', 'skipped'])
+export const logStatusSchema = z.enum(['completed', 'partial', 'skipped'], {
+  errorMap: () => ({ message: 'Estado de registro inválido' }),
+})
 export type LogStatus = z.infer<typeof logStatusSchema>
 
 // ============================================================================
@@ -26,9 +29,9 @@ export type LogStatus = z.infer<typeof logStatusSchema>
  */
 export const loggedSeriesSchema = z.object({
   orderIndex: z.number().int().min(0),
-  repsPerformed: z.number().int().min(0).nullable(),
-  weightUsed: z.number().min(0).nullable(), // Always in kg
-  rpe: z.number().min(1).max(10).nullable(), // 1-10 scale
+  repsPerformed: z.number().int().min(0, 'Las repeticiones no pueden ser negativas').nullable(),
+  weightUsed: z.number().min(0, 'El peso no puede ser negativo').nullable(), // Always in kg
+  rpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable(), // 1-10 scale
   skipped: z.boolean(),
   // Snapshot of prescription for deviation display
   prescribedReps: z.number().int().min(0).nullable(),
@@ -36,7 +39,7 @@ export const loggedSeriesSchema = z.object({
   // Extended prescription snapshot for display
   prescribedRepsMax: z.number().int().min(0).nullable(),
   prescribedIsAmrap: z.boolean(),
-  prescribedIntensityType: z.enum(['absolute', 'percentage', 'rpe', 'rir']).nullable(),
+  prescribedIntensityType: intensityTypeSchema.nullable(),
   prescribedIntensityValue: z.number().nullable(),
   prescribedTempo: z.string().nullable(),
   prescribedRestSeconds: z.number().int().min(0).nullable(),
@@ -49,16 +52,16 @@ export type LoggedSeries = z.infer<typeof loggedSeriesSchema>
  * All fields optional except those auto-calculated
  */
 export const loggedSeriesInputSchema = z.object({
-  repsPerformed: z.number().int().min(0).nullable().optional(),
-  weightUsed: z.number().min(0).nullable().optional(),
-  rpe: z.number().min(1).max(10).nullable().optional(),
+  repsPerformed: z.number().int().min(0, 'Las repeticiones no pueden ser negativas').nullable().optional(),
+  weightUsed: z.number().min(0, 'El peso no puede ser negativo').nullable().optional(),
+  rpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable().optional(),
   skipped: z.boolean().optional(),
   prescribedReps: z.number().int().min(0).nullable().optional(),
   prescribedWeight: z.number().min(0).nullable().optional(),
   // Extended prescription snapshot
   prescribedRepsMax: z.number().int().min(0).nullable().optional(),
   prescribedIsAmrap: z.boolean().optional(),
-  prescribedIntensityType: z.enum(['absolute', 'percentage', 'rpe', 'rir']).nullable().optional(),
+  prescribedIntensityType: intensityTypeSchema.nullable().optional(),
   prescribedIntensityValue: z.number().nullable().optional(),
   prescribedTempo: z.string().nullable().optional(),
   prescribedRestSeconds: z.number().int().min(0).nullable().optional(),
@@ -78,7 +81,7 @@ export const loggedExerciseSchema = z.object({
   exerciseId: z.string(),
   groupItemId: z.string(), // Reference to program group item
   orderIndex: z.number().int().min(0),
-  notes: z.string().nullable(),
+  notes: z.string().max(500, 'Las notas no pueden superar los 500 caracteres').nullable(),
   skipped: z.boolean(),
   series: z.array(loggedSeriesSchema),
   // Group display info
@@ -96,7 +99,7 @@ export const loggedExerciseInputSchema = z.object({
   exerciseId: z.string(),
   groupItemId: z.string(),
   orderIndex: z.number().int().min(0),
-  notes: z.string().nullable().optional(),
+  notes: z.string().max(500, 'Las notas no pueden superar los 500 caracteres').nullable().optional(),
   skipped: z.boolean().optional(),
   series: z.array(loggedSeriesInputSchema).optional(),
   // Group display info
@@ -123,8 +126,8 @@ export const workoutLogAggregateSchema = z.object({
   weekId: z.string(),
   logDate: z.string(), // ISO date string
   status: logStatusSchema,
-  sessionRpe: z.number().min(1).max(10).nullable(),
-  sessionNotes: z.string().nullable(),
+  sessionRpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable(),
+  sessionNotes: z.string().max(1000, 'Las notas de sesión no pueden superar los 1000 caracteres').nullable(),
   exercises: z.array(loggedExerciseSchema),
   createdAt: z.string(),
   updatedAt: z.string(),

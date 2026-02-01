@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod'
+import { paginationQuerySchema } from '../common/pagination'
 import { logStatusSchema, workoutLogAggregateSchema } from './workout-log'
 
 // ============================================================================
@@ -13,20 +14,17 @@ import { logStatusSchema, workoutLogAggregateSchema } from './workout-log'
 
 /**
  * Input for listing workout logs by athlete with filters and pagination.
+ * Uses common pagination schema with domain-specific filters.
  */
-export const listAthleteLogsInputSchema = z.object({
-  athleteId: z.string().min(1, { message: 'Athlete ID is required' }),
-  status: logStatusSchema.optional(),
-  fromDate: z.string().optional(), // ISO date string
-  toDate: z.string().optional(), // ISO date string
-  limit: z
-    .number()
-    .int()
-    .min(1, { message: 'Limit must be at least 1' })
-    .max(100, { message: 'Limit cannot exceed 100' })
-    .optional(),
-  offset: z.number().int().min(0, { message: 'Offset cannot be negative' }).optional(),
-})
+export const listAthleteLogsInputSchema = paginationQuerySchema
+  .extend({
+    athleteId: z.string().min(1, 'ID de atleta requerido'),
+    status: logStatusSchema.optional(),
+    fromDate: z.string().optional(), // ISO date string
+    toDate: z.string().optional(), // ISO date string
+  })
+  .partial()
+  .required({ athleteId: true }) // athleteId is required
 
 export type ListAthleteLogsInput = z.infer<typeof listAthleteLogsInputSchema>
 
@@ -67,16 +65,9 @@ export type PendingWorkout = z.infer<typeof pendingWorkoutSchema>
 
 /**
  * Input for listing pending workouts with pagination.
+ * Uses common pagination schema.
  */
-export const listPendingWorkoutsInputSchema = z.object({
-  limit: z
-    .number()
-    .int()
-    .min(1, { message: 'Limit must be at least 1' })
-    .max(100, { message: 'Limit cannot exceed 100' })
-    .optional(),
-  offset: z.number().int().min(0, { message: 'Offset cannot be negative' }).optional(),
-})
+export const listPendingWorkoutsInputSchema = paginationQuerySchema.partial()
 
 export type ListPendingWorkoutsInput = z.infer<typeof listPendingWorkoutsInputSchema>
 
@@ -98,7 +89,7 @@ export type ListPendingWorkoutsOutput = z.infer<typeof listPendingWorkoutsOutput
  * Input for getting a single workout log by ID.
  */
 export const getLogInputSchema = z.object({
-  logId: z.string().min(1, { message: 'Log ID is required' }),
+  logId: z.string().min(1, 'ID de registro requerido'),
 })
 
 export type GetLogInput = z.infer<typeof getLogInputSchema>
@@ -119,9 +110,9 @@ export type GetLogOutput = z.infer<typeof getLogOutputSchema>
  * Used to check if a log already exists before creating a new one.
  */
 export const getLogBySessionInputSchema = z.object({
-  athleteId: z.string().min(1, { message: 'Athlete ID is required' }),
-  sessionId: z.string().min(1, { message: 'Session ID is required' }),
-  weekId: z.string().min(1, { message: 'Week ID is required' }),
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+  sessionId: z.string().min(1, 'ID de sesión requerido'),
+  weekId: z.string().min(1, 'ID de semana requerido'),
 })
 
 export type GetLogBySessionInput = z.infer<typeof getLogBySessionInputSchema>
@@ -141,7 +132,7 @@ export type GetLogBySessionOutput = z.infer<typeof getLogBySessionOutputSchema>
  * Input for deleting a workout log.
  */
 export const deleteLogInputSchema = z.object({
-  logId: z.string().min(1, { message: 'Log ID is required' }),
+  logId: z.string().min(1, 'ID de registro requerido'),
 })
 
 export type DeleteLogInput = z.infer<typeof deleteLogInputSchema>

@@ -17,10 +17,10 @@ import { workoutLogAggregateSchema } from './workout-log'
  * The log will be pre-filled with prescription values.
  */
 export const createLogInputSchema = z.object({
-  athleteId: z.string().min(1, { message: 'Athlete ID is required' }),
-  programId: z.string().min(1, { message: 'Program ID is required' }),
-  sessionId: z.string().min(1, { message: 'Session ID is required' }),
-  weekId: z.string().min(1, { message: 'Week ID is required' }),
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+  programId: z.string().min(1, 'ID de programa requerido'),
+  sessionId: z.string().min(1, 'ID de sesión requerido'),
+  weekId: z.string().min(1, 'ID de semana requerido'),
   logDate: z.string().optional(), // ISO date string, defaults to today
 })
 
