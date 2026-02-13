@@ -58,7 +58,7 @@ export const makeCheckAthleteLimit =
           .andThen((plan) => {
             // Check if plan was found
             if (plan === null) {
-              return errAsync({ type: 'plan_not_found', planId: subscription.planId } as CheckAthleteLimitError)
+              return errAsync({ type: 'plan_not_found' as const, planId: subscription.planId })
             }
 
             // 4. Use domain helper
