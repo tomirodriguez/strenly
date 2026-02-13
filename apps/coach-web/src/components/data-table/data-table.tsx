@@ -12,14 +12,15 @@ type DataTableContextValue<TData> = {
   isLoading?: boolean
 }
 
-const DataTableContext = createContext<DataTableContextValue<unknown> | null>(null)
+// biome-ignore lint/suspicious/noExplicitAny: React generic contexts require any for type erasure
+const DataTableContext = createContext<DataTableContextValue<any> | null>(null)
 
-function useDataTableContext<TData>() {
+function useDataTableContext<TData>(): DataTableContextValue<TData> {
   const context = useContext(DataTableContext)
   if (!context) {
     throw new Error('DataTable components must be used within DataTable.Root')
   }
-  return context as DataTableContextValue<TData>
+  return context
 }
 
 type DataTableRootProps<TData> = {
@@ -75,7 +76,7 @@ function DataTableRoot<TData>({
   }
 
   return (
-    <DataTableContext.Provider value={contextValue as DataTableContextValue<unknown>}>
+    <DataTableContext.Provider value={contextValue}>
       {children}
     </DataTableContext.Provider>
   )

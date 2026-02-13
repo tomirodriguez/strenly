@@ -32,8 +32,7 @@ const link = new RPCLink({
   url: `${API_URL}/rpc`,
   fetch: (input, init) => {
     const organizationSlug = currentOrgSlug
-    const existingHeaders = (init as RequestInit | undefined)?.headers
-    const headers = new Headers(existingHeaders)
+    const headers = new Headers()
 
     // Add organization context header if we have an active organization
     if (organizationSlug) {

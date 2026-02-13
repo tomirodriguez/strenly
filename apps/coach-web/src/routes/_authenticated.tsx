@@ -46,13 +46,24 @@ export const Route = createFileRoute('/_authenticated')({
     }
 
     const orgsResult = await authClient.organization.list()
-    const organizations = (orgsResult.data ?? []).map((org) => ({
-      id: org.id,
-      name: org.name,
-      slug: org.slug,
-      logo: org.logo,
-      metadata: org.metadata as OrganizationContextValue['metadata'],
-    }))
+    const organizations = (orgsResult.data ?? []).map((org) => {
+      const rawMeta = org.metadata
+      const metadata: OrganizationContextValue['metadata'] =
+        rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)
+          ? {
+              type: 'type' in rawMeta && typeof rawMeta.type === 'string' ? rawMeta.type : undefined,
+              status: 'status' in rawMeta && typeof rawMeta.status === 'string' ? rawMeta.status : undefined,
+            }
+          : null
+
+      return {
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        logo: org.logo,
+        metadata,
+      }
+    })
 
     // Cache the auth data
     authCache = {

@@ -1,4 +1,4 @@
-import type { ProgramStatus } from '@strenly/contracts/programs/program'
+import { type ProgramStatus, programStatusSchema } from '@strenly/contracts/programs/program'
 import { useNavigate } from '@tanstack/react-router'
 import { FileTextIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
@@ -136,7 +136,8 @@ export function ProgramsListView() {
           items={STATUS_OPTIONS}
           value={statusFilter}
           onValueChange={(v) => {
-            setStatusFilter(v as ProgramStatus | 'all')
+            const parsed = programStatusSchema.safeParse(v)
+            setStatusFilter(parsed.success ? parsed.data : 'all')
             setPageIndex(0) // Reset to first page on filter change
           }}
         >

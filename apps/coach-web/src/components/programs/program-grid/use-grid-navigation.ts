@@ -89,7 +89,7 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
   )
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: Pick<KeyboardEvent, 'key' | 'shiftKey' | 'ctrlKey' | 'preventDefault'>) => {
       if (!activeCell) return
 
       const { rowIndex, colIndex } = activeCell

@@ -21,6 +21,10 @@ function parseOrganizationType(value: string): OrganizationType {
   return 'coach_solo'
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 /**
  * Safely parse features from database JSON
  * Maps database features to domain PlanFeatures type
@@ -35,18 +39,16 @@ function parseFeatures(dbFeatures: unknown): PlanFeatures {
     multipleCoaches: false,
   }
 
-  if (!dbFeatures || typeof dbFeatures !== 'object') {
+  if (!isRecord(dbFeatures)) {
     return defaultFeatures
   }
 
-  const features = dbFeatures as Record<string, unknown>
-
   return {
-    templates: typeof features.templates === 'boolean' ? features.templates : false,
-    analytics: typeof features.analytics === 'boolean' ? features.analytics : false,
-    exportData: typeof features.exportData === 'boolean' ? features.exportData : false,
-    customExercises: typeof features.customExercises === 'boolean' ? features.customExercises : false,
-    multipleCoaches: typeof features.multipleCoaches === 'boolean' ? features.multipleCoaches : false,
+    templates: typeof dbFeatures.templates === 'boolean' ? dbFeatures.templates : false,
+    analytics: typeof dbFeatures.analytics === 'boolean' ? dbFeatures.analytics : false,
+    exportData: typeof dbFeatures.exportData === 'boolean' ? dbFeatures.exportData : false,
+    customExercises: typeof dbFeatures.customExercises === 'boolean' ? dbFeatures.customExercises : false,
+    multipleCoaches: typeof dbFeatures.multipleCoaches === 'boolean' ? dbFeatures.multipleCoaches : false,
   }
 }
 

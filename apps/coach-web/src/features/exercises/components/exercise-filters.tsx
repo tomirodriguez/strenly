@@ -1,4 +1,9 @@
-import type { MovementPattern, MuscleGroup } from '@strenly/contracts/exercises/muscle-group'
+import {
+  type MovementPattern,
+  movementPatternSchema,
+  type MuscleGroup,
+  muscleGroupSchema,
+} from '@strenly/contracts/exercises/muscle-group'
 import { useMemo } from 'react'
 import { useMuscleGroups } from '../hooks/queries/use-muscle-groups'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -43,7 +48,10 @@ export function ExerciseFilters({
     if (value === 'all') {
       onMuscleGroupChange(undefined)
     } else if (value) {
-      onMuscleGroupChange(value as MuscleGroup)
+      const parsed = muscleGroupSchema.safeParse(value)
+      if (parsed.success) {
+        onMuscleGroupChange(parsed.data)
+      }
     }
   }
 
@@ -51,7 +59,10 @@ export function ExerciseFilters({
     if (value === 'all') {
       onMovementPatternChange(undefined)
     } else if (value) {
-      onMovementPatternChange(value as MovementPattern)
+      const parsed = movementPatternSchema.safeParse(value)
+      if (parsed.success) {
+        onMovementPatternChange(parsed.data)
+      }
     }
   }
 

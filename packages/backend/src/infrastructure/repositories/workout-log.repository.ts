@@ -510,7 +510,7 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
             weekName: String(row.week_name),
           }))
 
-          const countRow = countResult[0] as Record<string, unknown> | undefined
+          const countRow = countResult[0]
           const totalCount = Number(countRow?.count ?? 0)
 
           return { ok: true, data: { items, totalCount } }

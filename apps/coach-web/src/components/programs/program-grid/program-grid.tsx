@@ -176,7 +176,7 @@ export function ProgramGrid({
         bubbles: true,
       })
       // Call the navigation handler directly with the synthetic event
-      handleKeyDown(event as unknown as React.KeyboardEvent)
+      handleKeyDown(event)
     }
   }
 
