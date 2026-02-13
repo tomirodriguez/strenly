@@ -3,7 +3,7 @@ import { exercises } from './exercises'
 import { health } from './health/health'
 import { programs } from './programs'
 import { subscriptions } from './subscriptions'
-import { workoutLogs } from './workout-logs/router'
+import { workoutLogs } from './workout-logs'
 
 /**
  * Main oRPC router

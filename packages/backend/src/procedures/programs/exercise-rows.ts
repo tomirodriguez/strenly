@@ -30,6 +30,7 @@ export const addExerciseRowProcedure = authProcedure
 
     const useCase = makeAddExerciseRow({
       programRepository,
+      exerciseRepository,
       generateId: () => crypto.randomUUID(),
     })
 
@@ -54,11 +55,7 @@ export const addExerciseRowProcedure = authProcedure
       }
     }
 
-    const row = result.value
-
-    // Fetch exercise name (pass organizationId to get curated or org-specific exercises)
-    const exerciseResult = await exerciseRepository.findById(context.organization.id, row.exerciseId)
-    const exerciseName = exerciseResult.isOk() ? (exerciseResult.value?.name ?? 'Unknown') : 'Unknown'
+    const { row, exerciseName } = result.value
 
     return {
       id: row.id,
@@ -90,6 +87,7 @@ export const updateExerciseRowProcedure = authProcedure
 
     const useCase = makeUpdateExerciseRow({
       programRepository,
+      exerciseRepository,
     })
 
     const result = await useCase({
@@ -117,11 +115,7 @@ export const updateExerciseRowProcedure = authProcedure
       }
     }
 
-    const row = result.value
-
-    // Fetch exercise name (pass organizationId to get curated or org-specific exercises)
-    const exerciseResult = await exerciseRepository.findById(context.organization.id, row.exerciseId)
-    const exerciseName = exerciseResult.isOk() ? (exerciseResult.value?.name ?? 'Unknown') : 'Unknown'
+    const { row, exerciseName } = result.value
 
     return {
       id: row.id,

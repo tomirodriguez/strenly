@@ -21,6 +21,7 @@ export const createSubscription = sessionProcedure
     const createSubscriptionUseCase = makeCreateSubscription({
       subscriptionRepository: createSubscriptionRepository(context.db),
       planRepository: createPlanRepository(context.db),
+      generateId: crypto.randomUUID,
     })
 
     const result = await createSubscriptionUseCase({
@@ -40,21 +41,7 @@ export const createSubscription = sessionProcedure
       }
     }
 
-    const subscription = result.value
-
-    // We need to fetch the plan details to return the full subscription output
-    const planRepository = createPlanRepository(context.db)
-    const planResult = await planRepository.findById(subscription.planId)
-
-    if (planResult.isErr()) {
-      console.error('Failed to fetch plan:', planResult.error.message)
-      throw errors.PLAN_NOT_FOUND()
-    }
-
-    const plan = planResult.value
-    if (plan === null) {
-      throw errors.PLAN_NOT_FOUND()
-    }
+    const { subscription, plan } = result.value
 
     return {
       id: subscription.id,

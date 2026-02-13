@@ -1,9 +1,4 @@
-import {
-  athleteSchema,
-  athleteStatusSchema,
-  genderSchema,
-  updateAthleteInputSchema,
-} from '@strenly/contracts/athletes/athlete'
+import { athleteSchema, updateAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdateAthlete } from '../../use-cases/athletes/update-athlete'
@@ -16,20 +11,14 @@ export const updateAthlete = authProcedure
   .input(updateAthleteInputSchema)
   .output(athleteSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para actualizar atletas' },
-    NOT_FOUND: { message: 'Atleta no encontrado' },
-    VALIDATION_ERROR: { message: 'Datos de atleta invalidos' },
+    FORBIDDEN: { message: 'No permission to update athletes' },
+    NOT_FOUND: { message: 'Athlete not found' },
+    VALIDATION_ERROR: { message: 'Invalid athlete data' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeUpdateAthlete({
       athleteRepository: createAthleteRepository(context.db),
     })
-
-    // Parse gender from optional string to enum
-    const gender = input.gender !== undefined ? (input.gender ? genderSchema.parse(input.gender) : null) : undefined
-
-    // Parse status from optional string to enum
-    const status = input.status ? athleteStatusSchema.parse(input.status) : undefined
 
     const result = await useCase({
       organizationId: context.organization.id,
@@ -40,9 +29,9 @@ export const updateAthlete = authProcedure
       email: input.email !== undefined ? input.email || null : undefined,
       phone: input.phone !== undefined ? input.phone || null : undefined,
       birthdate: input.birthdate !== undefined ? (input.birthdate ? new Date(input.birthdate) : null) : undefined,
-      gender,
+      gender: input.gender !== undefined ? input.gender || null : undefined,
       notes: input.notes !== undefined ? input.notes || null : undefined,
-      status,
+      status: input.status,
     })
 
     if (result.isErr()) {

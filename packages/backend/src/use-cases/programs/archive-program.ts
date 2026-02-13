@@ -50,15 +50,8 @@ export const makeArchiveProgram =
           })
         }
 
-        // 4. Create archived program
-        const archivedProgram: Program = {
-          ...existing,
-          status: 'archived',
-          updatedAt: new Date(),
-        }
-
-        // 5. Persist
-        return deps.programRepository.update(ctx, archivedProgram).mapErr(
+        // 4. Archive and persist
+        return deps.programRepository.update(ctx, { ...existing, status: 'archived', updatedAt: new Date() }).mapErr(
           (e): ArchiveProgramError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,

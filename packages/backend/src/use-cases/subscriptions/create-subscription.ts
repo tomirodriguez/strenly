@@ -1,17 +1,23 @@
 import {
   createSubscription as createSubscriptionEntity,
+  type Plan,
   type PlanRepositoryPort,
   type Subscription,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
-type CreateSubscriptionInput = {
+export type CreateSubscriptionInput = {
   organizationId: string
   planId: string
 }
 
-type CreateSubscriptionError =
+export type CreateSubscriptionResult = {
+  subscription: Subscription
+  plan: Plan
+}
+
+export type CreateSubscriptionError =
   | { type: 'plan_not_found'; planId: string }
   | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
@@ -19,6 +25,7 @@ type CreateSubscriptionError =
 type Dependencies = {
   subscriptionRepository: SubscriptionRepositoryPort
   planRepository: PlanRepositoryPort
+  generateId: () => string
 }
 
 /**
@@ -27,16 +34,20 @@ type Dependencies = {
  * No authorization check needed as this is called during onboarding
  * when the user is creating their own organization.
  */
-export function makeCreateSubscription(deps: Dependencies) {
-  return (input: CreateSubscriptionInput): ResultAsync<Subscription, CreateSubscriptionError> => {
+export const makeCreateSubscription =
+  (deps: Dependencies) =>
+  (input: CreateSubscriptionInput): ResultAsync<CreateSubscriptionResult, CreateSubscriptionError> => {
     // 1. Validate plan exists
     return deps.planRepository
       .findById(input.planId)
-      .mapErr((error) => ({ type: 'repository_error', message: error.message }) as const)
+      .mapErr((error): CreateSubscriptionError => ({ type: 'repository_error', message: error.message }))
       .andThen((plan) => {
         // Check if plan was found
         if (plan === null) {
-          return errAsync({ type: 'plan_not_found', planId: input.planId } as const)
+          return errAsync<CreateSubscriptionResult, CreateSubscriptionError>({
+            type: 'plan_not_found',
+            planId: input.planId,
+          })
         }
 
         // 2. Create subscription entity with 30-day period
@@ -45,7 +56,7 @@ export function makeCreateSubscription(deps: Dependencies) {
         periodEnd.setDate(periodEnd.getDate() + 30)
 
         const subscriptionResult = createSubscriptionEntity({
-          id: crypto.randomUUID(),
+          id: deps.generateId(),
           organizationId: input.organizationId,
           planId: plan.id,
           status: 'active',
@@ -56,15 +67,20 @@ export function makeCreateSubscription(deps: Dependencies) {
         })
 
         if (subscriptionResult.isErr()) {
-          return errAsync({ type: 'validation_error', message: subscriptionResult.error.message } as const)
+          return errAsync<CreateSubscriptionResult, CreateSubscriptionError>({
+            type: 'validation_error',
+            message: subscriptionResult.error.message,
+          })
         }
 
         // 3. Persist via repository
-        return deps.subscriptionRepository.create(subscriptionResult.value).mapErr((error) => {
-          const message =
-            error.type === 'DATABASE_ERROR' ? error.message : `Organization ${error.organizationId} not found`
-          return { type: 'repository_error', message } as const
-        })
+        return deps.subscriptionRepository
+          .create(subscriptionResult.value)
+          .mapErr((error): CreateSubscriptionError => {
+            const message =
+              error.type === 'DATABASE_ERROR' ? error.message : `Organization ${error.organizationId} not found`
+            return { type: 'repository_error', message }
+          })
+          .andThen((subscription) => okAsync({ subscription, plan }))
       })
   }
-}

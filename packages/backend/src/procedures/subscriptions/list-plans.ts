@@ -1,6 +1,7 @@
 import { listPlansInputSchema, listPlansOutputSchema } from '@strenly/contracts/subscriptions/plan'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { publicProcedure } from '../../lib/orpc'
+import { makeListPlans } from '../../use-cases/subscriptions/list-plans'
 
 /**
  * List available subscription plans
@@ -14,18 +15,16 @@ export const listPlans = publicProcedure
   .input(listPlansInputSchema)
   .output(listPlansOutputSchema)
   .handler(async ({ input, context, errors }) => {
-    const planRepository = createPlanRepository(context.db)
+    const listPlansUseCase = makeListPlans({
+      planRepository: createPlanRepository(context.db),
+    })
 
-    const result = await planRepository.findAll({
+    const result = await listPlansUseCase({
       organizationType: input?.organizationType,
-      activeOnly: true,
-      limit: 100, // Plans are typically few, fetch all
-      offset: 0,
     })
 
     if (result.isErr()) {
-      // Log and throw typed error for public endpoint
-      console.error('Failed to list plans:', result.error)
+      console.error('Failed to list plans:', result.error.message)
       throw errors.INTERNAL_ERROR()
     }
 

@@ -48,7 +48,7 @@ To launch a phase, start a new conversation and tell the agent which batch to ex
 
 ### Batch 3 — SEQUENTIAL (domain → ports → use cases dependency chain)
 - [x] **Phase 4+5: Domain + Ports/Repos** — athlete-invitation factory, reconstitute fns, required pagination, T|null returns
-- [ ] **Phase 6: Use Cases & Procedures** — missing use cases, domain validation, business logic cleanup
+- [x] **Phase 6: Use Cases & Procedures** — missing use cases, domain validation, business logic cleanup
 
 ### Batch 4 — after all above
 - [ ] **Phase 8: Routes & Forms Polish** — thin routes, remove useEffects, form purity, error boundaries
@@ -60,8 +60,8 @@ To launch a phase, start a new conversation and tell the agent which batch to ex
 | 1 | DONE | 2026-02-13 | b20663f | 13 files: org scoping, permissions, ILIKE escape, markAccepted scope |
 | 2 | DONE | 2026-02-13 | 6e01742 | 9 files: schema validation, type guards, widened types, removed casts |
 | 3 | DONE | 2026-02-13 | 1cc849b | 23 files: .pick() derivation for 14+ schemas, timestampsSchema spread, inline schemas moved to contracts |
-| 4+5 | DONE | 2026-02-13 | TBD | 37 files: athlete-invitation Result factory, reconstitute fns for 5 entities, required pagination on all ports, T|null for findById/findByOrgId, MuscleGroup port to core, null-check pattern in 8 use cases |
-| 6 | PENDING | - | - | - |
+| 4+5 | DONE | 2026-02-13 | 7f3ec1e | 37 files: athlete-invitation Result factory, reconstitute fns for 5 entities, required pagination on all ports, T|null for findById/findByOrgId, MuscleGroup port to core, null-check pattern in 8 use cases |
+| 6 | DONE | 2026-02-13 | d92ac58 | 22 files: ListMuscleGroups/ListPlans use cases, enriched exercise-row use cases, fixed create-subscription (generateId, enriched return), save-draft forbidden/English errors, archive-program status guard, removed redundant parse calls from procedures, split workout-logs router into 9 files |
 | 7 | DONE | 2026-02-13 | 49e8b56 | 11 files: createDataTableColumns helper, DataTableColumnHeader, error/empty states, fixed double nesting, page reset on filter, removed barrel file |
 | 8 | PENDING | - | - | - |
 

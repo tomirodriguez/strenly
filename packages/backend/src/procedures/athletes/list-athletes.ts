@@ -1,8 +1,4 @@
-import {
-  athleteStatusSchema,
-  listAthletesInputSchema,
-  listAthletesOutputSchema,
-} from '@strenly/contracts/athletes/athlete'
+import { listAthletesInputSchema, listAthletesOutputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeListAthletes } from '../../use-cases/athletes/list-athletes'
@@ -16,21 +12,18 @@ export const listAthletes = authProcedure
   .input(listAthletesInputSchema)
   .output(listAthletesOutputSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para ver atletas' },
+    FORBIDDEN: { message: 'No permission to view athletes' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeListAthletes({
       athleteRepository: createAthleteRepository(context.db),
     })
 
-    // Parse status from optional string to enum
-    const status = input.status ? athleteStatusSchema.parse(input.status) : undefined
-
     const result = await useCase({
       organizationId: context.organization.id,
       userId: context.user.id,
       memberRole: context.membership.role,
-      status,
+      status: input.status,
       search: input.search,
       limit: input.limit,
       offset: input.offset,

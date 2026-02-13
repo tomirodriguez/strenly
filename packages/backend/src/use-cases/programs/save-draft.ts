@@ -27,7 +27,7 @@ export type SaveDraftInput = {
 }
 
 export type SaveDraftError =
-  | { type: 'unauthorized'; message: string }
+  | { type: 'forbidden'; message: string }
   | { type: 'validation_error'; message: string; details?: unknown }
   | { type: 'program_not_found'; programId: string }
   | { type: 'conflict'; message: string; serverUpdatedAt: Date }
@@ -84,8 +84,8 @@ export const makeSaveDraft =
     // 1. Authorization FIRST
     if (!hasPermission(ctx.memberRole, 'programs:write')) {
       return errAsync({
-        type: 'unauthorized',
-        message: 'No tienes permiso para editar programas',
+        type: 'forbidden',
+        message: 'No permission to edit programs',
       })
     }
 
@@ -118,7 +118,7 @@ export const makeSaveDraft =
         .andThen((currentProgram) => {
           const conflictWarning =
             currentProgram.updatedAt > lastLoadedAt
-              ? 'El programa fue modificado por otro usuario. Tus cambios se guardaron pero podrian sobrescribir cambios recientes.'
+              ? 'Program was modified by another user. Your changes were saved but may overwrite recent changes.'
               : null
 
           // 5. Save aggregate (replace-on-save)

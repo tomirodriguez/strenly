@@ -1,4 +1,5 @@
 import {
+  type ExerciseRepositoryPort,
   hasPermission,
   type OrganizationContext,
   type ProgramExerciseRow,
@@ -14,6 +15,11 @@ export type AddExerciseRowInput = OrganizationContext & {
   groupId?: string | null
 }
 
+export type AddExerciseRowResult = {
+  row: ProgramExerciseRow
+  exerciseName: string
+}
+
 export type AddExerciseRowError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; entityType: 'session'; id: string }
@@ -21,12 +27,13 @@ export type AddExerciseRowError =
 
 type Dependencies = {
   programRepository: ProgramRepositoryPort
+  exerciseRepository: ExerciseRepositoryPort
   generateId: () => string
 }
 
 export const makeAddExerciseRow =
   (deps: Dependencies) =>
-  (input: AddExerciseRowInput): ResultAsync<ProgramExerciseRow, AddExerciseRowError> => {
+  (input: AddExerciseRowInput): ResultAsync<AddExerciseRowResult, AddExerciseRowError> => {
     // 1. Authorization FIRST
     if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
@@ -64,11 +71,30 @@ export const makeAddExerciseRow =
           updatedAt: now,
         }
 
-        return deps.programRepository.createExerciseRow(ctx, input.sessionId, row).mapErr((e): AddExerciseRowError => {
-          if (e.type === 'NOT_FOUND') {
-            return { type: 'not_found', entityType: 'session', id: e.id }
-          }
-          return { type: 'repository_error', message: e.message }
-        })
+        return deps.programRepository
+          .createExerciseRow(ctx, input.sessionId, row)
+          .mapErr((e): AddExerciseRowError => {
+            if (e.type === 'NOT_FOUND') {
+              return { type: 'not_found', entityType: 'session', id: e.id }
+            }
+            return { type: 'repository_error', message: e.message }
+          })
+          .andThen((createdRow) => {
+            // 4. Fetch exercise name for the response
+            return deps.exerciseRepository
+              .findById(input.organizationId, createdRow.exerciseId)
+              .map(
+                (exercise): AddExerciseRowResult => ({
+                  row: createdRow,
+                  exerciseName: exercise?.name ?? 'Unknown',
+                }),
+              )
+              .mapErr(
+                (e): AddExerciseRowError => ({
+                  type: 'repository_error',
+                  message: e.type === 'DATABASE_ERROR' ? e.message : 'Failed to fetch exercise',
+                }),
+              )
+          })
       })
   }

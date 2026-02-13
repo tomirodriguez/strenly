@@ -11,10 +11,10 @@ import { makeSaveDraft } from '../../use-cases/programs/save-draft'
  */
 export const saveDraftProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
-    VALIDATION_ERROR: { message: 'Error de validacion' },
-    CONFLICT: { message: 'El programa fue modificado por otro usuario' },
+    FORBIDDEN: { message: 'No permission to modify programs' },
+    PROGRAM_NOT_FOUND: { message: 'Program not found' },
+    VALIDATION_ERROR: { message: 'Validation error' },
+    CONFLICT: { message: 'Program was modified by another user' },
   })
   .input(saveDraftInputSchema)
   .output(saveDraftOutputSchema)
@@ -38,7 +38,7 @@ export const saveDraftProcedure = authProcedure
 
     if (result.isErr()) {
       switch (result.error.type) {
-        case 'unauthorized':
+        case 'forbidden':
           throw errors.FORBIDDEN()
         case 'program_not_found':
           throw errors.PROGRAM_NOT_FOUND()
