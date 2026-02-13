@@ -280,3 +280,43 @@ The project at `/Users/tomiardz/Projects/strenly` serves as a reference for:
 - `docs/domain-research-strength-training.md` - Domain concepts
 - `.planning/ROADMAP.md` - Implementation phases
 - `.planning/PROJECT.md` - Project context
+
+---
+
+## Development Conventions
+
+Before implementing anything, search the codebase for 2-3 existing examples of similar features (list views, forms, API routes). Document the exact pattern used including file structure, hook patterns, contract shapes, and component composition. Then implement following that same pattern exactly. Show the pattern found before writing any new code.
+
+When running a dev-story workflow, before starting implementation tasks, first use an agent to identify all existing patterns relevant to the story's features (list views, forms, API routes, test patterns) and document them. Implement each task following those patterns exactly. After all tasks, run the full quality gate (`/quality-gate`). Do not mark a story complete until the quality gate passes.
+
+---
+
+## Quality Checks
+
+Always run the full quality gate after completing changes: all tests must pass, lint must be clean, and typecheck must succeed. The command sequence is typically: run tests, run lint, run typecheck. Fix unused imports, type mismatches, and lint errors before presenting work as complete.
+
+---
+
+## TypeScript Rules
+
+This is a TypeScript monorepo. Never use CommonJS `require()` - always use ESM imports. Never use `as` type casts - use proper type narrowing or schema validation instead. Use Zod schemas with `.pick()` and `.extend()` for contract composition rather than manually selecting fields.
+
+---
+
+## Debugging Guidelines
+
+When debugging UI issues, ask the user to clarify the exact visual/behavioral problem before diving into source code investigation. Do not spend time adding logging or reading library source code until the problem is clearly understood. Prefer simple fixes first.
+
+---
+
+## UI Component Standards
+
+When implementing UI components (comboboxes, dropdowns, date pickers), proactively consider: empty states, infinite scroll/pagination, keyboard navigation, deletion/clearing behavior, portal/positioning for popover elements, and form nesting (nested form submit bubbling). Test these edge cases before marking work complete.
+
+Implement UI features incrementally. After each interaction pattern (create, edit, delete, empty state, error state), stop and tell the user what to test manually. Do NOT move to the next interaction until the user confirms the current one works. Start with the happy path only.
+
+---
+
+## Architecture Decisions
+
+When making architectural decisions (batch vs individual API calls, data fetching strategies, component composition), proactively flag tradeoffs to the user rather than silently choosing the simpler approach. Prefer batch endpoints over individual calls, and embed/denormalize data via schema composition rather than making extra fetches.

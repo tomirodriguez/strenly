@@ -5,7 +5,6 @@ description: |
   Use this skill when defining data access contracts, creating repository interfaces,
   or working with OrganizationContext for multi-tenancy.
   Do NOT load for repository implementations (use /repository), use case logic, or API contracts.
-version: 1.0.0
 ---
 
 <objective>
@@ -13,7 +12,7 @@ Defines repository contracts (interfaces) that implementations must follow. Port
 </objective>
 
 <quick_start>
-1. Create file at `packages/core/src/ports/{entity}-repository.port.ts`
+1. Create file at `src/core/ports/{entity}-repository.port.ts`
 2. Define entity type with all fields
 3. Define `Create{Entity}Data` and `Update{Entity}Data` types
 4. Define `List{Entities}Options` with **limit and offset (REQUIRED)**

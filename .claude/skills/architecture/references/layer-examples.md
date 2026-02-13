@@ -491,7 +491,7 @@ export const create{Entity} = authProcedure
     // 2. Create use case with dependencies
     const create{Entity}UseCase = makeCreate{Entity}({
       {entity}Repository,
-      generateId: () => crypto.randomUUID(),
+      generateId,
     })
 
     // 3. Execute use case with context info

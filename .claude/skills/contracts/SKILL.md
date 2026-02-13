@@ -5,55 +5,88 @@ description: |
   Contracts define the API boundary between frontend and backend, ensuring type safety and validation.
   Use this skill when creating new procedures, forms, or API endpoints that need input/output schemas.
   Do NOT load for runtime validation, frontend-only local state, or database schema definitions.
-version: 1.0.0
 ---
 
 <objective>
-Creates shared Zod 4 schemas that define the data structures exchanged between frontend and backend. Follows a 3-layer architecture: Entity Schema → Input Schemas → Output Schemas.
+Creates shared Zod 4 schemas that define the data structures exchanged between frontend and backend. Entity schemas are the TRUE single source of truth - they contain ALL validation rules INCLUDING Spanish error messages. Input schemas just use `.pick()` to select fields.
 </objective>
 
 <quick_start>
 1. Create file at `src/contracts/{domain}/{resource}.ts`
-2. Define entity schema first (source of truth, no validation)
-3. Extract input validation object with Spanish messages
-4. Define input schemas (create, update, get/delete)
-5. Derive output schemas from entity using `.pick()`/`.omit()`
-6. **ALWAYS include `limit`/`offset` in list input and `totalCount` in list output**
+2. Define entity schema first - **WITH invariants AND Spanish messages** (true single source)
+3. Define input schemas using `.pick()` only - they inherit validation from entity
+4. Only use `.extend()` to ADD new fields not in entity (like `owners` array)
+5. **ALWAYS include `limit`/`offset` in list input and `totalCount` in list output**
 </quick_start>
 
 <architecture>
 ```
-┌─────────────────────────────────────┐
-│   {resource}Schema (entity)         │  ← Source of truth
-└─────────────────────────────────────┘
-         ↓ .pick() / .omit()
-┌─────────────────┐  ┌─────────────────┐
-│  Input Schemas  │  │ Output Schemas  │
-│ (+ validación)  │  │  (estructura)   │
-└─────────────────┘  └─────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│   {resource}Schema (entity)                                 │  ← TRUE Single Source
+│   - Business invariants (max lengths, ranges, formats)      │
+│   - Spanish error messages                                  │
+│   - ALL validation lives here                               │
+└────────────────────────────────────────────────────────────┘
+         ↓ .pick() only (NO .extend() for messages)
+┌─────────────────────────┐  ┌─────────────────┐
+│    Input Schemas        │  │ Output Schemas  │
+│ .pick() from entity     │  │ .pick()/.omit() │
+│ (inherit validation)    │  │ from entity     │
+└─────────────────────────┘  └─────────────────┘
 ```
 
-**3 Layers:**
-1. **Entity Schema** - Complete resource representation (source of truth, no validation)
-2. **Input Schemas** - Derived conceptually from entity, with Spanish validation messages
-3. **Output Schemas** - Derived via `.pick()`/`.omit()` from entity for API responses
+**Key Principle:**
+- Entity schema = **TRUE single source of truth** (invariants + messages)
+- Input schemas = `.pick()` only (inherit everything from entity)
+- Only use `.extend()` to ADD new fields that don't exist in entity
 </architecture>
+
+<critical_rule>
+**MUST NOT redefine validation in input schemas**
+
+```typescript
+// WRONG - redefining validation in input schema
+const createInputSchema = entitySchema.pick({ name: true }).extend({
+  name: z.string().min(1, 'Requerido').max(200, 'Máximo 200'),  // WRONG!
+})
+
+// CORRECT - entity has all validation, input just picks
+const entitySchema = z.object({
+  name: z.string()
+    .min(1, 'El nombre es requerido')
+    .max(200, 'El nombre no puede exceder 200 caracteres'),
+})
+const createInputSchema = entitySchema.pick({ name: true })  // Just pick!
+```
+
+**When to use `.extend()`:**
+ONLY to add fields that don't exist in the entity schema:
+```typescript
+// Entity doesn't have owners - it's a create-only concept
+const createAccountInputSchema = accountSchema
+  .pick({ name: true, institution: true })
+  .extend({
+    owners: ownershipArraySchema,  // NEW field, not in entity
+  })
+```
+</critical_rule>
 
 <file_structure>
 ```
 src/contracts/
-├── common/             # Reusable schemas (pagination, timestamps, etc.)
+├── common/             # Reusable schemas (pagination, timestamps, amounts, etc.)
 │   ├── pagination.ts
 │   ├── dates.ts
 │   ├── email.ts
-│   └── id.ts
+│   ├── id.ts
+│   └── amount.ts       # Currency amount schemas (up to 6 decimals)
 ├── taxpayer/
 │   └── taxpayer.ts
 ├── movement/
 │   └── movement.ts
 ├── auth/
 │   ├── login.ts
-│   └── register.ts
+│   └── signup.ts
 └── {domain}/
     └── {resource}.ts
 ```
@@ -63,11 +96,11 @@ src/contracts/
 | Type | Naming | Purpose |
 |------|--------|---------|
 | Enum | `{name}Schema` | Fixed values (roles, status) |
-| **Entity** | `{resource}Schema` | Source of truth (no validation) |
-| Create Input | `create{Resource}InputSchema` | Create operation |
-| Update Input | `update{Resource}InputSchema` | Update operation |
+| **Entity** | `{resource}Schema` | TRUE single source (invariants + messages) |
+| Create Input | `create{Resource}InputSchema` | Create operation (`.pick()` from entity) |
+| Update Input | `update{Resource}InputSchema` | Update operation (`.partial()` from create) |
 | Get/Delete Input | `get{Resource}InputSchema` | Single item operations |
-| **Output** | `{resource}OutputSchema` | API response (derived from entity) |
+| **Output** | `{resource}OutputSchema` | API response (same as entity or `.pick()`) |
 | List Item | `{resource}ListItemSchema` | Lighter version for lists |
 | List Query | `list{Resources}QuerySchema` | Paginated list params |
 | List Output | `list{Resources}OutputSchema` | Paginated list response |
@@ -76,8 +109,8 @@ src/contracts/
 <contract_template>
 ```typescript
 import { z } from 'zod'
-import { idInputSchema } from '@contracts/common/id'
-import { timestampsSchema } from '@contracts/common/dates'
+import { idInputSchema } from '@/contracts/common/id'
+import { timestampsSchema } from '@/contracts/common/dates'
 
 // ============================================================
 // ENUMS
@@ -87,17 +120,24 @@ export const statusSchema = z.enum(['active', 'inactive'])
 export type Status = z.infer<typeof statusSchema>
 
 // ============================================================
-// ENTITY SCHEMA (source of truth - complete resource)
+// ENTITY SCHEMA (TRUE single source - invariants + messages)
 // ============================================================
+// This is THE source of truth. All validation AND messages live here.
+// Input schemas inherit by using .pick() - no need to redefine.
 
 export const taxpayerSchema = z.object({
   // Identity
   id: z.string(),
+  organizationId: z.string(),
 
-  // Core data
-  name: z.string(),
-  fiscalPeriod: z.number(),
-  taxJurisdiction: z.string(),
+  // Core data - invariants WITH Spanish messages
+  name: z.string()
+    .min(1, 'El nombre es requerido')
+    .max(200, 'El nombre no puede exceder 200 caracteres'),
+  currentPeriod: z.enum(['2024', '2025', '2026'], {
+    errorMap: () => ({ message: 'Periodo fiscal inválido' }),
+  }),
+  status: statusSchema,
 
   // Timestamps
   ...timestampsSchema.shape,
@@ -105,23 +145,24 @@ export const taxpayerSchema = z.object({
 export type Taxpayer = z.infer<typeof taxpayerSchema>
 
 // ============================================================
-// INPUT SCHEMAS (derived from entity + validation)
+// INPUT SCHEMAS (just .pick() - inherit validation from entity)
 // ============================================================
+// DO NOT redefine validation here. Just pick the fields you need.
+// Only use .extend() to ADD new fields not in entity.
 
-// Input validation messages (Spanish)
-const taxpayerInputValidation = {
-  name: z.string().min(1, 'El nombre es requerido').max(100, 'Nombre muy largo'),
-  fiscalPeriod: z.number().min(2020, 'Período mínimo 2020').max(2030, 'Período máximo 2030'),
-}
-
-// Create
-export const createTaxpayerInputSchema = z.object(taxpayerInputValidation)
+// Create - picks fields from entity (validation inherited!)
+export const createTaxpayerInputSchema = taxpayerSchema.pick({
+  name: true,
+  currentPeriod: true,
+})
 export type CreateTaxpayerInput = z.infer<typeof createTaxpayerInputSchema>
 
-// Update - derive from create
-export const updateTaxpayerInputSchema = createTaxpayerInputSchema.partial().extend({
-  id: z.string().min(1, 'ID de contribuyente requerido'),
-})
+// Update - partial of create + id
+export const updateTaxpayerInputSchema = createTaxpayerInputSchema
+  .partial()
+  .extend({
+    id: z.string().min(1, 'ID de contribuyente requerido'),
+  })
 export type UpdateTaxpayerInput = z.infer<typeof updateTaxpayerInputSchema>
 
 // Get/Delete - use common idInputSchema
@@ -129,26 +170,15 @@ export const getTaxpayerInputSchema = idInputSchema('contribuyente')
 export type GetTaxpayerInput = z.infer<typeof getTaxpayerInputSchema>
 
 // ============================================================
-// OUTPUT SCHEMAS (derived from entity via pick/omit)
+// OUTPUT SCHEMAS (derived from entity)
 // ============================================================
 
-// Full output (same as entity)
 export const taxpayerOutputSchema = taxpayerSchema
 export type TaxpayerOutput = z.infer<typeof taxpayerOutputSchema>
-
-// List item - omit heavy fields for performance
-export const taxpayerListItemSchema = taxpayerSchema.omit({ notes: true })
-export type TaxpayerListItem = z.infer<typeof taxpayerListItemSchema>
 
 // ============================================================
 // LIST/SEARCH SCHEMAS (PAGINATION REQUIRED)
 // ============================================================
-
-/**
- * IMPORTANT: All list endpoints MUST support pagination.
- * - Input: limit (default 50, max 100) + offset (default 0)
- * - Output: items array + totalCount for pagination controls
- */
 
 export const LIST_TAXPAYERS_DEFAULTS = {
   limit: 10,
@@ -156,105 +186,115 @@ export const LIST_TAXPAYERS_DEFAULTS = {
 } as const
 
 export const listTaxpayersInputSchema = z.object({
-  // Filters
   search: z.string().optional(),
-  status: z.enum(['active', 'inactive']).optional(),
-  // Pagination (REQUIRED for all list endpoints)
+  status: statusSchema.optional(),
   limit: z.number().int().min(1).max(100).default(10),
   offset: z.number().int().min(0).default(0),
 })
 export type ListTaxpayersInput = z.infer<typeof listTaxpayersInputSchema>
 
 export const listTaxpayersOutputSchema = z.object({
-  taxpayers: z.array(taxpayerListItemSchema),
-  totalCount: z.number().int(), // REQUIRED: Total items for pagination
+  items: z.array(taxpayerSchema),
+  totalCount: z.number().int(),
 })
 export type ListTaxpayersOutput = z.infer<typeof listTaxpayersOutputSchema>
 ```
 </contract_template>
 
-<error_messages>
-All validation messages in **Spanish** using **string format** (not object):
+<common_schemas>
+**Common schemas have Spanish messages built-in:**
 
 ```typescript
-// Correct - string directo
+import { currencyAmountSchema } from '@/contracts/common/amount'
+import { dateOnlySchema } from '@/contracts/common/dates'
+import { emailSchema } from '@/contracts/common/email'
+
+// Use directly in entity - messages are included
+const entitySchema = z.object({
+  balance: currencyAmountSchema,      // 'Monto invalido (hasta 6 decimales)'
+  acquisitionDate: dateOnlySchema,    // 'Fecha invalida (YYYY-MM-DD)'
+  email: emailSchema,                 // 'Email invalido'
+})
+```
+
+**Available common schemas:**
+
+| Schema | Purpose | Message |
+|--------|---------|---------|
+| `currencyAmountSchema` | Financial amounts (±, 6 decimals) | 'Monto invalido (hasta 6 decimales)' |
+| `positiveCurrencyAmountSchema` | Positive amounts only | 'Monto invalido (debe ser positivo)' |
+| `dateOnlySchema` | Business dates (YYYY-MM-DD) | 'Fecha invalida (YYYY-MM-DD)' |
+| `datetimeSchema` | Timestamps | Coerced Date object |
+| `emailSchema` | Email addresses | 'Email invalido' |
+</common_schemas>
+
+<error_messages>
+All validation messages in **Spanish** using **string format**:
+
+```typescript
+// Correct - string format
 z.string().min(1, 'El nombre es requerido')
 z.string().email('Email inválido')
+z.number().min(0, 'Debe ser mayor o igual a 0')
 
-// Incorrect - objeto
-z.string().min(1, { error: 'El nombre es requerido' })
+// For enums, use errorMap
+z.enum(['active', 'inactive'], {
+  errorMap: () => ({ message: 'Estado inválido' }),
+})
 ```
 </error_messages>
 
 <nullability_guidelines>
 | Context | Modifier | Example |
 |---------|----------|---------|
-| Entity fields | `.nullable()` | `description: z.string().nullable()` |
-| Input optional | `.nullish()` | `description: z.string().nullish()` |
-| Output from entity | `.nullable()` (inherited) | via `.pick()`/`.omit()` |
+| Optional in entity | `.nullable()` | `description: z.string().max(500).nullable()` |
+| Optional in input | `.optional()` or `.nullish()` | `.partial()` makes all optional |
+| Never null | No modifier | `name: z.string().min(1, '...')` |
 </nullability_guidelines>
 
 <date_fields>
-Use the appropriate schema based on the field type:
-
 ```typescript
-import { datetimeSchema, dateOnlySchema, timestampsSchema } from '@contracts/common/dates'
+import { datetimeSchema, dateOnlySchema, timestampsSchema } from '@/contracts/common/dates'
 
-// In entity
-export const taxpayerSchema = z.object({
-  dateOfBirth: dateOnlySchema.nullable(),      // ISO date string "2024-01-15"
-  scheduledAt: datetimeSchema.nullable(),       // Coerced Date object
-  ...timestampsSchema.shape,                    // createdAt, updatedAt (Date objects)
+export const entitySchema = z.object({
+  birthDate: dateOnlySchema.nullable(),    // "2024-01-15" string
+  scheduledAt: datetimeSchema.nullable(),  // Date object
+  ...timestampsSchema.shape,               // createdAt, updatedAt
 })
 ```
-
-| Schema | Type | Use case |
-|--------|------|----------|
-| `timestampsSchema` | `Date` | createdAt, updatedAt (auto-serialized by JSON) |
-| `datetimeSchema` | `Date` | Scheduled events, appointments |
-| `dateOnlySchema` | `string` | Birthdays, expiration dates (no time component) |
 </date_fields>
 
 <pagination_requirements>
-**ALL list endpoints MUST support pagination.** This is non-negotiable.
+**ALL list endpoints MUST support pagination.**
 
-**Input Schema Pattern:**
+**Input:**
 ```typescript
-export const list{Resources}InputSchema = z.object({
-  // Your filters here...
+export const listResourcesInputSchema = z.object({
   search: z.string().optional(),
-  status: z.enum(['active', 'inactive']).optional(),
-
-  // Pagination params (ALWAYS REQUIRED)
-  limit: z.number().int().min(1).max(100).default(50),
+  limit: z.number().int().min(1).max(100).default(10),
   offset: z.number().int().min(0).default(0),
 })
 ```
 
-**Output Schema Pattern:**
+**Output:**
 ```typescript
-export const list{Resources}OutputSchema = z.object({
-  {resources}: z.array({resource}ListItemSchema),
-  totalCount: z.number().int(), // REQUIRED for DataTable.Pagination
+export const listResourcesOutputSchema = z.object({
+  items: z.array(resourceSchema),
+  totalCount: z.number().int(),
 })
 ```
-
-**Why This Matters:**
-- Without `totalCount`, the frontend cannot render pagination controls
-- Without `limit`/`offset`, the API loads ALL records (performance disaster)
-- The DataTable component REQUIRES `totalCount` for `DataTable.Pagination`
 </pagination_requirements>
 
 <imports_pattern>
-Always import from the specific file path:
+Always import from specific file path:
 
 ```typescript
 // Correct
-import { createTaxpayerInputSchema } from '@contracts/taxpayer/taxpayer'
-import { paginationQuerySchema } from '@contracts/common/pagination'
+import { taxpayerSchema, createTaxpayerInputSchema } from '@/contracts/taxpayer/taxpayer'
+import { currencyAmountSchema } from '@/contracts/common/amount'
 
-// Incorrect - barrel imports
-import { createTaxpayerInputSchema } from '@contracts'
+// Wrong - barrel imports
+import { taxpayerSchema } from '@/contracts'
 ```
 </imports_pattern>
 
@@ -262,23 +302,17 @@ import { createTaxpayerInputSchema } from '@contracts'
 When creating a new contract:
 
 - [ ] Create file at `src/contracts/{domain}/{resource}.ts`
-- [ ] Import common schemas (pagination, id, dates, email) if applicable
-- [ ] Define enums at the top
-- [ ] **Define entity schema first** (source of truth, no validation)
-- [ ] Extract input validation object with Spanish messages
-- [ ] Define input schemas using the validation object
-- [ ] Derive update from create using `.partial().extend()`
-- [ ] **Derive output schemas from entity** using `.pick()`/`.omit()`
-- [ ] Use `datetimeSchema` / `dateOnlySchema` for dates
-- [ ] Use `.nullish()` for optional fields in inputs
-- [ ] Use `.nullable()` for optional fields in entity/outputs
-- [ ] Define list query with defaults constant
+- [ ] **Entity schema has ALL validation WITH Spanish messages**
+- [ ] **Input schemas use `.pick()` only - NO redefining validation**
+- [ ] Only use `.extend()` to ADD new fields not in entity
+- [ ] Update schema uses `.partial()` from create
+- [ ] Output schemas derive from entity
+- [ ] List input has `limit` and `offset`
+- [ ] List output has `items` and `totalCount`
 - [ ] Export TypeScript types for all schemas
-- [ ] **PAGINATION: List input has `limit` (default 10) and `offset` (default 0)**
-- [ ] **PAGINATION: List output has `totalCount` for DataTable.Pagination**
 </success_criteria>
 
 <resources>
-- `references/contract-example.md` - Complete well-structured contract example with 3-layer pattern
-- `common/` schemas - See the actual common directory for reusable patterns
+- `references/contract-example.md` - Complete example with correct pattern
+- `common/` schemas - Reusable schemas with Spanish messages
 </resources>

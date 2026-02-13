@@ -108,6 +108,46 @@ import { Field, FieldContent, FieldLabel, FieldDescription, FieldError } from '@
   <Input {...register('fieldName')} /> {/* NO! */}
 </Field>
 ```
+
+**4. Derive Form Schemas from Contracts**
+
+Form schemas MUST derive from `@/contracts` using `.pick()`, `.omit()`, or `.extend()`. NEVER redefine validation inline.
+
+```tsx
+// CORRECT - derive from contract
+import { createTaxpayerInputSchema } from '@/contracts/taxpayer/create-taxpayer'
+const formSchema = createTaxpayerInputSchema.omit({ organizationId: true })
+
+// WRONG - duplicates contract validation
+const formSchema = z.object({
+  name: z.string().min(1, 'Requerido'),  // Duplicated!
+})
+```
+
+See `references/schema-derivation.md` for complete patterns.
+
+**5. Submit Data Types MUST Use Contract Types**
+
+Never define custom submit data interfaces. Use contract types directly or extend them:
+
+```tsx
+// CORRECT - use contract type directly
+import type { UpdateTaxpayerInput } from '@/contracts/taxpayer/update-taxpayer'
+
+type FormProps = {
+  onSubmit: (data: UpdateTaxpayerInput) => void
+}
+
+// CORRECT - extend contract type for UI-only fields
+import type { InstrumentPositionInput } from '@/contracts/declaration/update-declaration'
+type FormValue = InstrumentPositionInput & { instrumentName?: string }  // UI-only field
+
+// WRONG - custom interface duplicating contract structure
+interface MyFormSubmitData {
+  declarationId: string
+  cashPosition?: { ... }  // Duplicates contract!
+}
+```
 </core_rules>
 
 <template>
@@ -460,6 +500,7 @@ import { FieldSet, FieldLegend, FieldGroup } from '@/components/ui/field'
 <success_criteria>
 When creating a form:
 
+- [ ] **Schema derived from `@/contracts`** using `.pick()`/`.omit()`/`.extend()`
 - [ ] Form receives `onSubmit`, `onCancel`, `isSubmitting`, `defaultValues` as props
 - [ ] Uses `zodResolver` with Zod schema (fallback to `standardSchemaResolver` if needed)
 - [ ] ALL fields use `Controller` - never use `register()`
@@ -471,7 +512,8 @@ When creating a form:
 </success_criteria>
 
 <resources>
-- `references/react-hook-form-guide.md` - Complete documentation
-- `/contracts` skill - Zod schema patterns
-- `/mutation-errors` skill - Error handling
+- `references/schema-derivation.md` - **Contract-first schema patterns** (pick/omit/extend)
+- `references/react-hook-form-guide.md` - Complete React Hook Form documentation
+- `/contracts` skill - Creating Zod schemas in `@/contracts`
+- `/mutation-errors` skill - Error handling in mutations
 </resources>

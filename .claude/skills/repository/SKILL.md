@@ -5,7 +5,6 @@ description: |
   Use this skill when implementing a port interface with Drizzle ORM, writing database queries,
   or working with ResultAsync.fromPromise for error handling.
   Do NOT load for port definitions (use /port), business logic, or raw SQL without Drizzle.
-version: 1.0.0
 ---
 
 <objective>
@@ -13,7 +12,7 @@ Implements port interfaces using Drizzle ORM with proper error handling, multi-t
 </objective>
 
 <quick_start>
-1. Create file at `packages/backend/src/infrastructure/repositories/{entity}.repository.ts`
+1. Create file at `src/server/repositories/{entity}.repository.ts`
 2. Define `wrapError` helper at top
 3. Create factory function that receives `DbClient`
 4. All methods receive `OrganizationContext` and filter by `organizationId`

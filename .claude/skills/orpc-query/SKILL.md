@@ -39,7 +39,7 @@ const { data } = useQuery(orpc.athletes.get.queryOptions({ input: { athleteId } 
 import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
 import { createORPCReactQueryUtils } from '@orpc/react-query'
-import type { Router, RouterClient } from '@my-app/backend'
+import type { Router, RouterClient } from '@/server/router' // or your backend router path
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8787'
 

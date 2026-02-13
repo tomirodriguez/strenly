@@ -1,24 +1,28 @@
 # Contract Example: Workout
 
-A complete, well-structured contract following the 3-layer pattern.
+A complete, well-structured contract following the TRUE single source pattern.
 
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────┐
-│   workoutSchema (entity completa)   │  ← Source of truth
-└─────────────────────────────────────┘
-         ↓ .pick() / .omit()
-┌─────────────────┐  ┌─────────────────┐
-│  Input Schemas  │  │ Output Schemas  │
-│ (+ validación)  │  │  (estructura)   │
-└─────────────────┘  └─────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│   workoutSchema (entity)                                    │  <- TRUE Single Source
+│   - Business invariants (max lengths, ranges, formats)      │
+│   - Spanish error messages                                  │
+│   - ALL validation lives here                               │
+└────────────────────────────────────────────────────────────┘
+         ↓ .pick() only (NO .extend() for messages)
+┌─────────────────────────┐  ┌─────────────────┐
+│    Input Schemas        │  │ Output Schemas  │
+│ .pick() from entity     │  │ .pick()/.omit() │
+│ (inherit validation)    │  │ from entity     │
+└─────────────────────────┘  └─────────────────┘
 ```
 
-**3 Layers:**
-1. **Entity Schema** - Complete resource representation (source of truth, no validation)
-2. **Input Schemas** - Derived via `.pick()`/`.omit()`, then add validation with Spanish messages
-3. **Output Schemas** - Derived via `.pick()`/`.omit()` for API responses
+**Key Principle:**
+- Entity schema = **TRUE single source of truth** (invariants + messages)
+- Input schemas = `.pick()` only (inherit everything from entity)
+- Only use `.extend()` to ADD new fields that don't exist in entity
 
 ## Complete Example
 
@@ -29,18 +33,26 @@ import { paginationQuerySchema, sortOrderSchema, PAGINATION_DEFAULTS } from '@st
 import { timestampsSchema, datetimeSchema } from '@strenly/contracts/common/dates'
 
 // ============================================================
-// ENUMS
+// ENUMS (with Spanish messages)
 // ============================================================
 
-export const workoutStatusSchema = z.enum(['draft', 'scheduled', 'in_progress', 'completed', 'cancelled'])
+export const workoutStatusSchema = z.enum(
+  ['draft', 'scheduled', 'in_progress', 'completed', 'cancelled'],
+  { errorMap: () => ({ message: 'Estado de entrenamiento invalido' }) }
+)
 export type WorkoutStatus = z.infer<typeof workoutStatusSchema>
 
-export const workoutTypeSchema = z.enum(['strength', 'cardio', 'flexibility', 'mixed'])
+export const workoutTypeSchema = z.enum(
+  ['strength', 'cardio', 'flexibility', 'mixed'],
+  { errorMap: () => ({ message: 'Tipo de entrenamiento invalido' }) }
+)
 export type WorkoutType = z.infer<typeof workoutTypeSchema>
 
 // ============================================================
-// ENTITY SCHEMA (source of truth - complete resource)
+// ENTITY SCHEMA (TRUE single source - invariants + messages)
 // ============================================================
+// This is THE source of truth. All validation AND messages live here.
+// Input schemas inherit by using .pick() - no need to redefine.
 
 export const workoutSchema = z.object({
   // Identity
@@ -48,13 +60,17 @@ export const workoutSchema = z.object({
 
   // Relations
   athleteId: z.string(),
-  athleteName: z.string(),
+  athleteName: z.string().max(200, 'El nombre del atleta no puede exceder 200 caracteres'),
   coachId: z.string(),
-  coachName: z.string(),
+  coachName: z.string().max(200, 'El nombre del entrenador no puede exceder 200 caracteres'),
 
-  // Core data
-  name: z.string(),
-  description: z.string().nullable(),
+  // Core data WITH invariants AND Spanish messages
+  name: z.string()
+    .min(1, 'El nombre es requerido')
+    .max(100, 'El nombre no puede exceder 100 caracteres'),
+  description: z.string()
+    .max(2000, 'La descripcion no puede exceder 2000 caracteres')
+    .nullable(),
   type: workoutTypeSchema,
   status: workoutStatusSchema,
 
@@ -62,7 +78,11 @@ export const workoutSchema = z.object({
   scheduledAt: datetimeSchema.nullable(),
   startedAt: datetimeSchema.nullable(),
   completedAt: datetimeSchema.nullable(),
-  durationMinutes: z.number().nullable(),
+  durationMinutes: z.number()
+    .int()
+    .min(1, 'Duracion minima 1 minuto')
+    .max(480, 'Duracion maxima 8 horas')
+    .nullable(),
 
   // Timestamps
   ...timestampsSchema.shape,
@@ -70,23 +90,34 @@ export const workoutSchema = z.object({
 export type Workout = z.infer<typeof workoutSchema>
 
 // ============================================================
-// INPUT SCHEMAS (derived from entity + validation)
+// INPUT SCHEMAS (just .pick() - inherit validation from entity)
 // ============================================================
+// DO NOT redefine validation here. Just pick the fields you need.
+// Only use .extend() to ADD new fields not in entity.
 
-// Input validation messages (Spanish)
-const workoutInputValidation = {
-  name: z.string().min(1, 'El nombre es requerido').max(100, 'Nombre muy largo'),
-  description: z.string().max(2000, 'Descripción muy larga').nullish(),
-  type: workoutTypeSchema,
-  scheduledAt: datetimeSchema.nullish(),
-  durationMinutes: z.number().min(1, 'Duración mínima 1 minuto').max(480, 'Duración máxima 8 horas').nullish(),
-}
-
-// Create - picks editable fields from entity, applies validation
-export const createWorkoutInputSchema = z.object({
-  athleteId: z.string().min(1, 'Debes seleccionar un atleta'),
-  ...workoutInputValidation,
-})
+// Create - picks fields from entity (validation inherited!)
+export const createWorkoutInputSchema = workoutSchema
+  .pick({
+    name: true,
+    description: true,
+    type: true,
+    scheduledAt: true,
+    durationMinutes: true,
+  })
+  .extend({
+    // athleteId is NOT in entity with min(1) - it's a required relation for create
+    athleteId: z.string().min(1, 'Debes seleccionar un atleta'),
+    // description is optional for create (entity has it as nullable)
+    description: z.string()
+      .max(2000, 'La descripcion no puede exceder 2000 caracteres')
+      .nullish(),
+    // durationMinutes is optional for create (entity has it as nullable)
+    durationMinutes: z.number()
+      .int()
+      .min(1, 'Duracion minima 1 minuto')
+      .max(480, 'Duracion maxima 8 horas')
+      .nullish(),
+  })
 export type CreateWorkoutInput = z.infer<typeof createWorkoutInputSchema>
 
 // Update - derive from create with .partial()
@@ -110,7 +141,7 @@ export const startWorkoutInputSchema = idInputSchema('entrenamiento')
 export type StartWorkoutInput = z.infer<typeof startWorkoutInputSchema>
 
 export const completeWorkoutInputSchema = idInputSchema('entrenamiento').extend({
-  notes: z.string().max(2000, 'Notas muy largas').nullish(),
+  notes: z.string().max(2000, 'Las notas no pueden exceder 2000 caracteres').nullish(),
 })
 export type CompleteWorkoutInput = z.infer<typeof completeWorkoutInputSchema>
 
@@ -151,37 +182,49 @@ export const listWorkoutsQuerySchema = paginationQuerySchema.extend({
 export type ListWorkoutsQuery = z.infer<typeof listWorkoutsQuerySchema>
 
 export const listWorkoutsOutputSchema = z.object({
-  workouts: z.array(workoutListItemSchema),
-  total: z.number(),
+  items: z.array(workoutListItemSchema),
+  totalCount: z.number().int(),
 })
 export type ListWorkoutsOutput = z.infer<typeof listWorkoutsOutputSchema>
 ```
 
 ## Key Patterns
 
-### 1. Entity First (Source of Truth)
+### 1. Entity First WITH Invariants AND Messages (TRUE Single Source)
 ```typescript
-// The entity defines ALL fields of the resource
+// The entity defines ALL fields with validation AND Spanish messages
 export const workoutSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  // ... all fields, no validation
+  name: z.string()
+    .min(1, 'El nombre es requerido')           // <- Message in entity
+    .max(100, 'El nombre no puede exceder...'), // <- Message in entity
+  durationMinutes: z.number()
+    .int()
+    .min(1, 'Duracion minima 1 minuto')         // <- Message in entity
+    .max(480, 'Duracion maxima 8 horas')        // <- Message in entity
+    .nullable(),
 })
 export type Workout = z.infer<typeof workoutSchema>
 ```
 
-### 2. Input Validation Object
+### 2. Input Derives from Entity via .pick() Only
 ```typescript
-// Extract validation to reuse between create/update
-const workoutInputValidation = {
-  name: z.string().min(1, 'El nombre es requerido'),
-  description: z.string().max(2000, 'Muy largo').nullish(),
-}
+// Just pick fields - validation AND messages are inherited!
+export const createWorkoutInputSchema = workoutSchema
+  .pick({ name: true, type: true })
+// NO need to .extend() to add messages - they're already in entity!
+
+// Only use .extend() to ADD new fields not in entity:
+export const createWorkoutInputSchema = workoutSchema
+  .pick({ name: true, type: true })
+  .extend({
+    athleteId: z.string().min(1, 'Selecciona un atleta'), // NEW field
+  })
 ```
 
-### 3. Output via Pick/Omit
+### 3. Output via Pick/Omit (Inherits Everything)
 ```typescript
-// Full output = entity
+// Full output = entity (inherits all validation)
 export const workoutOutputSchema = workoutSchema
 
 // List item = entity minus heavy fields
@@ -195,7 +238,7 @@ export const workoutSummarySchema = workoutSchema.pick({
 })
 ```
 
-### 4. Update from Create
+### 4. Update from Create with Partial
 ```typescript
 export const updateWorkoutInputSchema = createWorkoutInputSchema
   .partial()
@@ -205,13 +248,24 @@ export const updateWorkoutInputSchema = createWorkoutInputSchema
 ## Common Mistakes
 
 ```typescript
-// BAD: Input defined before entity
-export const createWorkoutInputSchema = z.object({ ... })
-export const workoutSchema = z.object({ ... }) // entity after!
+// BAD: Entity without messages (old pattern)
+export const workoutSchema = z.object({
+  name: z.string().max(100),  // NO message - WRONG!
+})
+// Then input redefines EVERYTHING with messages - WRONG!
+export const createInputSchema = workoutSchema.pick({ name: true }).extend({
+  name: z.string().min(1, 'Requerido').max(100, 'Muy largo'),  // WRONG!
+})
 
-// GOOD: Entity first, then derive
-export const workoutSchema = z.object({ ... })
-export const createWorkoutInputSchema = z.object({ ...validation })
+// GOOD: Entity WITH messages (new pattern)
+export const workoutSchema = z.object({
+  name: z.string()
+    .min(1, 'El nombre es requerido')
+    .max(100, 'El nombre no puede exceder 100 caracteres'),
+})
+// Input just picks - messages inherited!
+export const createInputSchema = workoutSchema.pick({ name: true })
+
 
 // BAD: Duplicating entity fields in output
 export const workoutOutputSchema = z.object({
@@ -223,22 +277,55 @@ export const workoutOutputSchema = z.object({
 // GOOD: Derive from entity
 export const workoutOutputSchema = workoutSchema
 export const workoutListItemSchema = workoutSchema.omit({ description: true })
-
-// BAD: Validation in entity
-export const workoutSchema = z.object({
-  name: z.string().min(1, 'Requerido'), // NO!
-})
-
-// GOOD: Entity has no validation
-export const workoutSchema = z.object({
-  name: z.string(),
-})
 ```
+
+## When to Use .extend()
+
+**ONLY to add fields that DON'T exist in the entity:**
+
+```typescript
+// Entity doesn't have athleteId with min(1) constraint
+// It's a create-only required field
+const createInputSchema = entitySchema
+  .pick({ name: true })
+  .extend({
+    athleteId: z.string().min(1, 'Selecciona un atleta'), // NEW field
+  })
+```
+
+**DO NOT use .extend() just to add messages:**
+
+```typescript
+// WRONG - entity field with message re-added
+const createInputSchema = entitySchema.pick({ name: true }).extend({
+  name: z.string().min(1, 'Requerido').max(100, 'Muy largo'),  // WRONG!
+})
+
+// CORRECT - message is already in entity, just pick
+const createInputSchema = entitySchema.pick({ name: true })
+```
+
+## Validation Philosophy
+
+**TRUE Single Source (Entity):**
+- Business invariants (max lengths, valid ranges, formats)
+- Spanish error messages for user feedback
+- Defined ONCE, inherited everywhere
+
+**Input Schemas:**
+- Just `.pick()` fields from entity
+- Only `.extend()` to ADD new fields
+- DO NOT redefine validation or messages
+
+This gives you:
+- **Single source of truth** for ALL validation
+- **No duplication** of messages across operations
+- **Automatic consistency** - change entity, inputs update automatically
 
 ## Nullability Guidelines
 
 | Context | Modifier | Example |
 |---------|----------|---------|
-| Entity fields | `.nullable()` | `description: z.string().nullable()` |
-| Input optional | `.nullish()` | `description: z.string().nullish()` |
+| Entity fields | `.nullable()` | `description: z.string().max(2000).nullable()` |
+| Input optional | `.nullish()` | `description: z.string().max(2000).nullish()` |
 | Output from entity | `.nullable()` (inherited) | via `.pick()`/`.omit()` |

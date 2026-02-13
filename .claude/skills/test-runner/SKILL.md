@@ -5,7 +5,6 @@ description: |
   results with suggested fixes. Use after completing tasks or before declaring a feature complete.
   Triggers when code changes are done and validation is needed before committing or marking work complete.
   Do NOT load for writing tests or debugging test failures.
-version: 1.0.0
 ---
 
 <objective>

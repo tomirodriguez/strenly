@@ -6,7 +6,6 @@ description: |
   that have identity (Entities), concepts defined by their attributes (Value Objects), and
   consistency boundaries (Aggregates).
   Do NOT load for DTOs, API response types, database models, or infrastructure concerns.
-version: 1.0.0
 ---
 
 <objective>

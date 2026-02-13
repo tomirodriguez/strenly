@@ -5,7 +5,6 @@ description: |
   Use this skill when creating API endpoints, implementing thin handlers,
   or mapping use case results to HTTP responses.
   Do NOT load for business logic (use /use-case), database queries, or frontend API calls.
-version: 1.0.0
 ---
 
 <objective>
@@ -25,7 +24,7 @@ A procedure has only 4 responsibilities:
   const repo = createRepository(context.db)
 
   // 2. Create use case
-  const useCase = makeUseCase({ repo, generateId: () => crypto.randomUUID() })
+  const useCase = makeUseCase({ repo, generateId })
 
   // 3. Execute with member info
   const result = await useCase({
@@ -85,7 +84,7 @@ export const createUser = authProcedure
     // 2. Create use case with dependencies
     const createUserUseCase = makeCreateUser({
       userRepository,
-      generateId: () => crypto.randomUUID(),
+      generateId,
     })
 
     // 3. Execute use case with member info from context

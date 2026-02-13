@@ -5,7 +5,6 @@ description: |
   Use this skill when adding permission checks to use cases, restricting actions by role,
   checking if a user can perform an action, or adding new permissions to the system.
   Do NOT load for authentication flows, login/logout, session management, or JWT/token handling.
-version: 1.0.0
 ---
 
 <objective>
@@ -126,7 +125,7 @@ export const myProcedure = authProcedure
 </permissions_reference>
 
 <adding_permissions>
-1. Add to `Permission` type in `src/core/services/authorization.ts`:
+1. Add to `Permission` type in the authorization service (e.g., `src/core/services/authorization.ts`):
    ```typescript
    export type Permission =
      | 'users:read'
@@ -166,7 +165,7 @@ export const myProcedure = authProcedure
 
 <core_functions>
 ```typescript
-// src/core/services/authorization.ts
+// Authorization service (e.g., src/core/services/authorization.ts)
 export type Role = 'owner' | 'admin' | 'member' | 'viewer'
 export type Permission = 'users:read' | 'users:write' | /* ... */
 

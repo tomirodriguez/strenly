@@ -5,7 +5,6 @@ description: |
   Use this skill DURING PLANNING (before creating any plan) and BEFORE implementing any backend feature.
   Plans that don't include domain entities and ports for new concepts are INCOMPLETE.
   This skill should be loaded automatically when planning or implementing backend features.
-version: 1.1.0
 ---
 
 <objective>
@@ -15,12 +14,12 @@ Defines the mandatory inside-out development flow for backend features in Clean 
 <quick_start>
 For ANY backend feature, follow this order and invoke the corresponding skill:
 
-1. **Domain** (`/domain`) → `packages/core/src/domain/entities/`
-2. **Port** (`/port`) → `packages/core/src/ports/`
-3. **Repository** (`/repository`) → `packages/backend/src/infrastructure/repositories/`
-4. **Use Case** (`/use-case` + `/authorization`) → `packages/backend/src/use-cases/`
-5. **Contracts** (`/contracts`) → `packages/contracts/src/`
-6. **Procedure** (`/procedure`) → `packages/backend/src/procedures/`
+1. **Domain** (`/domain`) → `src/core/domain/entities/`
+2. **Port** (`/port`) → `src/core/ports/`
+3. **Repository** (`/repository`) → `src/server/repositories/`
+4. **Use Case** (`/use-case` + `/authorization`) → `src/server/use-cases/`
+5. **Contracts** (`/contracts`) → `src/contracts/`
+6. **Procedure** (`/procedure`) → `src/server/procedures/`
 </quick_start>
 
 <critical_context>
@@ -44,7 +43,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 1. DOMAIN (/domain)                                                  │
-│    Location: packages/core/src/domain/entities/{entity}.ts          │
+│    Location: src/core/domain/entities/{entity}.ts                   │
 │    - Factory function returns Result<Entity, DomainError>           │
 │    - All business validation rules live here                        │
 │    - ID is received as input (not generated here)                   │
@@ -52,7 +51,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
                                  ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 2. PORT (/port)                                                     │
-│    Location: packages/core/src/ports/{entity}-repository.port.ts    │
+│    Location: src/core/ports/{entity}-repository.port.ts             │
 │    - Define repository interface                                    │
 │    - All methods receive OrganizationContext                        │
 │    - findAll returns { items, totalCount } (REQUIRED for pagination)│
@@ -60,7 +59,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
                                  ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 3. REPOSITORY (/repository)                                         │
-│    Location: packages/backend/src/infrastructure/repositories/      │
+│    Location: src/server/repositories/                               │
 │    - Implement port with Drizzle ORM                                │
 │    - ALWAYS filter by ctx.organizationId (multi-tenancy)            │
 │    - Use ResultAsync.fromPromise with wrapError                     │
@@ -68,7 +67,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
                                  ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 4. USE CASE (/use-case + /authorization)                            │
-│    Location: packages/backend/src/use-cases/{domain}/               │
+│    Location: src/server/use-cases/{domain}/                         │
 │    - Authorization check FIRST (hasPermission)                      │
 │    - Validate via domain entity BEFORE persisting                   │
 │    - generateId as injected dependency                              │
@@ -76,7 +75,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
                                  ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 5. CONTRACTS (/contracts)                                           │
-│    Location: packages/contracts/src/{domain}/                       │
+│    Location: src/contracts/{domain}/                                │
 │    - Zod schemas for API input/output                               │
 │    - Validation messages in Spanish                                 │
 │    - List endpoints: limit, offset input + totalCount output        │
@@ -84,7 +83,7 @@ For ANY backend feature, follow this order and invoke the corresponding skill:
                                  ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 6. PROCEDURE (/procedure)                                           │
-│    Location: packages/backend/src/procedures/{domain}/              │
+│    Location: src/server/procedures/{domain}/                        │
 │    - ONLY orchestration (create repos, use case, map errors)        │
 │    - NO business logic here                                         │
 │    - Map ALL error types with exhaustive switch                     │
@@ -114,7 +113,7 @@ export const makeCreateAthlete = (deps) => (input) => {
 
 ```typescript
 // WRONG - Persist without domain validation
-const id = crypto.randomUUID()
+const id = deps.generateId()
 return deps.repository.create(ctx, { id, ...input })
 
 // CORRECT - Validate via domain first
@@ -196,10 +195,10 @@ findById: (ctx, id) => {
 <planning_checklist>
 For each new domain concept introduced by a phase, the plan MUST include tasks for:
 
-- [ ] **Domain** task — `packages/core/src/domain/entities/{entity}.ts` — skill: `/domain`
-- [ ] **Domain Entity Tests** task — `packages/core/src/domain/entities/{entity}.test.ts` (90%+ coverage required)
-- [ ] **Port** task — `packages/core/src/ports/{entity}-repository.port.ts` — skill: `/port`
-- [ ] **Repository** task — `packages/backend/src/infrastructure/repositories/{entity}.repository.ts` — skill: `/repository`
+- [ ] **Domain** task — `src/core/domain/entities/{entity}.ts` — skill: `/domain`
+- [ ] **Domain Entity Tests** task — `src/core/domain/entities/{entity}.test.ts` (90%+ coverage required)
+- [ ] **Port** task — `src/core/ports/{entity}-repository.port.ts` — skill: `/port`
+- [ ] **Repository** task — `src/server/repositories/{entity}.repository.ts` — skill: `/repository`
 - [ ] **Use Case** tasks — authorization-first, domain validation — skills: `/use-case`, `/authorization`
 - [ ] **Contracts** task — Zod schemas for API — skill: `/contracts`
 - [ ] **Procedure** task — thin API handler — skill: `/procedure`
@@ -210,7 +209,7 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 <task type="auto">
   <name>Create Athlete Domain Entity</name>
   <skills>/domain</skills>
-  <files>packages/core/src/domain/entities/athlete.ts</files>
+  <files>src/core/domain/entities/athlete.ts</files>
   <action>...</action>
 </task>
 ```
@@ -218,7 +217,7 @@ For each new domain concept introduced by a phase, the plan MUST include tasks f
 
 <success_criteria>
 - [ ] Domain entity created with factory function returning Result
-- [ ] Domain entity has comprehensive tests (90%+ coverage on `packages/core`)
+- [ ] Domain entity has comprehensive tests (90%+ coverage on `src/core`)
 - [ ] Port defined with OrganizationContext and pagination types
 - [ ] Repository filters by organizationId, returns totalCount for lists
 - [ ] Use case checks authorization FIRST, validates via domain entity

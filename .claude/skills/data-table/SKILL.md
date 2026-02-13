@@ -6,7 +6,6 @@ description: |
   (columns, pagination, filtering, row actions). Covers imports, compound structure, column helpers,
   state handling, and server-side pagination.
   Do NOT load for simple lists, card grids, or non-tabular data displays.
-version: 1.0.0
 ---
 
 <objective>
@@ -20,7 +19,7 @@ import {
   DataTableColumnHeader,
   createDataTableColumns,
   type SortingState,
-} from '@strenly/ui/components/data-table'
+} from '@/components/ui/data-table'
 
 const columns = createDataTableColumns<MyType>((helper) => [
   helper.accessor('name', {
@@ -267,7 +266,7 @@ The Toolbar is for **search and filters only** - sorting is handled through colu
 <success_criteria>
 When creating a DataTable:
 
-- [ ] Import from `@strenly/ui/components/data-table`
+- [ ] Import from `@/components/ui/data-table`
 - [ ] Define columns with `createDataTableColumns`
 - [ ] Use `DataTableColumnHeader` for sortable columns
 - [ ] Implement server-side pagination with `totalCount`

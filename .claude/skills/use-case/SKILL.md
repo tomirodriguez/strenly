@@ -5,7 +5,6 @@ description: |
   Use this skill when implementing business logic, orchestrating repositories,
   or working with neverthrow for error handling in the application layer.
   Do NOT load for simple CRUD without business rules, API handlers, or domain entity definitions.
-version: 1.0.0
 ---
 
 <objective>
@@ -13,7 +12,7 @@ Creates use cases that contain business logic and orchestrate repositories. Use 
 </objective>
 
 <quick_start>
-1. Create file at `packages/backend/src/use-cases/{domain}/{action}.ts`
+1. Create file at `src/server/use-cases/{domain}/{action}.ts`
 2. Export Input, Output, and Error types
 3. Define Dependencies type with `generateId: () => string`
 4. Authorization check FIRST (before any logic)
