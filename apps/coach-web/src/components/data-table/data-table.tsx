@@ -1,7 +1,30 @@
-import { type ColumnDef, flexRender, getCoreRowModel, type PaginationState, useReactTable } from '@tanstack/react-table'
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  type OnChangeFn,
+  type PaginationState,
+  type SortingState,
+  useReactTable,
+} from '@tanstack/react-table'
+import { AlertCircle } from 'lucide-react'
 import { createContext, type ReactNode, useContext } from 'react'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+type ErrorConfig = {
+  message: string
+  retry?: () => void
+}
+
+type EmptyStateConfig = {
+  title?: string
+  description?: string
+  action?: ReactNode
+  icon?: ReactNode
+}
 
 type DataTableContextValue<TData> = {
   table: ReturnType<typeof useReactTable<TData>>
@@ -10,6 +33,7 @@ type DataTableContextValue<TData> = {
   pageSize: number
   onPageChange: (pageIndex: number, pageSize: number) => void
   isLoading?: boolean
+  error?: ErrorConfig | null
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: React generic contexts require any for type erasure
@@ -31,6 +55,9 @@ type DataTableRootProps<TData> = {
   pageSize: number
   onPageChange: (pageIndex: number, pageSize: number) => void
   isLoading?: boolean
+  error?: ErrorConfig | null
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
   children?: ReactNode
 }
 
@@ -42,6 +69,9 @@ function DataTableRoot<TData>({
   pageSize,
   onPageChange,
   isLoading = false,
+  error,
+  sorting,
+  onSortingChange,
   children,
 }: DataTableRootProps<TData>) {
   const pagination: PaginationState = {
@@ -55,6 +85,7 @@ function DataTableRoot<TData>({
     pageCount: Math.ceil(totalCount / pageSize),
     state: {
       pagination,
+      ...(sorting !== undefined ? { sorting } : {}),
     },
     onPaginationChange: (updater) => {
       if (typeof updater === 'function') {
@@ -62,8 +93,11 @@ function DataTableRoot<TData>({
         onPageChange(newPagination.pageIndex, newPagination.pageSize)
       }
     },
+    onSortingChange,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: onSortingChange ? getSortedRowModel() : undefined,
     manualPagination: true,
+    manualSorting: onSortingChange !== undefined,
   })
 
   const contextValue: DataTableContextValue<TData> = {
@@ -73,17 +107,33 @@ function DataTableRoot<TData>({
     pageSize,
     onPageChange,
     isLoading,
+    error,
   }
 
-  return (
-    <DataTableContext.Provider value={contextValue}>
-      {children}
-    </DataTableContext.Provider>
-  )
+  return <DataTableContext.Provider value={contextValue}>{children}</DataTableContext.Provider>
 }
 
-function DataTableContent<TData>() {
-  const { table, isLoading } = useDataTableContext<TData>()
+type DataTableContentProps<TData> = {
+  onRowClick?: (row: TData) => void
+  emptyState?: EmptyStateConfig
+}
+
+function DataTableContent<TData>({ onRowClick, emptyState }: DataTableContentProps<TData> = {}) {
+  const { table, isLoading, error } = useDataTableContext<TData>()
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-md border p-12 text-center">
+        <AlertCircle className="h-12 w-12 text-destructive/50" />
+        <h3 className="mt-4 font-semibold text-lg">{error.message}</h3>
+        {error.retry && (
+          <Button variant="outline" onClick={error.retry} className="mt-4">
+            Reintentar
+          </Button>
+        )}
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -119,28 +169,17 @@ function DataTableContent<TData>() {
   const rows = table.getRowModel().rows
 
   if (rows.length === 0) {
+    const title = emptyState?.title ?? 'No hay datos'
+    const description = emptyState?.description
+    const icon = emptyState?.icon
+    const action = emptyState?.action
+
     return (
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center text-muted-foreground">
-                No results found.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-12 text-center">
+        {icon && <div className="text-muted-foreground/50">{icon}</div>}
+        <h3 className={icon ? 'mt-4 font-semibold text-lg' : 'font-semibold text-lg'}>{title}</h3>
+        {description && <p className="mt-2 text-muted-foreground text-sm">{description}</p>}
+        {action && <div className="mt-4">{action}</div>}
       </div>
     )
   }
@@ -161,7 +200,12 @@ function DataTableContent<TData>() {
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.id} data-state={row.getIsSelected() ? 'selected' : undefined}>
+            <TableRow
+              key={row.id}
+              data-state={row.getIsSelected() ? 'selected' : undefined}
+              className={onRowClick ? 'cursor-pointer' : undefined}
+              onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+            >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
               ))}
@@ -179,3 +223,4 @@ export const DataTable = {
 }
 
 export { useDataTableContext }
+export type { ErrorConfig, EmptyStateConfig }

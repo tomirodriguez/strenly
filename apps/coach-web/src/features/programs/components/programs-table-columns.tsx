@@ -3,7 +3,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Archive, Copy, Edit } from 'lucide-react'
-import { DataTableRowActions, type RowAction } from '@/components/data-table/data-table-row-actions'
+import { createDataTableColumns } from '@/components/data-table/create-data-table-columns'
+import type { RowAction } from '@/components/data-table/data-table-row-actions'
 import { Badge } from '@/components/ui/badge'
 
 /**
@@ -33,33 +34,31 @@ type ProgramsColumnsCallbacks = {
 }
 
 /**
- * Creates column definitions for the programs table.
+ * Creates column definitions for the programs table using createDataTableColumns.
  * Includes: name, status, athlete, weeks, isTemplate, updatedAt, actions.
  */
-export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): ColumnDef<ProgramRow>[] {
-  return [
-    {
-      accessorKey: 'name',
+export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): ColumnDef<ProgramRow, unknown>[] {
+  return createDataTableColumns<ProgramRow>((helper) => [
+    helper.accessor('name', {
       header: 'Nombre',
       cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
-    },
-    {
-      accessorKey: 'status',
+    }),
+    helper.accessor('status', {
       header: 'Estado',
       cell: ({ row }) => {
         const status = row.original.status
         return <Badge variant={STATUS_VARIANTS[status]}>{STATUS_LABELS[status]}</Badge>
       },
-    },
-    {
+    }),
+    helper.display({
       id: 'athleteName',
       header: 'Atleta',
       cell: ({ row }) => {
         const athleteName = row.original.athleteName
         return <span className="text-muted-foreground">{athleteName ?? 'Sin atleta'}</span>
       },
-    },
-    {
+    }),
+    helper.display({
       id: 'weeksCount',
       header: 'Semanas',
       cell: ({ row }) => {
@@ -70,9 +69,8 @@ export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): Colu
           </span>
         )
       },
-    },
-    {
-      accessorKey: 'isTemplate',
+    }),
+    helper.accessor('isTemplate', {
       header: 'Tipo',
       cell: ({ row }) => {
         const isTemplate = row.original.isTemplate
@@ -81,9 +79,8 @@ export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): Colu
         }
         return <span className="text-muted-foreground">Programa</span>
       },
-    },
-    {
-      accessorKey: 'updatedAt',
+    }),
+    helper.accessor('updatedAt', {
       header: 'Actualizado',
       cell: ({ row }) => {
         const updatedAt = new Date(row.original.updatedAt)
@@ -93,22 +90,12 @@ export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): Colu
           </span>
         )
       },
-    },
-    {
-      id: 'actions',
-      cell: ({ row }) => {
-        const program = row.original
+    }),
+    helper.actions({
+      actions: (program) => {
         const actions: RowAction<ProgramRow>[] = [
-          {
-            label: 'Editar',
-            icon: Edit,
-            onClick: callbacks.onEdit,
-          },
-          {
-            label: 'Duplicar',
-            icon: Copy,
-            onClick: callbacks.onDuplicate,
-          },
+          { label: 'Editar', icon: Edit, onClick: callbacks.onEdit },
+          { label: 'Duplicar', icon: Copy, onClick: callbacks.onDuplicate },
         ]
 
         // Only show archive action if not already archived
@@ -121,8 +108,8 @@ export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): Colu
           })
         }
 
-        return <DataTableRowActions row={program} actions={actions} />
+        return actions
       },
-    },
-  ]
+    }),
+  ])
 }

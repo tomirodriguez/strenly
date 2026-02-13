@@ -1,4 +1,4 @@
-import { type ProgramStatus, programStatusSchema } from '@strenly/contracts/programs/program'
+import { programStatusSchema } from '@strenly/contracts/programs/program'
 import { useNavigate } from '@tanstack/react-router'
 import { FileTextIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
@@ -12,8 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useOrgSlug } from '@/hooks/use-org-slug'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos los estados' },
@@ -33,15 +33,19 @@ export function ProgramsListView() {
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<ProgramStatus | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showTemplates, setShowTemplates] = useState(false)
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
+  // Parse status filter safely
+  const parsedStatus = statusFilter === 'all' ? undefined : programStatusSchema.safeParse(statusFilter)
+  const activeStatus = parsedStatus?.success ? parsedStatus.data : undefined
+
   // Fetch programs with current filters and pagination
-  const { data, isLoading } = usePrograms({
+  const { data, isLoading, error, refetch } = usePrograms({
     search: search || undefined,
-    status: statusFilter === 'all' ? undefined : statusFilter,
+    status: activeStatus,
     isTemplate: showTemplates ? true : undefined,
     limit: pageSize,
     offset: pageIndex * pageSize,
@@ -136,9 +140,11 @@ export function ProgramsListView() {
           items={STATUS_OPTIONS}
           value={statusFilter}
           onValueChange={(v) => {
-            const parsed = programStatusSchema.safeParse(v)
-            setStatusFilter(parsed.success ? parsed.data : 'all')
-            setPageIndex(0) // Reset to first page on filter change
+            if (v) {
+              const parsed = programStatusSchema.safeParse(v)
+              setStatusFilter(parsed.success ? parsed.data : 'all')
+              setPageIndex(0) // Reset to first page on filter change
+            }
           }}
         >
           <SelectTrigger className="w-[180px]">
@@ -179,6 +185,7 @@ export function ProgramsListView() {
           pageSize={pageSize}
           onPageChange={handlePageChange}
           isLoading={isLoading}
+          error={error ? { message: 'Error al cargar programas', retry: refetch } : null}
           onEdit={handleEditProgram}
           onDuplicate={handleDuplicateProgram}
           onArchive={handleArchiveProgram}

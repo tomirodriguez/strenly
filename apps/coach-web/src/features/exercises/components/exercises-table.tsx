@@ -1,8 +1,8 @@
 import type { Exercise } from '@strenly/contracts/exercises/exercise'
-import type { ColumnDef } from '@tanstack/react-table'
 import type React from 'react'
 import { MuscleBadges } from './muscle-badges'
-import { DataTable } from '@/components/data-table/data-table'
+import { createDataTableColumns } from '@/components/data-table/create-data-table-columns'
+import { DataTable, type ErrorConfig } from '@/components/data-table/data-table'
 import { Badge } from '@/components/ui/badge'
 
 type ExercisesTableProps = {
@@ -12,6 +12,7 @@ type ExercisesTableProps = {
   pageSize: number
   onPageChange: (pageIndex: number, pageSize: number) => void
   isLoading?: boolean
+  error?: ErrorConfig | null
   children?: React.ReactNode
 }
 
@@ -19,13 +20,12 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-const columns: ColumnDef<Exercise>[] = [
-  {
-    accessorKey: 'name',
+const columns = createDataTableColumns<Exercise>((helper) => [
+  helper.accessor('name', {
     header: 'Nombre',
     cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
-  },
-  {
+  }),
+  helper.display({
     id: 'muscles',
     header: 'Musculos',
     cell: ({ row }) => (
@@ -34,9 +34,8 @@ const columns: ColumnDef<Exercise>[] = [
         <MuscleBadges muscles={row.original.secondaryMuscles} variant="secondary" />
       </div>
     ),
-  },
-  {
-    accessorKey: 'movementPattern',
+  }),
+  helper.accessor('movementPattern', {
     header: 'Patron',
     cell: ({ row }) =>
       row.original.movementPattern ? (
@@ -44,8 +43,8 @@ const columns: ColumnDef<Exercise>[] = [
       ) : (
         <span className="text-muted-foreground">-</span>
       ),
-  },
-  {
+  }),
+  helper.display({
     id: 'type',
     header: 'Tipo',
     cell: ({ row }) => (
@@ -53,8 +52,8 @@ const columns: ColumnDef<Exercise>[] = [
         {row.original.isCurated ? 'Curado' : 'Personalizado'}
       </Badge>
     ),
-  },
-]
+  }),
+])
 
 /**
  * Table component for displaying exercises with pagination
@@ -66,6 +65,7 @@ export function ExercisesTable({
   pageSize,
   onPageChange,
   isLoading,
+  error,
   children,
 }: ExercisesTableProps) {
   return (
@@ -77,8 +77,14 @@ export function ExercisesTable({
       pageSize={pageSize}
       onPageChange={onPageChange}
       isLoading={isLoading}
+      error={error}
     >
-      <DataTable.Content />
+      <DataTable.Content
+        emptyState={{
+          title: 'No se encontraron ejercicios',
+          description: 'Intenta ajustar los filtros de busqueda.',
+        }}
+      />
       {children}
     </DataTable.Root>
   )

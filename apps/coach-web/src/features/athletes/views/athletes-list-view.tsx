@@ -2,7 +2,7 @@ import type { Athlete, CreateAthleteInput } from '@strenly/contracts/athletes/at
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { AthleteForm } from '../components/athlete-form'
-import { AthletesTable } from '../components/athletes-table'
+import { useAthletesColumns } from '../components/athletes-table'
 import { InvitationModal } from '../components/invitation-modal'
 import { useArchiveAthlete } from '../hooks/mutations/use-archive-athlete'
 import { useCreateAthlete } from '../hooks/mutations/use-create-athlete'
@@ -38,7 +38,7 @@ export function AthletesListView() {
   const [invitationAthlete, setInvitationAthlete] = useState<Athlete | null>(null)
 
   // Fetch athletes with current filters
-  const { data, isLoading } = useAthletes({
+  const { data, isLoading, error, refetch } = useAthletes({
     search: search || undefined,
     status: showArchived ? undefined : 'active',
     limit: pageSize,
@@ -53,6 +53,16 @@ export function AthletesListView() {
   const handlePageChange = (newPageIndex: number, newPageSize: number) => {
     setPageIndex(newPageIndex)
     setPageSize(newPageSize)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setPageIndex(0)
+  }
+
+  const handleShowArchivedChange = (checked: boolean | 'indeterminate') => {
+    setShowArchived(checked === true)
+    setPageIndex(0)
   }
 
   const handleAddAthlete = () => {
@@ -109,6 +119,12 @@ export function AthletesListView() {
   const totalCount = data?.totalCount ?? 0
   const isSubmitting = createMutation.isPending || updateMutation.isPending
 
+  const columns = useAthletesColumns({
+    onEdit: handleEdit,
+    onArchive: handleArchive,
+    onInvitation: handleInvitation,
+  })
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -123,38 +139,36 @@ export function AthletesListView() {
       </div>
 
       <DataTable.Root
-        columns={[]}
+        columns={columns}
         data={athletes}
         totalCount={totalCount}
         pageIndex={pageIndex}
         pageSize={pageSize}
         onPageChange={handlePageChange}
         isLoading={isLoading}
+        error={error ? { message: 'Error al cargar atletas', retry: refetch } : null}
       >
         <DataTableToolbar>
-          <DataTableSearch value={search} onValueChange={setSearch} placeholder="Buscar atletas..." />
+          <DataTableSearch value={search} onValueChange={handleSearchChange} placeholder="Buscar atletas..." />
           <Field orientation="horizontal" className="gap-2">
-            <Checkbox
-              id="show-archived"
-              checked={showArchived}
-              onCheckedChange={(checked) => setShowArchived(checked === true)}
-            />
+            <Checkbox id="show-archived" checked={showArchived} onCheckedChange={handleShowArchivedChange} />
             <FieldLabel htmlFor="show-archived" className="font-normal text-sm">
               Mostrar archivados
             </FieldLabel>
           </Field>
         </DataTableToolbar>
 
-        <AthletesTable
-          data={athletes}
-          totalCount={totalCount}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          isLoading={isLoading}
-          onEdit={handleEdit}
-          onArchive={handleArchive}
-          onInvitation={handleInvitation}
+        <DataTable.Content
+          emptyState={{
+            title: 'No hay atletas',
+            description: 'Agrega tu primer atleta para comenzar',
+            action: (
+              <Button onClick={handleAddAthlete}>
+                <Plus className="h-4 w-4" />
+                Agregar atleta
+              </Button>
+            ),
+          }}
         />
 
         <DataTablePagination />

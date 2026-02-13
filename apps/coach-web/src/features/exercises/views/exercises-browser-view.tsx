@@ -1,5 +1,5 @@
 import type { MovementPattern, MuscleGroup } from '@strenly/contracts/exercises/muscle-group'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ExerciseFilters } from '../components/exercise-filters'
 import { ExercisesTable } from '../components/exercises-table'
 import { useExercises } from '../hooks/queries/use-exercises'
@@ -17,7 +17,7 @@ export function ExercisesBrowserView() {
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize, setPageSize] = useState(25)
 
-  const { data, isLoading } = useExercises({
+  const { data, isLoading, error, refetch } = useExercises({
     search: search || undefined,
     muscleGroup,
     movementPattern,
@@ -25,14 +25,24 @@ export function ExercisesBrowserView() {
     offset: pageIndex * pageSize,
   })
 
-  // Reset page to 0 when filters change
-  useEffect(() => {
-    setPageIndex(0)
-  }, [])
-
   const handlePageChange = (newPageIndex: number, newPageSize: number) => {
     setPageIndex(newPageIndex)
     setPageSize(newPageSize)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setPageIndex(0)
+  }
+
+  const handleMuscleGroupChange = (value: MuscleGroup | undefined) => {
+    setMuscleGroup(value)
+    setPageIndex(0)
+  }
+
+  const handleMovementPatternChange = (value: MovementPattern | undefined) => {
+    setMovementPattern(value)
+    setPageIndex(0)
   }
 
   return (
@@ -47,12 +57,12 @@ export function ExercisesBrowserView() {
       <div className="space-y-4">
         <DataTableToolbar>
           <div className="flex flex-1 items-center gap-4">
-            <DataTableSearch value={search} onValueChange={setSearch} placeholder="Buscar ejercicios..." />
+            <DataTableSearch value={search} onValueChange={handleSearchChange} placeholder="Buscar ejercicios..." />
             <ExerciseFilters
               muscleGroup={muscleGroup}
               movementPattern={movementPattern}
-              onMuscleGroupChange={setMuscleGroup}
-              onMovementPatternChange={setMovementPattern}
+              onMuscleGroupChange={handleMuscleGroupChange}
+              onMovementPatternChange={handleMovementPatternChange}
             />
           </div>
         </DataTableToolbar>
@@ -64,6 +74,7 @@ export function ExercisesBrowserView() {
           pageSize={pageSize}
           onPageChange={handlePageChange}
           isLoading={isLoading}
+          error={error ? { message: 'Error al cargar ejercicios', retry: refetch } : null}
         >
           <DataTablePagination />
         </ExercisesTable>
