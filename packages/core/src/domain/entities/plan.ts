@@ -45,6 +45,14 @@ type CreatePlanInput = {
   isActive: boolean
 }
 
+/**
+ * Reconstitute a Plan from database props without validation.
+ * Used when loading from the database where data is already known to be valid.
+ */
+export function reconstitutePlan(props: Plan): Plan {
+  return { ...props }
+}
+
 export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
   // Validate name
   if (!input.name || input.name.trim().length < 2) {

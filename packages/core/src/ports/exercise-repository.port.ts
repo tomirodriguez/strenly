@@ -15,8 +15,8 @@ export type ListExercisesOptions = {
   muscleGroup?: MuscleGroup
   search?: string
   includeArchived?: boolean
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
 }
 
 export type ExerciseRepositoryPort = {

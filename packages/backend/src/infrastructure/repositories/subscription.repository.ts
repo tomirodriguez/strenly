@@ -1,5 +1,10 @@
 import type { SubscriptionRepositoryError, SubscriptionRepositoryPort } from '@strenly/core'
-import { createSubscription, type OrganizationContext, type Subscription, type SubscriptionStatus } from '@strenly/core'
+import {
+  type OrganizationContext,
+  reconstituteSubscription,
+  type Subscription,
+  type SubscriptionStatus,
+} from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { subscriptions } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
@@ -21,28 +26,26 @@ function parseStatus(value: string): SubscriptionStatus {
   return 'active'
 }
 
-function mapToDomain(row: typeof subscriptions.$inferSelect): Subscription | null {
-  // Handle nullable dates - use current date as fallback
-  const currentPeriodStart = row.currentPeriodStart ?? new Date()
-  const currentPeriodEnd = row.currentPeriodEnd ?? new Date()
-
-  const result = createSubscription({
+/**
+ * Maps a database row to a Subscription domain entity.
+ * Uses reconstitute since DB data is already validated.
+ */
+function mapToDomain(row: typeof subscriptions.$inferSelect): Subscription {
+  return reconstituteSubscription({
     id: row.id,
     organizationId: row.organizationId,
     planId: row.planId,
     status: parseStatus(row.status),
     athleteCount: row.athleteCount,
-    currentPeriodStart,
-    currentPeriodEnd,
+    currentPeriodStart: row.currentPeriodStart ?? new Date(),
+    currentPeriodEnd: row.currentPeriodEnd ?? new Date(),
     createdAt: row.createdAt,
   })
-
-  return result.isOk() ? result.value : null
 }
 
 export function createSubscriptionRepository(db: DbClient): SubscriptionRepositoryPort {
   return {
-    findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription, SubscriptionRepositoryError> {
+    findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription | null, SubscriptionRepositoryError> {
       return ResultAsync.fromPromise(
         db
           .select()
@@ -50,16 +53,7 @@ export function createSubscriptionRepository(db: DbClient): SubscriptionReposito
           .where(eq(subscriptions.organizationId, ctx.organizationId))
           .then((rows) => rows[0]),
         wrapDbError,
-      ).andThen((row) => {
-        if (!row) {
-          return err({ type: 'NOT_FOUND', organizationId: ctx.organizationId } as const)
-        }
-        const subscription = mapToDomain(row)
-        if (!subscription) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid subscription data' } as const)
-        }
-        return ok(subscription)
-      })
+      ).map((row) => (row ? mapToDomain(row) : null))
     },
 
     save(ctx: OrganizationContext, subscription: Subscription): ResultAsync<Subscription, SubscriptionRepositoryError> {
@@ -81,11 +75,7 @@ export function createSubscriptionRepository(db: DbClient): SubscriptionReposito
         if (!row) {
           return err({ type: 'NOT_FOUND', organizationId: ctx.organizationId } as const)
         }
-        const updated = mapToDomain(row)
-        if (!updated) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid subscription data' } as const)
-        }
-        return ok(updated)
+        return ok(mapToDomain(row))
       })
     },
 
@@ -124,11 +114,7 @@ export function createSubscriptionRepository(db: DbClient): SubscriptionReposito
         if (!row) {
           return err({ type: 'DATABASE_ERROR', message: 'Failed to create subscription' } as const)
         }
-        const created = mapToDomain(row)
-        if (!created) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid subscription data after insert' } as const)
-        }
-        return ok(created)
+        return ok(mapToDomain(row))
       })
     },
   }

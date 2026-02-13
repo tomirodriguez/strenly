@@ -1,9 +1,9 @@
 import type {
-  AthleteInvitation,
   AthleteInvitationRepositoryError,
   AthleteInvitationRepositoryPort,
   OrganizationContext,
 } from '@strenly/core'
+import { type AthleteInvitation, reconstituteAthleteInvitation } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { athleteInvitations, athletes } from '@strenly/database/schema'
 import { and, desc, eq, isNull } from 'drizzle-orm'
@@ -18,7 +18,7 @@ function wrapDbError(error: unknown): AthleteInvitationRepositoryError {
  * Maps a database row to an AthleteInvitation domain entity.
  */
 function mapToDomain(row: typeof athleteInvitations.$inferSelect): AthleteInvitation {
-  return {
+  return reconstituteAthleteInvitation({
     id: row.id,
     athleteId: row.athleteId,
     organizationId: row.organizationId,
@@ -28,7 +28,7 @@ function mapToDomain(row: typeof athleteInvitations.$inferSelect): AthleteInvita
     acceptedAt: row.acceptedAt,
     revokedAt: row.revokedAt,
     createdAt: row.createdAt,
-  }
+  })
 }
 
 export function createAthleteInvitationRepository(db: DbClient): AthleteInvitationRepositoryPort {

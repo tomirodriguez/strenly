@@ -36,6 +36,14 @@ type CreateAthleteInput = {
 // Simple email regex - validates basic email structure
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+/**
+ * Reconstitute an Athlete from database props without validation.
+ * Used when loading from the database where data is already known to be valid.
+ */
+export function reconstituteAthlete(props: Athlete): Athlete {
+  return { ...props }
+}
+
 export function createAthlete(input: CreateAthleteInput): Result<Athlete, AthleteError> {
   // Validate and normalize name
   const trimmedName = input.name.trim()

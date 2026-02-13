@@ -7,7 +7,7 @@ import {
   isExpired,
   isRevoked,
 } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type AcceptInvitationInput = {
   token: string
@@ -97,16 +97,24 @@ export const makeAcceptInvitation =
 
             return deps.athleteRepository
               .findById(ctx, invitation.athleteId)
-              .mapErr((e): AcceptInvitationError => {
-                if (e.type === 'NOT_FOUND') {
-                  return { type: 'athlete_not_found', athleteId: invitation.athleteId }
+              .mapErr(
+                (e): AcceptInvitationError => ({
+                  type: 'repository_error',
+                  message: e.type === 'DATABASE_ERROR' ? e.message : `Athlete ${e.athleteId} not found`,
+                }),
+              )
+              .andThen((athlete) => {
+                if (athlete === null) {
+                  return errAsync<AcceptInvitationResult, AcceptInvitationError>({
+                    type: 'athlete_not_found',
+                    athleteId: invitation.athleteId,
+                  })
                 }
-                return { type: 'repository_error', message: e.message }
+                return okAsync({
+                  athlete,
+                  organizationId: invitation.organizationId,
+                })
               })
-              .map((athlete) => ({
-                athlete,
-                organizationId: invitation.organizationId,
-              }))
           })
       })
   }

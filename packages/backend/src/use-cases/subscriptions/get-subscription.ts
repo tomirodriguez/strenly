@@ -43,15 +43,17 @@ export const makeGetSubscription =
     // 2. Get subscription
     return deps.subscriptionRepository
       .findByOrganizationId(input)
-      .mapErr((e): GetSubscriptionError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'subscription_not_found', organizationId: input.organizationId }
+      .mapErr((): GetSubscriptionError => ({ type: 'repository_error', message: 'Failed to fetch subscription' }))
+      .andThen((subscription) => {
+        if (subscription === null) {
+          return errAsync<GetSubscriptionResult, GetSubscriptionError>({
+            type: 'subscription_not_found',
+            organizationId: input.organizationId,
+          })
         }
-        return { type: 'repository_error', message: e.message }
-      })
-      .andThen((subscription) =>
+
         // 3. Get plan
-        deps.planRepository
+        return deps.planRepository
           .findById(subscription.planId)
           .mapErr((e): GetSubscriptionError => ({ type: 'repository_error', message: e.message }))
           .andThen((plan) => {
@@ -60,6 +62,6 @@ export const makeGetSubscription =
               return errAsync({ type: 'plan_not_found' as const, planId: subscription.planId })
             }
             return okAsync({ subscription, plan })
-          }),
-      )
+          })
+      })
   }

@@ -216,12 +216,23 @@ export const makeCreateLog =
             return { type: 'repository_error', message: e.message }
           })
 
-        const athleteResult = deps.athleteRepository.findById(ctx, input.athleteId).mapErr(
-          (): CreateLogError => ({
-            type: 'repository_error',
-            message: 'Failed to load athlete',
-          }),
-        )
+        const athleteResult = deps.athleteRepository
+          .findById(ctx, input.athleteId)
+          .mapErr(
+            (): CreateLogError => ({
+              type: 'repository_error',
+              message: 'Failed to load athlete',
+            }),
+          )
+          .andThen((athlete) => {
+            if (athlete === null) {
+              return errAsync<Athlete, CreateLogError>({
+                type: 'repository_error',
+                message: `Athlete ${input.athleteId} not found`,
+              })
+            }
+            return okAsync(athlete)
+          })
 
         // Combine results
         return programResult.andThen((program) => athleteResult.map((athlete) => ({ program, athlete })))

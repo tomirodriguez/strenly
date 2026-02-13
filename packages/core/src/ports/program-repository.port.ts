@@ -23,8 +23,8 @@ export type ProgramFilters = {
   athleteId?: string | null // null = templates only, string = athlete programs, undefined = all
   isTemplate?: boolean
   search?: string
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
 }
 
 // ============================================================================
@@ -240,7 +240,7 @@ export type ProgramRepositoryPort = {
    * List template programs
    * @deprecated Use list with isTemplate filter
    */
-  listTemplates(ctx: OrganizationContext): ResultAsync<Program[], ProgramRepositoryError>
+  listTemplates(ctx: OrganizationContext): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Week Operations

@@ -115,12 +115,20 @@ export const makeCreateProgram =
     const athleteCheck: ResultAsync<void, CreateProgramError> = input.athleteId
       ? deps.athleteRepository
           .findById(ctx, input.athleteId)
-          .map(() => undefined)
-          .mapErr((e): CreateProgramError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'athlete_not_found', athleteId: input.athleteId ?? '' }
+          .mapErr(
+            (e): CreateProgramError => ({
+              type: 'repository_error',
+              message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to find athlete`,
+            }),
+          )
+          .andThen((athlete) => {
+            if (athlete === null) {
+              return errAsync<void, CreateProgramError>({
+                type: 'athlete_not_found',
+                athleteId: input.athleteId ?? '',
+              })
             }
-            return { type: 'repository_error', message: e.message }
+            return okAsync(undefined)
           })
       : okAsync(undefined)
 

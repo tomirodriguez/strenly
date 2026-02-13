@@ -2,6 +2,7 @@ import { generateInvitationOutputSchema } from '@strenly/contracts/athletes/invi
 import { z } from 'zod'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
+import { generateInvitationToken } from '../../lib/invitation-token'
 import { authProcedure } from '../../lib/orpc'
 import { makeGenerateInvitation } from '../../use-cases/athletes/generate-invitation'
 
@@ -23,6 +24,7 @@ export const generateInvitation = authProcedure
       athleteRepository: createAthleteRepository(context.db),
       invitationRepository: createAthleteInvitationRepository(context.db),
       generateId: () => crypto.randomUUID(),
+      generateToken: generateInvitationToken,
       appUrl: process.env.APP_URL ?? 'http://localhost:3000',
     })
 
@@ -42,6 +44,9 @@ export const generateInvitation = authProcedure
           throw errors.ATHLETE_NOT_FOUND()
         case 'already_linked':
           throw errors.ALREADY_LINKED()
+        case 'invalid_invitation':
+          console.error('Invalid invitation:', result.error.message)
+          throw new Error('Internal error')
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')

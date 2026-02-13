@@ -7,7 +7,7 @@ import type {
   ListAthletesOptions,
   OrganizationContext,
 } from '@strenly/core'
-import { createAthlete } from '@strenly/core'
+import { reconstituteAthlete } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { athletes } from '@strenly/database/schema'
 import { and, count, desc, eq, ilike } from 'drizzle-orm'
@@ -49,13 +49,12 @@ function parseGender(value: string | null): AthleteGender | null {
 
 /**
  * Maps a database row to an Athlete domain entity.
- * Returns null if the domain validation fails.
+ * Uses reconstitute since DB data is already validated.
  */
-function mapToDomain(row: typeof athletes.$inferSelect): Athlete | null {
-  // Parse date string from database to Date object if needed
+function mapToDomain(row: typeof athletes.$inferSelect): Athlete {
   const birthdate = row.birthdate ? new Date(row.birthdate) : null
 
-  const result = createAthlete({
+  return reconstituteAthlete({
     id: row.id,
     organizationId: row.organizationId,
     name: row.name,
@@ -66,24 +65,14 @@ function mapToDomain(row: typeof athletes.$inferSelect): Athlete | null {
     notes: row.notes,
     status: parseStatus(row.status),
     linkedUserId: row.linkedUserId,
-  })
-
-  if (result.isErr()) {
-    console.error('Failed to map athlete from database:', result.error)
-    return null
-  }
-
-  // Reconstitute with actual timestamps from database
-  return {
-    ...result.value,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-  }
+  })
 }
 
 export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
   return {
-    findById(ctx: OrganizationContext, id: string): ResultAsync<Athlete, AthleteRepositoryError> {
+    findById(ctx: OrganizationContext, id: string): ResultAsync<Athlete | null, AthleteRepositoryError> {
       return RA.fromPromise(
         db
           .select()
@@ -91,33 +80,24 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
           .where(and(eq(athletes.id, id), eq(athletes.organizationId, ctx.organizationId)))
           .then((rows) => rows[0]),
         wrapDbError,
-      ).andThen((row) => {
-        if (!row) {
-          return err({ type: 'NOT_FOUND', athleteId: id } as const)
-        }
-        const athlete = mapToDomain(row)
-        if (!athlete) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid athlete data' } as const)
-        }
-        return ok(athlete)
-      })
+      ).map((row) => (row ? mapToDomain(row) : null))
     },
 
     findAll(
       ctx: OrganizationContext,
-      options?: ListAthletesOptions,
+      options: ListAthletesOptions,
     ): ResultAsync<{ items: Athlete[]; totalCount: number }, AthleteRepositoryError> {
       return RA.fromPromise(
         (async () => {
           const conditions = [eq(athletes.organizationId, ctx.organizationId)]
 
           // Optional status filter
-          if (options?.status) {
+          if (options.status) {
             conditions.push(eq(athletes.status, options.status))
           }
 
           // Optional search filter (ILIKE on name, escape wildcards)
-          if (options?.search) {
+          if (options.search) {
             const escaped = options.search.replace(/[%_]/g, '\\$&')
             conditions.push(ilike(athletes.name, `%${escaped}%`))
           }
@@ -131,11 +111,11 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
               .from(athletes)
               .where(whereClause)
               .orderBy(desc(athletes.updatedAt))
-              .limit(options?.limit ?? 100)
-              .offset(options?.offset ?? 0),
+              .limit(options.limit)
+              .offset(options.offset),
           ])
 
-          const items = rows.map(mapToDomain).filter((a): a is Athlete => a !== null)
+          const items = rows.map(mapToDomain)
 
           return {
             items,
@@ -185,11 +165,7 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
         if (!row) {
           return err({ type: 'DATABASE_ERROR', message: 'Failed to create athlete' } as const)
         }
-        const created = mapToDomain(row)
-        if (!created) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid athlete data after create' } as const)
-        }
-        return ok(created)
+        return ok(mapToDomain(row))
       })
     },
 
@@ -216,11 +192,7 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
         if (!row) {
           return err({ type: 'NOT_FOUND', athleteId: athlete.id } as const)
         }
-        const updated = mapToDomain(row)
-        if (!updated) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid athlete data after update' } as const)
-        }
-        return ok(updated)
+        return ok(mapToDomain(row))
       })
     },
 

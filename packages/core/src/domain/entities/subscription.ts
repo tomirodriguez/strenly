@@ -29,6 +29,14 @@ type CreateSubscriptionInput = {
   createdAt: Date
 }
 
+/**
+ * Reconstitute a Subscription from database props without validation.
+ * Used when loading from the database where data is already known to be valid.
+ */
+export function reconstituteSubscription(props: Subscription): Subscription {
+  return { ...props }
+}
+
 export function createSubscription(input: CreateSubscriptionInput): Result<Subscription, SubscriptionError> {
   // Validate athlete count
   if (input.athleteCount < 0) {

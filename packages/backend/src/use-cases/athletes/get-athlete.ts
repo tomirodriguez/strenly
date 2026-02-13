@@ -5,7 +5,7 @@ import {
   type OrganizationContext,
   type Role,
 } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetAthleteInput = OrganizationContext & {
   memberRole: Role
@@ -38,10 +38,19 @@ export const makeGetAthlete =
         { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole },
         input.athleteId,
       )
-      .mapErr((e): GetAthleteError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', athleteId: input.athleteId }
+      .mapErr(
+        (e): GetAthleteError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to find athlete`,
+        }),
+      )
+      .andThen((athlete) => {
+        if (athlete === null) {
+          return errAsync<Athlete, GetAthleteError>({
+            type: 'not_found',
+            athleteId: input.athleteId,
+          })
         }
-        return { type: 'repository_error', message: e.type === 'DATABASE_ERROR' ? e.message : `Unknown error` }
+        return okAsync(athlete)
       })
   }

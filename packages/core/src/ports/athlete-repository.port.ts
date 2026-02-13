@@ -9,22 +9,22 @@ export type AthleteRepositoryError =
 export type ListAthletesOptions = {
   status?: AthleteStatus
   search?: string
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
 }
 
 export type AthleteRepositoryPort = {
   /**
    * Find an athlete by ID within the organization.
    */
-  findById(ctx: OrganizationContext, id: string): ResultAsync<Athlete, AthleteRepositoryError>
+  findById(ctx: OrganizationContext, id: string): ResultAsync<Athlete | null, AthleteRepositoryError>
 
   /**
    * Find all athletes in the organization with optional filtering.
    */
   findAll(
     ctx: OrganizationContext,
-    options?: ListAthletesOptions,
+    options: ListAthletesOptions,
   ): ResultAsync<{ items: Athlete[]; totalCount: number }, AthleteRepositoryError>
 
   /**

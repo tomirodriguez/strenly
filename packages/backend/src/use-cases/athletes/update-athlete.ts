@@ -48,13 +48,12 @@ export const makeUpdateAthlete =
     // 2. Fetch existing athlete
     return deps.athleteRepository
       .findById(ctx, input.athleteId)
-      .mapErr((e): UpdateAthleteError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', athleteId: input.athleteId }
-        }
-        return { type: 'repository_error', message: e.type === 'DATABASE_ERROR' ? e.message : `Unknown error` }
-      })
+      .mapErr((): UpdateAthleteError => ({ type: 'repository_error', message: 'Database operation failed' }))
       .andThen((existing) => {
+        if (existing === null) {
+          return errAsync<Athlete, UpdateAthleteError>({ type: 'not_found', athleteId: input.athleteId })
+        }
+
         // 3. Merge updates with existing data
         const merged = {
           id: existing.id,

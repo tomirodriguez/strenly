@@ -1,9 +1,9 @@
 import type { ListPlansOptions, PlanRepositoryError, PlanRepositoryPort } from '@strenly/core'
-import { createPlan, type OrganizationType, type Plan, type PlanFeatures } from '@strenly/core'
+import { type OrganizationType, type Plan, type PlanFeatures, reconstitutePlan } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { plans } from '@strenly/database/schema'
 import { and, count, eq } from 'drizzle-orm'
-import { err, ok, ResultAsync } from 'neverthrow'
+import { ResultAsync } from 'neverthrow'
 
 function wrapDbError(error: unknown): PlanRepositoryError {
   console.error('Plan repository error:', error)
@@ -52,8 +52,12 @@ function parseFeatures(dbFeatures: unknown): PlanFeatures {
   }
 }
 
-function mapToDomain(row: typeof plans.$inferSelect): Plan | null {
-  const result = createPlan({
+/**
+ * Maps a database row to a Plan domain entity.
+ * Uses reconstitute since DB data is already validated.
+ */
+function mapToDomain(row: typeof plans.$inferSelect): Plan {
+  return reconstitutePlan({
     id: row.id,
     name: row.name,
     slug: row.slug,
@@ -65,8 +69,6 @@ function mapToDomain(row: typeof plans.$inferSelect): Plan | null {
     priceYearly: row.priceYearly,
     isActive: row.isActive,
   })
-
-  return result.isOk() ? result.value : null
 }
 
 export function createPlanRepository(db: DbClient): PlanRepositoryPort {
@@ -79,16 +81,7 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
           .where(eq(plans.id, id))
           .then((rows) => rows[0]),
         wrapDbError,
-      ).andThen((row) => {
-        if (!row) {
-          return ok(null)
-        }
-        const plan = mapToDomain(row)
-        if (!plan) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid plan data' } as const)
-        }
-        return ok(plan)
-      })
+      ).map((row) => (row ? mapToDomain(row) : null))
     },
 
     findBySlug(slug: string): ResultAsync<Plan | null, PlanRepositoryError> {
@@ -99,16 +92,7 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
           .where(eq(plans.slug, slug))
           .then((rows) => rows[0]),
         wrapDbError,
-      ).andThen((row) => {
-        if (!row) {
-          return ok(null)
-        }
-        const plan = mapToDomain(row)
-        if (!plan) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid plan data' } as const)
-        }
-        return ok(plan)
-      })
+      ).map((row) => (row ? mapToDomain(row) : null))
     },
 
     findAll(options: ListPlansOptions): ResultAsync<{ items: Plan[]; totalCount: number }, PlanRepositoryError> {
@@ -133,11 +117,11 @@ export function createPlanRepository(db: DbClient): PlanRepositoryPort {
               .from(plans)
               .where(whereClause)
               .orderBy(plans.priceMonthly)
-              .limit(options.limit ?? 100)
-              .offset(options.offset ?? 0),
+              .limit(options.limit)
+              .offset(options.offset),
           ])
 
-          const items = rows.map(mapToDomain).filter((p): p is Plan => p !== null)
+          const items = rows.map(mapToDomain)
 
           return {
             items,

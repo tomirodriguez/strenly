@@ -343,7 +343,7 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
     listByAthlete(
       ctx: OrganizationContext,
       athleteId: string,
-      filters?: Omit<WorkoutLogFilters, 'athleteId'>,
+      filters: Omit<WorkoutLogFilters, 'athleteId'>,
     ): ResultAsync<{ items: WorkoutLog[]; totalCount: number }, WorkoutLogRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<
@@ -354,20 +354,20 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
           const conditions = [eq(workoutLogs.organizationId, ctx.organizationId), eq(workoutLogs.athleteId, athleteId)]
 
           // Optional status filter
-          if (filters?.status) {
+          if (filters.status) {
             conditions.push(eq(workoutLogs.status, filters.status))
           }
 
           // Optional date range filters
-          if (filters?.fromDate) {
+          if (filters.fromDate) {
             conditions.push(gte(workoutLogs.logDate, filters.fromDate))
           }
-          if (filters?.toDate) {
+          if (filters.toDate) {
             conditions.push(lte(workoutLogs.logDate, filters.toDate))
           }
 
           // Optional program filter
-          if (filters?.programId) {
+          if (filters.programId) {
             conditions.push(eq(workoutLogs.programId, filters.programId))
           }
 
@@ -381,8 +381,8 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
               .from(workoutLogs)
               .where(whereClause)
               .orderBy(desc(workoutLogs.logDate))
-              .limit(filters?.limit ?? 50)
-              .offset(filters?.offset ?? 0),
+              .limit(filters.limit)
+              .offset(filters.offset),
           ])
 
           const totalCount = countResult[0]?.count ?? 0
@@ -435,15 +435,14 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
 
     listPendingWorkouts(
       ctx: OrganizationContext,
-      filters?: { limit?: number; offset?: number },
+      filters: { limit: number; offset: number },
     ): ResultAsync<{ items: PendingWorkout[]; totalCount: number }, WorkoutLogRepositoryError> {
       return RA.fromPromise(
         (async (): Promise<
           | { ok: true; data: { items: PendingWorkout[]; totalCount: number } }
           | { ok: false; error: WorkoutLogRepositoryError }
         > => {
-          const limit = filters?.limit ?? 50
-          const offset = filters?.offset ?? 0
+          const { limit, offset } = filters
 
           /**
            * Complex query to find sessions without logs:

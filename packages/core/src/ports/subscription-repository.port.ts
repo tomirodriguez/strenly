@@ -7,7 +7,7 @@ export type SubscriptionRepositoryError =
   | { type: 'DATABASE_ERROR'; message: string }
 
 export type SubscriptionRepositoryPort = {
-  findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription, SubscriptionRepositoryError>
+  findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription | null, SubscriptionRepositoryError>
   save(ctx: OrganizationContext, subscription: Subscription): ResultAsync<Subscription, SubscriptionRepositoryError>
   updateAthleteCount(ctx: OrganizationContext, count: number): ResultAsync<void, SubscriptionRepositoryError>
   /**

@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
+  acceptInvitation,
   createAthleteInvitation,
-  generateInvitationToken,
   isAccepted,
   isExpired,
   isRevoked,
   isValid,
+  reconstituteAthleteInvitation,
+  revokeInvitation,
 } from './athlete-invitation'
 
 const validInput = {
@@ -13,51 +15,36 @@ const validInput = {
   athleteId: 'athlete-456',
   organizationId: 'org-789',
   createdByUserId: 'user-111',
+  token: 'test-token-abc123-xyz789-secure-value',
 }
-
-describe('generateInvitationToken', () => {
-  it('generates a 43-character base64url token', () => {
-    const token = generateInvitationToken()
-    expect(token.length).toBe(43)
-  })
-
-  it('generates unique tokens on each call', () => {
-    const token1 = generateInvitationToken()
-    const token2 = generateInvitationToken()
-    const token3 = generateInvitationToken()
-    expect(token1).not.toBe(token2)
-    expect(token2).not.toBe(token3)
-    expect(token1).not.toBe(token3)
-  })
-
-  it('generates tokens with valid base64url characters', () => {
-    const token = generateInvitationToken()
-    // base64url uses A-Za-z0-9-_
-    expect(/^[A-Za-z0-9_-]+$/.test(token)).toBe(true)
-  })
-})
 
 describe('createAthleteInvitation', () => {
   it('creates invitation with all required fields', () => {
-    const invitation = createAthleteInvitation(validInput)
+    const result = createAthleteInvitation(validInput)
 
+    expect(result.isOk()).toBe(true)
+    const invitation = result._unsafeUnwrap()
     expect(invitation.id).toBe('invitation-123')
     expect(invitation.athleteId).toBe('athlete-456')
     expect(invitation.organizationId).toBe('org-789')
     expect(invitation.createdByUserId).toBe('user-111')
   })
 
-  it('generates token automatically', () => {
-    const invitation = createAthleteInvitation(validInput)
+  it('uses provided token', () => {
+    const result = createAthleteInvitation(validInput)
 
-    expect(invitation.token).toBeDefined()
-    expect(invitation.token.length).toBe(43)
+    expect(result.isOk()).toBe(true)
+    const invitation = result._unsafeUnwrap()
+    expect(invitation.token).toBe('test-token-abc123-xyz789-secure-value')
   })
 
   it('sets expiresAt to 7 days from creation', () => {
     const before = new Date()
-    const invitation = createAthleteInvitation(validInput)
+    const result = createAthleteInvitation(validInput)
     const after = new Date()
+
+    expect(result.isOk()).toBe(true)
+    const invitation = result._unsafeUnwrap()
 
     // Calculate expected expiry range (7 days in milliseconds)
     const sevenDays = 7 * 24 * 60 * 60 * 1000
@@ -69,38 +56,126 @@ describe('createAthleteInvitation', () => {
   })
 
   it('defaults acceptedAt to null', () => {
-    const invitation = createAthleteInvitation(validInput)
-    expect(invitation.acceptedAt).toBeNull()
+    const result = createAthleteInvitation(validInput)
+    expect(result._unsafeUnwrap().acceptedAt).toBeNull()
   })
 
   it('defaults revokedAt to null', () => {
-    const invitation = createAthleteInvitation(validInput)
-    expect(invitation.revokedAt).toBeNull()
+    const result = createAthleteInvitation(validInput)
+    expect(result._unsafeUnwrap().revokedAt).toBeNull()
   })
 
   it('sets createdAt to now', () => {
     const before = new Date()
-    const invitation = createAthleteInvitation(validInput)
+    const result = createAthleteInvitation(validInput)
     const after = new Date()
 
+    const invitation = result._unsafeUnwrap()
     expect(invitation.createdAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
     expect(invitation.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
+  })
+})
+
+describe('reconstituteAthleteInvitation', () => {
+  it('reconstitutes an invitation from database props', () => {
+    const dbProps = {
+      id: 'inv-1',
+      athleteId: 'athlete-1',
+      organizationId: 'org-1',
+      createdByUserId: 'user-1',
+      token: 'stored-token',
+      expiresAt: new Date('2026-02-20'),
+      acceptedAt: null,
+      revokedAt: null,
+      createdAt: new Date('2026-02-13'),
+    }
+
+    const invitation = reconstituteAthleteInvitation(dbProps)
+    expect(invitation.id).toBe('inv-1')
+    expect(invitation.token).toBe('stored-token')
+    expect(invitation.expiresAt).toEqual(new Date('2026-02-20'))
+  })
+})
+
+describe('acceptInvitation', () => {
+  it('accepts a valid invitation', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const result = acceptInvitation(invitation)
+
+    expect(result.isOk()).toBe(true)
+    const accepted = result._unsafeUnwrap()
+    expect(accepted.acceptedAt).toBeInstanceOf(Date)
+  })
+
+  it('returns error when already accepted', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const accepted = { ...invitation, acceptedAt: new Date() }
+    const result = acceptInvitation(accepted)
+
+    expect(result.isErr()).toBe(true)
+    expect(result._unsafeUnwrapErr().type).toBe('ALREADY_ACCEPTED')
+  })
+
+  it('returns error when revoked', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const revoked = { ...invitation, revokedAt: new Date() }
+    const result = acceptInvitation(revoked)
+
+    expect(result.isErr()).toBe(true)
+    expect(result._unsafeUnwrapErr().type).toBe('ALREADY_REVOKED')
+  })
+
+  it('returns error when expired', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const expired = { ...invitation, expiresAt: new Date(Date.now() - 1000) }
+    const result = acceptInvitation(expired)
+
+    expect(result.isErr()).toBe(true)
+    expect(result._unsafeUnwrapErr().type).toBe('EXPIRED')
+  })
+})
+
+describe('revokeInvitation', () => {
+  it('revokes a valid invitation', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const result = revokeInvitation(invitation)
+
+    expect(result.isOk()).toBe(true)
+    const revoked = result._unsafeUnwrap()
+    expect(revoked.revokedAt).toBeInstanceOf(Date)
+  })
+
+  it('returns error when already accepted', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const accepted = { ...invitation, acceptedAt: new Date() }
+    const result = revokeInvitation(accepted)
+
+    expect(result.isErr()).toBe(true)
+    expect(result._unsafeUnwrapErr().type).toBe('ALREADY_ACCEPTED')
+  })
+
+  it('returns error when already revoked', () => {
+    const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
+    const revoked = { ...invitation, revokedAt: new Date() }
+    const result = revokeInvitation(revoked)
+
+    expect(result.isErr()).toBe(true)
+    expect(result._unsafeUnwrapErr().type).toBe('ALREADY_REVOKED')
   })
 })
 
 describe('helper functions', () => {
   describe('isExpired', () => {
     it('returns false for non-expired invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isExpired(invitation)).toBe(false)
     })
 
     it('returns true for expired invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
-      // Create a copy with past expiry date
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const expiredInvitation = {
         ...invitation,
-        expiresAt: new Date(Date.now() - 1000), // 1 second ago
+        expiresAt: new Date(Date.now() - 1000),
       }
       expect(isExpired(expiredInvitation)).toBe(true)
     })
@@ -108,12 +183,12 @@ describe('helper functions', () => {
 
   describe('isRevoked', () => {
     it('returns false when revokedAt is null', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isRevoked(invitation)).toBe(false)
     })
 
     it('returns true when revokedAt is set', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const revokedInvitation = {
         ...invitation,
         revokedAt: new Date(),
@@ -124,12 +199,12 @@ describe('helper functions', () => {
 
   describe('isAccepted', () => {
     it('returns false when acceptedAt is null', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isAccepted(invitation)).toBe(false)
     })
 
     it('returns true when acceptedAt is set', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const acceptedInvitation = {
         ...invitation,
         acceptedAt: new Date(),
@@ -140,12 +215,12 @@ describe('helper functions', () => {
 
   describe('isValid', () => {
     it('returns true for fresh invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isValid(invitation)).toBe(true)
     })
 
     it('returns false for expired invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const expiredInvitation = {
         ...invitation,
         expiresAt: new Date(Date.now() - 1000),
@@ -154,7 +229,7 @@ describe('helper functions', () => {
     })
 
     it('returns false for revoked invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const revokedInvitation = {
         ...invitation,
         revokedAt: new Date(),
@@ -163,7 +238,7 @@ describe('helper functions', () => {
     })
 
     it('returns false for accepted invitation', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const acceptedInvitation = {
         ...invitation,
         acceptedAt: new Date(),
@@ -172,7 +247,7 @@ describe('helper functions', () => {
     })
 
     it('returns false when both expired and revoked', () => {
-      const invitation = createAthleteInvitation(validInput)
+      const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const invalidInvitation = {
         ...invitation,
         expiresAt: new Date(Date.now() - 1000),

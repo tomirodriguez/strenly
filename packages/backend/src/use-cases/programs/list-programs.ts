@@ -51,8 +51,8 @@ export const makeListPrograms =
         isTemplate: input.isTemplate,
         status: input.status,
         search: input.search,
-        limit: input.limit,
-        offset: input.offset,
+        limit: input.limit ?? 50,
+        offset: input.offset ?? 0,
       })
       .mapErr(
         (e): ListProgramsError => ({

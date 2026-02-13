@@ -52,11 +52,20 @@ export const makeGetAthleteInvitation =
     // 2. Verify athlete exists and belongs to org
     return deps.athleteRepository
       .findById(ctx, input.athleteId)
-      .mapErr((e): GetAthleteInvitationError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'athlete_not_found', athleteId: input.athleteId }
+      .mapErr(
+        (e): GetAthleteInvitationError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Unknown error',
+        }),
+      )
+      .andThen((athlete) => {
+        if (athlete === null) {
+          return errAsync<GetAthleteInvitationResult, GetAthleteInvitationError>({
+            type: 'athlete_not_found',
+            athleteId: input.athleteId,
+          })
         }
-        return { type: 'repository_error', message: e.type === 'DATABASE_ERROR' ? e.message : 'Unknown error' }
+        return okAsync(athlete)
       })
       .andThen(() => {
         // 3. Get active invitation

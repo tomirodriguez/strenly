@@ -1,30 +1,8 @@
+import type { MuscleGroupData, MuscleGroupRepositoryError, MuscleGroupRepositoryPort } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { muscleGroups } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
 import { err, ok, ResultAsync } from 'neverthrow'
-
-/**
- * Muscle group data from database
- */
-export type MuscleGroupData = {
-  readonly id: string
-  readonly name: string
-  readonly displayName: string
-  readonly bodyRegion: 'upper' | 'lower' | 'core'
-}
-
-export type MuscleGroupRepositoryError =
-  | { type: 'NOT_FOUND'; muscleGroupId: string }
-  | { type: 'DATABASE_ERROR'; message: string }
-
-/**
- * MuscleGroup Repository Interface
- * Simple read-only repository for muscle group lookup data
- */
-export type MuscleGroupRepository = {
-  findAll(): ResultAsync<MuscleGroupData[], MuscleGroupRepositoryError>
-  findById(id: string): ResultAsync<MuscleGroupData, MuscleGroupRepositoryError>
-}
 
 function wrapDbError(error: unknown): MuscleGroupRepositoryError {
   console.error('MuscleGroup repository error:', error)
@@ -58,7 +36,7 @@ function mapToData(row: typeof muscleGroups.$inferSelect): MuscleGroupData {
  * Create a read-only MuscleGroup repository
  * Used for populating dropdowns and validating muscle group references
  */
-export function createMuscleGroupRepository(db: DbClient): MuscleGroupRepository {
+export function createMuscleGroupRepository(db: DbClient): MuscleGroupRepositoryPort {
   return {
     findAll(): ResultAsync<MuscleGroupData[], MuscleGroupRepositoryError> {
       return ResultAsync.fromPromise(

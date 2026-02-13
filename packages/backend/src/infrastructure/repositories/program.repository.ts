@@ -961,15 +961,24 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
-    listTemplates(ctx: OrganizationContext): ResultAsync<Program[], ProgramRepositoryError> {
+    listTemplates(
+      ctx: OrganizationContext,
+    ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError> {
       return RA.fromPromise(
-        db
-          .select()
-          .from(programs)
-          .where(and(eq(programs.organizationId, ctx.organizationId), eq(programs.isTemplate, true)))
-          .orderBy(asc(programs.name)),
+        (async () => {
+          const whereClause = and(eq(programs.organizationId, ctx.organizationId), eq(programs.isTemplate, true))
+
+          const [countResult, rows] = await Promise.all([
+            db.select({ count: count() }).from(programs).where(whereClause),
+            db.select().from(programs).where(whereClause).orderBy(asc(programs.name)),
+          ])
+
+          const items = rows.map(mapProgramToDomain).filter((p): p is Program => p !== null)
+
+          return { items, totalCount: countResult[0]?.count ?? 0 }
+        })(),
         wrapDbError,
-      ).map((rows) => rows.map(mapProgramToDomain).filter((p): p is Program => p !== null))
+      )
     },
 
     // -------------------------------------------------------------------------

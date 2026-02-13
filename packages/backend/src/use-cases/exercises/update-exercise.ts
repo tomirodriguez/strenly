@@ -86,7 +86,6 @@ export const makeUpdateExercise =
           primaryMuscles: input.primaryMuscles ?? [...existing.primaryMuscles],
           secondaryMuscles: input.secondaryMuscles ?? [...existing.secondaryMuscles],
           archivedAt: existing.archivedAt,
-          createdAt: existing.createdAt,
         })
 
         if (updatedResult.isErr()) {

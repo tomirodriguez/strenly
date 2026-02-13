@@ -21,12 +21,14 @@ export type GenerateInvitationError =
   | { type: 'forbidden'; message: string }
   | { type: 'athlete_not_found'; athleteId: string }
   | { type: 'already_linked'; athleteId: string; message: string }
+  | { type: 'invalid_invitation'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
   athleteRepository: AthleteRepositoryPort
   invitationRepository: AthleteInvitationRepositoryPort
   generateId: () => string
+  generateToken: () => string
   appUrl: string
 }
 
@@ -50,11 +52,20 @@ export const makeGenerateInvitation =
     // 2. Fetch athlete
     return deps.athleteRepository
       .findById(ctx, input.athleteId)
-      .mapErr((e): GenerateInvitationError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'athlete_not_found', athleteId: input.athleteId }
+      .mapErr(
+        (e): GenerateInvitationError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : 'Unknown error',
+        }),
+      )
+      .andThen((athlete) => {
+        if (athlete === null) {
+          return errAsync<never, GenerateInvitationError>({
+            type: 'athlete_not_found',
+            athleteId: input.athleteId,
+          })
         }
-        return { type: 'repository_error', message: e.type === 'DATABASE_ERROR' ? e.message : `Unknown error` }
+        return okAsync(athlete)
       })
       .andThen((athlete) => {
         // 3. Check if already linked
@@ -88,15 +99,23 @@ export const makeGenerateInvitation =
           })
           .andThen(() => {
             // 5. Create new invitation
-            const invitation = createAthleteInvitation({
+            const invitationResult = createAthleteInvitation({
               id: deps.generateId(),
               athleteId: input.athleteId,
               organizationId: input.organizationId,
               createdByUserId: input.userId,
+              token: deps.generateToken(),
             })
 
+            if (invitationResult.isErr()) {
+              return errAsync<AthleteInvitation, GenerateInvitationError>({
+                type: 'invalid_invitation',
+                message: invitationResult.error.message,
+              })
+            }
+
             // 6. Persist
-            return deps.invitationRepository.create(ctx, invitation).mapErr(
+            return deps.invitationRepository.create(ctx, invitationResult.value).mapErr(
               (e): GenerateInvitationError => ({
                 type: 'repository_error',
                 message: e.type === 'DATABASE_ERROR' ? e.message : `Failed to create invitation`,

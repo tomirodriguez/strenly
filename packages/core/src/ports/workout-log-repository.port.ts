@@ -21,8 +21,8 @@ export type WorkoutLogFilters = {
   status?: 'completed' | 'partial' | 'skipped'
   fromDate?: Date
   toDate?: Date
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
 }
 
 // ============================================================================
@@ -44,7 +44,7 @@ export type PendingWorkout = {
 // Repository Port
 // ============================================================================
 
-export interface WorkoutLogRepository {
+export type WorkoutLogRepository = {
   /**
    * Save a workout log (insert or replace)
    * Uses DELETE + INSERT for simplicity (same as program aggregate pattern)
@@ -75,7 +75,7 @@ export interface WorkoutLogRepository {
   listByAthlete(
     ctx: OrganizationContext,
     athleteId: string,
-    filters?: Omit<WorkoutLogFilters, 'athleteId'>,
+    filters: Omit<WorkoutLogFilters, 'athleteId'>,
   ): ResultAsync<{ items: WorkoutLog[]; totalCount: number }, WorkoutLogRepositoryError>
 
   /**
@@ -85,7 +85,7 @@ export interface WorkoutLogRepository {
    */
   listPendingWorkouts(
     ctx: OrganizationContext,
-    filters?: { limit?: number; offset?: number },
+    filters: { limit: number; offset: number },
   ): ResultAsync<{ items: PendingWorkout[]; totalCount: number }, WorkoutLogRepositoryError>
 
   /**

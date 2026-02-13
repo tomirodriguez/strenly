@@ -38,8 +38,14 @@ type CreateExerciseInput = {
   primaryMuscles?: MuscleGroup[]
   secondaryMuscles?: MuscleGroup[]
   archivedAt?: Date | null
-  createdAt?: Date
-  updatedAt?: Date
+}
+
+/**
+ * Reconstitute an Exercise from database props without validation.
+ * Used when loading from the database where data is already known to be valid.
+ */
+export function reconstituteExercise(props: Exercise): Exercise {
+  return { ...props }
 }
 
 export function createExercise(input: CreateExerciseInput): Result<Exercise, ExerciseError> {
@@ -99,8 +105,8 @@ export function createExercise(input: CreateExerciseInput): Result<Exercise, Exe
     primaryMuscles,
     secondaryMuscles,
     archivedAt: input.archivedAt ?? null,
-    createdAt: input.createdAt ?? now,
-    updatedAt: input.updatedAt ?? now,
+    createdAt: now,
+    updatedAt: now,
   })
 }
 

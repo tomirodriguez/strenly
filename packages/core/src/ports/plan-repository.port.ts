@@ -6,8 +6,8 @@ export type PlanRepositoryError = { type: 'DATABASE_ERROR'; message: string }
 export type ListPlansOptions = {
   organizationType?: OrganizationType
   activeOnly?: boolean
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
 }
 
 export type PlanRepositoryPort = {

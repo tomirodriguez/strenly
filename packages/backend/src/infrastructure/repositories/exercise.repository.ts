@@ -5,16 +5,16 @@ import type {
   OrganizationContext,
 } from '@strenly/core'
 import {
-  createExercise,
   type Exercise,
   isValidMovementPattern,
   isValidMuscleGroup,
   type MuscleGroup,
+  reconstituteExercise,
 } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { exerciseMuscles, exercises } from '@strenly/database/schema'
 import { and, count, eq, ilike, isNull, or, sql } from 'drizzle-orm'
-import { err, ok, ResultAsync } from 'neverthrow'
+import { ok, ResultAsync } from 'neverthrow'
 
 function wrapDbError(error: unknown): ExerciseRepositoryError {
   console.error('Exercise repository error:', error)
@@ -40,9 +40,10 @@ async function fetchMuscleMappings(db: DbClient, exerciseId: string): Promise<Mu
 }
 
 /**
- * Map database row and muscle mappings to domain Exercise entity
+ * Map database row and muscle mappings to domain Exercise entity.
+ * Uses reconstitute since DB data is already validated.
  */
-function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercise | null {
+function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercise {
   // Safely parse movement pattern - use type guard
   let movementPattern = null
   if (row.movementPattern !== null) {
@@ -67,7 +68,7 @@ function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercis
     }
   }
 
-  const result = createExercise({
+  return reconstituteExercise({
     id: row.id,
     organizationId: row.organizationId,
     name: row.name,
@@ -83,8 +84,6 @@ function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercis
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   })
-
-  return result.isOk() ? result.value : null
 }
 
 export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
@@ -122,12 +121,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
           return ok(null)
         }
 
-        const exercise = mapToDomain(data.row, data.muscleMappings)
-        if (!exercise) {
-          return err({ type: 'DATABASE_ERROR', message: 'Invalid exercise data' } as const)
-        }
-
-        return ok(exercise)
+        return ok(mapToDomain(data.row, data.muscleMappings))
       })
     },
 
@@ -206,8 +200,8 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
               .from(exercises)
               .where(finalWhereClause)
               .orderBy(exercises.name)
-              .limit(options.limit ?? 100)
-              .offset(options.offset ?? 0),
+              .limit(options.limit)
+              .offset(options.offset),
           ])
 
           // Fetch muscle mappings for all exercises
@@ -239,9 +233,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
           }
 
           // Map rows to domain entities
-          const items = rows
-            .map((row) => mapToDomain(row, muscleMappingsByExercise.get(row.id) ?? []))
-            .filter((e): e is Exercise => e !== null)
+          const items = rows.map((row) => mapToDomain(row, muscleMappingsByExercise.get(row.id) ?? []))
 
           return {
             items,

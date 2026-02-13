@@ -44,15 +44,17 @@ export const makeCheckAthleteLimit =
     // 2. Get subscription
     return deps.subscriptionRepository
       .findByOrganizationId(input)
-      .mapErr((e): CheckAthleteLimitError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'subscription_not_found', organizationId: input.organizationId }
+      .mapErr((): CheckAthleteLimitError => ({ type: 'repository_error', message: 'Failed to fetch subscription' }))
+      .andThen((subscription) => {
+        if (subscription === null) {
+          return errAsync<CheckAthleteLimitResult, CheckAthleteLimitError>({
+            type: 'subscription_not_found',
+            organizationId: input.organizationId,
+          })
         }
-        return { type: 'repository_error', message: e.message }
-      })
-      .andThen((subscription) =>
+
         // 3. Get plan for limit
-        deps.planRepository
+        return deps.planRepository
           .findById(subscription.planId)
           .mapErr((e): CheckAthleteLimitError => ({ type: 'repository_error', message: e.message }))
           .andThen((plan) => {
@@ -71,6 +73,6 @@ export const makeCheckAthleteLimit =
               limit: plan.athleteLimit,
               remaining: Math.max(0, remaining),
             })
-          }),
-      )
+          })
+      })
   }

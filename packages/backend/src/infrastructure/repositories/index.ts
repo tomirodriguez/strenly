@@ -8,12 +8,7 @@
 export { createAthleteRepository } from './athlete.repository'
 export { createAthleteInvitationRepository } from './athlete-invitation.repository'
 export { createExerciseRepository } from './exercise.repository'
-export {
-  createMuscleGroupRepository,
-  type MuscleGroupData,
-  type MuscleGroupRepository,
-  type MuscleGroupRepositoryError,
-} from './muscle-group.repository'
+export { createMuscleGroupRepository } from './muscle-group.repository'
 export { createPlanRepository } from './plan.repository'
 export { createProgramRepository } from './program.repository'
 export { createSubscriptionRepository } from './subscription.repository'
