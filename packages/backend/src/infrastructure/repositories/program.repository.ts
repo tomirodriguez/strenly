@@ -774,7 +774,8 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           }
 
           if (filters?.search) {
-            conditions.push(ilike(programs.name, `%${filters.search}%`))
+            const escaped = filters.search.replace(/[%_]/g, '\\$&')
+            conditions.push(ilike(programs.name, `%${escaped}%`))
           }
 
           const whereClause = and(...conditions)

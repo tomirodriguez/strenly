@@ -77,8 +77,14 @@ export const makeCloneExercise =
           })
         }
 
-        // 5. Persist cloned exercise
-        return deps.exerciseRepository.create(clonedResult.value).mapErr(
+        // 5. Persist cloned exercise with organization scope
+        const ctx: OrganizationContext = {
+          organizationId: input.organizationId,
+          userId: input.userId,
+          memberRole: input.memberRole,
+        }
+
+        return deps.exerciseRepository.create(ctx, clonedResult.value).mapErr(
           (e): CloneExerciseError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Exercise not found: ${e.exerciseId}`,

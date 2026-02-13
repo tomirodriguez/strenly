@@ -1,4 +1,9 @@
-import type { ExerciseRepositoryError, ExerciseRepositoryPort, ListExercisesOptions } from '@strenly/core'
+import type {
+  ExerciseRepositoryError,
+  ExerciseRepositoryPort,
+  ListExercisesOptions,
+  OrganizationContext,
+} from '@strenly/core'
 import {
   createExercise,
   type Exercise,
@@ -150,9 +155,10 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
             conditions.push(eq(exercises.movementPattern, options.movementPattern))
           }
 
-          // Filter by search term (case-insensitive)
+          // Filter by search term (case-insensitive, escape wildcards)
           if (options?.search) {
-            conditions.push(ilike(exercises.name, `%${options.search}%`))
+            const escaped = options.search.replace(/[%_]/g, '\\$&')
+            conditions.push(ilike(exercises.name, `%${escaped}%`))
           }
 
           // Exclude archived by default
@@ -246,13 +252,13 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
       )
     },
 
-    create(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError> {
+    create(ctx: OrganizationContext, exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         db.transaction(async (tx) => {
-          // Insert the exercise
+          // Insert the exercise with organization scope from context
           await tx.insert(exercises).values({
             id: exercise.id,
-            organizationId: exercise.organizationId,
+            organizationId: ctx.organizationId,
             name: exercise.name,
             description: exercise.description,
             instructions: exercise.instructions,
@@ -295,10 +301,10 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
       )
     },
 
-    update(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError> {
+    update(ctx: OrganizationContext, exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         db.transaction(async (tx) => {
-          // Update the exercise
+          // Update the exercise scoped to organization
           const [updatedRow] = await tx
             .update(exercises)
             .set({
@@ -310,7 +316,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
               isUnilateral: exercise.isUnilateral,
               updatedAt: new Date(),
             })
-            .where(eq(exercises.id, exercise.id))
+            .where(and(eq(exercises.id, exercise.id), eq(exercises.organizationId, ctx.organizationId)))
             .returning()
 
           if (!updatedRow) {
@@ -349,7 +355,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
       ).andThen(() => ok(exercise))
     },
 
-    archive(id: string): ResultAsync<void, ExerciseRepositoryError> {
+    archive(ctx: OrganizationContext, id: string): ResultAsync<void, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         db
           .update(exercises)
@@ -357,7 +363,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
             archivedAt: new Date(),
             updatedAt: new Date(),
           })
-          .where(eq(exercises.id, id))
+          .where(and(eq(exercises.id, id), eq(exercises.organizationId, ctx.organizationId)))
           .returning()
           .then((rows) => {
             if (rows.length === 0) {

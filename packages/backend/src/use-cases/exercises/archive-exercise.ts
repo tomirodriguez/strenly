@@ -59,8 +59,14 @@ export const makeArchiveExercise =
           })
         }
 
-        // 5. Archive the exercise (soft delete via archivedAt timestamp)
-        return deps.exerciseRepository.archive(input.exerciseId).mapErr(
+        // 5. Archive the exercise (soft delete via archivedAt timestamp) with organization scope
+        const ctx: OrganizationContext = {
+          organizationId: input.organizationId,
+          userId: input.userId,
+          memberRole: input.memberRole,
+        }
+
+        return deps.exerciseRepository.archive(ctx, input.exerciseId).mapErr(
           (e): ArchiveExerciseError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Exercise not found: ${e.exerciseId}`,

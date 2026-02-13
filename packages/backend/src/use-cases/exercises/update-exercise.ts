@@ -96,8 +96,14 @@ export const makeUpdateExercise =
           })
         }
 
-        // 6. Persist update
-        return deps.exerciseRepository.update(updatedResult.value).mapErr(
+        // 6. Persist update with organization scope
+        const ctx: OrganizationContext = {
+          organizationId: input.organizationId,
+          userId: input.userId,
+          memberRole: input.memberRole,
+        }
+
+        return deps.exerciseRepository.update(ctx, updatedResult.value).mapErr(
           (e): UpdateExerciseError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Exercise not found: ${e.exerciseId}`,

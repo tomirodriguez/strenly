@@ -135,14 +135,14 @@ export function createAthleteInvitationRepository(db: DbClient): AthleteInvitati
           // Update the invitation to mark as accepted
           await db.update(athleteInvitations).set({ acceptedAt: new Date() }).where(eq(athleteInvitations.token, token))
 
-          // Link the user to the athlete
+          // Link the user to the athlete (scoped by organizationId for defense-in-depth)
           await db
             .update(athletes)
             .set({
               linkedUserId: userId,
               updatedAt: new Date(),
             })
-            .where(eq(athletes.id, invitation.athleteId))
+            .where(and(eq(athletes.id, invitation.athleteId), eq(athletes.organizationId, invitation.organizationId)))
 
           return { found: true } as const
         })(),

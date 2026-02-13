@@ -174,7 +174,7 @@ export const makeCreateLog =
   (deps: Dependencies) =>
   (input: CreateLogInput): ResultAsync<WorkoutLog, CreateLogError> => {
     // 1. Authorization FIRST
-    if (!hasPermission(input.memberRole, 'programs:write')) {
+    if (!hasPermission(input.memberRole, 'workout_log:create')) {
       return errAsync({
         type: 'forbidden',
         message: 'No permission to log workouts',

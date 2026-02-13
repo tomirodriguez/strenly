@@ -116,28 +116,23 @@ export function createAthleteRepository(db: DbClient): AthleteRepositoryPort {
             conditions.push(eq(athletes.status, options.status))
           }
 
-          // Optional search filter (ILIKE on name)
+          // Optional search filter (ILIKE on name, escape wildcards)
           if (options?.search) {
-            conditions.push(ilike(athletes.name, `%${options.search}%`))
+            const escaped = options.search.replace(/[%_]/g, '\\$&')
+            conditions.push(ilike(athletes.name, `%${escaped}%`))
           }
 
           const whereClause = and(...conditions)
 
-          // Build base query
-          const baseQuery = db.select().from(athletes).where(whereClause)
-
-          // Apply pagination
-          let query = baseQuery
-          if (options?.limit !== undefined) {
-            query = query.limit(options.limit) as typeof baseQuery
-          }
-          if (options?.offset !== undefined) {
-            query = query.offset(options.offset) as typeof baseQuery
-          }
-
           const [countResult, rows] = await Promise.all([
             db.select({ count: count() }).from(athletes).where(whereClause),
-            query.orderBy(desc(athletes.updatedAt)),
+            db
+              .select()
+              .from(athletes)
+              .where(whereClause)
+              .orderBy(desc(athletes.updatedAt))
+              .limit(options?.limit ?? 100)
+              .offset(options?.offset ?? 0),
           ])
 
           const items = rows.map(mapToDomain).filter((a): a is Athlete => a !== null)

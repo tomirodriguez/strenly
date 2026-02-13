@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow'
 import type { Exercise } from '../domain/entities/exercise'
 import type { MovementPattern } from '../domain/entities/movement-pattern'
 import type { MuscleGroup } from '../domain/entities/muscle-group'
+import type { OrganizationContext } from '../types/organization-context'
 
 export type ExerciseRepositoryError =
   | { type: 'NOT_FOUND'; exerciseId: string }
@@ -29,7 +30,16 @@ export type ExerciseRepositoryPort = {
   findAll(
     options: ListExercisesOptions,
   ): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError>
-  create(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>
-  update(exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>
-  archive(id: string): ResultAsync<void, ExerciseRepositoryError>
+  /**
+   * Create a new exercise in the organization.
+   */
+  create(ctx: OrganizationContext, exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>
+  /**
+   * Update an existing exercise within the organization.
+   */
+  update(ctx: OrganizationContext, exercise: Exercise): ResultAsync<Exercise, ExerciseRepositoryError>
+  /**
+   * Archive an exercise (soft delete) within the organization.
+   */
+  archive(ctx: OrganizationContext, id: string): ResultAsync<void, ExerciseRepositoryError>
 }

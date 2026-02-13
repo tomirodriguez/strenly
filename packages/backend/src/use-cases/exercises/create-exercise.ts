@@ -64,8 +64,14 @@ export const makeCreateExercise =
       })
     }
 
-    // 3. Persist
-    return deps.exerciseRepository.create(exerciseResult.value).mapErr(
+    // 3. Persist with organization scope
+    const ctx: OrganizationContext = {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      memberRole: input.memberRole,
+    }
+
+    return deps.exerciseRepository.create(ctx, exerciseResult.value).mapErr(
       (e): CreateExerciseError => ({
         type: 'repository_error',
         message: e.type === 'DATABASE_ERROR' ? e.message : `Exercise not found: ${e.exerciseId}`,
