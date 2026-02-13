@@ -37,7 +37,9 @@ export {
   SKIP_PRESCRIPTION,
   type UnilateralUnit,
   type UpdatePrescriptionInput,
+  type UpdatePrescriptionOutput,
   unilateralUnitSchema,
+  updatePrescriptionOutputSchema,
   updatePrescriptionSchema,
 } from './prescription'
 export {

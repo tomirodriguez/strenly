@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { archiveAthleteInputSchema, archiveAthleteOutputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeArchiveAthlete } from '../../use-cases/athletes/archive-athlete'
@@ -9,8 +9,8 @@ import { makeArchiveAthlete } from '../../use-cases/athletes/archive-athlete'
  * Requires authentication and organization context
  */
 export const archiveAthlete = authProcedure
-  .input(z.object({ athleteId: z.string() }))
-  .output(z.object({ success: z.boolean() }))
+  .input(archiveAthleteInputSchema)
+  .output(archiveAthleteOutputSchema)
   .errors({
     FORBIDDEN: { message: 'No tienes permisos para archivar atletas' },
     NOT_FOUND: { message: 'Atleta no encontrado' },

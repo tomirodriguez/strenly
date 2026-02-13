@@ -1,15 +1,8 @@
-import { planSchema } from '@strenly/contracts/subscriptions/plan'
-import { subscriptionSchema } from '@strenly/contracts/subscriptions/subscription'
-import { z } from 'zod'
+import { getSubscriptionOutputSchema } from '@strenly/contracts/subscriptions/subscription'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { createSubscriptionRepository } from '../../infrastructure/repositories/subscription.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetSubscription } from '../../use-cases/subscriptions/get-subscription'
-
-const getSubscriptionOutputSchema = z.object({
-  subscription: subscriptionSchema,
-  plan: planSchema,
-})
 
 /**
  * Get current organization's subscription

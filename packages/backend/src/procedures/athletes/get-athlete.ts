@@ -1,5 +1,4 @@
-import { athleteSchema } from '@strenly/contracts/athletes/athlete'
-import { z } from 'zod'
+import { athleteSchema, getAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetAthlete } from '../../use-cases/athletes/get-athlete'
@@ -9,7 +8,7 @@ import { makeGetAthlete } from '../../use-cases/athletes/get-athlete'
  * Requires authentication and organization context
  */
 export const getAthlete = authProcedure
-  .input(z.object({ athleteId: z.string() }))
+  .input(getAthleteInputSchema)
   .output(athleteSchema)
   .errors({
     FORBIDDEN: { message: 'No tienes permisos para ver atletas' },

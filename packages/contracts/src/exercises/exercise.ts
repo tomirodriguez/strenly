@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { timestampsSchema } from '../common/dates'
 import { paginationQuerySchema } from '../common/pagination'
 import { movementPatternSchema, muscleGroupSchema } from './muscle-group'
 
@@ -20,26 +21,36 @@ export const exerciseSchema = z.object({
   primaryMuscles: z.array(muscleGroupSchema),
   secondaryMuscles: z.array(muscleGroupSchema),
   archivedAt: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type Exercise = z.infer<typeof exerciseSchema>
 
 /**
  * Create exercise input schema
- * Derives validation from entity
+ * Derives from entity via .pick() - validation inherited automatically
+ * Only uses .extend() for fields that need different nullability for input
  */
-export const createExerciseInputSchema = z.object({
-  name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede superar los 100 caracteres'),
-  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional(),
-  instructions: z.string().max(2000, 'Las instrucciones no pueden superar los 2000 caracteres').optional(),
-  videoUrl: z.string().url('URL de video inválida').optional(),
-  movementPattern: movementPatternSchema.optional(),
-  isUnilateral: z.boolean().optional(),
-  primaryMuscles: z.array(muscleGroupSchema).optional(),
-  secondaryMuscles: z.array(muscleGroupSchema).optional(),
-})
+export const createExerciseInputSchema = exerciseSchema
+  .pick({
+    name: true,
+    description: true,
+    instructions: true,
+    videoUrl: true,
+    movementPattern: true,
+    isUnilateral: true,
+    primaryMuscles: true,
+    secondaryMuscles: true,
+  })
+  .partial({
+    description: true,
+    instructions: true,
+    videoUrl: true,
+    movementPattern: true,
+    isUnilateral: true,
+    primaryMuscles: true,
+    secondaryMuscles: true,
+  })
 
 export type CreateExerciseInput = z.infer<typeof createExerciseInputSchema>
 
@@ -79,15 +90,14 @@ export type ListExercisesOutput = z.infer<typeof listExercisesOutputSchema>
 
 /**
  * Clone exercise input schema
+ * Derives name validation from entity via .pick()
  */
-export const cloneExerciseInputSchema = z.object({
-  sourceExerciseId: z.string().min(1, 'ID de ejercicio origen requerido'),
-  name: z
-    .string()
-    .min(1, 'El nombre es obligatorio')
-    .max(100, 'El nombre no puede superar los 100 caracteres')
-    .optional(),
-})
+export const cloneExerciseInputSchema = exerciseSchema
+  .pick({ name: true })
+  .partial()
+  .extend({
+    sourceExerciseId: z.string().min(1, 'ID de ejercicio origen requerido'),
+  })
 
 export type CloneExerciseInput = z.infer<typeof cloneExerciseInputSchema>
 

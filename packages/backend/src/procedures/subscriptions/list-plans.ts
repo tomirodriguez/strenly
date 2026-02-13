@@ -1,18 +1,6 @@
-import { organizationTypeSchema, planSchema } from '@strenly/contracts/subscriptions/plan'
-import { z } from 'zod'
+import { listPlansInputSchema, listPlansOutputSchema } from '@strenly/contracts/subscriptions/plan'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { publicProcedure } from '../../lib/orpc'
-
-const listPlansInputSchema = z
-  .object({
-    organizationType: organizationTypeSchema.optional(),
-  })
-  .optional()
-
-const listPlansOutputSchema = z.object({
-  plans: z.array(planSchema),
-  totalCount: z.number(),
-})
 
 /**
  * List available subscription plans

@@ -4,14 +4,20 @@
  */
 
 export {
+  type ArchiveAthleteInput,
+  type ArchiveAthleteOutput,
   type Athlete,
   type AthleteGender,
   type AthleteStatus,
+  archiveAthleteInputSchema,
+  archiveAthleteOutputSchema,
   athleteSchema,
   athleteStatusSchema,
   type CreateAthleteInput,
   createAthleteInputSchema,
+  type GetAthleteInput,
   genderSchema,
+  getAthleteInputSchema,
   type ListAthletesInput,
   type ListAthletesOutput,
   listAthletesInputSchema,

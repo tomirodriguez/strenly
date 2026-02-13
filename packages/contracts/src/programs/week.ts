@@ -23,18 +23,21 @@ export type Week = z.infer<typeof weekSchema>
 
 /**
  * Add week input schema
- * Creates a new week in a program
+ * Derives name validation from entity via .pick()
  */
-export const addWeekSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'),
-  name: z.string().max(50, 'El nombre de semana no puede superar los 50 caracteres').optional(),
-})
+export const addWeekSchema = weekSchema
+  .pick({ name: true })
+  .partial()
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'),
+  })
 
 export type AddWeekInput = z.infer<typeof addWeekSchema>
 
 /**
  * Update week input schema
- * Updates the name of a week
+ * Derives name validation from entity via .pick()
+ * Note: adds min(1) constraint for update since name is required when updating
  */
 export const updateWeekSchema = z.object({
   weekId: z.string().min(1, 'ID de semana requerido'),
@@ -59,13 +62,15 @@ export type DeleteWeekInput = z.infer<typeof deleteWeekSchema>
 
 /**
  * Duplicate week input schema
- * Creates a copy of a week with all its prescriptions
+ * Derives name validation from entity via .pick()
  */
-export const duplicateWeekSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'),
-  weekId: z.string().min(1, 'ID de semana requerido'),
-  name: z.string().max(50, 'El nombre de semana no puede superar los 50 caracteres').optional(),
-})
+export const duplicateWeekSchema = weekSchema
+  .pick({ name: true })
+  .partial()
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'),
+    weekId: z.string().min(1, 'ID de semana requerido'),
+  })
 
 export type DuplicateWeekInput = z.infer<typeof duplicateWeekSchema>
 

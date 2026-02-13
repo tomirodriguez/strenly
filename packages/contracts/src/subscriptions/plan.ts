@@ -42,3 +42,25 @@ export const planSchema = z.object({
 })
 
 export type Plan = z.infer<typeof planSchema>
+
+/**
+ * List plans input schema
+ * Public endpoint - optional organization type filter
+ */
+export const listPlansInputSchema = z
+  .object({
+    organizationType: organizationTypeSchema.optional(),
+  })
+  .optional()
+
+export type ListPlansInput = z.infer<typeof listPlansInputSchema>
+
+/**
+ * List plans output schema
+ */
+export const listPlansOutputSchema = z.object({
+  plans: z.array(planSchema),
+  totalCount: z.number(),
+})
+
+export type ListPlansOutput = z.infer<typeof listPlansOutputSchema>

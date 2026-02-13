@@ -41,17 +41,21 @@ export type AddExerciseRowInput = z.infer<typeof addExerciseRowSchema>
 
 /**
  * Update exercise row input schema
- * Updates an exercise row's properties
+ * Derives field validation from entity via .pick().partial()
  */
-export const updateExerciseRowSchema = z.object({
-  rowId: z.string().min(1, 'ID de fila requerido'),
-  exerciseId: z.string().optional(),
-  groupId: z.string().nullable().optional(),
-  orderWithinGroup: z.number().int().min(0).nullable().optional(),
-  setTypeLabel: z.string().max(30, 'La etiqueta de tipo no puede superar los 30 caracteres').nullable().optional(),
-  notes: z.string().max(500, 'Las notas no pueden superar los 500 caracteres').nullable().optional(),
-  restSeconds: z.number().int().min(0).max(600, 'El descanso no puede superar los 600 segundos').nullable().optional(),
-})
+export const updateExerciseRowSchema = exerciseRowSchema
+  .pick({
+    exerciseId: true,
+    groupId: true,
+    orderWithinGroup: true,
+    setTypeLabel: true,
+    notes: true,
+    restSeconds: true,
+  })
+  .partial()
+  .extend({
+    rowId: z.string().min(1, 'ID de fila requerido'),
+  })
 
 export type UpdateExerciseRowInput = z.infer<typeof updateExerciseRowSchema>
 

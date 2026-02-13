@@ -7,14 +7,18 @@ import { z } from 'zod'
  * - rpe: Rate of Perceived Exertion (e.g., @RPE8)
  * - rir: Reps in Reserve (e.g., @RIR2)
  */
-export const intensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'])
+export const intensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'], {
+  errorMap: () => ({ message: 'Tipo de intensidad inválido' }),
+})
 
 export type IntensityType = z.infer<typeof intensityTypeSchema>
 
 /**
  * Units for intensity values
  */
-export const intensityUnitSchema = z.enum(['kg', 'lb', '%', 'rpe', 'rir'])
+export const intensityUnitSchema = z.enum(['kg', 'lb', '%', 'rpe', 'rir'], {
+  errorMap: () => ({ message: 'Unidad de intensidad inválida' }),
+})
 
 export type IntensityUnit = z.infer<typeof intensityUnitSchema>
 
@@ -291,10 +295,20 @@ export function parsePrescriptionNotation(input: string): ParsedPrescription | n
 export const updatePrescriptionSchema = z.object({
   exerciseRowId: z.string(),
   weekId: z.string(),
-  notation: z.string().max(50), // e.g., "3x8@120kg (31X0)"
+  notation: z.string().max(50, 'La notación no puede superar los 50 caracteres'), // e.g., "3x8@120kg (31X0)"
 })
 
 export type UpdatePrescriptionInput = z.infer<typeof updatePrescriptionSchema>
+
+/**
+ * Update prescription output schema
+ * Returns the formatted notation for display
+ */
+export const updatePrescriptionOutputSchema = z.object({
+  notation: z.string(),
+})
+
+export type UpdatePrescriptionOutput = z.infer<typeof updatePrescriptionOutputSchema>
 
 export function formatPrescription(prescription: ParsedPrescription | null): string {
   if (prescription === null) {

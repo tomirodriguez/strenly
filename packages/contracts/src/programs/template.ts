@@ -8,27 +8,27 @@ import { programSchema, programWithDetailsSchema } from './program'
 
 /**
  * Save program as template input schema
+ * Derives name/description validation from programSchema via .pick()
  */
-export const saveAsTemplateInputSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'),
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede superar los 100 caracteres'),
-  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
-})
+export const saveAsTemplateInputSchema = programSchema
+  .pick({
+    name: true,
+    description: true,
+  })
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'),
+    // Override description to allow optional/empty strings for form handling
+    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+  })
 
 export type SaveAsTemplateInput = z.infer<typeof saveAsTemplateInputSchema>
 
 /**
  * Create program from template input schema
+ * Derives name validation from programSchema via .pick()
  */
-export const createFromTemplateInputSchema = z.object({
+export const createFromTemplateInputSchema = programSchema.pick({ name: true }).extend({
   templateId: z.string().min(1, 'ID de plantilla requerido'),
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede superar los 100 caracteres'),
   athleteId: z.string().optional(),
 })
 

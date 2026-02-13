@@ -28,3 +28,14 @@ export const subscriptionSchema = z.object({
 })
 
 export type Subscription = z.infer<typeof subscriptionSchema>
+
+/**
+ * Get subscription output schema
+ * Returns subscription with full plan details
+ */
+export const getSubscriptionOutputSchema = z.object({
+  subscription: subscriptionSchema,
+  plan: planSchema,
+})
+
+export type GetSubscriptionOutput = z.infer<typeof getSubscriptionOutputSchema>

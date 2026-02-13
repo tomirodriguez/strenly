@@ -27,26 +27,31 @@ export type ExerciseGroup = z.infer<typeof exerciseGroupSchema>
 
 /**
  * Create exercise group input schema
- * Creates a new group within a session
+ * Derives name validation from entity via .pick()
  */
-export const createExerciseGroupInputSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'), // For access verification
-  sessionId: z.string().min(1, 'ID de sesión requerido'),
-  name: z.string().max(50, 'El nombre de grupo no puede superar los 50 caracteres').optional(), // Empty/missing = auto-letter
-  exerciseId: z.string().optional(), // Optional initial exercise to add to the group
-})
+export const createExerciseGroupInputSchema = exerciseGroupSchema
+  .pick({ name: true })
+  .partial()
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'), // For access verification
+    sessionId: z.string().min(1, 'ID de sesión requerido'),
+    exerciseId: z.string().optional(), // Optional initial exercise to add to the group
+  })
 
 export type CreateExerciseGroupInput = z.infer<typeof createExerciseGroupInputSchema>
 
 /**
  * Update exercise group input schema
- * Updates the name of an existing group
+ * Derives name validation from entity via .pick()
+ * name is nullable.optional: null to clear, undefined to keep
  */
-export const updateExerciseGroupInputSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'), // For access verification
-  groupId: z.string().min(1, 'ID de grupo requerido'),
-  name: z.string().max(50, 'El nombre de grupo no puede superar los 50 caracteres').nullable().optional(), // null to clear, undefined to keep
-})
+export const updateExerciseGroupInputSchema = exerciseGroupSchema
+  .pick({ name: true })
+  .partial()
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'), // For access verification
+    groupId: z.string().min(1, 'ID de grupo requerido'),
+  })
 
 export type UpdateExerciseGroupInput = z.infer<typeof updateExerciseGroupInputSchema>
 

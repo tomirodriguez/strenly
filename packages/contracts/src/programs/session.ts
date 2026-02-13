@@ -26,28 +26,20 @@ export type Session = z.infer<typeof sessionSchema>
 
 /**
  * Add session input schema
- * Creates a new session (training day) in a program
+ * Derives name validation from entity via .pick()
  */
-export const addSessionSchema = z.object({
+export const addSessionSchema = sessionSchema.pick({ name: true }).extend({
   programId: z.string().min(1, 'ID de programa requerido'),
-  name: z
-    .string()
-    .min(1, 'El nombre de sesión es obligatorio')
-    .max(100, 'El nombre de sesión no puede superar los 100 caracteres'),
 })
 
 export type AddSessionInput = z.infer<typeof addSessionSchema>
 
 /**
  * Update session input schema
- * Updates the name of a session
+ * Derives name validation from entity via .pick()
  */
-export const updateSessionSchema = z.object({
+export const updateSessionSchema = sessionSchema.pick({ name: true }).extend({
   sessionId: z.string().min(1, 'ID de sesión requerido'),
-  name: z
-    .string()
-    .min(1, 'El nombre de sesión es obligatorio')
-    .max(100, 'El nombre de sesión no puede superar los 100 caracteres'),
 })
 
 export type UpdateSessionInput = z.infer<typeof updateSessionSchema>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { timestampsSchema } from '../common/dates'
 import { paginationQuerySchema } from '../common/pagination'
 import { exerciseGroupSchema } from './exercise-group'
 import { intensityTypeSchema, prescriptionSeriesInputSchema } from './prescription'
@@ -103,8 +104,7 @@ export const programAggregateSchema = z.object({
   isTemplate: z.boolean(),
   status: programStatusSchema,
   weeks: z.array(weekAggregateSchema),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type ProgramAggregate = z.infer<typeof programAggregateSchema>
@@ -195,8 +195,7 @@ export const programSchema = z.object({
   athleteId: z.string().nullable(),
   isTemplate: z.boolean(),
   status: programStatusSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type Program = z.infer<typeof programSchema>
@@ -209,8 +208,7 @@ export const programWeekSchema = z.object({
   programId: z.string(),
   name: z.string(),
   orderIndex: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type ProgramWeek = z.infer<typeof programWeekSchema>
@@ -223,8 +221,7 @@ export const programSessionSchema = z.object({
   programId: z.string(),
   name: z.string(),
   orderIndex: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type ProgramSession = z.infer<typeof programSessionSchema>
@@ -278,8 +275,7 @@ export const exerciseRowWithPrescriptionsSchema = z.object({
   notes: z.string().nullable(),
   restSeconds: z.number().nullable(),
   prescriptionsByWeekId: z.record(z.string(), prescriptionSchema),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type ExerciseRowWithPrescriptions = z.infer<typeof exerciseRowWithPrescriptionsSchema>
@@ -310,47 +306,52 @@ export type ProgramWithDetails = z.infer<typeof programWithDetailsSchema>
 
 /**
  * Create program input schema
- * Uses .pick() pattern with extensions for creation-specific fields
+ * Derives from entity via .pick() - validation inherited automatically
+ * Only uses .extend() for fields not in entity (weeksCount, sessionsCount)
  * @property weeksCount - Number of initial weeks to create (1-12). Defaults to 4 if not provided.
  * @property sessionsCount - Number of initial sessions to create (1-7). Defaults to 3 if not provided.
  */
-export const createProgramInputSchema = z.object({
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede superar los 100 caracteres'),
-  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
-  athleteId: z.string().optional(),
-  isTemplate: z.boolean().optional(),
-  weeksCount: z
-    .number()
-    .int('El número de semanas debe ser entero')
-    .min(1, 'El programa debe tener al menos 1 semana')
-    .max(12, 'El programa no puede tener más de 12 semanas')
-    .optional(),
-  sessionsCount: z
-    .number()
-    .int('El número de sesiones debe ser entero')
-    .min(1, 'El programa debe tener al menos 1 sesión')
-    .max(7, 'El programa no puede tener más de 7 sesiones por semana')
-    .optional(),
-})
+export const createProgramInputSchema = programSchema
+  .pick({
+    name: true,
+    description: true,
+  })
+  .extend({
+    // Override description to allow optional/empty strings for form handling
+    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+    athleteId: z.string().optional(),
+    isTemplate: z.boolean().optional(),
+    weeksCount: z
+      .number()
+      .int('El número de semanas debe ser entero')
+      .min(1, 'El programa debe tener al menos 1 semana')
+      .max(12, 'El programa no puede tener más de 12 semanas')
+      .optional(),
+    sessionsCount: z
+      .number()
+      .int('El número de sesiones debe ser entero')
+      .min(1, 'El programa debe tener al menos 1 sesión')
+      .max(7, 'El programa no puede tener más de 7 sesiones por semana')
+      .optional(),
+  })
 
 export type CreateProgramInput = z.infer<typeof createProgramInputSchema>
 
 /**
  * Update program input schema
- * Uses .partial() for optional updates
+ * Derives from entity via .pick().partial() - validation inherited automatically
  */
-export const updateProgramInputSchema = z.object({
-  programId: z.string().min(1, 'ID de programa requerido'),
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede superar los 100 caracteres')
-    .optional(),
-  description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
-})
+export const updateProgramInputSchema = programSchema
+  .pick({
+    name: true,
+    description: true,
+  })
+  .partial()
+  .extend({
+    programId: z.string().min(1, 'ID de programa requerido'),
+    // Override description to allow empty strings for form handling
+    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+  })
 
 export type UpdateProgramInput = z.infer<typeof updateProgramInputSchema>
 
@@ -399,13 +400,10 @@ export type ArchiveProgramInput = z.infer<typeof archiveProgramInputSchema>
 
 /**
  * Duplicate program input schema
+ * Derives name validation from entity via .pick()
  */
-export const duplicateProgramInputSchema = z.object({
+export const duplicateProgramInputSchema = programSchema.pick({ name: true }).extend({
   sourceProgramId: z.string().min(1, 'ID de programa origen requerido'),
-  name: z
-    .string()
-    .min(3, 'El nombre debe tener al menos 3 caracteres')
-    .max(100, 'El nombre no puede superar los 100 caracteres'),
   athleteId: z.string().optional(),
   isTemplate: z.boolean().optional(),
 })

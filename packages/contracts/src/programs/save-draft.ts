@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { programStatusSchema, weekInputSchema } from './program'
+import { programSchema, programStatusSchema, weekInputSchema } from './program'
 
 // ============================================================================
 // Aggregate-Based Schema (Primary Interface)
@@ -7,16 +7,21 @@ import { programStatusSchema, weekInputSchema } from './program'
 
 /**
  * Program data for saveDraft aggregate input
- * Contains the complete program state to be saved
+ * Derives name/description validation from programSchema via .pick()
  */
-const programDataInputSchema = z.object({
-  name: z.string().min(3).max(100),
-  description: z.string().max(500).nullable().optional(),
-  athleteId: z.string().nullable().optional(),
-  isTemplate: z.boolean().optional(),
-  status: programStatusSchema.optional(),
-  weeks: z.array(weekInputSchema),
-})
+const programDataInputSchema = programSchema
+  .pick({
+    name: true,
+    description: true,
+  })
+  .extend({
+    // Override description to allow optional for partial saves
+    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').nullable().optional(),
+    athleteId: z.string().nullable().optional(),
+    isTemplate: z.boolean().optional(),
+    status: programStatusSchema.optional(),
+    weeks: z.array(weekInputSchema),
+  })
 
 /**
  * Save draft input - full aggregate approach

@@ -1,17 +1,8 @@
 import { updatePrescriptionSchema } from '@strenly/contracts/programs'
-import { formatSeriesToNotation } from '@strenly/contracts/programs/prescription'
-import { z } from 'zod'
+import { formatSeriesToNotation, updatePrescriptionOutputSchema } from '@strenly/contracts/programs/prescription'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdatePrescription } from '../../use-cases/programs/update-prescription'
-
-/**
- * Output schema for prescription update
- * Returns the formatted notation for display
- */
-const updatePrescriptionOutputSchema = z.object({
-  notation: z.string(),
-})
 
 /**
  * Update a prescription cell in the program grid

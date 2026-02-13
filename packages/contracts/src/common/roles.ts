@@ -6,5 +6,7 @@ import { z } from 'zod'
  * - admin: Manage members and settings
  * - member: Basic access to organization resources
  */
-export const memberRoleSchema = z.enum(['owner', 'admin', 'member'])
+export const memberRoleSchema = z.enum(['owner', 'admin', 'member'], {
+  errorMap: () => ({ message: 'Rol de miembro inválido' }),
+})
 export type MemberRole = z.infer<typeof memberRoleSchema>

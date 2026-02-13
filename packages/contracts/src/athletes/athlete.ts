@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { timestampsSchema } from '../common/dates'
 import { emailSchema } from '../common/email'
 import { paginationQuerySchema } from '../common/pagination'
 
@@ -39,8 +40,7 @@ export const athleteSchema = z.object({
   status: athleteStatusSchema,
   linkedUserId: z.string().nullable(),
   isLinked: z.boolean(), // Computed from linkedUserId
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
 })
 
 export type Athlete = z.infer<typeof athleteSchema>
@@ -79,6 +79,33 @@ export const updateAthleteInputSchema = createAthleteInputSchema.partial().exten
 })
 
 export type UpdateAthleteInput = z.infer<typeof updateAthleteInputSchema>
+
+/**
+ * Get athlete input schema
+ */
+export const getAthleteInputSchema = z.object({
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+})
+
+export type GetAthleteInput = z.infer<typeof getAthleteInputSchema>
+
+/**
+ * Archive athlete input schema
+ */
+export const archiveAthleteInputSchema = z.object({
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+})
+
+export type ArchiveAthleteInput = z.infer<typeof archiveAthleteInputSchema>
+
+/**
+ * Archive athlete output schema
+ */
+export const archiveAthleteOutputSchema = z.object({
+  success: z.boolean(),
+})
+
+export type ArchiveAthleteOutput = z.infer<typeof archiveAthleteOutputSchema>
 
 /**
  * List athletes input schema

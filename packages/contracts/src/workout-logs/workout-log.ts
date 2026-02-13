@@ -8,6 +8,7 @@
  */
 
 import { z } from 'zod'
+import { timestampsSchema } from '../common/dates'
 import { intensityTypeSchema } from '../programs/prescription'
 
 // ============================================================================
@@ -49,23 +50,25 @@ export type LoggedSeries = z.infer<typeof loggedSeriesSchema>
 
 /**
  * Input schema for creating/updating series
- * All fields optional except those auto-calculated
+ * Derives validation from entity via .pick().partial()
+ * Inherits Spanish messages from loggedSeriesSchema
  */
-export const loggedSeriesInputSchema = z.object({
-  repsPerformed: z.number().int().min(0, 'Las repeticiones no pueden ser negativas').nullable().optional(),
-  weightUsed: z.number().min(0, 'El peso no puede ser negativo').nullable().optional(),
-  rpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable().optional(),
-  skipped: z.boolean().optional(),
-  prescribedReps: z.number().int().min(0).nullable().optional(),
-  prescribedWeight: z.number().min(0).nullable().optional(),
-  // Extended prescription snapshot
-  prescribedRepsMax: z.number().int().min(0).nullable().optional(),
-  prescribedIsAmrap: z.boolean().optional(),
-  prescribedIntensityType: intensityTypeSchema.nullable().optional(),
-  prescribedIntensityValue: z.number().nullable().optional(),
-  prescribedTempo: z.string().nullable().optional(),
-  prescribedRestSeconds: z.number().int().min(0).nullable().optional(),
-})
+export const loggedSeriesInputSchema = loggedSeriesSchema
+  .pick({
+    repsPerformed: true,
+    weightUsed: true,
+    rpe: true,
+    skipped: true,
+    prescribedReps: true,
+    prescribedWeight: true,
+    prescribedRepsMax: true,
+    prescribedIsAmrap: true,
+    prescribedIntensityType: true,
+    prescribedIntensityValue: true,
+    prescribedTempo: true,
+    prescribedRestSeconds: true,
+  })
+  .partial()
 
 export type LoggedSeriesInput = z.infer<typeof loggedSeriesInputSchema>
 
@@ -93,19 +96,29 @@ export type LoggedExercise = z.infer<typeof loggedExerciseSchema>
 
 /**
  * Input schema for creating/updating logged exercises
+ * Derives validation from entity via .pick()
+ * Uses loggedSeriesInputSchema for nested series array
  */
-export const loggedExerciseInputSchema = z.object({
-  id: z.string(),
-  exerciseId: z.string(),
-  groupItemId: z.string(),
-  orderIndex: z.number().int().min(0),
-  notes: z.string().max(500, 'Las notas no pueden superar los 500 caracteres').nullable().optional(),
-  skipped: z.boolean().optional(),
-  series: z.array(loggedSeriesInputSchema).optional(),
-  // Group display info
-  groupLabel: z.string().nullable().optional(),
-  groupOrder: z.number().int().min(0).optional(),
-})
+export const loggedExerciseInputSchema = loggedExerciseSchema
+  .pick({
+    id: true,
+    exerciseId: true,
+    groupItemId: true,
+    orderIndex: true,
+    notes: true,
+    skipped: true,
+    groupLabel: true,
+    groupOrder: true,
+  })
+  .partial({
+    notes: true,
+    skipped: true,
+    groupLabel: true,
+    groupOrder: true,
+  })
+  .extend({
+    series: z.array(loggedSeriesInputSchema).optional(),
+  })
 
 export type LoggedExerciseInput = z.infer<typeof loggedExerciseInputSchema>
 
@@ -129,8 +142,7 @@ export const workoutLogAggregateSchema = z.object({
   sessionRpe: z.number().min(1, 'El RPE mínimo es 1').max(10, 'El RPE máximo es 10').nullable(),
   sessionNotes: z.string().max(1000, 'Las notas de sesión no pueden superar los 1000 caracteres').nullable(),
   exercises: z.array(loggedExerciseSchema),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  ...timestampsSchema.shape,
   // Display context (denormalized snapshots)
   programName: z.string().nullable(),
   weekName: z.string().nullable(),
@@ -143,19 +155,12 @@ export type WorkoutLogAggregate = z.infer<typeof workoutLogAggregateSchema>
 /**
  * Basic workout log schema (without exercises array) for list operations.
  */
-export const workoutLogSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  athleteId: z.string(),
-  programId: z.string(),
-  sessionId: z.string(),
-  weekId: z.string(),
-  logDate: z.string(),
-  status: logStatusSchema,
-  sessionRpe: z.number().min(1).max(10).nullable(),
-  sessionNotes: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+export const workoutLogSchema = workoutLogAggregateSchema.omit({
+  exercises: true,
+  programName: true,
+  weekName: true,
+  sessionName: true,
+  athleteName: true,
 })
 
 export type WorkoutLog = z.infer<typeof workoutLogSchema>
