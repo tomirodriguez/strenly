@@ -1,11 +1,12 @@
 import type { Athlete } from '@strenly/contracts/athletes/athlete'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
 import { Edit, Eye, History, Mail, Trash } from 'lucide-react'
 import { InvitationStatus } from './invitation-status'
 import { DataTable } from '@/components/data-table/data-table'
 import { DataTableRowActions, type RowAction } from '@/components/data-table/data-table-row-actions'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { Badge } from '@/components/ui/badge'
 
 type AthletesTableProps = {
@@ -35,8 +36,7 @@ export function AthletesTable({
   onArchive,
   onInvitation,
 }: AthletesTableProps) {
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
   const navigate = useNavigate()
 
   const handleViewAthlete = (athlete: Athlete) => {

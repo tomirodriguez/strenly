@@ -1,5 +1,5 @@
 import type { ProgramStatus } from '@strenly/contracts/programs/program'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { FileTextIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { ProgramsTable } from '../components/programs-table'
@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 
 const STATUS_OPTIONS = [
@@ -28,8 +29,7 @@ const DEFAULT_PAGE_SIZE = 20
  * Displays programs as a DataTable for scalable list view.
  */
 export function ProgramsListView() {
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')

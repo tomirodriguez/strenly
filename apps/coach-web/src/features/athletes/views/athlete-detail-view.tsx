@@ -5,12 +5,13 @@
  * Shows weeks/sessions with "Registrar" buttons for logging workouts.
  */
 
-import { Link, useParams } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { ArrowLeft, ChevronDown, ChevronRight, ClipboardList, History, Mail, Phone, User } from 'lucide-react'
 import { useState } from 'react'
 import { useAthlete } from '../hooks/queries/use-athlete'
 import { usePrograms } from '@/features/programs/hooks/queries/use-programs'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,8 +24,7 @@ interface AthleteDetailViewProps {
 }
 
 export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
 
   const { data: athlete, isLoading: athleteLoading, error: athleteError } = useAthlete(athleteId)
 

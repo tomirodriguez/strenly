@@ -1,4 +1,4 @@
-import { Link, useMatchRoute, useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router'
 import {
   CopyIcon,
   DumbbellIcon,
@@ -39,6 +39,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { signOut } from '@/lib/auth-client'
 import { useTheme } from '@/lib/theme'
 
@@ -65,8 +66,7 @@ type AppSidebarProps = {
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const matchRoute = useMatchRoute()
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
 

@@ -1,7 +1,8 @@
-import { Link, useParams } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Dumbbell, Users } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { cn } from '@/lib/utils'
 
 /**
@@ -9,8 +10,7 @@ import { cn } from '@/lib/utils'
  * Provides shortcuts to frequently used features.
  */
 export function QuickActions() {
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
 
   return (
     <Card>

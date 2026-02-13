@@ -1,11 +1,12 @@
 import type { CreateProgramInput, Program, ProgramAggregate } from '@strenly/contracts/programs/program'
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ProgramForm } from '../components/program-form'
 import { useCreateFromTemplate } from '../hooks/mutations/use-create-from-template'
 import { useCreateProgram } from '../hooks/mutations/use-create-program'
 import { useTemplates } from '../hooks/queries/use-templates'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -17,8 +18,7 @@ import { Separator } from '@/components/ui/separator'
  * Supports creating from scratch or from a template.
  */
 export function NewProgramView() {
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
   const navigate = useNavigate()
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')

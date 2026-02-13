@@ -1,5 +1,6 @@
-import { Link, useMatches, useParams } from '@tanstack/react-router'
+import { Link, useMatches } from '@tanstack/react-router'
 import { ChevronRightIcon } from 'lucide-react'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,8 +23,7 @@ function capitalizeFirst(str: string): string {
 
 export function Breadcrumbs() {
   const matches = useMatches()
-  const params = useParams({ strict: false })
-  const orgSlug = (params as { orgSlug?: string }).orgSlug ?? ''
+  const orgSlug = useOrgSlug()
 
   // Build breadcrumb items from route matches
   const breadcrumbs = matches
