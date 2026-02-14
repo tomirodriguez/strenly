@@ -1,9 +1,9 @@
 import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
-  addWeekSchema,
-  deleteWeekSchema,
-  duplicateWeekSchema,
-  updateWeekSchema,
+  addWeekInputSchema,
+  deleteWeekInputSchema,
+  duplicateWeekInputSchema,
+  updateWeekInputSchema,
   weekOutputSchema,
 } from '@strenly/contracts/programs'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
@@ -22,7 +22,7 @@ export const addWeekProcedure = authProcedure
     NOT_FOUND: { message: 'Program not found' },
     VALIDATION_ERROR: { message: 'Invalid week data' },
   })
-  .input(addWeekSchema)
+  .input(addWeekInputSchema)
   .output(weekOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeAddWeek({
@@ -71,7 +71,7 @@ export const updateWeekProcedure = authProcedure
     NOT_FOUND: { message: 'Week not found' },
     VALIDATION_ERROR: { message: 'Invalid week data' },
   })
-  .input(updateWeekSchema)
+  .input(updateWeekInputSchema)
   .output(weekOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeUpdateWeek({
@@ -120,7 +120,7 @@ export const deleteWeekProcedure = authProcedure
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
     LAST_WEEK: { message: 'Cannot delete the last week of a program' },
   })
-  .input(deleteWeekSchema)
+  .input(deleteWeekInputSchema)
   .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteWeek({
@@ -164,7 +164,7 @@ export const duplicateWeekProcedure = authProcedure
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
     VALIDATION_ERROR: { message: 'Invalid week data' },
   })
-  .input(duplicateWeekSchema)
+  .input(duplicateWeekInputSchema)
   .output(weekOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDuplicateWeek({

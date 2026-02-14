@@ -48,6 +48,7 @@ export type Athlete = z.infer<typeof athleteSchema>
 /**
  * Create athlete input schema
  * Derives from entity via .pick() - validation inherited automatically
+ * Uses .extend() only to handle form empty-string values, deriving from entity shape
  */
 export const createAthleteInputSchema = athleteSchema
   .pick({
@@ -58,13 +59,14 @@ export const createAthleteInputSchema = athleteSchema
     gender: true,
     notes: true,
   })
+  .partial({ gender: true })
   .extend({
-    // Override to allow optional/empty strings for form handling
-    email: emailSchema.optional().or(z.literal('')),
-    phone: z.string().max(20, 'El teléfono no puede superar los 20 caracteres').optional().or(z.literal('')),
-    birthdate: z.string().optional().or(z.literal('')),
-    gender: genderSchema.optional(),
-    notes: z.string().max(1000, 'Las notas no pueden superar los 1000 caracteres').optional().or(z.literal('')),
+    // Override for form handling: unwrap nullable (forms don't send null),
+    // accept empty strings + optional (validation derived from entity)
+    email: athleteSchema.shape.email.unwrap().or(z.literal('')).optional(),
+    phone: athleteSchema.shape.phone.unwrap().or(z.literal('')).optional(),
+    birthdate: athleteSchema.shape.birthdate.unwrap().or(z.literal('')).optional(),
+    notes: athleteSchema.shape.notes.unwrap().or(z.literal('')).optional(),
   })
 
 export type CreateAthleteInput = z.infer<typeof createAthleteInputSchema>
@@ -98,14 +100,12 @@ export const archiveAthleteInputSchema = z.object({
 
 export type ArchiveAthleteInput = z.infer<typeof archiveAthleteInputSchema>
 
+export type { SuccessOutput as ArchiveAthleteOutput } from '../common/success'
 /**
  * Archive athlete output schema
+ * Reuses common successOutputSchema
  */
-export const archiveAthleteOutputSchema = z.object({
-  success: z.boolean(),
-})
-
-export type ArchiveAthleteOutput = z.infer<typeof archiveAthleteOutputSchema>
+export { successOutputSchema as archiveAthleteOutputSchema } from '../common/success'
 
 /**
  * List athletes input schema

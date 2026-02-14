@@ -17,6 +17,7 @@
     "./athletes": "./src/athletes/index.ts",
     "./athletes/athlete": "./src/athletes/athlete.ts",
     "./athletes/invitation": "./src/athletes/invitation.ts",
+    "./auth/organization": "./src/auth/organization.ts",
     "./programs": "./src/programs/index.ts",
     "./programs/program": "./src/programs/program.ts",
     "./programs/prescription": "./src/programs/prescription.ts",

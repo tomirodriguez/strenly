@@ -1,10 +1,10 @@
 import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
-  addExerciseRowSchema,
-  deleteExerciseRowSchema,
+  addExerciseRowInputSchema,
+  deleteExerciseRowInputSchema,
   exerciseRowOutputSchema,
-  reorderExerciseRowsSchema,
-  updateExerciseRowSchema,
+  reorderExerciseRowsInputSchema,
+  updateExerciseRowInputSchema,
 } from '@strenly/contracts/programs'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
@@ -23,7 +23,7 @@ export const addExerciseRowProcedure = authProcedure
     SESSION_NOT_FOUND: { message: 'Session not found' },
     VALIDATION_ERROR: { message: 'Invalid exercise row data' },
   })
-  .input(addExerciseRowSchema)
+  .input(addExerciseRowInputSchema)
   .output(exerciseRowOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const programRepository = createProgramRepository(context.db)
@@ -83,7 +83,7 @@ export const updateExerciseRowProcedure = authProcedure
     NOT_FOUND: { message: 'Exercise row not found' },
     VALIDATION_ERROR: { message: 'Invalid exercise row data' },
   })
-  .input(updateExerciseRowSchema)
+  .input(updateExerciseRowInputSchema)
   .output(exerciseRowOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const programRepository = createProgramRepository(context.db)
@@ -145,7 +145,7 @@ export const deleteExerciseRowProcedure = authProcedure
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Exercise row not found' },
   })
-  .input(deleteExerciseRowSchema)
+  .input(deleteExerciseRowInputSchema)
   .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteExerciseRow({
@@ -182,7 +182,7 @@ export const reorderExerciseRowsProcedure = authProcedure
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     SESSION_NOT_FOUND: { message: 'Session not found' },
   })
-  .input(reorderExerciseRowsSchema)
+  .input(reorderExerciseRowsInputSchema)
   .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeReorderExerciseRows({

@@ -25,46 +25,43 @@ export type Week = z.infer<typeof weekSchema>
  * Add week input schema
  * Derives name validation from entity via .pick()
  */
-export const addWeekSchema = weekSchema
+export const addWeekInputSchema = weekSchema
   .pick({ name: true })
   .partial()
   .extend({
     programId: z.string().min(1, 'ID de programa requerido'),
   })
 
-export type AddWeekInput = z.infer<typeof addWeekSchema>
+export type AddWeekInput = z.infer<typeof addWeekInputSchema>
 
 /**
  * Update week input schema
  * Derives name validation from entity via .pick()
- * Note: adds min(1) constraint for update since name is required when updating
+ * Adds min(1) constraint for update since name is required when updating
  */
-export const updateWeekSchema = z.object({
+export const updateWeekInputSchema = weekSchema.pick({ name: true }).extend({
   weekId: z.string().min(1, 'ID de semana requerido'),
-  name: z
-    .string()
-    .min(1, 'El nombre de semana es obligatorio')
-    .max(50, 'El nombre de semana no puede superar los 50 caracteres'),
+  name: weekSchema.shape.name.min(1, 'El nombre de semana es obligatorio'),
 })
 
-export type UpdateWeekInput = z.infer<typeof updateWeekSchema>
+export type UpdateWeekInput = z.infer<typeof updateWeekInputSchema>
 
 /**
  * Delete week input schema
  * Requires programId for efficient week count check
  */
-export const deleteWeekSchema = z.object({
+export const deleteWeekInputSchema = z.object({
   programId: z.string().min(1, 'ID de programa requerido'),
   weekId: z.string().min(1, 'ID de semana requerido'),
 })
 
-export type DeleteWeekInput = z.infer<typeof deleteWeekSchema>
+export type DeleteWeekInput = z.infer<typeof deleteWeekInputSchema>
 
 /**
  * Duplicate week input schema
  * Derives name validation from entity via .pick()
  */
-export const duplicateWeekSchema = weekSchema
+export const duplicateWeekInputSchema = weekSchema
   .pick({ name: true })
   .partial()
   .extend({
@@ -72,7 +69,7 @@ export const duplicateWeekSchema = weekSchema
     weekId: z.string().min(1, 'ID de semana requerido'),
   })
 
-export type DuplicateWeekInput = z.infer<typeof duplicateWeekSchema>
+export type DuplicateWeekInput = z.infer<typeof duplicateWeekInputSchema>
 
 // ============================================================================
 // Week Output Schemas

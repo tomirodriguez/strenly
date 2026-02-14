@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type AddWeekInput, addWeekSchema } from '@strenly/contracts/programs/week'
+import { type AddWeekInput, addWeekInputSchema } from '@strenly/contracts/programs/week'
 import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,7 +33,7 @@ export function AddWeekModal({ programId, weekCount, open, onOpenChange, onSubmi
   const defaultName = `Semana ${weekCount + 1}`
 
   const { handleSubmit, control, reset } = useForm<AddWeekInput>({
-    resolver: zodResolver(addWeekSchema),
+    resolver: zodResolver(addWeekInputSchema),
     defaultValues: {
       programId,
       name: '',

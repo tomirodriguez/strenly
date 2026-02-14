@@ -1,9 +1,9 @@
 import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
-  addSessionSchema,
-  deleteSessionSchema,
+  addSessionInputSchema,
+  deleteSessionInputSchema,
   sessionOutputSchema,
-  updateSessionSchema,
+  updateSessionInputSchema,
 } from '@strenly/contracts/programs'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -20,7 +20,7 @@ export const addSessionProcedure = authProcedure
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
     VALIDATION_ERROR: { message: 'Invalid session data' },
   })
-  .input(addSessionSchema)
+  .input(addSessionInputSchema)
   .output(sessionOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeAddSession({
@@ -69,7 +69,7 @@ export const updateSessionProcedure = authProcedure
     NOT_FOUND: { message: 'Session not found' },
     VALIDATION_ERROR: { message: 'Invalid session data' },
   })
-  .input(updateSessionSchema)
+  .input(updateSessionInputSchema)
   .output(sessionOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeUpdateSession({
@@ -118,7 +118,7 @@ export const deleteSessionProcedure = authProcedure
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
     LAST_SESSION: { message: 'Cannot delete the last session of a program' },
   })
-  .input(deleteSessionSchema)
+  .input(deleteSessionInputSchema)
   .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteSession({

@@ -1,4 +1,4 @@
-import { updatePrescriptionSchema } from '@strenly/contracts/programs'
+import { updatePrescriptionInputSchema } from '@strenly/contracts/programs'
 import { updatePrescriptionOutputSchema } from '@strenly/contracts/programs/prescription'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -20,7 +20,7 @@ export const updatePrescriptionProcedure = authProcedure
     WEEK_NOT_FOUND: { message: 'Week not found' },
     VALIDATION_ERROR: { message: 'Invalid prescription notation' },
   })
-  .input(updatePrescriptionSchema)
+  .input(updatePrescriptionInputSchema)
   .output(updatePrescriptionOutputSchema.nullable())
   .handler(async ({ input, context, errors }) => {
     const useCase = makeUpdatePrescription({

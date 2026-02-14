@@ -119,11 +119,9 @@ export const archiveExerciseInputSchema = z.object({
 
 export type ArchiveExerciseInput = z.infer<typeof archiveExerciseInputSchema>
 
+export type { SuccessOutput as ArchiveExerciseOutput } from '../common/success'
 /**
  * Archive exercise output schema
+ * Reuses common successOutputSchema
  */
-export const archiveExerciseOutputSchema = z.object({
-  success: z.boolean(),
-})
-
-export type ArchiveExerciseOutput = z.infer<typeof archiveExerciseOutputSchema>
+export { successOutputSchema as archiveExerciseOutputSchema } from '../common/success'

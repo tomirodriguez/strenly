@@ -31,19 +31,19 @@ export type ExerciseRow = z.infer<typeof exerciseRowSchema>
  * Add exercise row input schema
  * Adds an exercise to a session
  */
-export const addExerciseRowSchema = z.object({
+export const addExerciseRowInputSchema = z.object({
   sessionId: z.string().min(1, 'ID de sesión requerido'),
   exerciseId: z.string().min(1, 'ID de ejercicio requerido'),
   groupId: z.string().optional(), // Optional: assign to existing group
 })
 
-export type AddExerciseRowInput = z.infer<typeof addExerciseRowSchema>
+export type AddExerciseRowInput = z.infer<typeof addExerciseRowInputSchema>
 
 /**
  * Update exercise row input schema
  * Derives field validation from entity via .pick().partial()
  */
-export const updateExerciseRowSchema = exerciseRowSchema
+export const updateExerciseRowInputSchema = exerciseRowSchema
   .pick({
     exerciseId: true,
     groupId: true,
@@ -57,27 +57,27 @@ export const updateExerciseRowSchema = exerciseRowSchema
     rowId: z.string().min(1, 'ID de fila requerido'),
   })
 
-export type UpdateExerciseRowInput = z.infer<typeof updateExerciseRowSchema>
+export type UpdateExerciseRowInput = z.infer<typeof updateExerciseRowInputSchema>
 
 /**
  * Delete exercise row input schema
  */
-export const deleteExerciseRowSchema = z.object({
+export const deleteExerciseRowInputSchema = z.object({
   rowId: z.string().min(1, 'ID de fila requerido'),
 })
 
-export type DeleteExerciseRowInput = z.infer<typeof deleteExerciseRowSchema>
+export type DeleteExerciseRowInput = z.infer<typeof deleteExerciseRowInputSchema>
 
 /**
  * Reorder exercise rows input schema
  * Provides new order for all rows in a session
  */
-export const reorderExerciseRowsSchema = z.object({
+export const reorderExerciseRowsInputSchema = z.object({
   sessionId: z.string().min(1, 'ID de sesión requerido'),
   rowIds: z.array(z.string()).min(1, 'Se requiere al menos una fila'),
 })
 
-export type ReorderExerciseRowsInput = z.infer<typeof reorderExerciseRowsSchema>
+export type ReorderExerciseRowsInput = z.infer<typeof reorderExerciseRowsInputSchema>
 
 // ============================================================================
 // Exercise Row Output Schemas

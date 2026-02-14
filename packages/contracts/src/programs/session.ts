@@ -28,32 +28,32 @@ export type Session = z.infer<typeof sessionSchema>
  * Add session input schema
  * Derives name validation from entity via .pick()
  */
-export const addSessionSchema = sessionSchema.pick({ name: true }).extend({
+export const addSessionInputSchema = sessionSchema.pick({ name: true }).extend({
   programId: z.string().min(1, 'ID de programa requerido'),
 })
 
-export type AddSessionInput = z.infer<typeof addSessionSchema>
+export type AddSessionInput = z.infer<typeof addSessionInputSchema>
 
 /**
  * Update session input schema
  * Derives name validation from entity via .pick()
  */
-export const updateSessionSchema = sessionSchema.pick({ name: true }).extend({
+export const updateSessionInputSchema = sessionSchema.pick({ name: true }).extend({
   sessionId: z.string().min(1, 'ID de sesión requerido'),
 })
 
-export type UpdateSessionInput = z.infer<typeof updateSessionSchema>
+export type UpdateSessionInput = z.infer<typeof updateSessionInputSchema>
 
 /**
  * Delete session input schema
  * Requires programId for efficient session count check
  */
-export const deleteSessionSchema = z.object({
+export const deleteSessionInputSchema = z.object({
   programId: z.string().min(1, 'ID de programa requerido'),
   sessionId: z.string().min(1, 'ID de sesión requerido'),
 })
 
-export type DeleteSessionInput = z.infer<typeof deleteSessionSchema>
+export type DeleteSessionInput = z.infer<typeof deleteSessionInputSchema>
 
 // ============================================================================
 // Session Output Schemas

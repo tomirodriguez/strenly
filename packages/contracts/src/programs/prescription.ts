@@ -68,13 +68,13 @@ export const parsedPrescriptionSchema = z.object({
  * Update prescription input schema
  * Used to update a single cell in the program grid
  */
-export const updatePrescriptionSchema = z.object({
+export const updatePrescriptionInputSchema = z.object({
   exerciseRowId: z.string(),
   weekId: z.string(),
   notation: z.string().max(50, 'La notación no puede superar los 50 caracteres'), // e.g., "3x8@120kg (31X0)"
 })
 
-export type UpdatePrescriptionInput = z.infer<typeof updatePrescriptionSchema>
+export type UpdatePrescriptionInput = z.infer<typeof updatePrescriptionInputSchema>
 
 /**
  * Update prescription output schema
@@ -88,20 +88,20 @@ export type UpdatePrescriptionOutput = z.infer<typeof updatePrescriptionOutputSc
 
 /**
  * Schema for a single series (one set) in a prescription.
- * Used as input for creating prescription series arrays.
+ * Derives shared fields from parsedPrescriptionSchema, extends with series-specific fields.
  */
-export const prescriptionSeriesInputSchema = z.object({
-  orderIndex: z.number().min(0),
-  reps: z.number().min(0).nullable(), // null or 0 for AMRAP
-  repsMax: z.number().min(0).nullable(),
-  isAmrap: z.boolean(),
-  intensityType: intensityTypeSchema.nullable(),
-  intensityValue: z.number().nullable(),
-  intensityUnit: intensityUnitSchema.nullable(),
-  tempo: z
-    .string()
-    .regex(/^[\dX]{4}$/i)
-    .nullable(),
-})
+export const prescriptionSeriesInputSchema = parsedPrescriptionSchema
+  .pick({
+    isAmrap: true,
+    intensityType: true,
+    intensityValue: true,
+    tempo: true,
+  })
+  .extend({
+    orderIndex: z.number().int().min(0),
+    reps: z.number().int().min(0).nullable(), // null or 0 for AMRAP
+    repsMax: z.number().int().min(0).nullable(),
+    intensityUnit: intensityUnitSchema.nullable(),
+  })
 
 export type PrescriptionSeriesInput = z.infer<typeof prescriptionSeriesInputSchema>

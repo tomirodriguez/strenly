@@ -16,15 +16,15 @@ export {
 // Exercise row operations
 export {
   type AddExerciseRowInput,
-  addExerciseRowSchema,
+  addExerciseRowInputSchema,
   type DeleteExerciseRowInput,
-  deleteExerciseRowSchema,
+  deleteExerciseRowInputSchema,
   type ExerciseRowOutput,
   exerciseRowOutputSchema,
   type ReorderExerciseRowsInput,
-  reorderExerciseRowsSchema,
+  reorderExerciseRowsInputSchema,
   type UpdateExerciseRowInput,
-  updateExerciseRowSchema,
+  updateExerciseRowInputSchema,
 } from './exercise-row'
 // Re-export prescription notation utilities
 export {
@@ -48,8 +48,8 @@ export {
   type UpdatePrescriptionInput,
   type UpdatePrescriptionOutput,
   unilateralUnitSchema,
+  updatePrescriptionInputSchema,
   updatePrescriptionOutputSchema,
-  updatePrescriptionSchema,
 } from './prescription'
 export {
   // Input schemas
@@ -101,13 +101,13 @@ export {
 // Session operations
 export {
   type AddSessionInput,
-  addSessionSchema,
+  addSessionInputSchema,
   type DeleteSessionInput,
-  deleteSessionSchema,
+  deleteSessionInputSchema,
   type SessionOutput,
   sessionOutputSchema,
   type UpdateSessionInput,
-  updateSessionSchema,
+  updateSessionInputSchema,
 } from './session'
 // Template operations
 export {
@@ -127,13 +127,13 @@ export {
 // Week operations
 export {
   type AddWeekInput,
-  addWeekSchema,
+  addWeekInputSchema,
   type DeleteWeekInput,
   type DuplicateWeekInput,
-  deleteWeekSchema,
-  duplicateWeekSchema,
+  deleteWeekInputSchema,
+  duplicateWeekInputSchema,
   type UpdateWeekInput,
-  updateWeekSchema,
+  updateWeekInputSchema,
   type WeekOutput,
   weekOutputSchema,
 } from './week'

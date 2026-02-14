@@ -39,3 +39,14 @@ export const getSubscriptionOutputSchema = z.object({
 })
 
 export type GetSubscriptionOutput = z.infer<typeof getSubscriptionOutputSchema>
+
+/**
+ * Input schema for creating a subscription during onboarding
+ * Used when a user completes the onboarding flow
+ */
+export const createSubscriptionInputSchema = z.object({
+  organizationId: z.string().min(1, 'ID de organización requerido'),
+  planId: z.string().min(1, 'ID de plan requerido'),
+})
+
+export type CreateSubscriptionInput = z.infer<typeof createSubscriptionInputSchema>

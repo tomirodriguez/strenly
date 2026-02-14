@@ -1,23 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { type CreateOrganizationInput, createOrganizationInputSchema } from '@strenly/contracts/auth/organization'
 import { useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-const orgFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(50, 'El nombre no puede superar los 50 caracteres'),
-  slug: z
-    .string()
-    .min(2, 'La URL debe tener al menos 2 caracteres')
-    .regex(/^[a-z0-9-]+$/, 'Solo puede contener letras minusculas, numeros y guiones'),
-})
-
-type OrgFormData = z.infer<typeof orgFormSchema>
+type OrgFormData = CreateOrganizationInput
 
 interface OrgFormProps {
   onSubmit: (data: OrgFormData) => void | Promise<void>
@@ -34,7 +23,7 @@ function generateSlug(name: string): string {
 export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
   const userEditedSlug = useRef(false)
   const { handleSubmit, control, setValue } = useForm<OrgFormData>({
-    resolver: zodResolver(orgFormSchema),
+    resolver: zodResolver(createOrganizationInputSchema),
     defaultValues: {
       name: '',
       slug: '',

@@ -92,50 +92,25 @@ export const weekAggregateSchema = z.object({
 export type WeekAggregate = z.infer<typeof weekAggregateSchema>
 
 /**
- * Full program aggregate schema for output
- * Contains the complete hierarchy: weeks > sessions > groups > items > series
- */
-export const programAggregateSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
-  athleteId: z.string().nullable(),
-  isTemplate: z.boolean(),
-  status: programStatusSchema,
-  weeks: z.array(weekAggregateSchema),
-  ...timestampsSchema.shape,
-})
-
-export type ProgramAggregate = z.infer<typeof programAggregateSchema>
-
-/**
  * Series input schema (for creating/updating)
- * Same as output but no orderIndex (auto-calculated)
+ * Derives from seriesSchema, omitting orderIndex (auto-calculated)
+ * and making most fields optional
  */
-export const seriesInputSchema = z.object({
-  reps: z.number().int().min(0).nullable(),
-  repsMax: z.number().int().min(0).nullable().optional(),
-  isAmrap: z.boolean(),
-  intensityType: intensityTypeSchema.nullable().optional(),
-  intensityValue: z.number().nullable().optional(),
-  tempo: z
-    .string()
-    .regex(/^[\dX]{4}$/i, 'Formato de tempo inválido (ej: 3110)')
-    .nullable()
-    .optional(),
-  restSeconds: z.number().int().min(0).nullable().optional(),
+export const seriesInputSchema = seriesSchema.omit({ orderIndex: true }).partial({
+  repsMax: true,
+  intensityType: true,
+  intensityValue: true,
+  tempo: true,
+  restSeconds: true,
 })
 
 export type SeriesInput = z.infer<typeof seriesInputSchema>
 
 /**
  * Group item input schema
+ * Derives from groupItemSchema, replacing series with input version
  */
-export const groupItemInputSchema = z.object({
-  id: z.string(),
-  exerciseId: z.string(),
-  orderIndex: z.number().int().min(0),
+export const groupItemInputSchema = groupItemSchema.pick({ id: true, exerciseId: true, orderIndex: true }).extend({
   series: z.array(seriesInputSchema).optional(),
 })
 
@@ -143,10 +118,9 @@ export type GroupItemInput = z.infer<typeof groupItemInputSchema>
 
 /**
  * Exercise group input schema
+ * Derives from exerciseGroupAggregateSchema, replacing items with input version
  */
-export const exerciseGroupInputSchema = z.object({
-  id: z.string(),
-  orderIndex: z.number().int().min(0),
+export const exerciseGroupInputSchema = exerciseGroupAggregateSchema.pick({ id: true, orderIndex: true }).extend({
   items: z.array(groupItemInputSchema),
 })
 
@@ -154,11 +128,9 @@ export type ExerciseGroupInput = z.infer<typeof exerciseGroupInputSchema>
 
 /**
  * Session input schema
+ * Derives from sessionAggregateSchema, replacing exerciseGroups with input version
  */
-export const sessionInputSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  orderIndex: z.number().int().min(0),
+export const sessionInputSchema = sessionAggregateSchema.pick({ id: true, name: true, orderIndex: true }).extend({
   exerciseGroups: z.array(exerciseGroupInputSchema).optional(),
 })
 
@@ -166,13 +138,14 @@ export type SessionInput = z.infer<typeof sessionInputSchema>
 
 /**
  * Week input schema
+ * Derives from weekAggregateSchema, making name optional and replacing sessions with input version
  */
-export const weekInputSchema = z.object({
-  id: z.string(),
-  name: z.string().optional(),
-  orderIndex: z.number().int().min(0),
-  sessions: z.array(sessionInputSchema).optional(),
-})
+export const weekInputSchema = weekAggregateSchema
+  .pick({ id: true, name: true, orderIndex: true })
+  .partial({ name: true })
+  .extend({
+    sessions: z.array(sessionInputSchema).optional(),
+  })
 
 export type WeekInput = z.infer<typeof weekInputSchema>
 
@@ -199,6 +172,17 @@ export const programSchema = z.object({
 })
 
 export type Program = z.infer<typeof programSchema>
+
+/**
+ * Full program aggregate schema for output
+ * Contains the complete hierarchy: weeks > sessions > groups > items > series
+ * Derives from programSchema (entity) and extends with nested hierarchy
+ */
+export const programAggregateSchema = programSchema.extend({
+  weeks: z.array(weekAggregateSchema),
+})
+
+export type ProgramAggregate = z.infer<typeof programAggregateSchema>
 
 /**
  * Program week output schema
@@ -306,24 +290,19 @@ export type ProgramWithDetails = z.infer<typeof programWithDetailsSchema>
 
 /**
  * Optional description schema for form handling.
- * Derives the max-length validation from the entity but allows
- * empty strings and optional values (forms send '' for cleared fields).
+ * Derives validation from programSchema entity (source of truth).
+ * Allows empty strings and optional values (forms send '' for cleared fields).
  */
-export const optionalDescriptionSchema = z
-  .string()
-  .max(500, 'La descripción no puede superar los 500 caracteres')
-  .optional()
+export const optionalDescriptionSchema = programSchema.shape.description
+  .unwrap() // strip nullable for form handling (forms don't send null)
   .or(z.literal(''))
+  .optional()
 
 /**
  * Nullable optional description schema for partial saves.
- * Similar to optionalDescriptionSchema but also allows null.
+ * Derives validation from programSchema entity (source of truth).
  */
-export const nullableOptionalDescriptionSchema = z
-  .string()
-  .max(500, 'La descripción no puede superar los 500 caracteres')
-  .nullable()
-  .optional()
+export const nullableOptionalDescriptionSchema = programSchema.shape.description.optional()
 
 // ============================================================================
 // Input Schemas

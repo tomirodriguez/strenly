@@ -17,7 +17,7 @@ import { useGridActions } from '@/stores/grid-store'
 
 /**
  * Local-only schema derived from the session entity schema.
- * The addSessionSchema from contracts requires programId (for API calls),
+ * The addSessionInputSchema from contracts requires programId (for API calls),
  * but this form operates on local grid state only, so we pick just the name field.
  */
 const addSessionFormSchema = sessionSchema.pick({ name: true })
