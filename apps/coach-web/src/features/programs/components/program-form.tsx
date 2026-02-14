@@ -14,8 +14,11 @@ import {
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
-import { useDebounce } from '@/hooks/use-debounce'
+
+type AthleteOption = {
+  id: string
+  name: string
+}
 
 type ProgramFormProps = {
   id?: string
@@ -25,12 +28,20 @@ type ProgramFormProps = {
   showWeeksCount?: boolean
   /** Whether to show the sessions count field (hidden when creating from template) */
   showSessionsCount?: boolean
+  /** Available athletes for the athlete selector */
+  athletes: AthleteOption[]
+  /** Whether athletes are currently loading */
+  isLoadingAthletes: boolean
+  /** Callback when the athlete search input changes */
+  onAthleteSearch: (search: string) => void
 }
 
 /**
  * Form component for creating or editing a program.
  * Uses React Hook Form with Zod validation.
  * Accepts an optional id prop to link with external submit buttons.
+ *
+ * Pure UI component - athlete data is provided via props.
  */
 export function ProgramForm({
   id,
@@ -38,6 +49,9 @@ export function ProgramForm({
   defaultValues,
   showWeeksCount = true,
   showSessionsCount = true,
+  athletes,
+  isLoadingAthletes,
+  onAthleteSearch,
 }: ProgramFormProps) {
   const { handleSubmit, control } = useForm<CreateProgramInput>({
     resolver: zodResolver(createProgramInputSchema),
@@ -52,19 +66,10 @@ export function ProgramForm({
     },
   })
 
-  // Search state for athlete selector
+  // Local search input state (controls what the user sees in the combobox input)
   const [athleteSearch, setAthleteSearch] = useState('')
-  const debouncedSearch = useDebounce(athleteSearch, 300)
 
-  // Server-side athlete search
-  const { data: athletesData, isLoading: isLoadingAthletes } = useAthletes({
-    status: 'active',
-    search: debouncedSearch || undefined,
-    limit: 20,
-  })
-  const athletes = athletesData?.items ?? []
-
-  // Get athlete name for display (searches in current results or uses cached data)
+  // Get athlete name for display
   const [selectedAthleteName, setSelectedAthleteName] = useState<string>('')
 
   return (
@@ -181,7 +186,10 @@ export function ProgramForm({
                     id="athlete"
                     placeholder={field.value ? selectedAthleteName || 'Cargando...' : 'Buscar atleta...'}
                     value={athleteSearch}
-                    onChange={(e) => setAthleteSearch(e.target.value)}
+                    onChange={(e) => {
+                      setAthleteSearch(e.target.value)
+                      onAthleteSearch(e.target.value)
+                    }}
                     showTrigger
                     showClear={!!field.value}
                   />

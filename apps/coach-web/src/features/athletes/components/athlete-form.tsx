@@ -15,7 +15,6 @@ const GENDER_OPTIONS = [
 type AthleteFormProps = {
   id?: string
   onSubmit: (data: CreateAthleteInput) => void
-  isSubmitting?: boolean
   defaultValues?: Partial<CreateAthleteInput>
 }
 

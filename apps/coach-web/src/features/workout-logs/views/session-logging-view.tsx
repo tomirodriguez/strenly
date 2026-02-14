@@ -115,12 +115,15 @@ export function SessionLoggingView({
       // If no log exists and we haven't started creating one, create it
       if (!hasTriggeredCreate.current) {
         hasTriggeredCreate.current = true
-        createLogMutation.mutate({
-          athleteId,
-          programId,
-          sessionId,
-          weekId,
-        })
+        createLogMutation.mutate(
+          { athleteId, programId, sessionId, weekId },
+          {
+            onSuccess: (data) => {
+              hasInitialized.current = true
+              actions.initialize(data)
+            },
+          },
+        )
       }
     }
   }, [
@@ -136,14 +139,6 @@ export function SessionLoggingView({
     createLogMutation,
   ])
 
-  // Initialize store when create mutation succeeds
-  useEffect(() => {
-    if (createLogMutation.data && !hasInitialized.current) {
-      hasInitialized.current = true
-      actions.initialize(createLogMutation.data)
-    }
-  }, [createLogMutation.data, actions])
-
   // Cleanup store on unmount
   useEffect(() => {
     return () => {
@@ -154,10 +149,7 @@ export function SessionLoggingView({
   }, [actions])
 
   // Unsaved changes guard
-  useUnsavedChanges(
-    isDirty,
-    'Tienes cambios sin guardar. Estas seguro de que quieres salir?',
-  )
+  useUnsavedChanges(isDirty, 'Tienes cambios sin guardar. Estas seguro de que quieres salir?')
 
   // Handle save
   const handleSave = useCallback(() => {
@@ -169,10 +161,7 @@ export function SessionLoggingView({
 
   // Loading states
   const isLoading =
-    exercisesLoading ||
-    (logId
-      ? existingLogByIdLoading
-      : existingLogBySessionLoading || createLogMutation.isPending)
+    exercisesLoading || (logId ? existingLogByIdLoading : existingLogBySessionLoading || createLogMutation.isPending)
 
   if (isLoading) {
     return <SessionLoggingSkeleton />
@@ -186,13 +175,8 @@ export function SessionLoggingView({
   if (createLogMutation.error) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">
-          Error al crear el log: {createLogMutation.error.message}
-        </p>
-        <Button
-          variant="outline"
-          render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
-        >
+        <p className="text-muted-foreground">Error al crear el log: {createLogMutation.error.message}</p>
+        <Button variant="outline" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
           <ArrowLeftIcon className="h-4 w-4" />
           Volver
         </Button>
@@ -228,11 +212,7 @@ export function SessionLoggingView({
       </div>
 
       {/* Footer with save button */}
-      <SessionLoggingFooter
-        isDirty={isDirty}
-        isPending={saveLogMutation.isPending}
-        onSave={handleSave}
-      />
+      <SessionLoggingFooter isDirty={isDirty} isPending={saveLogMutation.isPending} onSave={handleSave} />
     </div>
   )
 }
@@ -249,13 +229,7 @@ interface SessionLoggingHeaderProps {
   onSave: () => void
 }
 
-function SessionLoggingHeader({
-  log,
-  orgSlug,
-  isDirty,
-  isPending,
-  onSave,
-}: SessionLoggingHeaderProps) {
+function SessionLoggingHeader({ log, orgSlug, isDirty, isPending, onSave }: SessionLoggingHeaderProps) {
   const logDate = new Date(log.logDate).toLocaleDateString('es-ES', {
     weekday: 'short',
     month: 'short',
@@ -271,19 +245,14 @@ function SessionLoggingHeader({
   return (
     <header className="flex shrink-0 items-center justify-between border-border border-b bg-background px-4 py-3">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
-        >
+        <Button variant="ghost" size="icon" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
           <ArrowLeftIcon className="h-4 w-4" />
         </Button>
 
         <div className="min-w-0">
           {/* Primary: Session name + Athlete */}
           <h1 className="truncate font-semibold text-sm">
-            {sessionName}{' '}
-            <span className="text-muted-foreground">- {athleteName}</span>
+            {sessionName} <span className="text-muted-foreground">- {athleteName}</span>
           </h1>
 
           {/* Secondary: Program > Week + Date */}
@@ -298,9 +267,7 @@ function SessionLoggingHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        {isDirty && (
-          <span className="text-muted-foreground text-xs">Sin guardar</span>
-        )}
+        {isDirty && <span className="text-muted-foreground text-xs">Sin guardar</span>}
         <Button size="sm" onClick={onSave} disabled={!isDirty || isPending}>
           <SaveIcon className="h-4 w-4" />
           {isPending ? 'Guardando...' : 'Guardar'}
@@ -320,17 +287,11 @@ interface SessionLoggingFooterProps {
   onSave: () => void
 }
 
-function SessionLoggingFooter({
-  isDirty,
-  isPending,
-  onSave,
-}: SessionLoggingFooterProps) {
+function SessionLoggingFooter({ isDirty, isPending, onSave }: SessionLoggingFooterProps) {
   return (
     <footer className="flex shrink-0 items-center justify-between border-border border-t bg-background px-4 py-3">
       <div className="text-muted-foreground text-xs">
-        <span className="hidden sm:inline">
-          Los cambios son locales hasta que guardes.
-        </span>
+        <span className="hidden sm:inline">Los cambios son locales hasta que guardes.</span>
       </div>
 
       <Button size="sm" onClick={onSave} disabled={!isDirty || isPending}>
@@ -385,13 +346,8 @@ function SessionLoggingSkeleton() {
 function SessionLogNotFound({ orgSlug }: { orgSlug: string }) {
   return (
     <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-      <p className="text-muted-foreground">
-        No se encontro el registro de entrenamiento
-      </p>
-      <Button
-        variant="outline"
-        render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
-      >
+      <p className="text-muted-foreground">No se encontro el registro de entrenamiento</p>
+      <Button variant="outline" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
         <ArrowLeftIcon className="h-4 w-4" />
         Volver
       </Button>

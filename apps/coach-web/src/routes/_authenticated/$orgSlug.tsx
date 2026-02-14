@@ -18,8 +18,8 @@ export const Route = createFileRoute('/_authenticated/$orgSlug')({
       throw redirect({ to: '/$orgSlug/dashboard', params: { orgSlug: params.orgSlug } })
     }
 
-    // No setActive() call - org context comes from URL slug
-    // The X-Organization-Slug header is set via setCurrentOrgSlug() in the component
+    // Set org slug for API client immediately (available before component renders)
+    setCurrentOrgSlug(params.orgSlug)
 
     return { org }
   },
@@ -27,14 +27,12 @@ export const Route = createFileRoute('/_authenticated/$orgSlug')({
 })
 
 function OrgSlugLayout() {
-  const { orgSlug } = Route.useParams()
   const { org } = Route.useRouteContext()
 
-  // Sync URL org slug with API client
+  // Cleanup org slug on unmount (navigating away from org scope)
   useEffect(() => {
-    setCurrentOrgSlug(orgSlug)
     return () => setCurrentOrgSlug(null)
-  }, [orgSlug])
+  }, [])
 
   return (
     <OrganizationProvider value={org}>

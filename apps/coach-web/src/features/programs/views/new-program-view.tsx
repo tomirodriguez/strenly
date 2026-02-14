@@ -6,12 +6,14 @@ import { ProgramForm } from '../components/program-form'
 import { useCreateFromTemplate } from '../hooks/mutations/use-create-from-template'
 import { useCreateProgram } from '../hooks/mutations/use-create-program'
 import { useTemplates } from '../hooks/queries/use-templates'
-import { useOrgSlug } from '@/hooks/use-org-slug'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 
 /**
  * New program view for creating programs.
@@ -22,6 +24,16 @@ export function NewProgramView() {
   const navigate = useNavigate()
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+
+  // Athlete search state (lifted from ProgramForm for purity)
+  const [athleteSearch, setAthleteSearch] = useState('')
+  const debouncedAthleteSearch = useDebounce(athleteSearch, 300)
+  const { data: athletesData, isLoading: isLoadingAthletes } = useAthletes({
+    status: 'active',
+    search: debouncedAthleteSearch || undefined,
+    limit: 20,
+  })
+  const athletes = (athletesData?.items ?? []).map((a) => ({ id: a.id, name: a.name }))
 
   // Fetch templates using dedicated hook
   const { data: templatesData, isLoading: isLoadingTemplates } = useTemplates({
@@ -133,6 +145,9 @@ export function NewProgramView() {
             id="program-form"
             onSubmit={handleSubmit}
             showWeeksCount={!selectedTemplateId}
+            athletes={athletes}
+            isLoadingAthletes={isLoadingAthletes}
+            onAthleteSearch={setAthleteSearch}
             defaultValues={
               selectedTemplate
                 ? {
