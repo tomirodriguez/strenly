@@ -14,10 +14,9 @@ import {
 import type { DbClient } from '@strenly/database'
 import { exerciseMuscles, exercises } from '@strenly/database/schema'
 import { and, count, eq, ilike, isNull, or, sql } from 'drizzle-orm'
-import { ok, ResultAsync } from 'neverthrow'
+import { err, ok, ResultAsync } from 'neverthrow'
 
-function wrapDbError(error: unknown): ExerciseRepositoryError {
-  console.error('Exercise repository error:', error)
+function wrapDbError(_error: unknown): ExerciseRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 
@@ -235,21 +234,29 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
       return ResultAsync.fromPromise(
         db.transaction(async (tx) => {
           // Insert the exercise with organization scope from context
-          await tx.insert(exercises).values({
-            id: exercise.id,
-            organizationId: ctx.organizationId,
-            name: exercise.name,
-            description: exercise.description,
-            instructions: exercise.instructions,
-            videoUrl: exercise.videoUrl,
-            movementPattern: exercise.movementPattern,
-            isUnilateral: exercise.isUnilateral,
-            isCurated: exercise.organizationId === null,
-            clonedFromId: exercise.clonedFromId,
-            archivedAt: exercise.archivedAt,
-            createdAt: exercise.createdAt,
-            updatedAt: exercise.updatedAt,
-          })
+          const rows = await tx
+            .insert(exercises)
+            .values({
+              id: exercise.id,
+              organizationId: ctx.organizationId,
+              name: exercise.name,
+              description: exercise.description,
+              instructions: exercise.instructions,
+              videoUrl: exercise.videoUrl,
+              movementPattern: exercise.movementPattern,
+              isUnilateral: exercise.isUnilateral,
+              isCurated: exercise.organizationId === null,
+              clonedFromId: exercise.clonedFromId,
+              archivedAt: exercise.archivedAt,
+              createdAt: exercise.createdAt,
+              updatedAt: exercise.updatedAt,
+            })
+            .returning()
+
+          const createdRow = rows[0]
+          if (!createdRow) {
+            throw new Error('Insert did not return a row')
+          }
 
           // Insert muscle mappings
           const muscleMappings: Array<{ exerciseId: string; muscleGroupId: string; isPrimary: boolean }> = []
@@ -274,7 +281,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
             await tx.insert(exerciseMuscles).values(muscleMappings)
           }
 
-          return exercise
+          return mapToDomain(createdRow, muscleMappings)
         }),
         wrapDbError,
       )
@@ -328,10 +335,12 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
             await tx.insert(exerciseMuscles).values(muscleMappings)
           }
 
-          return exercise
+          // Fetch updated muscle mappings to reconstitute from DB state
+          const newMappings = await fetchMuscleMappings(tx, exercise.id)
+          return mapToDomain(updatedRow, newMappings)
         }),
         wrapDbError,
-      ).andThen(() => ok(exercise))
+      )
     },
 
     archive(ctx: OrganizationContext, id: string): ResultAsync<void, ExerciseRepositoryError> {
@@ -343,20 +352,14 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
             updatedAt: new Date(),
           })
           .where(and(eq(exercises.id, id), eq(exercises.organizationId, ctx.organizationId)))
-          .returning()
-          .then((rows) => {
-            if (rows.length === 0) {
-              throw new Error('Exercise not found')
-            }
-            return undefined
-          }),
-        (error) => {
-          if (error instanceof Error && error.message === 'Exercise not found') {
-            return { type: 'NOT_FOUND', exerciseId: id } as const
-          }
-          return wrapDbError(error)
-        },
-      )
+          .returning(),
+        wrapDbError,
+      ).andThen((rows) => {
+        if (rows.length === 0) {
+          return err({ type: 'NOT_FOUND', exerciseId: id } as const)
+        }
+        return ok(undefined)
+      })
     },
   }
 }

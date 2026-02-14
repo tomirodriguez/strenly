@@ -5,8 +5,7 @@ import { plans } from '@strenly/database/schema'
 import { and, count, eq } from 'drizzle-orm'
 import { ResultAsync } from 'neverthrow'
 
-function wrapDbError(error: unknown): PlanRepositoryError {
-  console.error('Plan repository error:', error)
+function wrapDbError(_error: unknown): PlanRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 

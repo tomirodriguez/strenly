@@ -74,8 +74,7 @@ export function AddExerciseRow({ programId, sessionId }: AddExerciseRowProps) {
   }
 
   const handleBlur = (e: React.FocusEvent) => {
-    const relatedTarget = e.relatedTarget as HTMLElement | null
-    if (listRef.current?.contains(relatedTarget)) {
+    if (e.relatedTarget instanceof HTMLElement && listRef.current?.contains(e.relatedTarget)) {
       return
     }
     setSearchTerm('')

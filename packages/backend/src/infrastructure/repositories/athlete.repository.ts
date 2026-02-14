@@ -13,8 +13,7 @@ import { athletes } from '@strenly/database/schema'
 import { and, count, desc, eq, ilike } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
-function wrapDbError(error: unknown): AthleteRepositoryError {
-  console.error('Athlete repository error:', error)
+function wrapDbError(_error: unknown): AthleteRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 

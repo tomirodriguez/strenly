@@ -2,6 +2,7 @@ import { athleteSchema, getAthleteInputSchema } from '@strenly/contracts/athlete
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetAthlete } from '../../use-cases/athletes/get-athlete'
+import { mapAthleteToOutput } from './map-athlete-to-output'
 
 /**
  * Get athlete procedure
@@ -11,8 +12,8 @@ export const getAthlete = authProcedure
   .input(getAthleteInputSchema)
   .output(athleteSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para ver atletas' },
-    NOT_FOUND: { message: 'Atleta no encontrado' },
+    FORBIDDEN: { message: 'You do not have permission to view athletes' },
+    NOT_FOUND: { message: 'Athlete not found' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeGetAthlete({
@@ -41,19 +42,5 @@ export const getAthlete = authProcedure
 
     const athlete = result.value
 
-    return {
-      id: athlete.id,
-      organizationId: athlete.organizationId,
-      name: athlete.name,
-      email: athlete.email,
-      phone: athlete.phone,
-      birthdate: athlete.birthdate?.toISOString().split('T')[0] ?? null,
-      gender: athlete.gender,
-      notes: athlete.notes,
-      status: athlete.status,
-      linkedUserId: athlete.linkedUserId,
-      isLinked: athlete.linkedUserId !== null,
-      createdAt: athlete.createdAt.toISOString(),
-      updatedAt: athlete.updatedAt.toISOString(),
-    }
+    return mapAthleteToOutput(athlete)
   })

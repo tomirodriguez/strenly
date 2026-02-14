@@ -35,8 +35,6 @@ import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 // ============================================================================
 
 function wrapDbError(error: unknown): WorkoutLogRepositoryError {
-  console.error('WorkoutLog repository error:', error)
-
   // Check for constraint violations (unique constraint on athlete_session_week)
   if (error instanceof Error) {
     if (error.message.includes('unique') || error.message.includes('duplicate')) {

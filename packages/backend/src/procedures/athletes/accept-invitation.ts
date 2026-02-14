@@ -13,10 +13,10 @@ export const acceptInvitation = sessionProcedure
   .input(acceptInvitationInputSchema)
   .output(acceptInvitationOutputSchema)
   .errors({
-    INVALID_TOKEN: { message: 'Token de invitacion invalido' },
-    EXPIRED: { message: 'La invitacion ha expirado' },
-    ALREADY_ACCEPTED: { message: 'La invitacion ya fue aceptada' },
-    ALREADY_REVOKED: { message: 'La invitacion fue revocada' },
+    INVALID_TOKEN: { message: 'Invalid invitation token' },
+    EXPIRED: { message: 'The invitation has expired' },
+    ALREADY_ACCEPTED: { message: 'The invitation has already been accepted' },
+    ALREADY_REVOKED: { message: 'The invitation has been revoked' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeAcceptInvitation({

@@ -14,9 +14,9 @@ export const generateInvitation = authProcedure
   .input(generateInvitationInputSchema)
   .output(generateInvitationOutputSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para generar invitaciones' },
-    ATHLETE_NOT_FOUND: { message: 'Atleta no encontrado' },
-    ALREADY_LINKED: { message: 'El atleta ya esta vinculado a una cuenta' },
+    FORBIDDEN: { message: 'You do not have permission to generate invitations' },
+    ATHLETE_NOT_FOUND: { message: 'Athlete not found' },
+    ALREADY_LINKED: { message: 'Athlete is already linked to an account' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeGenerateInvitation({

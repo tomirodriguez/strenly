@@ -41,8 +41,7 @@ import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 // Error Helpers
 // ============================================================================
 
-function wrapDbError(error: unknown): ProgramRepositoryError {
-  console.error('Program repository error:', error)
+function wrapDbError(_error: unknown): ProgramRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 

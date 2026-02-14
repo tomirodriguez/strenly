@@ -2,6 +2,7 @@ import { cloneExerciseInputSchema, exerciseSchema } from '@strenly/contracts/exe
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCloneExercise } from '../../use-cases/exercises/clone-exercise'
+import { mapExerciseToOutput } from './map-exercise-to-output'
 
 /**
  * Clone an exercise to create a custom copy
@@ -46,21 +47,5 @@ export const cloneExercise = authProcedure
 
     const exercise = result.value
 
-    return {
-      id: exercise.id,
-      organizationId: exercise.organizationId,
-      name: exercise.name,
-      description: exercise.description,
-      instructions: exercise.instructions,
-      videoUrl: exercise.videoUrl,
-      movementPattern: exercise.movementPattern,
-      isUnilateral: exercise.isUnilateral,
-      isCurated: exercise.organizationId === null,
-      clonedFromId: exercise.clonedFromId,
-      primaryMuscles: [...exercise.primaryMuscles],
-      secondaryMuscles: [...exercise.secondaryMuscles],
-      archivedAt: exercise.archivedAt?.toISOString() ?? null,
-      createdAt: exercise.createdAt.toISOString(),
-      updatedAt: exercise.updatedAt.toISOString(),
-    }
+    return mapExerciseToOutput(exercise)
   })

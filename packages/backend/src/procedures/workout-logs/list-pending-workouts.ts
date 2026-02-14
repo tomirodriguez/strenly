@@ -33,7 +33,7 @@ export const listPendingWorkouts = authProcedure
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in listPendingWorkouts:', result.error.message)
-          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
+          throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }
 

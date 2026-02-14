@@ -15,10 +15,10 @@ import { makeUpdatePrescription } from '../../use-cases/programs/update-prescrip
  */
 export const updatePrescriptionProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    EXERCISE_ROW_NOT_FOUND: { message: 'Fila de ejercicio no encontrada' },
-    WEEK_NOT_FOUND: { message: 'Semana no encontrada' },
-    VALIDATION_ERROR: { message: 'Notacion de prescripcion invalida' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    EXERCISE_ROW_NOT_FOUND: { message: 'Exercise row not found' },
+    WEEK_NOT_FOUND: { message: 'Week not found' },
+    VALIDATION_ERROR: { message: 'Invalid prescription notation' },
   })
   .input(updatePrescriptionSchema)
   .output(updatePrescriptionOutputSchema.nullable())

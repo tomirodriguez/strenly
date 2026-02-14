@@ -2,6 +2,7 @@ import { athleteSchema, createAthleteInputSchema } from '@strenly/contracts/athl
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateAthlete } from '../../use-cases/athletes/create-athlete'
+import { mapAthleteToOutput } from './map-athlete-to-output'
 
 /**
  * Create athlete procedure
@@ -11,8 +12,8 @@ export const createAthlete = authProcedure
   .input(createAthleteInputSchema)
   .output(athleteSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para crear atletas' },
-    VALIDATION_ERROR: { message: 'Datos de atleta invalidos' },
+    FORBIDDEN: { message: 'You do not have permission to create athletes' },
+    VALIDATION_ERROR: { message: 'Invalid athlete data' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeCreateAthlete({
@@ -47,19 +48,5 @@ export const createAthlete = authProcedure
 
     const athlete = result.value
 
-    return {
-      id: athlete.id,
-      organizationId: athlete.organizationId,
-      name: athlete.name,
-      email: athlete.email,
-      phone: athlete.phone,
-      birthdate: athlete.birthdate?.toISOString().split('T')[0] ?? null,
-      gender: athlete.gender,
-      notes: athlete.notes,
-      status: athlete.status,
-      linkedUserId: athlete.linkedUserId,
-      isLinked: athlete.linkedUserId !== null,
-      createdAt: athlete.createdAt.toISOString(),
-      updatedAt: athlete.updatedAt.toISOString(),
-    }
+    return mapAthleteToOutput(athlete)
   })

@@ -16,8 +16,8 @@ import { makeUpdateSession } from '../../use-cases/programs/update-session'
  */
 export const addSessionProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    PROGRAM_NOT_FOUND: { message: 'Program not found' },
   })
   .input(addSessionSchema)
   .output(sessionOutputSchema)
@@ -62,8 +62,8 @@ export const addSessionProcedure = authProcedure
  */
 export const updateSessionProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Sesion no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Session not found' },
   })
   .input(updateSessionSchema)
   .output(sessionOutputSchema)
@@ -107,10 +107,10 @@ export const updateSessionProcedure = authProcedure
  */
 export const deleteSessionProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Sesion no encontrada' },
-    PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
-    LAST_SESSION: { message: 'No puedes eliminar la ultima sesion de un programa' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Session not found' },
+    PROGRAM_NOT_FOUND: { message: 'Program not found' },
+    LAST_SESSION: { message: 'Cannot delete the last session of a program' },
   })
   .input(deleteSessionSchema)
   .output(successOutputSchema)

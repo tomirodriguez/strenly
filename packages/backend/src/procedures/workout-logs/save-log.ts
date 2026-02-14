@@ -59,7 +59,7 @@ export const saveLog = authProcedure
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error in saveLog:', result.error.message)
-          throw errors.INTERNAL_ERROR({ message: 'Error al guardar en la base de datos' })
+          throw errors.INTERNAL_ERROR({ message: 'Database save error' })
       }
     }
 

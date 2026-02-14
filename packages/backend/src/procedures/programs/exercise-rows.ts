@@ -19,8 +19,8 @@ import { makeUpdateExerciseRow } from '../../use-cases/programs/update-exercise-
  */
 export const addExerciseRowProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    SESSION_NOT_FOUND: { message: 'Sesion no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    SESSION_NOT_FOUND: { message: 'Session not found' },
   })
   .input(addExerciseRowSchema)
   .output(exerciseRowOutputSchema)
@@ -76,8 +76,8 @@ export const addExerciseRowProcedure = authProcedure
  */
 export const updateExerciseRowProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Fila de ejercicio no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Exercise row not found' },
   })
   .input(updateExerciseRowSchema)
   .output(exerciseRowOutputSchema)
@@ -136,8 +136,8 @@ export const updateExerciseRowProcedure = authProcedure
  */
 export const deleteExerciseRowProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Fila de ejercicio no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Exercise row not found' },
   })
   .input(deleteExerciseRowSchema)
   .output(successOutputSchema)
@@ -173,8 +173,8 @@ export const deleteExerciseRowProcedure = authProcedure
  */
 export const reorderExerciseRowsProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    SESSION_NOT_FOUND: { message: 'Sesion no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    SESSION_NOT_FOUND: { message: 'Session not found' },
   })
   .input(reorderExerciseRowsSchema)
   .output(successOutputSchema)

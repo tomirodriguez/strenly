@@ -13,7 +13,7 @@ export const getInvitationInfo = publicProcedure
   .input(getInvitationInfoInputSchema)
   .output(invitationInfoSchema)
   .errors({
-    INVALID_TOKEN: { message: 'Token de invitacion invalido' },
+    INVALID_TOKEN: { message: 'Invalid invitation token' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeGetInvitationInfo({

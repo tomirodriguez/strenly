@@ -12,8 +12,8 @@ export const archiveAthlete = authProcedure
   .input(archiveAthleteInputSchema)
   .output(archiveAthleteOutputSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para archivar atletas' },
-    NOT_FOUND: { message: 'Atleta no encontrado' },
+    FORBIDDEN: { message: 'You do not have permission to archive athletes' },
+    NOT_FOUND: { message: 'Athlete not found' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeArchiveAthlete({

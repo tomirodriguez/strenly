@@ -2,6 +2,7 @@ import { athleteSchema, updateAthleteInputSchema } from '@strenly/contracts/athl
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdateAthlete } from '../../use-cases/athletes/update-athlete'
+import { mapAthleteToOutput } from './map-athlete-to-output'
 
 /**
  * Update athlete procedure
@@ -51,19 +52,5 @@ export const updateAthlete = authProcedure
 
     const athlete = result.value
 
-    return {
-      id: athlete.id,
-      organizationId: athlete.organizationId,
-      name: athlete.name,
-      email: athlete.email,
-      phone: athlete.phone,
-      birthdate: athlete.birthdate?.toISOString().split('T')[0] ?? null,
-      gender: athlete.gender,
-      notes: athlete.notes,
-      status: athlete.status,
-      linkedUserId: athlete.linkedUserId,
-      isLinked: athlete.linkedUserId !== null,
-      createdAt: athlete.createdAt.toISOString(),
-      updatedAt: athlete.updatedAt.toISOString(),
-    }
+    return mapAthleteToOutput(athlete)
   })

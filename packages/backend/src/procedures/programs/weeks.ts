@@ -18,8 +18,8 @@ import { makeUpdateWeek } from '../../use-cases/programs/update-week'
  */
 export const addWeekProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Programa no encontrado' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Program not found' },
   })
   .input(addWeekSchema)
   .output(weekOutputSchema)
@@ -64,8 +64,8 @@ export const addWeekProcedure = authProcedure
  */
 export const updateWeekProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Semana no encontrada' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Week not found' },
   })
   .input(updateWeekSchema)
   .output(weekOutputSchema)
@@ -109,10 +109,10 @@ export const updateWeekProcedure = authProcedure
  */
 export const deleteWeekProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Semana no encontrada' },
-    PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
-    LAST_WEEK: { message: 'No puedes eliminar la ultima semana de un programa' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Week not found' },
+    PROGRAM_NOT_FOUND: { message: 'Program not found' },
+    LAST_WEEK: { message: 'Cannot delete the last week of a program' },
   })
   .input(deleteWeekSchema)
   .output(successOutputSchema)
@@ -153,9 +153,9 @@ export const deleteWeekProcedure = authProcedure
  */
 export const duplicateWeekProcedure = authProcedure
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para modificar programas' },
-    NOT_FOUND: { message: 'Semana no encontrada' },
-    PROGRAM_NOT_FOUND: { message: 'Programa no encontrado' },
+    FORBIDDEN: { message: 'You do not have permission to modify programs' },
+    NOT_FOUND: { message: 'Week not found' },
+    PROGRAM_NOT_FOUND: { message: 'Program not found' },
   })
   .input(duplicateWeekSchema)
   .output(weekOutputSchema)

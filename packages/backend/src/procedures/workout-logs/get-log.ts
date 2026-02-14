@@ -35,7 +35,7 @@ export const getLog = authProcedure
           throw errors.NOT_FOUND({ message: `Workout log ${result.error.logId} not found` })
         case 'repository_error':
           console.error('Repository error in getLog:', result.error.message)
-          throw errors.INTERNAL_ERROR({ message: 'Error al acceder a la base de datos' })
+          throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }
 

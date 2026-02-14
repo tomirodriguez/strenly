@@ -17,16 +17,14 @@
 import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect } from 'react'
 import { LoggingGrid } from '../components/logging-grid'
 import { SessionSummaryCard } from '../components/session-summary-card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises-map'
-import { useCreateLog } from '@/features/workout-logs/hooks/mutations/use-create-log'
 import { useSaveLog } from '@/features/workout-logs/hooks/mutations/use-save-log'
-import { useLogBySession } from '@/features/workout-logs/hooks/queries/use-log-by-session'
-import { useWorkoutLog } from '@/features/workout-logs/hooks/queries/use-workout-log'
+import { useLogInitialization } from '@/features/workout-logs/hooks/use-log-initialization'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { toast } from '@/lib/toast'
 import { useLogActions, useLogData, useLogIsDirty } from '@/stores/log-store'
@@ -58,26 +56,13 @@ export function SessionLoggingView({
   // Exercises map for name lookup
   const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
 
-  // Create log mutation - used when no log exists
-  const createLogMutation = useCreateLog()
-
-  // Fetch existing log if logId is provided (direct navigation to known log)
+  // Initialize log (get-or-create flow)
   const {
-    data: existingLogById,
-    isLoading: existingLogByIdLoading,
-    error: existingLogByIdError,
-  } = useWorkoutLog(logId ?? '')
-
-  // Check if log already exists by athlete/session/week (for get-or-create flow)
-  const {
-    data: existingLogBySession,
-    isLoading: existingLogBySessionLoading,
-    isSuccess: existingLogBySessionSuccess,
-  } = useLogBySession({
-    athleteId,
-    sessionId,
-    weekId,
-  })
+    isLoading: logInitLoading,
+    existingLogByIdError,
+    createError,
+    resetInitialization,
+  } = useLogInitialization({ logId, athleteId, sessionId, programId, weekId })
 
   // Save mutation
   const saveLogMutation = useSaveLog(() => {
@@ -89,66 +74,13 @@ export function SessionLoggingView({
     })
   })
 
-  // Track if we've initialized to prevent infinite loops
-  const hasInitialized = useRef(false)
-  const hasTriggeredCreate = useRef(false)
-
-  // Initialize store with log data
-  useEffect(() => {
-    // Skip if already initialized
-    if (hasInitialized.current) return
-
-    // Case 1: Direct navigation with logId - use the fetched log
-    if (logId && existingLogById) {
-      hasInitialized.current = true
-      actions.initialize(existingLogById)
-      return
-    }
-
-    // Case 2: No logId - implement get-or-create logic
-    if (!logId && existingLogBySessionSuccess) {
-      // If log exists for this athlete/session/week, use it
-      if (existingLogBySession) {
-        hasInitialized.current = true
-        actions.initialize(existingLogBySession)
-        return
-      }
-
-      // If no log exists and we haven't started creating one, create it
-      if (!hasTriggeredCreate.current) {
-        hasTriggeredCreate.current = true
-        createLogMutation.mutate(
-          { athleteId, programId, sessionId, weekId },
-          {
-            onSuccess: (data) => {
-              hasInitialized.current = true
-              actions.initialize(data)
-            },
-          },
-        )
-      }
-    }
-  }, [
-    logId,
-    existingLogById,
-    existingLogBySession,
-    existingLogBySessionSuccess,
-    athleteId,
-    programId,
-    sessionId,
-    weekId,
-    actions,
-    createLogMutation,
-  ])
-
   // Cleanup store on unmount
   useEffect(() => {
     return () => {
-      hasInitialized.current = false
-      hasTriggeredCreate.current = false
+      resetInitialization()
       actions.reset()
     }
-  }, [actions])
+  }, [actions, resetInitialization])
 
   // Unsaved changes guard
   useUnsavedChanges(isDirty, 'Tienes cambios sin guardar. Estas seguro de que quieres salir?')
@@ -162,22 +94,21 @@ export function SessionLoggingView({
   }, [actions, saveLogMutation])
 
   // Loading states
-  const isLoading =
-    exercisesLoading || (logId ? existingLogByIdLoading : existingLogBySessionLoading || createLogMutation.isPending)
+  const isLoading = exercisesLoading || logInitLoading
 
   if (isLoading) {
     return <SessionLoggingSkeleton />
   }
 
   // Error states
-  if (logId && existingLogByIdError) {
+  if (existingLogByIdError) {
     return <SessionLogNotFound orgSlug={orgSlug} />
   }
 
-  if (createLogMutation.error) {
+  if (createError) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Error al crear el log: {createLogMutation.error.message}</p>
+        <p className="text-muted-foreground">Error al crear el log: {createError.message}</p>
         <Button variant="outline" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
           <ArrowLeftIcon className="h-4 w-4" />
           Volver

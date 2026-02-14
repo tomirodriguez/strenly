@@ -9,8 +9,7 @@ import { athleteInvitations, athletes } from '@strenly/database/schema'
 import { and, desc, eq, isNull } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
-function wrapDbError(error: unknown): AthleteInvitationRepositoryError {
-  console.error('AthleteInvitation repository error:', error)
+function wrapDbError(_error: unknown): AthleteInvitationRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 

@@ -10,8 +10,7 @@ import { subscriptions } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
 import { err, ok, ResultAsync } from 'neverthrow'
 
-function wrapDbError(error: unknown): SubscriptionRepositoryError {
-  console.error('Subscription repository error:', error)
+function wrapDbError(_error: unknown): SubscriptionRepositoryError {
   return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
 }
 

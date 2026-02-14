@@ -16,9 +16,9 @@ export const getAthleteInvitation = authProcedure
   .input(getAthleteInvitationInputSchema)
   .output(getAthleteInvitationOutputSchema)
   .errors({
-    FORBIDDEN: { message: 'No tienes permisos para ver invitaciones' },
-    ATHLETE_NOT_FOUND: { message: 'Atleta no encontrado' },
-    NO_INVITATION: { message: 'No hay invitacion activa para este atleta' },
+    FORBIDDEN: { message: 'You do not have permission to view invitations' },
+    ATHLETE_NOT_FOUND: { message: 'Athlete not found' },
+    NO_INVITATION: { message: 'No active invitation for this athlete' },
   })
   .handler(async ({ input, context, errors }) => {
     const useCase = makeGetAthleteInvitation({
