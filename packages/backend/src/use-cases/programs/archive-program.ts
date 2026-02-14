@@ -41,13 +41,16 @@ export const makeArchiveProgram =
     // 2. Fetch existing program
     return deps.programRepository
       .findById(ctx, input.programId)
-      .mapErr((e): ArchiveProgramError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): ArchiveProgramError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((existing) => {
+        if (!existing) {
+          return errAsync<Program, ArchiveProgramError>({ type: 'not_found', programId: input.programId })
+        }
         // 3. Use domain function for status transition validation
         const result = archiveProgramDomain(existing)
         if (result.isErr()) {

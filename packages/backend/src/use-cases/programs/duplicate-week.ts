@@ -34,13 +34,16 @@ export const makeDuplicateWeek =
     // 2. Get program details to find source week name
     return deps.programRepository
       .findWithDetails(ctx, input.programId)
-      .mapErr((e): DuplicateWeekError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'program_not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): DuplicateWeekError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((program) => {
+        if (!program) {
+          return errAsync<ProgramWeek, DuplicateWeekError>({ type: 'program_not_found', programId: input.programId })
+        }
         // 3. Find the source week
         const sourceWeek = program.weeks.find((w) => w.id === input.weekId)
         if (!sourceWeek) {

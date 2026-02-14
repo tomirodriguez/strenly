@@ -1,6 +1,6 @@
 import { hasPermission, type OrganizationContext } from '@strenly/core'
 import type { WorkoutLog } from '@strenly/core/domain/entities/workout-log/types'
-import type { WorkoutLogFilters, WorkoutLogRepository } from '@strenly/core/ports/workout-log-repository.port'
+import type { WorkoutLogFilters, WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ListAthleteLogsInput = OrganizationContext & {
@@ -22,7 +22,7 @@ export type ListAthleteLogsError =
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
-  workoutLogRepository: WorkoutLogRepository
+  workoutLogRepository: WorkoutLogRepositoryPort
 }
 
 export const makeListAthleteLogs =

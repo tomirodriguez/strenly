@@ -47,13 +47,16 @@ export const makeUpdateProgram =
     // 2. Fetch existing program
     return deps.programRepository
       .findById(ctx, input.programId)
-      .mapErr((e): UpdateProgramError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): UpdateProgramError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((existing) => {
+        if (!existing) {
+          return errAsync<Program, UpdateProgramError>({ type: 'not_found', programId: input.programId })
+        }
         // 3. Merge updates with existing data
         const merged = {
           id: existing.id,

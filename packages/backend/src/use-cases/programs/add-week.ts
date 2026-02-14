@@ -32,13 +32,16 @@ export const makeAddWeek =
     // 2. Find program with details to get current week count
     return deps.programRepository
       .findWithDetails(ctx, input.programId)
-      .mapErr((e): AddWeekError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): AddWeekError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((program) => {
+        if (!program) {
+          return errAsync<ProgramWeek, AddWeekError>({ type: 'not_found', programId: input.programId })
+        }
         // 3. Calculate orderIndex and default name
         const nextOrderIndex = program.weeks.length
         const defaultName = `Semana ${nextOrderIndex + 1}`

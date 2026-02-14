@@ -4,7 +4,7 @@ import type { Program, Series, Session, Week } from '@strenly/core/domain/entiti
 import type { LoggedExerciseInput, LoggedSeriesInput } from '@strenly/core/domain/entities/workout-log/types'
 import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type { AthleteRepositoryPort } from '@strenly/core/ports/athlete-repository.port'
-import type { WorkoutLogRepository } from '@strenly/core/ports/workout-log-repository.port'
+import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateLogInput = OrganizationContext & {
@@ -25,7 +25,7 @@ export type CreateLogError =
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
-  workoutLogRepository: WorkoutLogRepository
+  workoutLogRepository: WorkoutLogRepositoryPort
   programRepository: ProgramRepositoryPort
   athleteRepository: AthleteRepositoryPort
   generateId: () => string

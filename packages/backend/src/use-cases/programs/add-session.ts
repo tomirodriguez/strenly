@@ -32,13 +32,16 @@ export const makeAddSession =
     // 2. Get program details to calculate next orderIndex
     return deps.programRepository
       .findWithDetails(ctx, input.programId)
-      .mapErr((e): AddSessionError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'program_not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): AddSessionError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((program) => {
+        if (!program) {
+          return errAsync<ProgramSession, AddSessionError>({ type: 'program_not_found', programId: input.programId })
+        }
         // 3. Calculate orderIndex as max existing + 1
         const nextOrderIndex = program.sessions.length
 

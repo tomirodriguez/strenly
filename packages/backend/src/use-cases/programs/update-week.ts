@@ -31,13 +31,16 @@ export const makeUpdateWeek =
     // 2. Fetch existing week to preserve its orderIndex
     return deps.programRepository
       .findWeekById(ctx, input.weekId)
-      .mapErr((e): UpdateWeekError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', weekId: input.weekId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): UpdateWeekError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((existing) => {
+        if (!existing) {
+          return errAsync<ProgramWeek, UpdateWeekError>({ type: 'not_found', weekId: input.weekId })
+        }
         // 3. Update with new name, preserving orderIndex
         const week: ProgramWeek = {
           id: existing.id,

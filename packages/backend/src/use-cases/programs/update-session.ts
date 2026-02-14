@@ -31,13 +31,16 @@ export const makeUpdateSession =
     // 2. Fetch existing session
     return deps.programRepository
       .findSessionById(ctx, input.sessionId)
-      .mapErr((e): UpdateSessionError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', sessionId: input.sessionId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): UpdateSessionError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((existing) => {
+        if (!existing) {
+          return errAsync<ProgramSession, UpdateSessionError>({ type: 'not_found', sessionId: input.sessionId })
+        }
         // 3. Merge updates with existing data
         const updated: ProgramSession = {
           ...existing,

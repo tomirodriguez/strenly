@@ -33,13 +33,16 @@ export const makeDeleteSession =
     // 2. Get program details to verify session count
     return deps.programRepository
       .findWithDetails(ctx, input.programId)
-      .mapErr((e): DeleteSessionError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'program_not_found', programId: input.programId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): DeleteSessionError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((program) => {
+        if (!program) {
+          return errAsync<void, DeleteSessionError>({ type: 'program_not_found', programId: input.programId })
+        }
         // 3. Verify session exists in this program
         const session = program.sessions.find((s) => s.id === input.sessionId)
         if (!session) {

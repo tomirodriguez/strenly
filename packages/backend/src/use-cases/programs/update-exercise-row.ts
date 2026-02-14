@@ -48,13 +48,16 @@ export const makeUpdateExerciseRow =
     // 2. Fetch existing row
     return deps.programRepository
       .findExerciseRowById(ctx, input.rowId)
-      .mapErr((e): UpdateExerciseRowError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', rowId: input.rowId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): UpdateExerciseRowError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((existing) => {
+        if (!existing) {
+          return errAsync<UpdateExerciseRowResult, UpdateExerciseRowError>({ type: 'not_found', rowId: input.rowId })
+        }
         // 3. Merge updates with existing data
         const updated: ProgramExerciseRow = {
           id: existing.id,
