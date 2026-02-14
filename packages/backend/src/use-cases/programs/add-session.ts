@@ -1,4 +1,5 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramSession } from '@strenly/core'
+import { createSession } from '@strenly/core/domain/entities/program/session'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type AddSessionInput = OrganizationContext & {
@@ -9,6 +10,7 @@ export type AddSessionInput = OrganizationContext & {
 export type AddSessionError =
   | { type: 'forbidden'; message: string }
   | { type: 'program_not_found'; programId: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -42,14 +44,22 @@ export const makeAddSession =
         if (!program) {
           return errAsync<ProgramSession, AddSessionError>({ type: 'program_not_found', programId: input.programId })
         }
-        // 3. Calculate orderIndex as max existing + 1
+        // 3. Validate via domain factory (handles trim)
         const nextOrderIndex = program.sessions.length
+        const sessionResult = createSession({ id: deps.generateId(), name: input.name, orderIndex: nextOrderIndex })
+
+        if (sessionResult.isErr()) {
+          return errAsync<ProgramSession, AddSessionError>({
+            type: 'validation_error',
+            message: sessionResult.error.message,
+          })
+        }
 
         const now = new Date()
         const session: Omit<ProgramSession, 'programId'> = {
-          id: deps.generateId(),
-          name: input.name.trim(),
-          orderIndex: nextOrderIndex,
+          id: sessionResult.value.id,
+          name: sessionResult.value.name,
+          orderIndex: sessionResult.value.orderIndex,
           createdAt: now,
           updatedAt: now,
         }

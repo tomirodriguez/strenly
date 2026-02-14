@@ -5,6 +5,7 @@ import {
   type ProgramExerciseRow,
   type ProgramRepositoryPort,
 } from '@strenly/core'
+import { createGroupItem } from '@strenly/core/domain/entities/program/group-item'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type AddExerciseRowInput = OrganizationContext & {
@@ -21,6 +22,7 @@ export type AddExerciseRowResult = {
 export type AddExerciseRowError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; entityType: 'session'; id: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -53,15 +55,26 @@ export const makeAddExerciseRow =
         return { type: 'repository_error', message: e.message }
       })
       .andThen((maxOrder) => {
-        // 3. Create exercise row via repository
-        const row: Omit<ProgramExerciseRow, 'sessionId'> = {
+        // 3. Validate via domain factory
+        const itemResult = createGroupItem({
           id: deps.generateId(),
           exerciseId: input.exerciseId,
           orderIndex: maxOrder + 1,
-          // Group-based fields
+        })
+
+        if (itemResult.isErr()) {
+          return errAsync<AddExerciseRowResult, AddExerciseRowError>({
+            type: 'validation_error',
+            message: itemResult.error.message,
+          })
+        }
+
+        const row: Omit<ProgramExerciseRow, 'sessionId'> = {
+          id: itemResult.value.id,
+          exerciseId: itemResult.value.exerciseId,
+          orderIndex: itemResult.value.orderIndex,
           groupId: input.groupId ?? null,
           orderWithinGroup: null,
-          // Other fields
           setTypeLabel: null,
           notes: null,
           restSeconds: null,

@@ -5,6 +5,7 @@ import {
   type ProgramExerciseRow,
   type ProgramRepositoryPort,
 } from '@strenly/core'
+import { createGroupItem } from '@strenly/core/domain/entities/program/group-item'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateExerciseRowInput = OrganizationContext & {
@@ -25,6 +26,7 @@ export type UpdateExerciseRowResult = {
 export type UpdateExerciseRowError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; rowId: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -58,16 +60,24 @@ export const makeUpdateExerciseRow =
         if (!existing) {
           return errAsync<UpdateExerciseRowResult, UpdateExerciseRowError>({ type: 'not_found', rowId: input.rowId })
         }
-        // 3. Merge updates with existing data
+        // 3. Validate core fields via domain factory
+        const exerciseId = input.exerciseId ?? existing.exerciseId
+        const itemResult = createGroupItem({ id: existing.id, exerciseId, orderIndex: existing.orderIndex })
+
+        if (itemResult.isErr()) {
+          return errAsync<UpdateExerciseRowResult, UpdateExerciseRowError>({
+            type: 'validation_error',
+            message: itemResult.error.message,
+          })
+        }
+
         const updated: ProgramExerciseRow = {
           id: existing.id,
           sessionId: existing.sessionId,
-          exerciseId: input.exerciseId ?? existing.exerciseId,
+          exerciseId: itemResult.value.exerciseId,
           orderIndex: existing.orderIndex,
-          // Group-based fields
           groupId: input.groupId !== undefined ? input.groupId : existing.groupId,
           orderWithinGroup: input.orderWithinGroup !== undefined ? input.orderWithinGroup : existing.orderWithinGroup,
-          // Other fields
           setTypeLabel: input.setTypeLabel !== undefined ? input.setTypeLabel : existing.setTypeLabel,
           notes: input.notes !== undefined ? input.notes : existing.notes,
           restSeconds: input.restSeconds !== undefined ? input.restSeconds : existing.restSeconds,

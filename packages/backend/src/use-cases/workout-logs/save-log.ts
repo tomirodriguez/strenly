@@ -1,5 +1,6 @@
 import { hasPermission, type OrganizationContext } from '@strenly/core'
-import type { LoggedExerciseInput, LogStatus } from '@strenly/core/domain/entities/workout-log/types'
+import { calculateStatus } from '@strenly/core/domain/entities/workout-log/calculate-status'
+import type { LoggedExerciseInput } from '@strenly/core/domain/entities/workout-log/types'
 import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, type ResultAsync } from 'neverthrow'
@@ -23,41 +24,6 @@ export type SaveLogError =
 
 type Dependencies = {
   workoutLogRepository: WorkoutLogRepositoryPort
-}
-
-/**
- * Calculate log status automatically from exercise states.
- * - 'completed' if all exercises done (not skipped) with all series done
- * - 'skipped' if all exercises skipped
- * - 'partial' otherwise
- */
-function calculateStatus(exercises: ReadonlyArray<LoggedExerciseInput>): LogStatus {
-  if (exercises.length === 0) {
-    return 'partial'
-  }
-
-  const allSkipped = exercises.every((ex) => ex.skipped === true)
-  if (allSkipped) {
-    return 'skipped'
-  }
-
-  const allCompleted = exercises.every((ex) => {
-    // Exercise is completed if not skipped and all series are not skipped
-    if (ex.skipped) {
-      return false
-    }
-    const series = ex.series ?? []
-    if (series.length === 0) {
-      return false // No series means not completed
-    }
-    return series.every((s) => s.skipped !== true)
-  })
-
-  if (allCompleted) {
-    return 'completed'
-  }
-
-  return 'partial'
 }
 
 /**

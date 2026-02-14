@@ -1,4 +1,5 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramWeek } from '@strenly/core'
+import { createWeek } from '@strenly/core/domain/entities/program/week'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type DuplicateWeekInput = OrganizationContext & {
@@ -11,6 +12,7 @@ export type DuplicateWeekError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; weekId: string }
   | { type: 'program_not_found'; programId: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -53,11 +55,19 @@ export const makeDuplicateWeek =
           })
         }
 
-        // 4. Generate default name if not provided
+        // 4. Validate new name via domain factory
         const newName = input.name ?? `${sourceWeek.name} (copia)`
+        const weekResult = createWeek({ id: sourceWeek.id, name: newName, orderIndex: sourceWeek.orderIndex })
+
+        if (weekResult.isErr()) {
+          return errAsync<ProgramWeek, DuplicateWeekError>({
+            type: 'validation_error',
+            message: weekResult.error.message,
+          })
+        }
 
         // 5. Duplicate the week via repository (copies all prescriptions)
-        return deps.programRepository.duplicateWeek(ctx, input.weekId, newName).mapErr(
+        return deps.programRepository.duplicateWeek(ctx, input.weekId, weekResult.value.name).mapErr(
           (e): DuplicateWeekError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Week not found: ${input.weekId}`,

@@ -54,15 +54,18 @@ export const makeCheckFeatureAccess =
           .andThen((plan) => {
             // Check if plan was found
             if (plan === null) {
-              return errAsync({ type: 'plan_not_found' as const, planId: subscription.planId })
+              return errAsync<boolean, CheckFeatureAccessError>({
+                type: 'plan_not_found',
+                planId: subscription.planId,
+              })
             }
 
             // 4. Use domain helper
             if (!hasFeature(plan, input.feature)) {
-              return errAsync({
+              return errAsync<boolean, CheckFeatureAccessError>({
                 type: 'feature_not_available',
                 feature: input.feature,
-              } as const)
+              })
             }
             return okAsync(true)
           })

@@ -6,6 +6,7 @@ import {
   parsePrescriptionToSeries,
   type Series,
 } from '@strenly/core'
+import { createSeries } from '@strenly/core/domain/entities/program/series'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdatePrescriptionInput = OrganizationContext & {
@@ -70,17 +71,29 @@ export const makeUpdatePrescription =
         .map(() => null)
     }
 
-    // 5. Convert ParsedSeriesData[] to domain Series[]
-    const series: Series[] = parsedSeries.map((s, idx) => ({
-      orderIndex: idx,
-      reps: s.reps,
-      repsMax: s.repsMax,
-      isAmrap: s.isAmrap,
-      intensityType: s.intensityType,
-      intensityValue: s.intensityValue,
-      tempo: s.tempo,
-      restSeconds: null, // Not supported in notation parsing
-    }))
+    // 5. Validate each series via domain factory
+    const series: Series[] = []
+    for (const [idx, s] of parsedSeries.entries()) {
+      const seriesResult = createSeries({
+        orderIndex: idx,
+        reps: s.reps,
+        repsMax: s.repsMax,
+        isAmrap: s.isAmrap,
+        intensityType: s.intensityType,
+        intensityValue: s.intensityValue,
+        tempo: s.tempo,
+        restSeconds: null,
+      })
+
+      if (seriesResult.isErr()) {
+        return errAsync({
+          type: 'validation_error',
+          message: seriesResult.error.message,
+        })
+      }
+
+      series.push(seriesResult.value)
+    }
 
     // 6. Upsert the prescription with series
     return deps.programRepository

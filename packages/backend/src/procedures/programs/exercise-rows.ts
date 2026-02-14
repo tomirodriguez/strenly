@@ -21,6 +21,7 @@ export const addExerciseRowProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     SESSION_NOT_FOUND: { message: 'Session not found' },
+    VALIDATION_ERROR: { message: 'Invalid exercise row data' },
   })
   .input(addExerciseRowSchema)
   .output(exerciseRowOutputSchema)
@@ -49,6 +50,8 @@ export const addExerciseRowProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'not_found':
           throw errors.SESSION_NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')
@@ -78,6 +81,7 @@ export const updateExerciseRowProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Exercise row not found' },
+    VALIDATION_ERROR: { message: 'Invalid exercise row data' },
   })
   .input(updateExerciseRowSchema)
   .output(exerciseRowOutputSchema)
@@ -109,6 +113,8 @@ export const updateExerciseRowProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'not_found':
           throw errors.NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')

@@ -56,7 +56,10 @@ export const makeGetSubscription =
           .andThen((plan) => {
             // Check if plan was found
             if (plan === null) {
-              return errAsync({ type: 'plan_not_found' as const, planId: subscription.planId })
+              return errAsync<GetSubscriptionResult, GetSubscriptionError>({
+                type: 'plan_not_found',
+                planId: subscription.planId,
+              })
             }
             return okAsync({ subscription, plan })
           })

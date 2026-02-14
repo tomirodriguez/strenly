@@ -1,4 +1,5 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramSession } from '@strenly/core'
+import { createSession } from '@strenly/core/domain/entities/program/session'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateSessionInput = OrganizationContext & {
@@ -9,6 +10,7 @@ export type UpdateSessionInput = OrganizationContext & {
 export type UpdateSessionError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; sessionId: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -41,10 +43,19 @@ export const makeUpdateSession =
         if (!existing) {
           return errAsync<ProgramSession, UpdateSessionError>({ type: 'not_found', sessionId: input.sessionId })
         }
-        // 3. Merge updates with existing data
+        // 3. Validate via domain factory (handles trim)
+        const sessionResult = createSession({ id: existing.id, name: input.name, orderIndex: existing.orderIndex })
+
+        if (sessionResult.isErr()) {
+          return errAsync<ProgramSession, UpdateSessionError>({
+            type: 'validation_error',
+            message: sessionResult.error.message,
+          })
+        }
+
         const updated: ProgramSession = {
           ...existing,
-          name: input.name.trim(),
+          name: sessionResult.value.name,
           updatedAt: new Date(),
         }
 

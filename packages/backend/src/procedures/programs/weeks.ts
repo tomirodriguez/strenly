@@ -20,6 +20,7 @@ export const addWeekProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Program not found' },
+    VALIDATION_ERROR: { message: 'Invalid week data' },
   })
   .input(addWeekSchema)
   .output(weekOutputSchema)
@@ -43,6 +44,8 @@ export const addWeekProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'not_found':
           throw errors.NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')
@@ -66,6 +69,7 @@ export const updateWeekProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Week not found' },
+    VALIDATION_ERROR: { message: 'Invalid week data' },
   })
   .input(updateWeekSchema)
   .output(weekOutputSchema)
@@ -88,6 +92,8 @@ export const updateWeekProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'not_found':
           throw errors.NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')
@@ -156,6 +162,7 @@ export const duplicateWeekProcedure = authProcedure
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Week not found' },
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
+    VALIDATION_ERROR: { message: 'Invalid week data' },
   })
   .input(duplicateWeekSchema)
   .output(weekOutputSchema)
@@ -182,6 +189,8 @@ export const duplicateWeekProcedure = authProcedure
           throw errors.NOT_FOUND()
         case 'program_not_found':
           throw errors.PROGRAM_NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')

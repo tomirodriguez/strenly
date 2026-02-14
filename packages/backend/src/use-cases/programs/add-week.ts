@@ -1,4 +1,5 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramWeek } from '@strenly/core'
+import { createWeek } from '@strenly/core/domain/entities/program/week'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type AddWeekInput = OrganizationContext & {
@@ -9,6 +10,7 @@ export type AddWeekInput = OrganizationContext & {
 export type AddWeekError =
   | { type: 'forbidden'; message: string }
   | { type: 'not_found'; programId: string }
+  | { type: 'validation_error'; message: string }
   | { type: 'repository_error'; message: string }
 
 type Dependencies = {
@@ -42,16 +44,22 @@ export const makeAddWeek =
         if (!program) {
           return errAsync<ProgramWeek, AddWeekError>({ type: 'not_found', programId: input.programId })
         }
-        // 3. Calculate orderIndex and default name
+        // 3. Calculate orderIndex and validate via domain factory
         const nextOrderIndex = program.weeks.length
-        const defaultName = `Semana ${nextOrderIndex + 1}`
-        const name = input.name ?? defaultName
+        const weekResult = createWeek({ id: deps.generateId(), name: input.name, orderIndex: nextOrderIndex })
+
+        if (weekResult.isErr()) {
+          return errAsync<ProgramWeek, AddWeekError>({
+            type: 'validation_error',
+            message: weekResult.error.message,
+          })
+        }
 
         const now = new Date()
         const week: Omit<ProgramWeek, 'programId'> = {
-          id: deps.generateId(),
-          name,
-          orderIndex: nextOrderIndex,
+          id: weekResult.value.id,
+          name: weekResult.value.name,
+          orderIndex: weekResult.value.orderIndex,
           createdAt: now,
           updatedAt: now,
         }

@@ -18,6 +18,7 @@ export const addSessionProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     PROGRAM_NOT_FOUND: { message: 'Program not found' },
+    VALIDATION_ERROR: { message: 'Invalid session data' },
   })
   .input(addSessionSchema)
   .output(sessionOutputSchema)
@@ -41,6 +42,8 @@ export const addSessionProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'program_not_found':
           throw errors.PROGRAM_NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')
@@ -64,6 +67,7 @@ export const updateSessionProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'You do not have permission to modify programs' },
     NOT_FOUND: { message: 'Session not found' },
+    VALIDATION_ERROR: { message: 'Invalid session data' },
   })
   .input(updateSessionSchema)
   .output(sessionOutputSchema)
@@ -86,6 +90,8 @@ export const updateSessionProcedure = authProcedure
           throw errors.FORBIDDEN()
         case 'not_found':
           throw errors.NOT_FOUND()
+        case 'validation_error':
+          throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
           console.error('Repository error:', result.error.message)
           throw new Error('Internal error')
