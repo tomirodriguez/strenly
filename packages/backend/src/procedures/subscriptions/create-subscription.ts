@@ -4,6 +4,7 @@ import { createPlanRepository } from '../../infrastructure/repositories/plan.rep
 import { createSubscriptionRepository } from '../../infrastructure/repositories/subscription.repository'
 import { sessionProcedure } from '../../lib/orpc'
 import { makeCreateSubscription } from '../../use-cases/subscriptions/create-subscription'
+import { mapPlanToOutput } from './map-plan-to-output'
 
 /**
  * Create a subscription for an organization during onboarding
@@ -46,18 +47,7 @@ export const createSubscription = sessionProcedure
     return {
       id: subscription.id,
       organizationId: subscription.organizationId,
-      plan: {
-        id: plan.id,
-        name: plan.name,
-        slug: plan.slug,
-        organizationType: plan.organizationType,
-        athleteLimit: plan.athleteLimit,
-        coachLimit: plan.coachLimit,
-        features: plan.features,
-        priceMonthly: plan.priceMonthly,
-        priceYearly: plan.priceYearly,
-        isActive: plan.isActive,
-      },
+      plan: mapPlanToOutput(plan),
       status: subscription.status,
       athleteCount: subscription.athleteCount,
       athleteLimit: plan.athleteLimit,

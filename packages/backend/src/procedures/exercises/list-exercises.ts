@@ -2,6 +2,7 @@ import { listExercisesInputSchema, listExercisesOutputSchema } from '@strenly/co
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeListExercises } from '../../use-cases/exercises/list-exercises'
+import { mapExerciseToOutput } from './map-exercise-to-output'
 
 /**
  * List exercises (curated + organization custom)
@@ -43,23 +44,7 @@ export const listExercises = authProcedure
     const { items, totalCount } = result.value
 
     return {
-      items: items.map((exercise) => ({
-        id: exercise.id,
-        organizationId: exercise.organizationId,
-        name: exercise.name,
-        description: exercise.description,
-        instructions: exercise.instructions,
-        videoUrl: exercise.videoUrl,
-        movementPattern: exercise.movementPattern,
-        isUnilateral: exercise.isUnilateral,
-        isCurated: exercise.organizationId === null,
-        clonedFromId: exercise.clonedFromId,
-        primaryMuscles: [...exercise.primaryMuscles],
-        secondaryMuscles: [...exercise.secondaryMuscles],
-        archivedAt: exercise.archivedAt?.toISOString() ?? null,
-        createdAt: exercise.createdAt.toISOString(),
-        updatedAt: exercise.updatedAt.toISOString(),
-      })),
+      items: items.map(mapExerciseToOutput),
       totalCount,
     }
   })

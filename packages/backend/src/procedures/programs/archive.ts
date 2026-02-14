@@ -2,6 +2,7 @@ import { archiveProgramInputSchema, programSchema } from '@strenly/contracts/pro
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeArchiveProgram } from '../../use-cases/programs/archive-program'
+import { mapProgramToOutput } from './map-program-to-output'
 
 /**
  * Archive a program (soft delete via status transition)
@@ -41,17 +42,5 @@ export const archiveProgram = authProcedure
       }
     }
 
-    const program = result.value
-
-    return {
-      id: program.id,
-      organizationId: program.organizationId,
-      name: program.name,
-      description: program.description,
-      athleteId: program.athleteId,
-      isTemplate: program.isTemplate,
-      status: program.status,
-      createdAt: program.createdAt.toISOString(),
-      updatedAt: program.updatedAt.toISOString(),
-    }
+    return mapProgramToOutput(result.value)
   })

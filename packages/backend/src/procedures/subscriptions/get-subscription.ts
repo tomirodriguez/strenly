@@ -3,6 +3,7 @@ import { createPlanRepository } from '../../infrastructure/repositories/plan.rep
 import { createSubscriptionRepository } from '../../infrastructure/repositories/subscription.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetSubscription } from '../../use-cases/subscriptions/get-subscription'
+import { mapPlanToOutput } from './map-plan-to-output'
 
 /**
  * Get current organization's subscription
@@ -44,23 +45,13 @@ export const getSubscription = authProcedure
     }
 
     const { subscription, plan } = result.value
+    const planOutput = mapPlanToOutput(plan)
 
     return {
       subscription: {
         id: subscription.id,
         organizationId: subscription.organizationId,
-        plan: {
-          id: plan.id,
-          name: plan.name,
-          slug: plan.slug,
-          organizationType: plan.organizationType,
-          athleteLimit: plan.athleteLimit,
-          coachLimit: plan.coachLimit,
-          features: plan.features,
-          priceMonthly: plan.priceMonthly,
-          priceYearly: plan.priceYearly,
-          isActive: plan.isActive,
-        },
+        plan: planOutput,
         status: subscription.status,
         athleteCount: subscription.athleteCount,
         athleteLimit: plan.athleteLimit,
@@ -68,17 +59,6 @@ export const getSubscription = authProcedure
         currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
         createdAt: subscription.createdAt.toISOString(),
       },
-      plan: {
-        id: plan.id,
-        name: plan.name,
-        slug: plan.slug,
-        organizationType: plan.organizationType,
-        athleteLimit: plan.athleteLimit,
-        coachLimit: plan.coachLimit,
-        features: plan.features,
-        priceMonthly: plan.priceMonthly,
-        priceYearly: plan.priceYearly,
-        isActive: plan.isActive,
-      },
+      plan: planOutput,
     }
   })

@@ -119,10 +119,6 @@ export {
   listTemplatesOutputSchema,
   type SaveAsTemplateInput,
   saveAsTemplateInputSchema,
-  type TemplateOutput,
-  type TemplateWithDetailsOutput,
-  templateOutputSchema,
-  templateWithDetailsOutputSchema,
 } from './template'
 // Week operations
 export {

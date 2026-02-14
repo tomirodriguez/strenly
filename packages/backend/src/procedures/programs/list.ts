@@ -2,6 +2,7 @@ import { listProgramsInputSchema, listProgramsOutputSchema } from '@strenly/cont
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeListPrograms } from '../../use-cases/programs/list-programs'
+import { mapProgramToOutput } from './map-program-to-output'
 
 /**
  * List programs with optional filters
@@ -43,17 +44,7 @@ export const listPrograms = authProcedure
     const { items, totalCount } = result.value
 
     return {
-      items: items.map((program) => ({
-        id: program.id,
-        organizationId: program.organizationId,
-        name: program.name,
-        description: program.description,
-        athleteId: program.athleteId,
-        isTemplate: program.isTemplate,
-        status: program.status,
-        createdAt: program.createdAt.toISOString(),
-        updatedAt: program.updatedAt.toISOString(),
-      })),
+      items: items.map(mapProgramToOutput),
       totalCount,
     }
   })

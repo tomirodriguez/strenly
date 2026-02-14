@@ -2,6 +2,7 @@ import { programSchema, updateProgramInputSchema } from '@strenly/contracts/prog
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdateProgram } from '../../use-cases/programs/update-program'
+import { mapProgramToOutput } from './map-program-to-output'
 
 /**
  * Update a program
@@ -43,17 +44,5 @@ export const updateProgram = authProcedure
       }
     }
 
-    const program = result.value
-
-    return {
-      id: program.id,
-      organizationId: program.organizationId,
-      name: program.name,
-      description: program.description,
-      athleteId: program.athleteId,
-      isTemplate: program.isTemplate,
-      status: program.status,
-      createdAt: program.createdAt.toISOString(),
-      updatedAt: program.updatedAt.toISOString(),
-    }
+    return mapProgramToOutput(result.value)
   })

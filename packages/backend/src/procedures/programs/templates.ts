@@ -11,6 +11,7 @@ import { makeCreateFromTemplate } from '../../use-cases/programs/create-from-tem
 import { makeListPrograms } from '../../use-cases/programs/list-programs'
 import { makeSaveAsTemplate } from '../../use-cases/programs/save-as-template'
 import { mapProgramToAggregate } from './map-program-to-aggregate'
+import { mapProgramToOutput } from './map-program-to-output'
 
 /**
  * Save a program as a template.
@@ -160,22 +161,8 @@ export const listTemplatesProcedure = authProcedure
 
     const { items, totalCount } = result.value
 
-    // For templates, we return basic info with counts from lightweight query
-    // Counts would need efficient aggregate query - for MVP we set to 0
     return {
-      items: items.map((program) => ({
-        id: program.id,
-        organizationId: program.organizationId,
-        name: program.name,
-        description: program.description,
-        athleteId: program.athleteId,
-        isTemplate: program.isTemplate,
-        status: program.status,
-        weekCount: 0, // TODO: Add efficient count query to repository
-        sessionCount: 0, // TODO: Add efficient count query to repository
-        createdAt: program.createdAt.toISOString(),
-        updatedAt: program.updatedAt.toISOString(),
-      })),
+      items: items.map(mapProgramToOutput),
       totalCount,
     }
   })

@@ -24,6 +24,8 @@ export {
 export {
   type BodyRegion,
   bodyRegionSchema,
+  type ListMuscleGroupsOutput,
+  listMuscleGroupsOutputSchema,
   type MovementPattern,
   type MuscleGroup,
   type MuscleGroupInfo,

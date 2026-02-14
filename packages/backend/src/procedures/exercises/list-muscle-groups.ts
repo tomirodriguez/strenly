@@ -1,5 +1,4 @@
-import { muscleGroupInfoSchema } from '@strenly/contracts/exercises'
-import { z } from 'zod'
+import { listMuscleGroupsOutputSchema } from '@strenly/contracts/exercises'
 import { createMuscleGroupRepository } from '../../infrastructure/repositories/muscle-group.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeListMuscleGroups } from '../../use-cases/exercises/list-muscle-groups'
@@ -14,7 +13,7 @@ export const listMuscleGroups = authProcedure
     FORBIDDEN: { message: 'No permission to list muscle groups' },
     INTERNAL_ERROR: { message: 'Failed to load muscle groups' },
   })
-  .output(z.array(muscleGroupInfoSchema))
+  .output(listMuscleGroupsOutputSchema)
   .handler(async ({ context, errors }) => {
     const listMuscleGroupsUseCase = makeListMuscleGroups({
       muscleGroupRepository: createMuscleGroupRepository(context.db),

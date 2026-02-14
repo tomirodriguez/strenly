@@ -34,6 +34,13 @@ export const muscleGroupInfoSchema = z.object({
 export type MuscleGroupInfo = z.infer<typeof muscleGroupInfoSchema>
 
 /**
+ * List muscle groups output schema
+ */
+export const listMuscleGroupsOutputSchema = z.array(muscleGroupInfoSchema)
+
+export type ListMuscleGroupsOutput = z.infer<typeof listMuscleGroupsOutputSchema>
+
+/**
  * Movement pattern schema - categorizes exercises by movement type
  */
 export const movementPatternSchema = z.enum(['push', 'pull', 'hinge', 'squat', 'carry', 'core'], {

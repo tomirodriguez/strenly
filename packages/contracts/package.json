@@ -11,6 +11,7 @@
     "./subscriptions": "./src/subscriptions/index.ts",
     "./subscriptions/plan": "./src/subscriptions/plan.ts",
     "./subscriptions/subscription": "./src/subscriptions/subscription.ts",
+    "./health/health": "./src/health/health.ts",
     "./exercises": "./src/exercises/index.ts",
     "./exercises/exercise": "./src/exercises/exercise.ts",
     "./exercises/muscle-group": "./src/exercises/muscle-group.ts",

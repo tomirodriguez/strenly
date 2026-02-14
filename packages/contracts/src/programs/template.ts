@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { paginationQuerySchema } from '../common/pagination'
-import { optionalDescriptionSchema, programSchema, programWithDetailsSchema } from './program'
+import { optionalDescriptionSchema, programSchema } from './program'
 
 // ============================================================================
 // Template Input Schemas
@@ -50,31 +50,12 @@ export type ListTemplatesInput = z.infer<typeof listTemplatesInputSchema>
 // ============================================================================
 
 /**
- * Template output schema - extends program with template-specific metadata
- */
-export const templateOutputSchema = programSchema.extend({
-  weekCount: z.number(),
-  sessionCount: z.number(),
-})
-
-export type TemplateOutput = z.infer<typeof templateOutputSchema>
-
-/**
  * List templates output schema
+ * Uses programSchema directly - templates are programs with isTemplate=true
  */
 export const listTemplatesOutputSchema = z.object({
-  items: z.array(templateOutputSchema),
+  items: z.array(programSchema),
   totalCount: z.number(),
 })
 
 export type ListTemplatesOutput = z.infer<typeof listTemplatesOutputSchema>
-
-/**
- * Template with details output schema - for creation result
- */
-export const templateWithDetailsOutputSchema = programWithDetailsSchema.extend({
-  weekCount: z.number(),
-  sessionCount: z.number(),
-})
-
-export type TemplateWithDetailsOutput = z.infer<typeof templateWithDetailsOutputSchema>

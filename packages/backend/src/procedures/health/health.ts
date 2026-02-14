@@ -1,10 +1,5 @@
-import { z } from 'zod'
+import { healthOutputSchema } from '@strenly/contracts/health/health'
 import { publicProcedure } from '../../lib/orpc'
-
-const healthOutputSchema = z.object({
-  status: z.literal('ok'),
-  timestamp: z.string(),
-})
 
 /**
  * Health check endpoint

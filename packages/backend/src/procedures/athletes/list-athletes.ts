@@ -2,6 +2,7 @@ import { listAthletesInputSchema, listAthletesOutputSchema } from '@strenly/cont
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeListAthletes } from '../../use-cases/athletes/list-athletes'
+import { mapAthleteToOutput } from './map-athlete-to-output'
 
 /**
  * List athletes procedure
@@ -43,21 +44,7 @@ export const listAthletes = authProcedure
     const { items, totalCount } = result.value
 
     return {
-      items: items.map((athlete) => ({
-        id: athlete.id,
-        organizationId: athlete.organizationId,
-        name: athlete.name,
-        email: athlete.email,
-        phone: athlete.phone,
-        birthdate: athlete.birthdate?.toISOString().split('T')[0] ?? null,
-        gender: athlete.gender,
-        notes: athlete.notes,
-        status: athlete.status,
-        linkedUserId: athlete.linkedUserId,
-        isLinked: athlete.linkedUserId !== null,
-        createdAt: athlete.createdAt.toISOString(),
-        updatedAt: athlete.updatedAt.toISOString(),
-      })),
+      items: items.map(mapAthleteToOutput),
       totalCount,
     }
   })

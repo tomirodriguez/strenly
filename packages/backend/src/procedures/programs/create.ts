@@ -3,6 +3,7 @@ import { createAthleteRepository } from '../../infrastructure/repositories/athle
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateProgram } from '../../use-cases/programs/create-program'
+import { mapProgramToOutput } from './map-program-to-output'
 
 /**
  * Create a new program
@@ -49,17 +50,5 @@ export const createProgram = authProcedure
       }
     }
 
-    const program = result.value
-
-    return {
-      id: program.id,
-      organizationId: program.organizationId,
-      name: program.name,
-      description: program.description,
-      athleteId: program.athleteId,
-      isTemplate: program.isTemplate,
-      status: program.status,
-      createdAt: program.createdAt.toISOString(),
-      updatedAt: program.updatedAt.toISOString(),
-    }
+    return mapProgramToOutput(result.value)
   })
