@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { paginationQuerySchema } from '../common/pagination'
-import { programSchema, programWithDetailsSchema } from './program'
+import { optionalDescriptionSchema, programSchema, programWithDetailsSchema } from './program'
 
 // ============================================================================
 // Template Input Schemas
@@ -17,8 +17,7 @@ export const saveAsTemplateInputSchema = programSchema
   })
   .extend({
     programId: z.string().min(1, 'ID de programa requerido'),
-    // Override description to allow optional/empty strings for form handling
-    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+    description: optionalDescriptionSchema,
   })
 
 export type SaveAsTemplateInput = z.infer<typeof saveAsTemplateInputSchema>

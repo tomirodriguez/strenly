@@ -1,5 +1,5 @@
+import { successOutputSchema } from '@strenly/contracts/common/success'
 import { deleteLogInputSchema } from '@strenly/contracts/workout-logs'
-import { z } from 'zod'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeDeleteLog } from '../../use-cases/workout-logs/delete-log'
@@ -14,7 +14,7 @@ export const deleteLog = authProcedure
     INTERNAL_ERROR: { message: 'Internal server error' },
   })
   .input(deleteLogInputSchema)
-  .output(z.object({ success: z.boolean() }))
+  .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteLog({
       workoutLogRepository: createWorkoutLogRepository(context.db),

@@ -1,5 +1,4 @@
-import { generateInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
-import { z } from 'zod'
+import { generateInvitationInputSchema, generateInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { generateInvitationToken } from '../../lib/invitation-token'
@@ -12,7 +11,7 @@ import { makeGenerateInvitation } from '../../use-cases/athletes/generate-invita
  * Revokes any existing active invitation
  */
 export const generateInvitation = authProcedure
-  .input(z.object({ athleteId: z.string() }))
+  .input(generateInvitationInputSchema)
   .output(generateInvitationOutputSchema)
   .errors({
     FORBIDDEN: { message: 'No tienes permisos para generar invitaciones' },

@@ -1,5 +1,53 @@
 import { z } from 'zod'
 
+// ============================================================================
+// Input Schemas
+// ============================================================================
+
+/**
+ * Generate invitation input schema
+ * Requires the athlete ID to generate an invitation for
+ */
+export const generateInvitationInputSchema = z.object({
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+})
+
+export type GenerateInvitationInput = z.infer<typeof generateInvitationInputSchema>
+
+/**
+ * Get athlete invitation input schema
+ * Requires the athlete ID to look up their invitation
+ */
+export const getAthleteInvitationInputSchema = z.object({
+  athleteId: z.string().min(1, 'ID de atleta requerido'),
+})
+
+export type GetAthleteInvitationInput = z.infer<typeof getAthleteInvitationInputSchema>
+
+/**
+ * Accept invitation input schema
+ * Requires the invitation token to accept
+ */
+export const acceptInvitationInputSchema = z.object({
+  token: z.string().min(1, 'Token de invitación requerido'),
+})
+
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationInputSchema>
+
+/**
+ * Get invitation info input schema
+ * Public endpoint - requires the invitation token
+ */
+export const getInvitationInfoInputSchema = z.object({
+  token: z.string().min(1, 'Token de invitación requerido'),
+})
+
+export type GetInvitationInfoInput = z.infer<typeof getInvitationInfoInputSchema>
+
+// ============================================================================
+// Output Schemas
+// ============================================================================
+
 /**
  * Invitation info schema
  * Public display info for invitation acceptance page

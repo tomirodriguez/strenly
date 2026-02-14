@@ -301,6 +301,31 @@ export const programWithDetailsSchema = programSchema.extend({
 export type ProgramWithDetails = z.infer<typeof programWithDetailsSchema>
 
 // ============================================================================
+// Shared Input Helpers
+// ============================================================================
+
+/**
+ * Optional description schema for form handling.
+ * Derives the max-length validation from the entity but allows
+ * empty strings and optional values (forms send '' for cleared fields).
+ */
+export const optionalDescriptionSchema = z
+  .string()
+  .max(500, 'La descripción no puede superar los 500 caracteres')
+  .optional()
+  .or(z.literal(''))
+
+/**
+ * Nullable optional description schema for partial saves.
+ * Similar to optionalDescriptionSchema but also allows null.
+ */
+export const nullableOptionalDescriptionSchema = z
+  .string()
+  .max(500, 'La descripción no puede superar los 500 caracteres')
+  .nullable()
+  .optional()
+
+// ============================================================================
 // Input Schemas
 // ============================================================================
 
@@ -317,8 +342,7 @@ export const createProgramInputSchema = programSchema
     description: true,
   })
   .extend({
-    // Override description to allow optional/empty strings for form handling
-    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+    description: optionalDescriptionSchema,
     athleteId: z.string().optional(),
     isTemplate: z.boolean().optional(),
     weeksCount: z
@@ -349,8 +373,7 @@ export const updateProgramInputSchema = programSchema
   .partial()
   .extend({
     programId: z.string().min(1, 'ID de programa requerido'),
-    // Override description to allow empty strings for form handling
-    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').optional().or(z.literal('')),
+    description: optionalDescriptionSchema,
   })
 
 export type UpdateProgramInput = z.infer<typeof updateProgramInputSchema>

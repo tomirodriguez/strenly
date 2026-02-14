@@ -1,3 +1,4 @@
+import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
   addExerciseRowSchema,
   deleteExerciseRowSchema,
@@ -5,7 +6,6 @@ import {
   reorderExerciseRowsSchema,
   updateExerciseRowSchema,
 } from '@strenly/contracts/programs'
-import { z } from 'zod'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -140,7 +140,7 @@ export const deleteExerciseRowProcedure = authProcedure
     NOT_FOUND: { message: 'Fila de ejercicio no encontrada' },
   })
   .input(deleteExerciseRowSchema)
-  .output(z.object({ success: z.boolean() }))
+  .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteExerciseRow({
       programRepository: createProgramRepository(context.db),
@@ -177,7 +177,7 @@ export const reorderExerciseRowsProcedure = authProcedure
     SESSION_NOT_FOUND: { message: 'Sesion no encontrada' },
   })
   .input(reorderExerciseRowsSchema)
-  .output(z.object({ success: z.boolean() }))
+  .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeReorderExerciseRows({
       programRepository: createProgramRepository(context.db),

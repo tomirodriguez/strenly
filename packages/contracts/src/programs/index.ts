@@ -68,6 +68,9 @@ export {
   type ListProgramsOutput,
   listProgramsInputSchema,
   listProgramsOutputSchema,
+  // Shared input helpers
+  nullableOptionalDescriptionSchema,
+  optionalDescriptionSchema,
   type Prescription,
   // Output schemas
   type Program,

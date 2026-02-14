@@ -59,7 +59,7 @@ export type ListPlansInput = z.infer<typeof listPlansInputSchema>
  * List plans output schema
  */
 export const listPlansOutputSchema = z.object({
-  plans: z.array(planSchema),
+  items: z.array(planSchema),
   totalCount: z.number(),
 })
 

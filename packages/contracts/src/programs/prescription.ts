@@ -38,7 +38,9 @@ export type IntensityUnit = z.infer<typeof intensityUnitSchema>
 /**
  * Units for unilateral exercises
  */
-export const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'])
+export const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'], {
+  errorMap: () => ({ message: 'Unidad unilateral invalida' }),
+})
 
 export type UnilateralUnit = z.infer<typeof unilateralUnitSchema>
 

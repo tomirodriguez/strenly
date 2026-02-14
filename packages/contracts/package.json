@@ -7,6 +7,7 @@
     ".": "./src/index.ts",
     "./common/errors": "./src/common/errors.ts",
     "./common/roles": "./src/common/roles.ts",
+    "./common/success": "./src/common/success.ts",
     "./subscriptions": "./src/subscriptions/index.ts",
     "./subscriptions/plan": "./src/subscriptions/plan.ts",
     "./subscriptions/subscription": "./src/subscriptions/subscription.ts",

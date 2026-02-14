@@ -1,5 +1,4 @@
-import { acceptInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
-import { z } from 'zod'
+import { acceptInvitationInputSchema, acceptInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { sessionProcedure } from '../../lib/orpc'
@@ -11,7 +10,7 @@ import { makeAcceptInvitation } from '../../use-cases/athletes/accept-invitation
  * The athlete accepting uses their user session to link accounts
  */
 export const acceptInvitation = sessionProcedure
-  .input(z.object({ token: z.string() }))
+  .input(acceptInvitationInputSchema)
   .output(acceptInvitationOutputSchema)
   .errors({
     INVALID_TOKEN: { message: 'Token de invitacion invalido' },

@@ -1,3 +1,4 @@
+import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
   addWeekSchema,
   deleteWeekSchema,
@@ -5,7 +6,6 @@ import {
   updateWeekSchema,
   weekOutputSchema,
 } from '@strenly/contracts/programs'
-import { z } from 'zod'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeAddWeek } from '../../use-cases/programs/add-week'
@@ -115,7 +115,7 @@ export const deleteWeekProcedure = authProcedure
     LAST_WEEK: { message: 'No puedes eliminar la ultima semana de un programa' },
   })
   .input(deleteWeekSchema)
-  .output(z.object({ success: z.boolean() }))
+  .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteWeek({
       programRepository: createProgramRepository(context.db),

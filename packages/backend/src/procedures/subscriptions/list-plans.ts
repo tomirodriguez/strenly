@@ -29,7 +29,7 @@ export const listPlans = publicProcedure
     }
 
     return {
-      plans: result.value.items.map((p) => ({
+      items: result.value.items.map((p) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,

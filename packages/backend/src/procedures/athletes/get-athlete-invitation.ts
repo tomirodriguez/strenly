@@ -1,5 +1,7 @@
-import { getAthleteInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
-import { z } from 'zod'
+import {
+  getAthleteInvitationInputSchema,
+  getAthleteInvitationOutputSchema,
+} from '@strenly/contracts/athletes/invitation'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -11,7 +13,7 @@ import { makeGetAthleteInvitation } from '../../use-cases/athletes/get-athlete-i
  * Returns full invitation details including URL, status, and expiration
  */
 export const getAthleteInvitation = authProcedure
-  .input(z.object({ athleteId: z.string() }))
+  .input(getAthleteInvitationInputSchema)
   .output(getAthleteInvitationOutputSchema)
   .errors({
     FORBIDDEN: { message: 'No tienes permisos para ver invitaciones' },

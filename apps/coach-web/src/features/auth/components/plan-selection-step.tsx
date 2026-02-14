@@ -114,7 +114,7 @@ export function PlanSelectionStep({ organizationType, onNext, onBack }: PlanSele
     )
   }
 
-  const plans = data?.plans ?? []
+  const plans = data?.items ?? []
 
   // Find recommended plan (second plan if more than 1, otherwise first)
   const recommendedIndex = plans.length > 1 ? 1 : 0

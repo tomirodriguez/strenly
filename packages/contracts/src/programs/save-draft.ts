@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { programSchema, programStatusSchema, weekInputSchema } from './program'
+import { nullableOptionalDescriptionSchema, programSchema, programStatusSchema, weekInputSchema } from './program'
 
 // ============================================================================
 // Aggregate-Based Schema (Primary Interface)
@@ -15,8 +15,7 @@ const programDataInputSchema = programSchema
     description: true,
   })
   .extend({
-    // Override description to allow optional for partial saves
-    description: z.string().max(500, 'La descripción no puede superar los 500 caracteres').nullable().optional(),
+    description: nullableOptionalDescriptionSchema,
     athleteId: z.string().nullable().optional(),
     isTemplate: z.boolean().optional(),
     status: programStatusSchema.optional(),

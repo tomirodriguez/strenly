@@ -1,10 +1,10 @@
+import { successOutputSchema } from '@strenly/contracts/common/success'
 import {
   addSessionSchema,
   deleteSessionSchema,
   sessionOutputSchema,
   updateSessionSchema,
 } from '@strenly/contracts/programs'
-import { z } from 'zod'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeAddSession } from '../../use-cases/programs/add-session'
@@ -113,7 +113,7 @@ export const deleteSessionProcedure = authProcedure
     LAST_SESSION: { message: 'No puedes eliminar la ultima sesion de un programa' },
   })
   .input(deleteSessionSchema)
-  .output(z.object({ success: z.boolean() }))
+  .output(successOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDeleteSession({
       programRepository: createProgramRepository(context.db),

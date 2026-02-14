@@ -1,5 +1,4 @@
-import { invitationInfoSchema } from '@strenly/contracts/athletes/invitation'
-import { z } from 'zod'
+import { getInvitationInfoInputSchema, invitationInfoSchema } from '@strenly/contracts/athletes/invitation'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { createOrganizationLookup } from '../../infrastructure/services/organization-lookup'
 import { publicProcedure } from '../../lib/orpc'
@@ -11,7 +10,7 @@ import { makeGetInvitationInfo } from '../../use-cases/athletes/get-invitation-i
  * Used to display invitation details on the acceptance page
  */
 export const getInvitationInfo = publicProcedure
-  .input(z.object({ token: z.string() }))
+  .input(getInvitationInfoInputSchema)
   .output(invitationInfoSchema)
   .errors({
     INVALID_TOKEN: { message: 'Token de invitacion invalido' },
