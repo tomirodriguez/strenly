@@ -5,28 +5,17 @@
  * Shows date, session, status, and RPE for each log.
  */
 
-import { useNavigate, useParams } from '@tanstack/react-router'
 import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
-import { useDeleteLog } from '../hooks/mutations/use-delete-log'
-import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Eye, Edit, Trash, MoreVertical } from 'lucide-react'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Edit, Eye, MoreVertical, Trash } from 'lucide-react'
+import { useDeleteLog } from '../hooks/mutations/use-delete-log'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { toast } from '@/lib/toast'
 
 interface LogHistoryTableProps {
   items: WorkoutLogAggregate[]
@@ -67,7 +56,14 @@ export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
 
   const handleDelete = (logId: string) => {
     if (confirm('Estas seguro de eliminar este registro?')) {
-      deleteLogMutation.mutate({ logId })
+      deleteLogMutation.mutate(
+        { logId },
+        {
+          onSuccess: () => {
+            toast.success('Workout eliminado')
+          },
+        },
+      )
     }
   }
 
@@ -87,9 +83,7 @@ export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
           const status = statusLabels[log.status]
           return (
             <TableRow key={log.id}>
-              <TableCell>
-                {format(new Date(log.logDate), 'PPP', { locale: es })}
-              </TableCell>
+              <TableCell>{format(new Date(log.logDate), 'PPP', { locale: es })}</TableCell>
               <TableCell>
                 {/* TODO: Get session name from program */}
                 Sesion
@@ -107,18 +101,15 @@ export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onViewLog(log)}>
-                      <Eye className="h-4 w-4 mr-2" />
+                      <Eye className="mr-2 h-4 w-4" />
                       Ver detalles
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleEdit(log)}>
-                      <Edit className="h-4 w-4 mr-2" />
+                      <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(log.id)}
-                      variant="destructive"
-                    >
-                      <Trash className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem onClick={() => handleDelete(log.id)} variant="destructive">
+                      <Trash className="mr-2 h-4 w-4" />
                       Eliminar
                     </DropdownMenuItem>
                   </DropdownMenuContent>

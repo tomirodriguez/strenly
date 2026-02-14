@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldLabel } from '@/components/ui/field'
+import { toast } from '@/lib/toast'
 
 /**
  * Athletes list view with search, filtering, pagination, and CRUD operations.
@@ -77,7 +78,14 @@ export function AthletesListView() {
 
   const handleArchive = (athlete: Athlete) => {
     if (window.confirm(`Estas seguro de que quieres archivar a ${athlete.name}?`)) {
-      archiveMutation.mutate({ athleteId: athlete.id })
+      archiveMutation.mutate(
+        { athleteId: athlete.id },
+        {
+          onSuccess: () => {
+            toast.success('Athlete archived successfully')
+          },
+        },
+      )
     }
   }
 
@@ -95,6 +103,7 @@ export function AthletesListView() {
         },
         {
           onSuccess: () => {
+            toast.success('Athlete updated successfully')
             setDialogOpen(false)
             setEditingAthlete(null)
           },
@@ -104,6 +113,7 @@ export function AthletesListView() {
       // Create new athlete
       createMutation.mutate(formData, {
         onSuccess: () => {
+          toast.success('Athlete created successfully')
           setDialogOpen(false)
         },
       })

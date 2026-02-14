@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to create a new program.
@@ -14,11 +14,9 @@ export function useCreateProgram() {
     ...orpc.programs.create.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.programs.key() })
-      toast.success('Programa creado exitosamente')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al crear el programa'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al crear el programa' })
     },
   })
 }

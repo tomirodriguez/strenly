@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 import { useLogStore } from '@/stores/log-store'
 
 /**
@@ -9,7 +9,6 @@ import { useLogStore } from '@/stores/log-store'
  * After successful save:
  * - Invalidates relevant queries (athlete logs, pending workouts)
  * - Calls markSaved() on log store to clear dirty flag
- * - Shows success toast
  *
  * @param onSuccess - Optional callback after successful save
  * @returns Mutation result with saveLog function
@@ -23,7 +22,7 @@ export function useSaveLog(onSuccess?: () => void) {
     onSuccess: (data) => {
       // Invalidate the specific log query
       queryClient.invalidateQueries({
-        queryKey: orpc.workoutLogs.get.queryOptions({ input: { logId: data.id } }).queryKey,
+        queryKey: orpc.workoutLogs.get.key({ input: { logId: data.id } }),
       })
 
       // Invalidate athlete logs
@@ -39,15 +38,11 @@ export function useSaveLog(onSuccess?: () => void) {
       // Clear dirty flag in store
       markSaved()
 
-      // Show success toast
-      toast.success('Workout guardado')
-
       // Call optional callback
       onSuccess?.()
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al guardar el workout'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al guardar el workout' })
     },
   })
 }

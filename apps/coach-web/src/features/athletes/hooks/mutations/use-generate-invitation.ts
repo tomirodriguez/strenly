@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to generate an invitation link for an athlete.
- * Copies the invitation URL to clipboard on success.
+ * Invalidates athlete queries on success.
  * @returns Mutation result with generateInvitation function
  */
 export function useGenerateInvitation() {
@@ -12,18 +12,11 @@ export function useGenerateInvitation() {
 
   return useMutation({
     ...orpc.athletes.generateInvitation.mutationOptions(),
-    onSuccess: async (data) => {
-      try {
-        await navigator.clipboard.writeText(data.invitationUrl)
-        queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
-        toast.success('Invitation link copied to clipboard!')
-      } catch (_error) {
-        toast.error('Failed to copy invitation link')
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Failed to generate invitation'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Failed to generate invitation' })
     },
   })
 }

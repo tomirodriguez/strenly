@@ -15,6 +15,7 @@ import {
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/lib/toast'
 
 type SaveAsTemplateFormProps = {
   id?: string
@@ -101,6 +102,7 @@ export function SaveAsTemplateDialog({
       },
       {
         onSuccess: () => {
+          toast.success('Plantilla guardada exitosamente')
           onOpenChange(false)
           onSuccess?.()
         },

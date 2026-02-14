@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { useDeleteWeek, useDuplicateWeek, useUpdateWeek } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { toast } from '@/lib/toast'
 
 interface WeekActionsMenuProps {
   programId: string
@@ -59,12 +60,26 @@ export function WeekActionsMenu({ programId, weekId, weekName, isLastWeek, onClo
   }
 
   const handleDuplicate = () => {
-    duplicateWeek.mutate({ programId, weekId })
+    duplicateWeek.mutate(
+      { programId, weekId },
+      {
+        onSuccess: () => {
+          toast.success('Semana duplicada')
+        },
+      },
+    )
     setOpen(false)
   }
 
   const handleDelete = () => {
-    deleteWeek.mutate({ programId, weekId })
+    deleteWeek.mutate(
+      { programId, weekId },
+      {
+        onSuccess: () => {
+          toast.success('Semana eliminada')
+        },
+      },
+    )
     setDeleteOpen(false)
     setOpen(false)
   }

@@ -10,6 +10,7 @@ import { useSaveDraft } from '@/features/programs/hooks/mutations/use-save-draft
 import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises-map'
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { toast } from '@/lib/toast'
 import { useGridActions, useGridData, useGridIsDirty, useGridProgramId } from '@/stores/grid-store'
 import '@/styles/program-grid.css'
 
@@ -51,6 +52,7 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
 
   // Save mutation
   const saveMutation = useSaveDraft(programId, () => {
+    toast.success('Programa guardado')
     actions.markSaved()
   })
 

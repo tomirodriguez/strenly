@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAddWeek } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { toast } from '@/lib/toast'
 
 type AddWeekModalProps = {
   programId: string
@@ -37,6 +38,7 @@ export function AddWeekModal({ programId, weekCount, open, onOpenChange }: AddWe
       },
       {
         onSuccess: () => {
+          toast.success('Semana agregada')
           setName('')
           onOpenChange(false)
         },

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to update an existing athlete.
@@ -14,11 +14,9 @@ export function useUpdateAthlete() {
     ...orpc.athletes.update.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
-      toast.success('Athlete updated successfully')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Failed to update athlete'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Failed to update athlete' })
     },
   })
 }

@@ -1,6 +1,7 @@
 import type { SaveDraftInput } from '@strenly/contracts/programs/save-draft'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
+import { handleMutationError } from '@/lib/api-errors'
 import { toast } from '@/lib/toast'
 
 /**
@@ -20,11 +21,8 @@ export function useSaveDraft(programId: string, onSuccess?: () => void) {
     onSuccess: (data) => {
       // Invalidate program query to refresh data
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-
-      // Show success toast
-      toast.success('Programa guardado')
 
       // Show conflict warning if present
       if (data.conflictWarning) {
@@ -35,8 +33,7 @@ export function useSaveDraft(programId: string, onSuccess?: () => void) {
       onSuccess?.()
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al guardar el programa'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al guardar el programa' })
     },
   })
 }

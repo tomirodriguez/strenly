@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to archive an athlete (set status to inactive).
@@ -14,11 +14,9 @@ export function useArchiveAthlete() {
     ...orpc.athletes.archive.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
-      toast.success('Athlete archived successfully')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Failed to archive athlete'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Failed to archive athlete' })
     },
   })
 }

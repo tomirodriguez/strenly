@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to create a new program from a template.
@@ -14,11 +14,9 @@ export function useCreateFromTemplate() {
     ...orpc.programs.templates.createFrom.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.programs.key() })
-      toast.success('Programa creado desde plantilla')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al crear el programa desde plantilla'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al crear el programa desde plantilla' })
     },
   })
 }

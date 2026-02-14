@@ -61,6 +61,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
       { athleteId: athlete.id },
       {
         onSuccess: () => {
+          toast.success('Invitacion generada exitosamente')
           // Invalidate the invitation query to refetch
           queryClient.invalidateQueries({
             queryKey: orpc.athletes.getInvitation.key({ input: { athleteId: athlete.id } }),

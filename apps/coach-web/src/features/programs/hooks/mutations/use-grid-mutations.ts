@@ -1,7 +1,7 @@
 import type { ProgramWithDetails } from '@strenly/contracts/programs/program'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Grid mutation hooks for program editing
@@ -43,12 +43,12 @@ export function useUpdatePrescription(programId: string) {
       if (context?.previous) {
         queryClient.setQueryData(orpc.programs.get.queryOptions({ input: { programId } }).queryKey, context.previous)
       }
-      toast.error('Error al actualizar la prescripcion')
+      handleMutationError(_err, { fallbackMessage: 'Error al actualizar la prescripcion' })
     },
     onSettled: () => {
       // Sync with server
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
   })
@@ -68,12 +68,11 @@ export function useAddExerciseRow(programId: string) {
     ...orpc.programs.exerciseRows.add.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al agregar ejercicio'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al agregar ejercicio' })
     },
   })
 }
@@ -88,12 +87,11 @@ export function useUpdateExerciseRow(programId: string) {
     ...orpc.programs.exerciseRows.update.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al actualizar ejercicio'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al actualizar ejercicio' })
     },
   })
 }
@@ -108,13 +106,11 @@ export function useDeleteExerciseRow(programId: string) {
     ...orpc.programs.exerciseRows.delete.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Ejercicio eliminado')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al eliminar ejercicio'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al eliminar ejercicio' })
     },
   })
 }
@@ -129,12 +125,11 @@ export function useReorderExerciseRows(programId: string) {
     ...orpc.programs.exerciseRows.reorder.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al reordenar ejercicios'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al reordenar ejercicios' })
     },
   })
 }
@@ -153,13 +148,11 @@ export function useAddWeek(programId: string) {
     ...orpc.programs.weeks.add.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Semana agregada')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al agregar semana'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al agregar semana' })
     },
   })
 }
@@ -174,12 +167,11 @@ export function useUpdateWeek(programId: string) {
     ...orpc.programs.weeks.update.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al actualizar semana'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al actualizar semana' })
     },
   })
 }
@@ -194,13 +186,11 @@ export function useDeleteWeek(programId: string) {
     ...orpc.programs.weeks.delete.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Semana eliminada')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al eliminar semana'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al eliminar semana' })
     },
   })
 }
@@ -215,13 +205,11 @@ export function useDuplicateWeek(programId: string) {
     ...orpc.programs.weeks.duplicate.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Semana duplicada')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al duplicar semana'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al duplicar semana' })
     },
   })
 }
@@ -240,13 +228,11 @@ export function useAddSession(programId: string) {
     ...orpc.programs.sessions.add.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Sesion agregada')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al agregar sesion'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al agregar sesion' })
     },
   })
 }
@@ -261,12 +247,11 @@ export function useUpdateSession(programId: string) {
     ...orpc.programs.sessions.update.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al actualizar sesion'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al actualizar sesion' })
     },
   })
 }
@@ -281,13 +266,11 @@ export function useDeleteSession(programId: string) {
     ...orpc.programs.sessions.delete.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
-      toast.success('Sesion eliminada')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al eliminar sesion'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al eliminar sesion' })
     },
   })
 }

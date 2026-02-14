@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useOrgSlug } from '@/hooks/use-org-slug'
+import { toast } from '@/lib/toast'
 
 /**
  * New program view for creating programs.
@@ -64,6 +65,7 @@ export function NewProgramView() {
         },
         {
           onSuccess: (program: ProgramAggregate) => {
+            toast.success('Programa creado desde plantilla')
             navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
           },
         },
@@ -72,6 +74,7 @@ export function NewProgramView() {
       // Create from scratch
       createMutation.mutate(data, {
         onSuccess: (program: Program) => {
+          toast.success('Programa creado exitosamente')
           navigate({ to: '/$orgSlug/programs/$programId', params: { orgSlug, programId: program.id } })
         },
       })

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to create a new athlete.
@@ -14,11 +14,9 @@ export function useCreateAthlete() {
     ...orpc.athletes.create.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
-      toast.success('Athlete created successfully')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Failed to create athlete'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Failed to create athlete' })
     },
   })
 }

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to update a program's metadata (name, description, etc.)
@@ -15,12 +15,11 @@ export function useUpdateProgram() {
       // Invalidate both list and single program queries
       queryClient.invalidateQueries({ queryKey: orpc.programs.key() })
       queryClient.invalidateQueries({
-        queryKey: orpc.programs.get.queryOptions({ input: { programId: variables.programId } }).queryKey,
+        queryKey: orpc.programs.get.key({ input: { programId: variables.programId } }),
       })
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al actualizar el programa'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al actualizar el programa' })
     },
   })
 }

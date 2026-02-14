@@ -28,6 +28,7 @@ import { useSaveLog } from '@/features/workout-logs/hooks/mutations/use-save-log
 import { useLogBySession } from '@/features/workout-logs/hooks/queries/use-log-by-session'
 import { useWorkoutLog } from '@/features/workout-logs/hooks/queries/use-workout-log'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { toast } from '@/lib/toast'
 import { useLogActions, useLogData, useLogIsDirty } from '@/stores/log-store'
 
 interface SessionLoggingViewProps {
@@ -80,6 +81,7 @@ export function SessionLoggingView({
 
   // Save mutation
   const saveLogMutation = useSaveLog(() => {
+    toast.success('Workout guardado')
     // Navigate back to athlete detail on success
     navigate({
       to: '/$orgSlug/athletes',

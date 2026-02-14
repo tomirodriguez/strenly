@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDeleteExerciseRow, useReorderExerciseRows } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { toast } from '@/lib/toast'
 import { useGridStore } from '@/stores/grid-store'
 
 interface ExerciseRowActionsProps {
@@ -102,7 +103,14 @@ export function ExerciseRowActions({
   }
 
   const handleDelete = () => {
-    deleteExerciseRow.mutate({ rowId })
+    deleteExerciseRow.mutate(
+      { rowId },
+      {
+        onSuccess: () => {
+          toast.success('Ejercicio eliminado')
+        },
+      },
+    )
     setDeleteOpen(false)
     setOpen(false)
   }

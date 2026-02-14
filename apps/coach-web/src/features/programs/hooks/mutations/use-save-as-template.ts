@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
-import { toast } from '@/lib/toast'
+import { handleMutationError } from '@/lib/api-errors'
 
 /**
  * Hook to save a program as a template.
@@ -15,11 +15,9 @@ export function useSaveAsTemplate() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.programs.key() })
       queryClient.invalidateQueries({ queryKey: orpc.programs.templates.key() })
-      toast.success('Plantilla guardada exitosamente')
     },
     onError: (error) => {
-      const message = error?.message ?? 'Error al guardar la plantilla'
-      toast.error(message)
+      handleMutationError(error, { fallbackMessage: 'Error al guardar la plantilla' })
     },
   })
 }

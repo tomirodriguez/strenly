@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
 import { useOrgSlug } from '@/hooks/use-org-slug'
+import { toast } from '@/lib/toast'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos los estados' },
@@ -72,12 +73,19 @@ export function ProgramsListView() {
 
   const handleDuplicateProgram = useCallback(
     (program: ProgramRow) => {
-      duplicateMutation.mutate({
-        sourceProgramId: program.id,
-        name: `${program.name} (copia)`,
-        athleteId: program.athleteId ?? undefined,
-        isTemplate: program.isTemplate,
-      })
+      duplicateMutation.mutate(
+        {
+          sourceProgramId: program.id,
+          name: `${program.name} (copia)`,
+          athleteId: program.athleteId ?? undefined,
+          isTemplate: program.isTemplate,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Programa duplicado exitosamente')
+          },
+        },
+      )
     },
     [duplicateMutation],
   )
@@ -85,7 +93,14 @@ export function ProgramsListView() {
   const handleArchiveProgram = useCallback(
     (program: ProgramRow) => {
       if (window.confirm(`Estas seguro de que quieres archivar "${program.name}"?`)) {
-        archiveMutation.mutate({ programId: program.id })
+        archiveMutation.mutate(
+          { programId: program.id },
+          {
+            onSuccess: () => {
+              toast.success('Programa archivado exitosamente')
+            },
+          },
+        )
       }
     },
     [archiveMutation],
