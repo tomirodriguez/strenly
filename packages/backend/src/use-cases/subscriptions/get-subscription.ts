@@ -3,15 +3,12 @@ import {
   type OrganizationContext,
   type Plan,
   type PlanRepositoryPort,
-  type Role,
   type Subscription,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
-export type GetSubscriptionInput = OrganizationContext & {
-  memberRole: Role
-}
+export type GetSubscriptionInput = OrganizationContext
 
 export type GetSubscriptionResult = {
   subscription: Subscription

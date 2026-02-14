@@ -1062,6 +1062,15 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     // Session Operations
     // -------------------------------------------------------------------------
 
+    findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession, ProgramRepositoryError> {
+      return RA.fromPromise(verifySessionAccess(ctx, sessionId), wrapDbError).andThen((row) => {
+        if (!row) {
+          return err(notFoundError('session', sessionId))
+        }
+        return ok(mapSessionToDomain(row))
+      })
+    },
+
     createSession(
       ctx: OrganizationContext,
       programId: string,

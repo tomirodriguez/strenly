@@ -3,13 +3,10 @@ import {
   type MuscleGroupData,
   type MuscleGroupRepositoryPort,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
-export type ListMuscleGroupsInput = OrganizationContext & {
-  memberRole: Role
-}
+export type ListMuscleGroupsInput = OrganizationContext
 
 export type ListMuscleGroupsError =
   | { type: 'forbidden'; message: string }

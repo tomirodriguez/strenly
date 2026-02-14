@@ -3,14 +3,11 @@ import {
   hasPermission,
   type OrganizationContext,
   type PlanRepositoryPort,
-  type Role,
   type SubscriptionRepositoryPort,
 } from '@strenly/core'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
-export type CheckAthleteLimitInput = OrganizationContext & {
-  memberRole: Role
-}
+export type CheckAthleteLimitInput = OrganizationContext
 
 export type CheckAthleteLimitResult = {
   canAdd: boolean

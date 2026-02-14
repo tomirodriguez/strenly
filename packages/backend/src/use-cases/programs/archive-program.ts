@@ -1,4 +1,10 @@
-import { hasPermission, type OrganizationContext, type Program, type ProgramRepositoryPort } from '@strenly/core'
+import {
+  archiveProgram as archiveProgramDomain,
+  hasPermission,
+  type OrganizationContext,
+  type Program,
+  type ProgramRepositoryPort,
+} from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ArchiveProgramInput = OrganizationContext & {
@@ -42,16 +48,17 @@ export const makeArchiveProgram =
         return { type: 'repository_error', message: e.message }
       })
       .andThen((existing) => {
-        // 3. Validate status transition - can only archive from draft or active
-        if (existing.status === 'archived') {
+        // 3. Use domain function for status transition validation
+        const result = archiveProgramDomain(existing)
+        if (result.isErr()) {
           return errAsync<Program, ArchiveProgramError>({
             type: 'invalid_transition',
-            message: 'Program is already archived',
+            message: result.error.message,
           })
         }
 
-        // 4. Archive and persist
-        return deps.programRepository.update(ctx, { ...existing, status: 'archived', updatedAt: new Date() }).mapErr(
+        // 4. Persist archived program
+        return deps.programRepository.update(ctx, result.value).mapErr(
           (e): ArchiveProgramError => ({
             type: 'repository_error',
             message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,

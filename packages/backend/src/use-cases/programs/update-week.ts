@@ -1,14 +1,7 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramWeek,
-  type Role,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramWeek } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateWeekInput = OrganizationContext & {
-  memberRole: Role
   weekId: string
   name: string
 }

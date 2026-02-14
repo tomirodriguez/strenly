@@ -5,12 +5,10 @@ import {
   createAthlete,
   hasPermission,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateAthleteInput = OrganizationContext & {
-  memberRole: Role
   name: string
   email?: string | null
   phone?: string | null

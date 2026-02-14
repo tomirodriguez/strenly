@@ -1,8 +1,7 @@
-import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type Role } from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ReorderExerciseRowsInput = OrganizationContext & {
-  memberRole: Role
   sessionId: string
   rowIds: string[]
 }

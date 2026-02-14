@@ -1,14 +1,7 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
-  type ProgramSession,
-  type Role,
-} from '@strenly/core'
+import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramSession } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateSessionInput = OrganizationContext & {
-  memberRole: Role
   sessionId: string
   name: string
 }
@@ -35,21 +28,29 @@ export const makeUpdateSession =
 
     const ctx = { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole }
 
-    // 2. The repository's updateSession verifies access internally
-    // We construct the session with the new name - repository preserves other fields
-    const session: ProgramSession = {
-      id: input.sessionId,
-      programId: '', // Will be ignored by update (repository uses ID lookup)
-      name: input.name.trim(),
-      orderIndex: 0, // Will be preserved by update
-      createdAt: new Date(), // Will be preserved
-      updatedAt: new Date(), // Will be updated
-    }
+    // 2. Fetch existing session
+    return deps.programRepository
+      .findSessionById(ctx, input.sessionId)
+      .mapErr((e): UpdateSessionError => {
+        if (e.type === 'NOT_FOUND') {
+          return { type: 'not_found', sessionId: input.sessionId }
+        }
+        return { type: 'repository_error', message: e.message }
+      })
+      .andThen((existing) => {
+        // 3. Merge updates with existing data
+        const updated: ProgramSession = {
+          ...existing,
+          name: input.name.trim(),
+          updatedAt: new Date(),
+        }
 
-    return deps.programRepository.updateSession(ctx, session).mapErr((e): UpdateSessionError => {
-      if (e.type === 'NOT_FOUND') {
-        return { type: 'not_found', sessionId: input.sessionId }
-      }
-      return { type: 'repository_error', message: e.message }
-    })
+        // 4. Persist
+        return deps.programRepository.updateSession(ctx, updated).mapErr((e): UpdateSessionError => {
+          if (e.type === 'NOT_FOUND') {
+            return { type: 'not_found', sessionId: input.sessionId }
+          }
+          return { type: 'repository_error', message: e.message }
+        })
+      })
   }

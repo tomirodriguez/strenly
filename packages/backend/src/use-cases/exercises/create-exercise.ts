@@ -6,12 +6,10 @@ import {
   type MovementPattern,
   type MuscleGroup,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateExerciseInput = OrganizationContext & {
-  memberRole: Role
   name: string
   description?: string | null
   instructions?: string | null

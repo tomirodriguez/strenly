@@ -4,13 +4,11 @@ import {
   type OrganizationContext,
   type ProgramRepositoryPort,
   parsePrescriptionToSeries,
-  type Role,
   type Series,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdatePrescriptionInput = OrganizationContext & {
-  memberRole: Role
   exerciseRowId: string
   weekId: string
   notation: string

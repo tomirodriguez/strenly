@@ -2,6 +2,9 @@ import {
   type AthleteInvitationRepositoryPort,
   type AthleteRepositoryPort,
   hasPermission,
+  isAccepted,
+  isExpired,
+  isRevoked,
   type OrganizationContext,
 } from '@strenly/core'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
@@ -84,13 +87,13 @@ export const makeGetAthleteInvitation =
           })
         }
 
-        // Determine status
+        // Determine status using domain helpers
         let status: 'pending' | 'accepted' | 'expired' | 'revoked' = 'pending'
-        if (invitation.acceptedAt) {
+        if (isAccepted(invitation)) {
           status = 'accepted'
-        } else if (invitation.revokedAt) {
+        } else if (isRevoked(invitation)) {
           status = 'revoked'
-        } else if (invitation.expiresAt < new Date()) {
+        } else if (isExpired(invitation)) {
           status = 'expired'
         }
 

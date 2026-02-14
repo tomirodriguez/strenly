@@ -4,12 +4,10 @@ import {
   type AthleteStatus,
   hasPermission,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ListAthletesInput = OrganizationContext & {
-  memberRole: Role
   status?: AthleteStatus
   search?: string
   limit?: number
