@@ -9,7 +9,7 @@ description: |
 ---
 
 <objective>
-Builds tables using the DataTable compound component with TanStack Table, supporting server-side pagination, sorting, filtering, and row selection. Provides patterns for column definitions, state handling, and backend integration.
+Builds tables using the DataTable compound component with TanStack Table, supporting server-side pagination, sorting, filtering, and row actions. Provides patterns for column definitions, state handling, and backend integration.
 </objective>
 
 <quick_start>
@@ -33,24 +33,31 @@ const columns = createDataTableColumns<MyType>((helper) => [
   }),
 ])
 
-<DataTable data={items} columns={columns} isLoading={isLoading}>
+<DataTable.Root
+  data={items}
+  columns={columns}
+  totalCount={totalCount}
+  pageIndex={pageIndex}
+  pageSize={pageSize}
+  onPageChange={handlePageChange}
+  isLoading={isLoading}
+>
   <DataTable.Header title="Título" />
   <DataTable.Content />
-  <DataTable.Pagination
-    pageIndex={page}
-    pageSize={10}
-    totalCount={total}
-    onPageChange={setPage}
-  />
-</DataTable>
+  <DataTable.Pagination />
+</DataTable.Root>
 ```
 </quick_start>
 
 <basic_structure>
 ```tsx
-<DataTable
+<DataTable.Root
   data={items}
   columns={columns}
+  totalCount={totalCount}
+  pageIndex={pageIndex}
+  pageSize={pageSize}
+  onPageChange={handlePageChange}
   isLoading={isLoading}
   error={error ? { message: error.message, retry: refetch } : null}
 >
@@ -59,13 +66,8 @@ const columns = createDataTableColumns<MyType>((helper) => [
   </DataTable.Header>
 
   <DataTable.Toolbar>
-    <DataTable.Search placeholder="Buscar..." onChange={setSearch} />
-    <DataTable.FilterSelect
-      placeholder="Filtro"
-      options={filterOptions}
-      value={filter}
-      onChange={setFilter}
-    />
+    <DataTable.Search placeholder="Buscar..." value={search} onValueChange={setSearch} />
+    {/* Custom filters — use raw <Select> or other components */}
   </DataTable.Toolbar>
 
   <DataTable.Content
@@ -77,13 +79,8 @@ const columns = createDataTableColumns<MyType>((helper) => [
     }}
   />
 
-  <DataTable.Pagination
-    pageIndex={page}
-    pageSize={pageSize}
-    totalCount={total}
-    onPageChange={setPage}
-  />
-</DataTable>
+  <DataTable.Pagination />
+</DataTable.Root>
 ```
 </basic_structure>
 
@@ -92,9 +89,6 @@ Use `createDataTableColumns` for type-safe column definitions:
 
 ```tsx
 const columns = createDataTableColumns<MyType>((helper) => [
-  // Selection checkbox column
-  helper.selection(),
-
   // Sortable column with DataTableColumnHeader (recommended)
   helper.accessor('name', {
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
@@ -117,6 +111,13 @@ const columns = createDataTableColumns<MyType>((helper) => [
     sortDescFirst: true,
   }),
 
+  // Display column (no data accessor)
+  helper.display({
+    id: 'custom',
+    header: 'Custom',
+    cell: ({ row }) => <CustomComponent data={row.original} />,
+  }),
+
   // Actions column with dropdown menu
   helper.actions({
     actions: (row) => [
@@ -126,6 +127,8 @@ const columns = createDataTableColumns<MyType>((helper) => [
   }),
 ])
 ```
+
+The column helper exposes three methods: `accessor`, `display`, and `actions`.
 </column_definitions>
 
 <server_side_pagination>
@@ -142,7 +145,7 @@ const columns = createDataTableColumns<MyType>((helper) => [
 **Frontend Implementation:**
 ```tsx
 const [pageIndex, setPageIndex] = useState(0)
-const pageSize = 10
+const [pageSize, setPageSize] = useState(10)
 
 const { data, isLoading } = useQuery({
   queryKey: ['users', { page: pageIndex, pageSize, search }],
@@ -159,19 +162,22 @@ const handleSearchChange = (value: string) => {
   setPageIndex(0)  // IMPORTANT: Reset to page 0
 }
 
-<DataTable
-  data={data?.users ?? []}
+const handlePageChange = (newPageIndex: number, newPageSize: number) => {
+  setPageIndex(newPageIndex)
+  setPageSize(newPageSize)
+}
+
+<DataTable.Root
+  data={data?.items ?? []}
   columns={columns}
+  totalCount={data?.totalCount ?? 0}
+  pageIndex={pageIndex}
+  pageSize={pageSize}
+  onPageChange={handlePageChange}
   isLoading={isLoading}
-  pageCount={Math.ceil((data?.totalCount ?? 0) / pageSize)}
 >
-  <DataTable.Pagination
-    pageIndex={pageIndex}
-    pageSize={pageSize}
-    totalCount={data?.totalCount ?? 0}
-    onPageChange={setPageIndex}
-  />
-</DataTable>
+  <DataTable.Pagination />
+</DataTable.Root>
 ```
 
 **Common Mistakes:**
@@ -197,9 +203,13 @@ const [sorting, setSorting] = useState<SortingState>([])
 const sortField = sorting[0]?.id
 const sortOrder = sorting[0]?.desc ? 'desc' : 'asc'
 
-<DataTable
+<DataTable.Root
   data={data}
   columns={columns}
+  totalCount={totalCount}
+  pageIndex={pageIndex}
+  pageSize={pageSize}
+  onPageChange={handlePageChange}
   sorting={sorting}
   onSortingChange={setSorting}
 >
@@ -214,23 +224,6 @@ const sortOrder = sorting[0]?.desc ? 'desc' : 'asc'
 | `invertSorting` | `boolean` | Invert order (for rankings where lower is better) |
 </sorting>
 
-<row_selection>
-```tsx
-const [selected, setSelected] = useState<RowSelectionState>({})
-
-<DataTable
-  data={data}
-  columns={columns}
-  rowSelection={selected}
-  onRowSelectionChange={setSelected}
-  getRowId={(row) => row.id}
->
-
-// Access selected rows
-const selectedIds = Object.keys(selected)
-```
-</row_selection>
-
 <state_handling>
 States are handled automatically based on props:
 
@@ -244,12 +237,12 @@ States are handled automatically based on props:
 <compound_components>
 | Component | Purpose |
 |-----------|---------|
+| `DataTable.Root` | Wraps the table, accepts data/columns/pagination state |
 | `DataTable.Header` | Title, description, action buttons |
-| `DataTable.Toolbar` | Container for search and filters |
-| `DataTable.Search` | Debounced search input with clear button |
-| `DataTable.FilterSelect` | Dropdown filter |
+| `DataTable.Toolbar` | Container for search and custom filters |
+| `DataTable.Search` | Debounced search input (300ms) with clear button |
 | `DataTable.Content` | Table body, handles all states |
-| `DataTable.Pagination` | Page navigation controls |
+| `DataTable.Pagination` | Page navigation controls (zero props, reads from context) |
 | `DataTable.ColumnHeader` | Sortable column header |
 </compound_components>
 
@@ -267,9 +260,11 @@ The Toolbar is for **search and filters only** - sorting is handled through colu
 When creating a DataTable:
 
 - [ ] Import from `@/components/ui/data-table`
+- [ ] Use `DataTable.Root` as the wrapper (not bare `DataTable`)
 - [ ] Define columns with `createDataTableColumns`
 - [ ] Use `DataTableColumnHeader` for sortable columns
-- [ ] Implement server-side pagination with `totalCount`
+- [ ] Pass `totalCount`, `pageIndex`, `pageSize`, `onPageChange` to `DataTable.Root`
+- [ ] Use `<DataTable.Pagination />` with zero props
 - [ ] Reset pageIndex when filters change
 - [ ] Handle loading and error states
 - [ ] Provide meaningful empty state

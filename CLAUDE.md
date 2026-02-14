@@ -156,7 +156,12 @@ Run `/orpc-query` skill for API hooks, `/form` skill for forms, `/data-table` sk
 ### MUST NOT
 1. No `as` type casting - fix the actual type issue. Only allowed in tests.
 2. No `!` non-null assertion - use optional chaining or guards
-3. No barrel files (`index.ts` re-exports) - exception: `procedures/router.ts`
+3. No barrel files (`index.ts` re-exports) - exceptions:
+   - `procedures/router.ts` (main router aggregation)
+   - `procedures/{domain}/index.ts` (domain router constructors — these contain logic, not pure re-exports)
+   - `infrastructure/repositories/index.ts` (DI aggregation)
+   - `database/src/schema/index.ts` (Drizzle Kit schema aggregation)
+   - Package-level `index.ts` files that define public APIs (`database`, `auth`, `backend`) — acceptable as package entry points
 4. No `any` type - use `unknown` and narrow
 5. No business logic in procedures - procedures only orchestrate
 6. No queries without organization scope on tenant tables
