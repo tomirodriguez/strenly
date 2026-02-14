@@ -4,7 +4,7 @@ import type { OrganizationContext } from '../types/organization-context'
 
 export type SubscriptionRepositoryError =
   | { type: 'NOT_FOUND'; organizationId: string }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 export type SubscriptionRepositoryPort = {
   findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription | null, SubscriptionRepositoryError>

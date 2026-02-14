@@ -13,11 +13,15 @@ import {
 } from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { exerciseMuscles, exercises } from '@strenly/database/schema'
-import { and, count, eq, ilike, isNull, or, sql } from 'drizzle-orm'
+import { and, count, eq, ilike, inArray, isNull, or } from 'drizzle-orm'
 import { err, ok, ResultAsync } from 'neverthrow'
 
-function wrapDbError(_error: unknown): ExerciseRepositoryError {
-  return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
+function wrapDbError(error: unknown): ExerciseRepositoryError {
+  return {
+    type: 'DATABASE_ERROR',
+    message: error instanceof Error ? error.message : 'Database operation failed',
+    cause: error,
+  }
 }
 
 type ExerciseRow = typeof exercises.$inferSelect
@@ -169,12 +173,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
           // Build final where clause with muscle group filter
           let finalWhereClause = whereClause
           if (exerciseIdsWithMuscle !== null && exerciseIdsWithMuscle.length > 0) {
-            // Use inArray equivalent - need to handle this with SQL
-            const muscleCondition = sql`${exercises.id} IN (${sql.join(
-              exerciseIdsWithMuscle.map((id) => sql`${id}`),
-              sql`, `,
-            )})`
-
+            const muscleCondition = inArray(exercises.id, exerciseIdsWithMuscle)
             finalWhereClause = whereClause ? and(whereClause, muscleCondition) : muscleCondition
           }
 
@@ -202,12 +201,7 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
                 isPrimary: exerciseMuscles.isPrimary,
               })
               .from(exerciseMuscles)
-              .where(
-                sql`${exerciseMuscles.exerciseId} IN (${sql.join(
-                  exerciseIds.map((id) => sql`${id}`),
-                  sql`, `,
-                )})`,
-              )
+              .where(inArray(exerciseMuscles.exerciseId, exerciseIds))
           }
 
           // Group muscle mappings by exercise ID

@@ -14,8 +14,8 @@ import { reconstituteWorkoutLog } from '@strenly/core/domain/entities/workout-lo
 import type {
   PendingWorkout,
   WorkoutLogFilters,
-  WorkoutLogRepository,
   WorkoutLogRepositoryError,
+  WorkoutLogRepositoryPort,
 } from '@strenly/core/ports/workout-log-repository.port'
 import type { DbClient } from '@strenly/database'
 import {
@@ -27,7 +27,7 @@ import {
   programWeeks,
   workoutLogs,
 } from '@strenly/database/schema'
-import { and, count, desc, eq, gte, lte, sql } from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
 // ============================================================================
@@ -45,7 +45,11 @@ function wrapDbError(error: unknown): WorkoutLogRepositoryError {
     }
   }
 
-  return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
+  return {
+    type: 'DATABASE_ERROR',
+    message: error instanceof Error ? error.message : 'Database operation failed',
+    cause: error,
+  }
 }
 
 function notFoundError(message: string): WorkoutLogRepositoryError {
@@ -171,7 +175,7 @@ function ensureLexPrefix(id: string): string {
 // Repository Factory
 // ============================================================================
 
-export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
+export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepositoryPort {
   /**
    * Helper to verify a workout log exists and belongs to the organization
    */
@@ -394,12 +398,7 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
           const allExercises = await db
             .select()
             .from(loggedExercises)
-            .where(
-              sql`${loggedExercises.logId} IN (${sql.join(
-                logIds.map((id) => sql`${id}`),
-                sql`, `,
-              )})`,
-            )
+            .where(inArray(loggedExercises.logId, logIds))
             .orderBy(loggedExercises.orderIndex)
 
           // Group exercises by log ID
@@ -442,73 +441,76 @@ export function createWorkoutLogRepository(db: DbClient): WorkoutLogRepository {
         > => {
           const { limit, offset } = filters
 
-          /**
-           * Complex query to find sessions without logs:
-           * 1. Get all active programs with athletes assigned
-           * 2. For each program, get sessions and weeks
-           * 3. LEFT JOIN to workout_logs to find which are missing
-           * 4. Return athlete name, program name, session name, week info
-           */
-          const pendingQuery = sql`
-            SELECT DISTINCT
-              a.id as athlete_id,
-              a.name as athlete_name,
-              p.id as program_id,
-              p.name as program_name,
-              ps.id as session_id,
-              ps.name as session_name,
-              pw.id as week_id,
-              pw.name as week_name,
-              pw.order_index as week_order,
-              ps.order_index as session_order
-            FROM ${programs} p
-            INNER JOIN ${athletes} a ON p.athlete_id = a.id
-            INNER JOIN ${programWeeks} pw ON pw.program_id = p.id
-            INNER JOIN ${programSessions} ps ON ps.program_id = p.id
-            LEFT JOIN ${workoutLogs} wl ON
-              wl.athlete_id = a.id AND
-              wl.session_id = ps.id AND
-              wl.week_id = pw.id
-            WHERE p.organization_id = ${ctx.organizationId}
-              AND p.status = 'active'
-              AND p.athlete_id IS NOT NULL
-              AND wl.id IS NULL
-            ORDER BY a.name, p.name, pw.order_index, ps.order_index
-            LIMIT ${limit} OFFSET ${offset}
-          `
+          const whereConditions = and(
+            eq(programs.organizationId, ctx.organizationId),
+            eq(programs.status, 'active'),
+            isNotNull(programs.athleteId),
+            isNull(workoutLogs.id),
+          )
 
-          const countQuery = sql`
-            SELECT COUNT(DISTINCT (a.id, p.id, ps.id, pw.id)) as count
-            FROM ${programs} p
-            INNER JOIN ${athletes} a ON p.athlete_id = a.id
-            INNER JOIN ${programWeeks} pw ON pw.program_id = p.id
-            INNER JOIN ${programSessions} ps ON ps.program_id = p.id
-            LEFT JOIN ${workoutLogs} wl ON
-              wl.athlete_id = a.id AND
-              wl.session_id = ps.id AND
-              wl.week_id = pw.id
-            WHERE p.organization_id = ${ctx.organizationId}
-              AND p.status = 'active'
-              AND p.athlete_id IS NOT NULL
-              AND wl.id IS NULL
-          `
+          const [pendingRows, countResult] = await Promise.all([
+            db
+              .selectDistinct({
+                athleteId: athletes.id,
+                athleteName: athletes.name,
+                programId: programs.id,
+                programName: programs.name,
+                sessionId: programSessions.id,
+                sessionName: programSessions.name,
+                weekId: programWeeks.id,
+                weekName: programWeeks.name,
+              })
+              .from(programs)
+              .innerJoin(athletes, eq(programs.athleteId, athletes.id))
+              .innerJoin(programWeeks, eq(programWeeks.programId, programs.id))
+              .innerJoin(programSessions, eq(programSessions.programId, programs.id))
+              .leftJoin(
+                workoutLogs,
+                and(
+                  eq(workoutLogs.athleteId, athletes.id),
+                  eq(workoutLogs.sessionId, programSessions.id),
+                  eq(workoutLogs.weekId, programWeeks.id),
+                ),
+              )
+              .where(whereConditions)
+              .orderBy(
+                asc(athletes.name),
+                asc(programs.name),
+                asc(programWeeks.orderIndex),
+                asc(programSessions.orderIndex),
+              )
+              .limit(limit)
+              .offset(offset),
 
-          const [pendingRows, countResult] = await Promise.all([db.execute(pendingQuery), db.execute(countQuery)])
+            db
+              .select({ count: count() })
+              .from(programs)
+              .innerJoin(athletes, eq(programs.athleteId, athletes.id))
+              .innerJoin(programWeeks, eq(programWeeks.programId, programs.id))
+              .innerJoin(programSessions, eq(programSessions.programId, programs.id))
+              .leftJoin(
+                workoutLogs,
+                and(
+                  eq(workoutLogs.athleteId, athletes.id),
+                  eq(workoutLogs.sessionId, programSessions.id),
+                  eq(workoutLogs.weekId, programWeeks.id),
+                ),
+              )
+              .where(whereConditions),
+          ])
 
-          // db.execute returns array of Record<string, unknown>
-          const items: PendingWorkout[] = pendingRows.map((row: Record<string, unknown>) => ({
-            athleteId: String(row.athlete_id),
-            athleteName: String(row.athlete_name),
-            programId: String(row.program_id),
-            programName: String(row.program_name),
-            sessionId: String(row.session_id),
-            sessionName: String(row.session_name),
-            weekId: String(row.week_id),
-            weekName: String(row.week_name),
+          const items: PendingWorkout[] = pendingRows.map((row) => ({
+            athleteId: row.athleteId,
+            athleteName: row.athleteName,
+            programId: row.programId,
+            programName: row.programName,
+            sessionId: row.sessionId,
+            sessionName: row.sessionName,
+            weekId: row.weekId,
+            weekName: row.weekName,
           }))
 
-          const countRow = countResult[0]
-          const totalCount = Number(countRow?.count ?? 0)
+          const totalCount = countResult[0]?.count ?? 0
 
           return { ok: true, data: { items, totalCount } }
         })(),

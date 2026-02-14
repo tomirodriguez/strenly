@@ -6,7 +6,7 @@ import type { OrganizationContext } from '../types/organization-context'
 
 export type ExerciseRepositoryError =
   | { type: 'NOT_FOUND'; exerciseId: string }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 export type ListExercisesOptions = {
   movementPattern?: MovementPattern

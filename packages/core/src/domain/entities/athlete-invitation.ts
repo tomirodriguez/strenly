@@ -4,7 +4,7 @@ export type AthleteInvitation = {
   readonly id: string
   readonly athleteId: string
   readonly organizationId: string
-  readonly createdByUserId: string
+  readonly createdByUserId: string | null
   readonly token: string
   readonly expiresAt: Date
   readonly acceptedAt: Date | null

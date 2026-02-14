@@ -15,7 +15,7 @@ export type MuscleGroupData = {
 
 export type MuscleGroupRepositoryError =
   | { type: 'NOT_FOUND'; muscleGroupId: string }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 /**
  * MuscleGroup Repository Interface.

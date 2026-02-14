@@ -41,8 +41,12 @@ import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 // Error Helpers
 // ============================================================================
 
-function wrapDbError(_error: unknown): ProgramRepositoryError {
-  return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
+function wrapDbError(error: unknown): ProgramRepositoryError {
+  return {
+    type: 'DATABASE_ERROR',
+    message: error instanceof Error ? error.message : 'Database operation failed',
+    cause: error,
+  }
 }
 
 function notFoundError(
@@ -651,36 +655,10 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     },
 
     // -------------------------------------------------------------------------
-    // Program CRUD (Legacy - will be deprecated)
+    // Program CRUD (Legacy)
     // -------------------------------------------------------------------------
 
-    create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError> {
-      return RA.fromPromise(
-        db
-          .insert(programs)
-          .values({
-            id: program.id,
-            organizationId: ctx.organizationId,
-            name: program.name,
-            description: program.description,
-            athleteId: program.athleteId,
-            isTemplate: program.isTemplate,
-            status: program.status,
-            createdAt: program.createdAt,
-            updatedAt: program.updatedAt,
-          })
-          .returning()
-          .then((rows) => rows[0]),
-        wrapDbError,
-      ).andThen((row) => {
-        if (!row) {
-          return err(dbError('Failed to create program'))
-        }
-        return ok(mapProgramToDomain(row))
-      })
-    },
-
-    findById(ctx: OrganizationContext, id: string): ResultAsync<Program, ProgramRepositoryError> {
+    findById(ctx: OrganizationContext, id: string): ResultAsync<Program | null, ProgramRepositoryError> {
       return RA.fromPromise(
         db
           .select()
@@ -690,7 +668,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         wrapDbError,
       ).andThen((row) => {
         if (!row) {
-          return err(notFoundError('program', id))
+          return ok(null)
         }
         return ok(mapProgramToDomain(row))
       })
@@ -770,9 +748,14 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       )
     },
 
-    findWithDetails(ctx: OrganizationContext, id: string): ResultAsync<ProgramWithDetails, ProgramRepositoryError> {
+    findWithDetails(
+      ctx: OrganizationContext,
+      id: string,
+    ): ResultAsync<ProgramWithDetails | null, ProgramRepositoryError> {
       return RA.fromPromise(
-        (async (): Promise<{ ok: true; data: ProgramWithDetails } | { ok: false; error: ProgramRepositoryError }> => {
+        (async (): Promise<
+          { ok: true; data: ProgramWithDetails | null } | { ok: false; error: ProgramRepositoryError }
+        > => {
           // 1. Fetch program
           const programRows = await db
             .select()
@@ -781,7 +764,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
 
           const programRow = programRows[0]
           if (!programRow) {
-            return { ok: false, error: notFoundError('program', id) }
+            return { ok: true, data: null }
           }
 
           const program = mapProgramToDomain(programRow)
@@ -809,12 +792,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             groupRows = await db
               .select()
               .from(exerciseGroups)
-              .where(
-                sql`${exerciseGroups.sessionId} IN (${sql.join(
-                  sessionIds.map((sId) => sql`${sId}`),
-                  sql`, `,
-                )})`,
-              )
+              .where(inArray(exerciseGroups.sessionId, sessionIds))
               .orderBy(asc(exerciseGroups.orderIndex))
           }
 
@@ -850,12 +828,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             prescriptionRows = await db
               .select()
               .from(prescriptions)
-              .where(
-                sql`${prescriptions.programExerciseId} IN (${sql.join(
-                  exerciseRowIds.map((rowId) => sql`${rowId}`),
-                  sql`, `,
-                )})`,
-              )
+              .where(inArray(prescriptions.programExerciseId, exerciseRowIds))
           }
 
           // 6. Group prescriptions by exercise row ID
@@ -929,26 +902,6 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
-    listTemplates(
-      ctx: OrganizationContext,
-    ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError> {
-      return RA.fromPromise(
-        (async () => {
-          const whereClause = and(eq(programs.organizationId, ctx.organizationId), eq(programs.isTemplate, true))
-
-          const [countResult, rows] = await Promise.all([
-            db.select({ count: count() }).from(programs).where(whereClause),
-            db.select().from(programs).where(whereClause).orderBy(asc(programs.name)),
-          ])
-
-          const items = rows.map(mapProgramToDomain)
-
-          return { items, totalCount: countResult[0]?.count ?? 0 }
-        })(),
-        wrapDbError,
-      )
-    },
-
     // -------------------------------------------------------------------------
     // Week Operations
     // -------------------------------------------------------------------------
@@ -993,10 +946,10 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
       })
     },
 
-    findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek, ProgramRepositoryError> {
+    findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek | null, ProgramRepositoryError> {
       return RA.fromPromise(verifyWeekAccess(ctx, weekId), wrapDbError).andThen((row) => {
         if (!row) {
-          return err(notFoundError('week', weekId))
+          return ok(null)
         }
         return ok(mapWeekToDomain(row))
       })
@@ -1061,10 +1014,13 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     // Session Operations
     // -------------------------------------------------------------------------
 
-    findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession, ProgramRepositoryError> {
+    findSessionById(
+      ctx: OrganizationContext,
+      sessionId: string,
+    ): ResultAsync<ProgramSession | null, ProgramRepositoryError> {
       return RA.fromPromise(verifySessionAccess(ctx, sessionId), wrapDbError).andThen((row) => {
         if (!row) {
-          return err(notFoundError('session', sessionId))
+          return ok(null)
         }
         return ok(mapSessionToDomain(row))
       })
@@ -1312,10 +1268,10 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     findExerciseRowById(
       ctx: OrganizationContext,
       rowId: string,
-    ): ResultAsync<ProgramExerciseRow, ProgramRepositoryError> {
+    ): ResultAsync<ProgramExerciseRow | null, ProgramRepositoryError> {
       return RA.fromPromise(verifyExerciseRowAccess(ctx, rowId), wrapDbError).andThen((row) => {
         if (!row) {
-          return err(notFoundError('exercise_row', rowId))
+          return ok(null)
         }
         return ok(mapExerciseRowToDomain(row))
       })

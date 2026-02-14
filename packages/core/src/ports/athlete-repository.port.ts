@@ -4,7 +4,7 @@ import type { OrganizationContext } from '../types/organization-context'
 
 export type AthleteRepositoryError =
   | { type: 'NOT_FOUND'; athleteId: string }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 export type ListAthletesOptions = {
   status?: AthleteStatus

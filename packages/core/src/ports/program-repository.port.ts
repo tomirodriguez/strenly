@@ -12,7 +12,7 @@ export type ProgramRepositoryError =
       entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group'
       id: string
     }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 // ============================================================================
 // Filter Types
@@ -197,30 +197,27 @@ export type ProgramRepositoryPort = {
   ): ResultAsync<{ updatedAt: Date }, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
-  // Program CRUD (Legacy - will be deprecated)
+  // Program CRUD (Legacy)
   // ---------------------------------------------------------------------------
 
   /**
-   * Create a new program
-   * @deprecated Use saveProgramAggregate for new implementations
-   */
-  create(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
-
-  /**
-   * Find a program by ID
+   * Find a program by ID (without nested hierarchy)
    * @deprecated Use loadProgramAggregate for new implementations
+   * TODO: Migrate archive-program and update-program use cases to use loadProgramAggregate + saveProgramAggregate
    */
-  findById(ctx: OrganizationContext, id: string): ResultAsync<Program, ProgramRepositoryError>
+  findById(ctx: OrganizationContext, id: string): ResultAsync<Program | null, ProgramRepositoryError>
 
   /**
    * Update a program
    * @deprecated Use saveProgramAggregate for new implementations
+   * TODO: Migrate archive-program and update-program use cases to use saveProgramAggregate
    */
   update(ctx: OrganizationContext, program: Program): ResultAsync<Program, ProgramRepositoryError>
 
   /**
    * List programs with optional filters
    * @deprecated Use loadProgramAggregate for individual programs
+   * TODO: Migrate list-programs use case to a dedicated list query or aggregate approach
    */
   list(
     ctx: OrganizationContext,
@@ -230,14 +227,9 @@ export type ProgramRepositoryPort = {
   /**
    * Get full program with nested data for grid view
    * @deprecated Use loadProgramAggregate which returns a full ProgramAggregate instead
+   * TODO: Migrate add-week, add-session, duplicate-week, delete-session, delete-week use cases
    */
-  findWithDetails(ctx: OrganizationContext, id: string): ResultAsync<ProgramWithDetails, ProgramRepositoryError>
-
-  /**
-   * List template programs
-   * @deprecated Use list with isTemplate filter
-   */
-  listTemplates(ctx: OrganizationContext): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
+  findWithDetails(ctx: OrganizationContext, id: string): ResultAsync<ProgramWithDetails | null, ProgramRepositoryError>
 
   // ---------------------------------------------------------------------------
   // Week Operations
@@ -255,7 +247,7 @@ export type ProgramRepositoryPort = {
   /**
    * Find a week by ID
    */
-  findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek, ProgramRepositoryError>
+  findWeekById(ctx: OrganizationContext, weekId: string): ResultAsync<ProgramWeek | null, ProgramRepositoryError>
 
   /**
    * Update a week
@@ -274,7 +266,7 @@ export type ProgramRepositoryPort = {
   /**
    * Find a session by ID
    */
-  findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession, ProgramRepositoryError>
+  findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession | null, ProgramRepositoryError>
 
   /**
    * Create a session (training day) for a program
@@ -335,7 +327,7 @@ export type ProgramRepositoryPort = {
   /**
    * Find an exercise row by ID
    */
-  findExerciseRowById(ctx: OrganizationContext, rowId: string): ResultAsync<ProgramExerciseRow, ProgramRepositoryError>
+  findExerciseRowById(ctx: OrganizationContext, rowId: string): ResultAsync<ProgramExerciseRow | null, ProgramRepositoryError>
 
   /**
    * Get the maximum order index for exercise rows in a session

@@ -5,7 +5,7 @@ import type { OrganizationContext } from '../types/organization-context'
 export type AthleteInvitationRepositoryError =
   | { type: 'NOT_FOUND'; invitationId: string }
   | { type: 'TOKEN_NOT_FOUND'; token: string }
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 export type AthleteInvitationRepositoryPort = {
   /**

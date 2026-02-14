@@ -9,7 +9,7 @@ import type { OrganizationContext } from '../types/organization-context'
 export type WorkoutLogRepositoryError =
   | { type: 'NOT_FOUND'; message: string }
   | { type: 'CONFLICT'; message: string } // Duplicate log for session/week
-  | { type: 'DATABASE_ERROR'; message: string }
+  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
 
 // ============================================================================
 // Filter Types
@@ -44,7 +44,7 @@ export type PendingWorkout = {
 // Repository Port
 // ============================================================================
 
-export type WorkoutLogRepository = {
+export type WorkoutLogRepositoryPort = {
   /**
    * Save a workout log (insert or replace)
    * Uses DELETE + INSERT for simplicity (same as program aggregate pattern)

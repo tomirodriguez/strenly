@@ -9,8 +9,12 @@ import { muscleGroups } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
 import { ok, ResultAsync } from 'neverthrow'
 
-function wrapDbError(_error: unknown): MuscleGroupRepositoryError {
-  return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
+function wrapDbError(error: unknown): MuscleGroupRepositoryError {
+  return {
+    type: 'DATABASE_ERROR',
+    message: error instanceof Error ? error.message : 'Database operation failed',
+    cause: error,
+  }
 }
 
 /**

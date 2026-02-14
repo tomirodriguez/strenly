@@ -9,8 +9,12 @@ import { athleteInvitations, athletes } from '@strenly/database/schema'
 import { and, desc, eq, isNull } from 'drizzle-orm'
 import { err, ok, ResultAsync as RA, type ResultAsync } from 'neverthrow'
 
-function wrapDbError(_error: unknown): AthleteInvitationRepositoryError {
-  return { type: 'DATABASE_ERROR', message: 'Database operation failed' }
+function wrapDbError(error: unknown): AthleteInvitationRepositoryError {
+  return {
+    type: 'DATABASE_ERROR',
+    message: error instanceof Error ? error.message : 'Database operation failed',
+    cause: error,
+  }
 }
 
 /**
@@ -21,7 +25,7 @@ function mapToDomain(row: typeof athleteInvitations.$inferSelect): AthleteInvita
     id: row.id,
     athleteId: row.athleteId,
     organizationId: row.organizationId,
-    createdByUserId: row.createdByUserId ?? '',
+    createdByUserId: row.createdByUserId,
     token: row.token,
     expiresAt: row.expiresAt,
     acceptedAt: row.acceptedAt,
@@ -122,20 +126,20 @@ export function createAthleteInvitationRepository(db: DbClient): AthleteInvitati
      */
     markAccepted(token: string, userId: string): ResultAsync<void, AthleteInvitationRepositoryError> {
       return RA.fromPromise(
-        (async () => {
-          // First find the invitation to get the athleteId
-          const invitationRows = await db.select().from(athleteInvitations).where(eq(athleteInvitations.token, token))
+        db.transaction(async (tx) => {
+          // 1. SELECT the invitation
+          const invitationRows = await tx.select().from(athleteInvitations).where(eq(athleteInvitations.token, token))
 
           const invitation = invitationRows[0]
           if (!invitation) {
             return { found: false } as const
           }
 
-          // Update the invitation to mark as accepted
-          await db.update(athleteInvitations).set({ acceptedAt: new Date() }).where(eq(athleteInvitations.token, token))
+          // 2. UPDATE the invitation to mark as accepted
+          await tx.update(athleteInvitations).set({ acceptedAt: new Date() }).where(eq(athleteInvitations.token, token))
 
-          // Link the user to the athlete (scoped by organizationId for defense-in-depth)
-          await db
+          // 3. UPDATE athlete to link the user (scoped by organizationId for defense-in-depth)
+          await tx
             .update(athletes)
             .set({
               linkedUserId: userId,
@@ -144,7 +148,7 @@ export function createAthleteInvitationRepository(db: DbClient): AthleteInvitati
             .where(and(eq(athletes.id, invitation.athleteId), eq(athletes.organizationId, invitation.organizationId)))
 
           return { found: true } as const
-        })(),
+        }),
         wrapDbError,
       ).andThen((result) => {
         if (!result.found) {

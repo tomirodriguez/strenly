@@ -1,5 +1,5 @@
 import { type AthleteInvitationRepositoryError, type AthleteInvitationRepositoryPort, isValid } from '@strenly/core'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetInvitationInfoInput = {
   token: string
@@ -67,21 +67,23 @@ export const makeGetInvitationInfo =
           .getOrganizationName(invitation.organizationId)
           .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
           .andThen((orgName) =>
-            deps.organizationLookup
-              .getUserName(invitation.createdByUserId)
-              .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
-              .andThen((coachName) =>
-                deps.organizationLookup
-                  .getAthleteName(invitation.athleteId, invitation.organizationId)
+            (invitation.createdByUserId
+              ? deps.organizationLookup
+                  .getUserName(invitation.createdByUserId)
                   .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
-                  .map((athleteName) => ({
-                    athleteName: athleteName ?? 'Unknown',
-                    organizationName: orgName ?? 'Unknown',
-                    coachName: coachName ?? 'Unknown',
-                    expiresAt: invitation.expiresAt,
-                    isValid: valid,
-                  })),
-              ),
+              : okAsync<string | null, GetInvitationInfoError>(null)
+            ).andThen((coachName) =>
+              deps.organizationLookup
+                .getAthleteName(invitation.athleteId, invitation.organizationId)
+                .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
+                .map((athleteName) => ({
+                  athleteName: athleteName ?? 'Unknown',
+                  organizationName: orgName ?? 'Unknown',
+                  coachName: coachName ?? 'Unknown',
+                  expiresAt: invitation.expiresAt,
+                  isValid: valid,
+                })),
+            ),
           )
       })
   }
