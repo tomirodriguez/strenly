@@ -1,4 +1,4 @@
-import type { SignupInput } from '@strenly/contracts'
+import type { SignupInput } from '@strenly/contracts/auth/auth'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'

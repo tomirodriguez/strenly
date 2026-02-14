@@ -1,5 +1,6 @@
-import { listMuscleGroupsOutputSchema } from '@strenly/contracts/exercises'
+import { listMuscleGroupsOutputSchema } from '@strenly/contracts/exercises/muscle-group'
 import { createMuscleGroupRepository } from '../../infrastructure/repositories/muscle-group.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeListMuscleGroups } from '../../use-cases/exercises/list-muscle-groups'
 
@@ -30,7 +31,7 @@ export const listMuscleGroups = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'listMuscleGroups' })
           throw errors.INTERNAL_ERROR({ message: result.error.message })
       }
     }

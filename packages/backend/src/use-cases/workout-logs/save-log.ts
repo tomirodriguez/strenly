@@ -1,8 +1,9 @@
-import { hasPermission, type OrganizationContext } from '@strenly/core'
 import { calculateStatus } from '@strenly/core/domain/entities/workout-log/calculate-status'
 import type { LoggedExerciseInput } from '@strenly/core/domain/entities/workout-log/types'
 import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type SaveLogInput = OrganizationContext & {

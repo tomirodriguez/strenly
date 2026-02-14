@@ -1,7 +1,8 @@
-import { createLogInputSchema, createLogOutputSchema } from '@strenly/contracts/workout-logs'
+import { createLogInputSchema, createLogOutputSchema } from '@strenly/contracts/workout-logs/create-log'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateLog } from '../../use-cases/workout-logs/create-log'
 import { mapLogToOutput } from './map-log-to-output'
@@ -60,7 +61,7 @@ export const createLog = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error in createLog:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'createLog' })
           throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }

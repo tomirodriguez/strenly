@@ -7,7 +7,6 @@
  * All methods filter by organizationId for multi-tenancy.
  */
 
-import type { OrganizationContext } from '@strenly/core'
 import type { LoggedExercise, LoggedSeries, WorkoutLog } from '@strenly/core/domain/entities/workout-log/types'
 import { isLogStatus } from '@strenly/core/domain/entities/workout-log/types'
 import { reconstituteWorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
@@ -17,6 +16,7 @@ import type {
   WorkoutLogRepositoryError,
   WorkoutLogRepositoryPort,
 } from '@strenly/core/ports/workout-log-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import {
   athletes,

@@ -4,12 +4,13 @@ import type { DbClient } from '@strenly/database'
 
 /**
  * Base context provided to all procedures
- * Contains database, auth, and request headers
+ * Contains database, auth, request headers, and environment config
  */
 export type BaseContext = {
   db: DbClient
   auth: TAuth
   headers: Headers
+  appUrl: string
 }
 
 /**

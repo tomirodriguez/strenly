@@ -1,6 +1,7 @@
 import { getInvitationInfoInputSchema, invitationInfoSchema } from '@strenly/contracts/athletes/invitation'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { createOrganizationLookup } from '../../infrastructure/services/organization-lookup'
+import { logger } from '../../lib/logger'
 import { publicProcedure } from '../../lib/orpc'
 import { makeGetInvitationInfo } from '../../use-cases/athletes/get-invitation-info'
 
@@ -31,7 +32,7 @@ export const getInvitationInfo = publicProcedure
         case 'invalid_token':
           throw errors.INVALID_TOKEN()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getInvitationInfo' })
           throw new Error('Internal error')
       }
     }

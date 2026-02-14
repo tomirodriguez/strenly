@@ -1,4 +1,5 @@
-import type { OrganizationType, Plan, PlanRepositoryPort } from '@strenly/core'
+import type { OrganizationType, Plan } from '@strenly/core/domain/entities/plan'
+import type { PlanRepositoryPort } from '@strenly/core/ports/plan-repository.port'
 import type { ResultAsync } from 'neverthrow'
 
 export type ListPlansInput = {

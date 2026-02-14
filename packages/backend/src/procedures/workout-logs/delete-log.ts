@@ -1,6 +1,7 @@
 import { successOutputSchema } from '@strenly/contracts/common/success'
-import { deleteLogInputSchema } from '@strenly/contracts/workout-logs'
+import { deleteLogInputSchema } from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeDeleteLog } from '../../use-cases/workout-logs/delete-log'
 
@@ -34,7 +35,7 @@ export const deleteLog = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND({ message: `Workout log ${result.error.logId} not found` })
         case 'repository_error':
-          console.error('Repository error in deleteLog:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'deleteLog' })
           throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }

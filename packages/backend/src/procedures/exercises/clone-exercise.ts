@@ -1,5 +1,6 @@
-import { cloneExerciseInputSchema, exerciseSchema } from '@strenly/contracts/exercises'
+import { cloneExerciseInputSchema, exerciseSchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeCloneExercise } from '../../use-cases/exercises/clone-exercise'
 import { mapExerciseToOutput } from './map-exercise-to-output'
@@ -40,7 +41,7 @@ export const cloneExercise = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'cloneExercise' })
           throw new Error('Internal error')
       }
     }

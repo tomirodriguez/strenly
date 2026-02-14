@@ -1,11 +1,9 @@
-import {
-  type Exercise,
-  type ExerciseRepositoryPort,
-  hasPermission,
-  type MovementPattern,
-  type MuscleGroup,
-  type OrganizationContext,
-} from '@strenly/core'
+import type { Exercise } from '@strenly/core/domain/entities/exercise'
+import type { MovementPattern } from '@strenly/core/domain/entities/movement-pattern'
+import type { MuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import type { ExerciseRepositoryPort } from '@strenly/core/ports/exercise-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ListExercisesInput = OrganizationContext & {

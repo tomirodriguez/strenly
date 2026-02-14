@@ -1,5 +1,6 @@
-import { programSchema, updateProgramInputSchema } from '@strenly/contracts/programs'
+import { programSchema, updateProgramInputSchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdateProgram } from '../../use-cases/programs/update-program'
 import { mapProgramToOutput } from './map-program-to-output'
@@ -39,7 +40,7 @@ export const updateProgram = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'update' })
           throw new Error('Internal error')
       }
     }

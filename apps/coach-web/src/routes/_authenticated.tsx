@@ -1,36 +1,12 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { Loader2Icon } from 'lucide-react'
 import { AppShell } from '@/components/layout/app-shell'
-import { type AuthContextValue, AuthProvider } from '@/contexts/auth-context'
+import { AuthProvider } from '@/contexts/auth-context'
 import type { OrganizationContextValue } from '@/contexts/organization-context'
+import { clearAuthCache, getCachedAuth, setCachedAuth } from '@/lib/auth-cache'
 import { authClient } from '@/lib/auth-client'
 
-/**
- * Cache for auth data to avoid redundant API calls on navigation.
- * Session + organizations fetched once, then cached for 30 seconds.
- */
-type AuthCache = {
-  session: AuthContextValue
-  organizations: OrganizationContextValue[]
-  timestamp: number
-}
-
-let authCache: AuthCache | null = null
-const CACHE_TTL = 30000 // 30 seconds
-
-function getCachedAuth(): AuthCache | null {
-  if (authCache && Date.now() - authCache.timestamp < CACHE_TTL) {
-    return authCache
-  }
-  return null
-}
-
-/**
- * Clear auth cache on logout or when session needs refresh.
- */
-export function clearAuthCache(): void {
-  authCache = null
-}
+export { clearAuthCache }
 
 export const Route = createFileRoute('/_authenticated')({
   pendingComponent: AuthenticatedPending,
@@ -68,11 +44,7 @@ export const Route = createFileRoute('/_authenticated')({
     })
 
     // Cache the auth data
-    authCache = {
-      session: sessionData.data,
-      organizations,
-      timestamp: Date.now(),
-    }
+    setCachedAuth(sessionData.data, organizations)
 
     return { authData: sessionData.data, organizations }
   },

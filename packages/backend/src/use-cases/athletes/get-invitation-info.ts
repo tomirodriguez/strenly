@@ -1,4 +1,8 @@
-import { type AthleteInvitationRepositoryError, type AthleteInvitationRepositoryPort, isValid } from '@strenly/core'
+import { isValid } from '@strenly/core/domain/entities/athlete-invitation'
+import type {
+  AthleteInvitationRepositoryError,
+  AthleteInvitationRepositoryPort,
+} from '@strenly/core/ports/athlete-invitation-repository.port'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetInvitationInfoInput = {

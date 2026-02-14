@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -46,26 +46,22 @@ export function PrescriptionCell({
   const [editValue, setEditValue] = useState(value)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Focus input when entering edit mode
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      const input = inputRef.current
-      input.focus()
-      // Position cursor at end instead of selecting all text
-      // Use requestAnimationFrame to ensure DOM is ready
+  // Reset edit value when cell value changes externally (derived state)
+  if (!isEditing && editValue !== value) {
+    setEditValue(value)
+  }
+
+  // Focus input and position cursor at end via ref callback
+  const editInputRef = useCallback((el: HTMLInputElement | null) => {
+    if (el) {
+      inputRef.current = el
+      el.focus()
       requestAnimationFrame(() => {
-        const len = input.value.length
-        input.setSelectionRange(len, len)
+        const len = el.value.length
+        el.setSelectionRange(len, len)
       })
     }
-  }, [isEditing])
-
-  // Reset edit value when cell value changes externally
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(value)
-    }
-  }, [value, isEditing])
+  }, [])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
@@ -140,7 +136,7 @@ export function PrescriptionCell({
     return (
       <td className="group border-border border-r border-b p-0" data-row-id={rowId} data-week-id={weekId}>
         <Input
-          ref={inputRef}
+          ref={editInputRef}
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={() => onCommit(editValue)}

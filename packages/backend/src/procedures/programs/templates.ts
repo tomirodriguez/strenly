@@ -1,11 +1,12 @@
+import { programAggregateSchema } from '@strenly/contracts/programs/program'
 import {
   createFromTemplateInputSchema,
   listTemplatesInputSchema,
   listTemplatesOutputSchema,
-  programAggregateSchema,
   saveAsTemplateInputSchema,
-} from '@strenly/contracts/programs'
+} from '@strenly/contracts/programs/template'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateFromTemplate } from '../../use-cases/programs/create-from-template'
 import { makeListPrograms } from '../../use-cases/programs/list-programs'
@@ -53,7 +54,7 @@ export const saveAsTemplateProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'templates' })
           throw new Error('Internal error')
       }
     }
@@ -109,7 +110,7 @@ export const createFromTemplateProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'templates' })
           throw new Error('Internal error')
       }
     }
@@ -154,7 +155,7 @@ export const listTemplatesProcedure = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'templates' })
           throw new Error('Internal error')
       }
     }

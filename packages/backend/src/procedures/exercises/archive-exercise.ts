@@ -1,5 +1,6 @@
-import { archiveExerciseInputSchema, archiveExerciseOutputSchema } from '@strenly/contracts/exercises'
+import { archiveExerciseInputSchema, archiveExerciseOutputSchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeArchiveExercise } from '../../use-cases/exercises/archive-exercise'
 
@@ -37,7 +38,7 @@ export const archiveExercise = authProcedure
         case 'cannot_archive_curated':
           throw errors.CANNOT_ARCHIVE_CURATED({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'archiveExercise' })
           throw new Error('Internal error')
       }
     }

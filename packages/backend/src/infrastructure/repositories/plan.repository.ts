@@ -1,5 +1,10 @@
-import type { ListPlansOptions, PlanRepositoryError, PlanRepositoryPort } from '@strenly/core'
-import { type OrganizationType, type Plan, type PlanFeatures, reconstitutePlan } from '@strenly/core'
+import type { OrganizationType, Plan, PlanFeatures } from '@strenly/core/domain/entities/plan'
+import { reconstitutePlan } from '@strenly/core/domain/entities/plan'
+import type {
+  ListPlansOptions,
+  PlanRepositoryError,
+  PlanRepositoryPort,
+} from '@strenly/core/ports/plan-repository.port'
 import type { DbClient } from '@strenly/database'
 import { plans } from '@strenly/database/schema'
 import { and, count, eq } from 'drizzle-orm'

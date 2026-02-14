@@ -1,5 +1,6 @@
 import { archiveAthleteInputSchema, archiveAthleteOutputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeArchiveAthlete } from '../../use-cases/athletes/archive-athlete'
 
@@ -35,7 +36,7 @@ export const archiveAthlete = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'archiveAthlete' })
           throw new Error('Internal error')
       }
     }

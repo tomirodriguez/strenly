@@ -1,5 +1,6 @@
-import { listProgramsInputSchema, listProgramsOutputSchema } from '@strenly/contracts/programs'
+import { listProgramsInputSchema, listProgramsOutputSchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeListPrograms } from '../../use-cases/programs/list-programs'
 import { mapProgramToOutput } from './map-program-to-output'
@@ -36,7 +37,7 @@ export const listPrograms = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'list' })
           throw new Error('Internal error')
       }
     }

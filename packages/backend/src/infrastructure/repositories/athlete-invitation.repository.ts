@@ -1,9 +1,10 @@
+import type { AthleteInvitation } from '@strenly/core/domain/entities/athlete-invitation'
+import { reconstituteAthleteInvitation } from '@strenly/core/domain/entities/athlete-invitation'
 import type {
   AthleteInvitationRepositoryError,
   AthleteInvitationRepositoryPort,
-  OrganizationContext,
-} from '@strenly/core'
-import { type AthleteInvitation, reconstituteAthleteInvitation } from '@strenly/core'
+} from '@strenly/core/ports/athlete-invitation-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import { athleteInvitations, athletes } from '@strenly/database/schema'
 import { and, desc, eq, isNull } from 'drizzle-orm'

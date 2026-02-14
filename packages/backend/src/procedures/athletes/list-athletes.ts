@@ -1,5 +1,6 @@
 import { listAthletesInputSchema, listAthletesOutputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeListAthletes } from '../../use-cases/athletes/list-athletes'
 import { mapAthleteToOutput } from './map-athlete-to-output'
@@ -36,7 +37,7 @@ export const listAthletes = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'listAthletes' })
           throw new Error('Internal error')
       }
     }

@@ -1,6 +1,7 @@
-import { createProgramInputSchema, programSchema } from '@strenly/contracts/programs'
+import { createProgramInputSchema, programSchema } from '@strenly/contracts/programs/program'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateProgram } from '../../use-cases/programs/create-program'
 import { mapProgramToOutput } from './map-program-to-output'
@@ -45,7 +46,7 @@ export const createProgram = authProcedure
         case 'athlete_not_found':
           throw errors.ATHLETE_NOT_FOUND({ message: `Athlete ${result.error.athleteId} not found` })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'create' })
           throw new Error('Internal error')
       }
     }

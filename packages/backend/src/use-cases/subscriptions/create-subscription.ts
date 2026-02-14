@@ -1,10 +1,8 @@
-import {
-  createSubscription as createSubscriptionEntity,
-  type Plan,
-  type PlanRepositoryPort,
-  type Subscription,
-  type SubscriptionRepositoryPort,
-} from '@strenly/core'
+import type { Plan } from '@strenly/core/domain/entities/plan'
+import type { Subscription } from '@strenly/core/domain/entities/subscription'
+import { createSubscription as createSubscriptionEntity } from '@strenly/core/domain/entities/subscription'
+import type { PlanRepositoryPort } from '@strenly/core/ports/plan-repository.port'
+import type { SubscriptionRepositoryPort } from '@strenly/core/ports/subscription-repository.port'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateSubscriptionInput = {

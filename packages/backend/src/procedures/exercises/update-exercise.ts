@@ -1,5 +1,6 @@
-import { exerciseSchema, updateExerciseInputSchema } from '@strenly/contracts/exercises'
+import { exerciseSchema, updateExerciseInputSchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdateExercise } from '../../use-cases/exercises/update-exercise'
 import { mapExerciseToOutput } from './map-exercise-to-output'
@@ -49,7 +50,7 @@ export const updateExercise = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'updateExercise' })
           throw new Error('Internal error')
       }
     }

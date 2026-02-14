@@ -1,5 +1,6 @@
 import { saveDraftInputSchema, saveDraftOutputSchema } from '@strenly/contracts/programs/save-draft'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeSaveDraft } from '../../use-cases/programs/save-draft'
 
@@ -43,7 +44,7 @@ export const saveDraftProcedure = authProcedure
         case 'conflict':
           throw errors.CONFLICT({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error in saveDraft:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'saveDraft' })
           throw new Error('Internal error')
       }
     }

@@ -1,5 +1,6 @@
-import { archiveProgramInputSchema, programSchema } from '@strenly/contracts/programs'
+import { archiveProgramInputSchema, programSchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeArchiveProgram } from '../../use-cases/programs/archive-program'
 import { mapProgramToOutput } from './map-program-to-output'
@@ -37,7 +38,7 @@ export const archiveProgram = authProcedure
         case 'invalid_transition':
           throw errors.INVALID_TRANSITION({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'archive' })
           throw new Error('Internal error')
       }
     }

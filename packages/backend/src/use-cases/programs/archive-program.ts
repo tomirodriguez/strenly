@@ -1,10 +1,8 @@
-import {
-  archiveProgram as archiveProgramDomain,
-  hasPermission,
-  type OrganizationContext,
-  type Program,
-  type ProgramRepositoryPort,
-} from '@strenly/core'
+import { archiveProgram as archiveProgramDomain } from '@strenly/core/domain/entities/program/program'
+import type { Program } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ArchiveProgramInput = OrganizationContext & {

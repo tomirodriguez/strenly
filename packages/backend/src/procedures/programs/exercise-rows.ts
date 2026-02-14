@@ -5,9 +5,10 @@ import {
   exerciseRowOutputSchema,
   reorderExerciseRowsInputSchema,
   updateExerciseRowInputSchema,
-} from '@strenly/contracts/programs'
+} from '@strenly/contracts/programs/exercise-row'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeAddExerciseRow } from '../../use-cases/programs/add-exercise-row'
 import { makeDeleteExerciseRow } from '../../use-cases/programs/delete-exercise-row'
@@ -53,7 +54,7 @@ export const addExerciseRowProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'exerciseRows' })
           throw new Error('Internal error')
       }
     }
@@ -116,7 +117,7 @@ export const updateExerciseRowProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'exerciseRows' })
           throw new Error('Internal error')
       }
     }
@@ -166,7 +167,7 @@ export const deleteExerciseRowProcedure = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'exerciseRows' })
           throw new Error('Internal error')
       }
     }
@@ -204,7 +205,7 @@ export const reorderExerciseRowsProcedure = authProcedure
         case 'not_found':
           throw errors.SESSION_NOT_FOUND()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'exerciseRows' })
           throw new Error('Internal error')
       }
     }

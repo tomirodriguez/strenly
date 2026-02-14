@@ -1,4 +1,6 @@
-import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type DeleteSessionInput = OrganizationContext & {

@@ -12,6 +12,7 @@ type Env = {
   BETTER_AUTH_URL: string
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
+  APP_URL?: string
   ENVIRONMENT?: 'development' | 'production' | 'test'
 }
 
@@ -79,6 +80,7 @@ app.use('/rpc/*', async (c, next) => {
     db,
     auth,
     headers: c.req.raw.headers,
+    appUrl: c.env.APP_URL ?? 'http://localhost:3000',
   }
 
   const { matched, response } = await rpcHandler.handle(c.req.raw, {

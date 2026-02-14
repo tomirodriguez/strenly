@@ -1,7 +1,18 @@
+import { type Program as ProgramAggregate, reconstituteProgram } from '@strenly/core/domain/entities/program/program'
+import type { Program, Series } from '@strenly/core/domain/entities/program/types'
+import {
+  type ExerciseGroup,
+  type GroupItem,
+  type IntensityType,
+  isProgramStatus as isAggregateStatus,
+  isProgramStatus,
+  mapIntensityTypeToUnit,
+  type Session,
+  type Week,
+} from '@strenly/core/domain/entities/program/types'
 import type {
   ExerciseGroupData,
   ExerciseRowWithPrescriptions,
-  OrganizationContext,
   PrescriptionSeriesData,
   ProgramExerciseRow,
   ProgramFilters,
@@ -12,17 +23,8 @@ import type {
   ProgramWithDetails,
   SaveDraftInput,
   SessionWithRows,
-} from '@strenly/core'
-import { isProgramStatus, mapIntensityTypeToUnit, type Program, type Series } from '@strenly/core'
-import { type Program as ProgramAggregate, reconstituteProgram } from '@strenly/core/domain/entities/program/program'
-import {
-  type ExerciseGroup,
-  type GroupItem,
-  type IntensityType,
-  isProgramStatus as isAggregateStatus,
-  type Session,
-  type Week,
-} from '@strenly/core/domain/entities/program/types'
+} from '@strenly/core/ports/program-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import {
   type PrescriptionSeriesData as DbPrescriptionSeriesData,

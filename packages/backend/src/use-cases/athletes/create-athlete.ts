@@ -1,11 +1,8 @@
-import {
-  type Athlete,
-  type AthleteGender,
-  type AthleteRepositoryPort,
-  createAthlete,
-  hasPermission,
-  type OrganizationContext,
-} from '@strenly/core'
+import type { Athlete, AthleteGender } from '@strenly/core/domain/entities/athlete'
+import { createAthlete } from '@strenly/core/domain/entities/athlete'
+import type { AthleteRepositoryPort } from '@strenly/core/ports/athlete-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateAthleteInput = OrganizationContext & {

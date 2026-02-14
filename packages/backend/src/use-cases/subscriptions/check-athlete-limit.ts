@@ -1,10 +1,8 @@
-import {
-  canAddAthlete,
-  hasPermission,
-  type OrganizationContext,
-  type PlanRepositoryPort,
-  type SubscriptionRepositoryPort,
-} from '@strenly/core'
+import { canAddAthlete } from '@strenly/core/domain/entities/plan'
+import type { PlanRepositoryPort } from '@strenly/core/ports/plan-repository.port'
+import type { SubscriptionRepositoryPort } from '@strenly/core/ports/subscription-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CheckAthleteLimitInput = OrganizationContext

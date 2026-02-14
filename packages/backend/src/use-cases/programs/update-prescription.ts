@@ -1,12 +1,12 @@
 import {
   formatDomainSeriesToNotation,
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryPort,
   parsePrescriptionToSeries,
-  type Series,
-} from '@strenly/core'
+} from '@strenly/core/domain/entities/program/prescription-notation'
 import { createSeries } from '@strenly/core/domain/entities/program/series'
+import type { Series } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdatePrescriptionInput = OrganizationContext & {

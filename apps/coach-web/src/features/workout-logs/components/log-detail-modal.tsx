@@ -5,7 +5,7 @@
  * Shows deviations from prescription with amber highlighting.
  */
 
-import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
+import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs/workout-log'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'

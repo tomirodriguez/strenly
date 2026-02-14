@@ -1,11 +1,9 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type Plan,
-  type PlanRepositoryPort,
-  type Subscription,
-  type SubscriptionRepositoryPort,
-} from '@strenly/core'
+import type { Plan } from '@strenly/core/domain/entities/plan'
+import type { Subscription } from '@strenly/core/domain/entities/subscription'
+import type { PlanRepositoryPort } from '@strenly/core/ports/plan-repository.port'
+import type { SubscriptionRepositoryPort } from '@strenly/core/ports/subscription-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetSubscriptionInput = OrganizationContext

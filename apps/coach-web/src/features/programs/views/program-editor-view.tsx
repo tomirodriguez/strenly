@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowLeftIcon, FileDownIcon } from 'lucide-react'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useRef } from 'react'
 import { ProgramGrid } from '@/components/programs/program-grid/program-grid'
 import { SaveButton } from '@/components/programs/program-grid/save-button'
 import { ProgramHeader } from '@/components/programs/program-header'
@@ -11,7 +11,7 @@ import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { toast } from '@/lib/toast'
-import { useGridActions, useGridData, useGridIsDirty, useGridProgramId } from '@/stores/grid-store'
+import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
 import '@/styles/program-grid.css'
 
 interface ProgramEditorViewProps {
@@ -34,18 +34,16 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
   const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
 
   // Zustand store - select only what you need
-  const storeProgramId = useGridProgramId()
   const gridData = useGridData()
   const isDirty = useGridIsDirty()
   const actions = useGridActions()
 
-  // Initialize store when program and exercises load
-  // Only initialize if not already initialized with the same programId
-  useEffect(() => {
-    if (program && exercisesMap.size > 0 && programId && storeProgramId !== programId) {
-      actions.initialize(programId, program, exercisesMap)
-    }
-  }, [program, exercisesMap, programId, storeProgramId, actions])
+  // Initialize store when program and exercises load (ref-based, no useEffect)
+  const initializedRef = useRef<string | null>(null)
+  if (program && exercisesMap.size > 0 && programId && initializedRef.current !== programId) {
+    initializedRef.current = programId
+    actions.initialize(programId, program, exercisesMap)
+  }
 
   // Navigation guard - warn before leaving with unsaved changes
   useUnsavedChanges(isDirty)

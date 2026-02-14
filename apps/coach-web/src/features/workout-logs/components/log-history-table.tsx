@@ -5,7 +5,7 @@
  * pagination, loading/error/empty states, and row actions.
  */
 
-import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
+import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs/workout-log'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import type { OnChangeFn, SortingState } from '@tanstack/react-table'
 import { format } from 'date-fns'

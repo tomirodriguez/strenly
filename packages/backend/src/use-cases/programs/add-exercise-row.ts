@@ -1,11 +1,8 @@
-import {
-  type ExerciseRepositoryPort,
-  hasPermission,
-  type OrganizationContext,
-  type ProgramExerciseRow,
-  type ProgramRepositoryPort,
-} from '@strenly/core'
 import { createGroupItem } from '@strenly/core/domain/entities/program/group-item'
+import type { ExerciseRepositoryPort } from '@strenly/core/ports/exercise-repository.port'
+import type { ProgramExerciseRow, ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type AddExerciseRowInput = OrganizationContext & {

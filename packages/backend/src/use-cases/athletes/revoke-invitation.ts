@@ -1,9 +1,9 @@
-import {
-  type AthleteInvitationRepositoryError,
-  type AthleteInvitationRepositoryPort,
-  hasPermission,
-  type OrganizationContext,
-} from '@strenly/core'
+import type {
+  AthleteInvitationRepositoryError,
+  AthleteInvitationRepositoryPort,
+} from '@strenly/core/ports/athlete-invitation-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type RevokeInvitationInput = OrganizationContext & {

@@ -9,7 +9,7 @@
  * - Notes textarea at bottom of each exercise
  */
 
-import type { LoggedExercise } from '@strenly/contracts/workout-logs'
+import type { LoggedExercise } from '@strenly/contracts/workout-logs/workout-log'
 import { SkipForwardIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { SeriesRow } from './series-row'
@@ -127,7 +127,7 @@ function ExerciseCard({ exercise, exerciseName, groupLabel }: ExerciseCardProps)
       <div className="mb-3">
         {exercise.series.map((series, index) => (
           <SeriesRow
-            key={index}
+            key={series.orderIndex}
             exerciseId={exercise.id}
             series={series}
             seriesIndex={index}

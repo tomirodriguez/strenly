@@ -1,4 +1,4 @@
-import type { ListAthleteLogsInput } from '@strenly/contracts/workout-logs'
+import type { ListAthleteLogsInput } from '@strenly/contracts/workout-logs/list-logs'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 

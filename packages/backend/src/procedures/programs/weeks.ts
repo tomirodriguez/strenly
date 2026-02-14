@@ -5,8 +5,9 @@ import {
   duplicateWeekInputSchema,
   updateWeekInputSchema,
   weekOutputSchema,
-} from '@strenly/contracts/programs'
+} from '@strenly/contracts/programs/week'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeAddWeek } from '../../use-cases/programs/add-week'
 import { makeDeleteWeek } from '../../use-cases/programs/delete-week'
@@ -47,7 +48,7 @@ export const addWeekProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'weeks' })
           throw new Error('Internal error')
       }
     }
@@ -95,7 +96,7 @@ export const updateWeekProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'weeks' })
           throw new Error('Internal error')
       }
     }
@@ -146,7 +147,7 @@ export const deleteWeekProcedure = authProcedure
         case 'last_week':
           throw errors.LAST_WEEK()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'weeks' })
           throw new Error('Internal error')
       }
     }
@@ -192,7 +193,7 @@ export const duplicateWeekProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'weeks' })
           throw new Error('Internal error')
       }
     }

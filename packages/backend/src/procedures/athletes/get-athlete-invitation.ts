@@ -4,6 +4,7 @@ import {
 } from '@strenly/contracts/athletes/invitation'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetAthleteInvitation } from '../../use-cases/athletes/get-athlete-invitation'
 
@@ -24,7 +25,7 @@ export const getAthleteInvitation = authProcedure
     const useCase = makeGetAthleteInvitation({
       athleteRepository: createAthleteRepository(context.db),
       invitationRepository: createAthleteInvitationRepository(context.db),
-      appUrl: process.env.APP_URL ?? 'http://localhost:3000',
+      appUrl: context.appUrl,
     })
 
     const result = await useCase({
@@ -43,7 +44,7 @@ export const getAthleteInvitation = authProcedure
         case 'no_invitation':
           throw errors.NO_INVITATION()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getAthleteInvitation' })
           throw new Error('Internal error')
       }
     }

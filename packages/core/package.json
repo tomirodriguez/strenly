@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./domain/entities/*": "./src/domain/entities/*.ts",
-    "./ports/*": "./src/ports/*.ts"
+    "./domain/entities/program/*": "./src/domain/entities/program/*.ts",
+    "./ports/*": "./src/ports/*.ts",
+    "./services/*": "./src/services/*.ts",
+    "./types/*": "./src/types/*.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

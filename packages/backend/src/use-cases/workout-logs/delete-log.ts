@@ -1,5 +1,6 @@
-import { hasPermission, type OrganizationContext } from '@strenly/core'
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type DeleteLogInput = OrganizationContext & {

@@ -7,7 +7,7 @@
  * 3. Handles legacy data where groupLabel might be null
  */
 
-import type { LoggedExercise } from '@strenly/contracts/workout-logs'
+import type { LoggedExercise } from '@strenly/contracts/workout-logs/workout-log'
 import { ExerciseGroupSection } from './exercise-group-section'
 
 interface LoggingGridProps {

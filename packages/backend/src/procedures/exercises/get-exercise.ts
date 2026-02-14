@@ -1,5 +1,6 @@
-import { exerciseSchema, getExerciseInputSchema } from '@strenly/contracts/exercises'
+import { exerciseSchema, getExerciseInputSchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetExercise } from '../../use-cases/exercises/get-exercise'
 import { mapExerciseToOutput } from './map-exercise-to-output'
@@ -35,7 +36,7 @@ export const getExercise = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND({ message: `Exercise not found: ${result.error.exerciseId}` })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getExercise' })
           throw new Error('Internal error')
       }
     }

@@ -2,13 +2,14 @@ import type { DbClient } from '@strenly/database'
 import { athletes, organizations, users } from '@strenly/database/schema'
 import { and, eq } from 'drizzle-orm'
 import { ResultAsync } from 'neverthrow'
+import { logger } from '../../lib/logger'
 import type { OrganizationLookup } from '../../use-cases/athletes/get-invitation-info'
 
 /**
  * Wraps database errors for lookup service
  */
 function wrapDbError(error: unknown): { message: string } {
-  console.error('Organization lookup error:', error)
+  logger.error('Organization lookup error', { error: String(error), service: 'organizationLookup' })
   return { message: 'Database operation failed' }
 }
 

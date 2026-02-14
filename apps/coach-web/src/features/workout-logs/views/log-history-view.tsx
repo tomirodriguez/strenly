@@ -5,7 +5,7 @@
  * Delegates loading, error, empty, and pagination states to LogHistoryTable (DataTable).
  */
 
-import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
+import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs/workout-log'
 import type { SortingState } from '@tanstack/react-table'
 import { useState } from 'react'
 import { LogDetailModal } from '../components/log-detail-modal'

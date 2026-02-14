@@ -14,7 +14,7 @@
  * - Unsaved changes guard
  */
 
-import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
+import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs/workout-log'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
 import { useCallback, useEffect } from 'react'

@@ -1,4 +1,4 @@
-import type { ListTemplatesInput } from '@strenly/contracts/programs'
+import type { ListTemplatesInput } from '@strenly/contracts/programs/template'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 

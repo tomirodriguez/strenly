@@ -1,7 +1,7 @@
-import { createSubscriptionInputSchema } from '@strenly/contracts/subscriptions'
-import { subscriptionSchema } from '@strenly/contracts/subscriptions/subscription'
+import { createSubscriptionInputSchema, subscriptionSchema } from '@strenly/contracts/subscriptions/subscription'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { createSubscriptionRepository } from '../../infrastructure/repositories/subscription.repository'
+import { logger } from '../../lib/logger'
 import { sessionProcedure } from '../../lib/orpc'
 import { makeCreateSubscription } from '../../use-cases/subscriptions/create-subscription'
 import { mapPlanToOutput } from './map-plan-to-output'
@@ -37,7 +37,7 @@ export const createSubscription = sessionProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'createSubscription' })
           throw new Error('Internal error')
       }
     }

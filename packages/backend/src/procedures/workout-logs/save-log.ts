@@ -1,5 +1,6 @@
-import { saveLogInputSchema, saveLogOutputSchema } from '@strenly/contracts/workout-logs'
+import { saveLogInputSchema, saveLogOutputSchema } from '@strenly/contracts/workout-logs/save-log'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeSaveLog } from '../../use-cases/workout-logs/save-log'
 import { mapLogToOutput } from './map-log-to-output'
@@ -58,7 +59,7 @@ export const saveLog = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error in saveLog:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'saveLog' })
           throw errors.INTERNAL_ERROR({ message: 'Database save error' })
       }
     }

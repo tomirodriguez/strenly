@@ -1,5 +1,5 @@
 import { PlusIcon, SearchIcon } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
 import { useAddExerciseRow } from '@/features/programs/hooks/mutations/use-grid-mutations'
 import { cn } from '@/lib/utils'
@@ -17,7 +17,9 @@ export function AddExerciseRow({ programId, sessionId }: AddExerciseRowProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState(0)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useCallback((el: HTMLInputElement | null) => {
+    el?.focus()
+  }, [])
   const listRef = useRef<HTMLDivElement>(null)
 
   const addExerciseRow = useAddExerciseRow(programId)
@@ -28,13 +30,6 @@ export function AddExerciseRow({ programId, sessionId }: AddExerciseRowProps) {
   })
 
   const exercises = exercisesData?.items ?? []
-
-  // Focus input when opening
-  useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus()
-    }
-  }, [isOpen])
 
   const handleSelect = (exerciseId: string) => {
     addExerciseRow.mutate(

@@ -1,5 +1,6 @@
-import { getProgramInputSchema, programAggregateSchema } from '@strenly/contracts/programs'
+import { getProgramInputSchema, programAggregateSchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetProgram } from '../../use-cases/programs/get-program'
 import { mapProgramToAggregate } from './map-program-to-aggregate'
@@ -38,7 +39,7 @@ export const getProgram = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND({ message: `Program ${result.error.programId} not found` })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'get' })
           throw new Error('Internal error')
       }
     }

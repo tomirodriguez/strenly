@@ -1,5 +1,6 @@
-import { duplicateProgramInputSchema, programAggregateSchema } from '@strenly/contracts/programs'
+import { duplicateProgramInputSchema, programAggregateSchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeDuplicateProgram } from '../../use-cases/programs/duplicate-program'
 import { mapProgramToAggregate } from './map-program-to-aggregate'
@@ -45,7 +46,7 @@ export const duplicateProgram = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'duplicate' })
           throw new Error('Internal error')
       }
     }

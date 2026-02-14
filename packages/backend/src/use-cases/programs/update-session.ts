@@ -1,5 +1,7 @@
-import { hasPermission, type OrganizationContext, type ProgramRepositoryPort, type ProgramSession } from '@strenly/core'
 import { createSession } from '@strenly/core/domain/entities/program/session'
+import type { ProgramRepositoryPort, ProgramSession } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateSessionInput = OrganizationContext & {

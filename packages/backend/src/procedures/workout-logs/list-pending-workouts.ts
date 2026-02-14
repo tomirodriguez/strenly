@@ -1,5 +1,9 @@
-import { listPendingWorkoutsInputSchema, listPendingWorkoutsOutputSchema } from '@strenly/contracts/workout-logs'
+import {
+  listPendingWorkoutsInputSchema,
+  listPendingWorkoutsOutputSchema,
+} from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeListPendingWorkouts } from '../../use-cases/workout-logs/list-pending-workouts'
 
@@ -32,7 +36,7 @@ export const listPendingWorkouts = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error in listPendingWorkouts:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'listPendingWorkouts' })
           throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }

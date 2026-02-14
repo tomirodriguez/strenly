@@ -1,6 +1,7 @@
 import { acceptInvitationInputSchema, acceptInvitationOutputSchema } from '@strenly/contracts/athletes/invitation'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
+import { logger } from '../../lib/logger'
 import { sessionProcedure } from '../../lib/orpc'
 import { makeAcceptInvitation } from '../../use-cases/athletes/accept-invitation'
 
@@ -42,10 +43,13 @@ export const acceptInvitation = sessionProcedure
           throw errors.ALREADY_REVOKED()
         case 'athlete_not_found':
           // This is an internal error - the athlete should exist
-          console.error('Athlete not found after accepting invitation:', result.error.athleteId)
+          logger.error('Athlete not found after accepting invitation', {
+            athleteId: result.error.athleteId,
+            procedure: 'acceptInvitation',
+          })
           throw new Error('Internal error')
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'acceptInvitation' })
           throw new Error('Internal error')
       }
     }

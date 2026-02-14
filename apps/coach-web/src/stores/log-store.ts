@@ -8,12 +8,12 @@
  * for updating series, skipping exercises, and session data.
  */
 
+import type { SaveLogInput } from '@strenly/contracts/workout-logs/save-log'
 import type {
   LoggedExerciseInput,
   LoggedSeriesInput,
-  SaveLogInput,
   WorkoutLogAggregate,
-} from '@strenly/contracts/workout-logs'
+} from '@strenly/contracts/workout-logs/workout-log'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 

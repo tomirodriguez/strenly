@@ -1,5 +1,6 @@
 import { listPlansInputSchema, listPlansOutputSchema } from '@strenly/contracts/subscriptions/plan'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
+import { logger } from '../../lib/logger'
 import { publicProcedure } from '../../lib/orpc'
 import { makeListPlans } from '../../use-cases/subscriptions/list-plans'
 
@@ -24,7 +25,7 @@ export const listPlans = publicProcedure
     })
 
     if (result.isErr()) {
-      console.error('Failed to list plans:', result.error.message)
+      logger.error('Failed to list plans', { error: result.error.message, procedure: 'listPlans' })
       throw errors.INTERNAL_ERROR()
     }
 

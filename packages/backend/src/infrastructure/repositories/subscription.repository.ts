@@ -1,10 +1,10 @@
-import type { SubscriptionRepositoryError, SubscriptionRepositoryPort } from '@strenly/core'
-import {
-  type OrganizationContext,
-  reconstituteSubscription,
-  type Subscription,
-  type SubscriptionStatus,
-} from '@strenly/core'
+import type { Subscription, SubscriptionStatus } from '@strenly/core/domain/entities/subscription'
+import { reconstituteSubscription } from '@strenly/core/domain/entities/subscription'
+import type {
+  SubscriptionRepositoryError,
+  SubscriptionRepositoryPort,
+} from '@strenly/core/ports/subscription-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import { subscriptions } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'

@@ -1,9 +1,9 @@
-import {
-  isValidMuscleGroup,
-  type MuscleGroupData,
-  type MuscleGroupRepositoryError,
-  type MuscleGroupRepositoryPort,
-} from '@strenly/core'
+import { isValidMuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import type {
+  MuscleGroupData,
+  MuscleGroupRepositoryError,
+  MuscleGroupRepositoryPort,
+} from '@strenly/core/ports/muscle-group-repository.port'
 import type { DbClient } from '@strenly/database'
 import { muscleGroups } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'

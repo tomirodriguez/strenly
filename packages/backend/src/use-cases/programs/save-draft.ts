@@ -1,11 +1,8 @@
-import {
-  hasPermission,
-  type OrganizationContext,
-  type ProgramRepositoryError,
-  type ProgramRepositoryPort,
-} from '@strenly/core'
 import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
 import type { CreateProgramInput, ProgramStatus, WeekInput } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryError, ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 /**

@@ -2,6 +2,7 @@ import { generateInvitationInputSchema, generateInvitationOutputSchema } from '@
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { createAthleteInvitationRepository } from '../../infrastructure/repositories/athlete-invitation.repository'
 import { generateInvitationToken } from '../../lib/invitation-token'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGenerateInvitation } from '../../use-cases/athletes/generate-invitation'
 
@@ -24,7 +25,7 @@ export const generateInvitation = authProcedure
       invitationRepository: createAthleteInvitationRepository(context.db),
       generateId: () => crypto.randomUUID(),
       generateToken: generateInvitationToken,
-      appUrl: process.env.APP_URL ?? 'http://localhost:3000',
+      appUrl: context.appUrl,
     })
 
     const result = await useCase({
@@ -44,10 +45,10 @@ export const generateInvitation = authProcedure
         case 'already_linked':
           throw errors.ALREADY_LINKED()
         case 'invalid_invitation':
-          console.error('Invalid invitation:', result.error.message)
+          logger.error('Invalid invitation', { error: result.error.message, procedure: 'generateInvitation' })
           throw new Error('Internal error')
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'generateInvitation' })
           throw new Error('Internal error')
       }
     }

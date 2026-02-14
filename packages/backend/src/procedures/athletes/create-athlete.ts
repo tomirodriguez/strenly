@@ -1,5 +1,6 @@
 import { athleteSchema, createAthleteInputSchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeCreateAthlete } from '../../use-cases/athletes/create-athlete'
 import { mapAthleteToOutput } from './map-athlete-to-output'
@@ -41,7 +42,7 @@ export const createAthlete = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'createAthlete' })
           throw new Error('Internal error')
       }
     }

@@ -7,20 +7,14 @@
  * Creates a new log from prescription or loads an existing one for editing.
  */
 
+import { sessionLogSearchSchema } from '@strenly/contracts/workout-logs/session-log-search'
 import { createFileRoute, type ErrorComponentProps } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { SessionLoggingView } from '@/features/workout-logs/views/session-logging-view'
 
-const searchSchema = z.object({
-  programId: z.string(),
-  weekId: z.string(),
-  logId: z.string().optional(), // If provided, load existing log
-})
-
 export const Route = createFileRoute('/_authenticated/$orgSlug/athletes/$athleteId/log/$sessionId')({
-  validateSearch: searchSchema,
+  validateSearch: sessionLogSearchSchema,
   component: SessionLoggingViewRoute,
   pendingComponent: PendingComponent,
   errorComponent: SessionLoggingErrorComponent,

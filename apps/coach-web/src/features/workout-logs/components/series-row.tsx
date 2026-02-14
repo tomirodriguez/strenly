@@ -9,7 +9,7 @@
  * - Skip button for individual series
  */
 
-import type { LoggedSeries } from '@strenly/contracts/workout-logs'
+import type { LoggedSeries } from '@strenly/contracts/workout-logs/workout-log'
 import { SkipForwardIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { Button } from '@/components/ui/button'

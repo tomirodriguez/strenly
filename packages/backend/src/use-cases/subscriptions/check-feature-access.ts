@@ -1,11 +1,9 @@
-import {
-  hasFeature,
-  hasPermission,
-  type OrganizationContext,
-  type PlanFeatures,
-  type PlanRepositoryPort,
-  type SubscriptionRepositoryPort,
-} from '@strenly/core'
+import type { PlanFeatures } from '@strenly/core/domain/entities/plan'
+import { hasFeature } from '@strenly/core/domain/entities/plan'
+import type { PlanRepositoryPort } from '@strenly/core/ports/plan-repository.port'
+import type { SubscriptionRepositoryPort } from '@strenly/core/ports/subscription-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CheckFeatureAccessInput = OrganizationContext & {

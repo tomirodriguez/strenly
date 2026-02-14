@@ -1,5 +1,6 @@
-import { getLogInputSchema, getLogOutputSchema } from '@strenly/contracts/workout-logs'
+import { getLogInputSchema, getLogOutputSchema } from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetLog } from '../../use-cases/workout-logs/get-log'
 import { mapLogToOutput } from './map-log-to-output'
@@ -34,7 +35,7 @@ export const getLog = authProcedure
         case 'not_found':
           throw errors.NOT_FOUND({ message: `Workout log ${result.error.logId} not found` })
         case 'repository_error':
-          console.error('Repository error in getLog:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getLog' })
           throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }

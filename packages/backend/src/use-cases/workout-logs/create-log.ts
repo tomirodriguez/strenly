@@ -1,10 +1,12 @@
-import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
 import type { Athlete } from '@strenly/core/domain/entities/athlete'
 import type { Program, Session, Week } from '@strenly/core/domain/entities/program/types'
 import { buildLoggedExercises } from '@strenly/core/domain/entities/workout-log/build-logged-exercises'
 import { createWorkoutLog, type WorkoutLog } from '@strenly/core/domain/entities/workout-log/workout-log'
 import type { AthleteRepositoryPort } from '@strenly/core/ports/athlete-repository.port'
+import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
+import { hasPermission } from '@strenly/core/services/authorization'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type CreateLogInput = OrganizationContext & {

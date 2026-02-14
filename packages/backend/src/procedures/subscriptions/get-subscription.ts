@@ -1,6 +1,7 @@
 import { getSubscriptionOutputSchema } from '@strenly/contracts/subscriptions/subscription'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { createSubscriptionRepository } from '../../infrastructure/repositories/subscription.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetSubscription } from '../../use-cases/subscriptions/get-subscription'
 import { mapPlanToOutput } from './map-plan-to-output'
@@ -39,7 +40,7 @@ export const getSubscription = authProcedure
         case 'plan_not_found':
           throw errors.PLAN_NOT_FOUND()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getSubscription' })
           throw new Error('Internal error')
       }
     }

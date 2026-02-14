@@ -1,16 +1,14 @@
+import type { Exercise } from '@strenly/core/domain/entities/exercise'
+import { reconstituteExercise } from '@strenly/core/domain/entities/exercise'
+import { isValidMovementPattern } from '@strenly/core/domain/entities/movement-pattern'
+import type { MuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import { isValidMuscleGroup } from '@strenly/core/domain/entities/muscle-group'
 import type {
   ExerciseRepositoryError,
   ExerciseRepositoryPort,
   ListExercisesOptions,
-  OrganizationContext,
-} from '@strenly/core'
-import {
-  type Exercise,
-  isValidMovementPattern,
-  isValidMuscleGroup,
-  type MuscleGroup,
-  reconstituteExercise,
-} from '@strenly/core'
+} from '@strenly/core/ports/exercise-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import { exerciseMuscles, exercises } from '@strenly/database/schema'
 import { and, count, eq, ilike, inArray, isNull, or } from 'drizzle-orm'

@@ -1,5 +1,6 @@
-import { getLogBySessionInputSchema, getLogBySessionOutputSchema } from '@strenly/contracts/workout-logs'
+import { getLogBySessionInputSchema, getLogBySessionOutputSchema } from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeGetLogBySession } from '../../use-cases/workout-logs/get-log-by-session'
 import { mapLogToOutput } from './map-log-to-output'
@@ -34,7 +35,7 @@ export const getLogBySession = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error in getBySession:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'getLogBySession' })
           throw errors.INTERNAL_ERROR({ message: 'Database access error' })
       }
     }

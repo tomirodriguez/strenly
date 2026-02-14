@@ -1,5 +1,6 @@
-import { listExercisesInputSchema, listExercisesOutputSchema } from '@strenly/contracts/exercises'
+import { listExercisesInputSchema, listExercisesOutputSchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeListExercises } from '../../use-cases/exercises/list-exercises'
 import { mapExerciseToOutput } from './map-exercise-to-output'
@@ -36,7 +37,7 @@ export const listExercises = authProcedure
         case 'forbidden':
           throw errors.FORBIDDEN({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'listExercises' })
           throw new Error('Internal error')
       }
     }

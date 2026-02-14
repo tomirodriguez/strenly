@@ -1,13 +1,11 @@
+import type { Athlete, AthleteGender, AthleteStatus } from '@strenly/core/domain/entities/athlete'
+import { reconstituteAthlete } from '@strenly/core/domain/entities/athlete'
 import type {
-  Athlete,
-  AthleteGender,
   AthleteRepositoryError,
   AthleteRepositoryPort,
-  AthleteStatus,
   ListAthletesOptions,
-  OrganizationContext,
-} from '@strenly/core'
-import { reconstituteAthlete } from '@strenly/core'
+} from '@strenly/core/ports/athlete-repository.port'
+import type { OrganizationContext } from '@strenly/core/types/organization-context'
 import type { DbClient } from '@strenly/database'
 import { athletes } from '@strenly/database/schema'
 import { and, count, desc, eq, ilike } from 'drizzle-orm'

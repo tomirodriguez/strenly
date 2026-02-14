@@ -4,8 +4,9 @@ import {
   deleteSessionInputSchema,
   sessionOutputSchema,
   updateSessionInputSchema,
-} from '@strenly/contracts/programs'
+} from '@strenly/contracts/programs/session'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
+import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
 import { makeAddSession } from '../../use-cases/programs/add-session'
 import { makeDeleteSession } from '../../use-cases/programs/delete-session'
@@ -45,7 +46,7 @@ export const addSessionProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'sessions' })
           throw new Error('Internal error')
       }
     }
@@ -93,7 +94,7 @@ export const updateSessionProcedure = authProcedure
         case 'validation_error':
           throw errors.VALIDATION_ERROR({ message: result.error.message })
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'sessions' })
           throw new Error('Internal error')
       }
     }
@@ -144,7 +145,7 @@ export const deleteSessionProcedure = authProcedure
         case 'last_session':
           throw errors.LAST_SESSION()
         case 'repository_error':
-          console.error('Repository error:', result.error.message)
+          logger.error('Repository error', { error: result.error.message, procedure: 'sessions' })
           throw new Error('Internal error')
       }
     }

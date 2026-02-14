@@ -5,13 +5,13 @@ export {
   formatDomainSeriesToNotation,
   formatPrescription,
   formatSeriesToNotation,
-  mapIntensityTypeToUnit,
   type ParsedPrescription,
   type ParsedSeriesData,
   parsePrescriptionNotation,
   parsePrescriptionToSeries,
   SKIP_PRESCRIPTION,
-} from '@strenly/core'
+} from '@strenly/core/domain/entities/program/prescription-notation'
+export { mapIntensityTypeToUnit } from '@strenly/core/domain/entities/program/types'
 
 /**
  * Intensity types for prescriptions
