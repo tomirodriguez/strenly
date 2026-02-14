@@ -3,8 +3,8 @@ import { formatDistanceToNow } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useOrgSlug } from '@/hooks/use-org-slug'
 import { useAthletes } from '@/features/athletes/hooks/queries/use-athletes'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 
 /**
  * Recent activity component for the dashboard.

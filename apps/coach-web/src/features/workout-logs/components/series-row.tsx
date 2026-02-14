@@ -35,10 +35,7 @@ function formatPrescription(series: LoggedSeries): string {
   if (series.prescribedIsAmrap) {
     parts.push('AMRAP')
   } else if (series.prescribedReps !== null) {
-    if (
-      series.prescribedRepsMax !== null &&
-      series.prescribedRepsMax !== series.prescribedReps
-    ) {
+    if (series.prescribedRepsMax !== null && series.prescribedRepsMax !== series.prescribedReps) {
       parts.push(`${series.prescribedReps}-${series.prescribedRepsMax}`)
     } else {
       parts.push(`${series.prescribedReps}`)
@@ -51,10 +48,7 @@ function formatPrescription(series: LoggedSeries): string {
   }
 
   // Intensity modifier (RPE, RIR, %)
-  if (
-    series.prescribedIntensityType !== null &&
-    series.prescribedIntensityValue !== null
-  ) {
+  if (series.prescribedIntensityType !== null && series.prescribedIntensityValue !== null) {
     switch (series.prescribedIntensityType) {
       case 'rpe':
         parts.push(`@RPE${series.prescribedIntensityValue}`)
@@ -72,24 +66,15 @@ function formatPrescription(series: LoggedSeries): string {
   return parts.join(' ') || '-'
 }
 
-export function SeriesRow({
-  exerciseId,
-  series,
-  seriesIndex,
-  disabled = false,
-}: SeriesRowProps) {
+export function SeriesRow({ exerciseId, series, seriesIndex, disabled = false }: SeriesRowProps) {
   const actions = useLogActions()
 
   // Check for deviations
   const hasRepsDeviation =
-    series.prescribedReps !== null &&
-    series.repsPerformed !== null &&
-    series.repsPerformed !== series.prescribedReps
+    series.prescribedReps !== null && series.repsPerformed !== null && series.repsPerformed !== series.prescribedReps
 
   const hasWeightDeviation =
-    series.prescribedWeight !== null &&
-    series.weightUsed !== null &&
-    series.weightUsed !== series.prescribedWeight
+    series.prescribedWeight !== null && series.weightUsed !== null && series.weightUsed !== series.prescribedWeight
 
   // Handlers
   const handleRepsChange = useCallback(
@@ -112,8 +97,7 @@ export function SeriesRow({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value === '' ? null : Number(e.target.value)
       // Clamp RPE to 1-10
-      const clampedValue =
-        value === null ? null : Math.min(10, Math.max(1, value))
+      const clampedValue = value === null ? null : Math.min(10, Math.max(1, value))
       actions.updateSeries(exerciseId, seriesIndex, { rpe: clampedValue })
     },
     [exerciseId, seriesIndex, actions],
@@ -134,14 +118,10 @@ export function SeriesRow({
       )}
     >
       {/* Series number */}
-      <span className="text-center text-muted-foreground text-xs tabular-nums">
-        {seriesIndex + 1}
-      </span>
+      <span className="text-center text-muted-foreground text-xs tabular-nums">{seriesIndex + 1}</span>
 
       {/* Prescription column */}
-      <span className="truncate text-muted-foreground text-xs">
-        {prescription}
-      </span>
+      <span className="truncate text-muted-foreground text-xs">{prescription}</span>
 
       {/* Reps input */}
       <Input
@@ -151,10 +131,7 @@ export function SeriesRow({
         onChange={handleRepsChange}
         disabled={isDisabled}
         placeholder={series.prescribedReps?.toString() ?? '-'}
-        className={cn(
-          'h-7 text-center text-xs',
-          hasRepsDeviation && 'border-amber-500 ring-1 ring-amber-500/50',
-        )}
+        className={cn('h-7 text-center text-xs', hasRepsDeviation && 'border-amber-500 ring-1 ring-amber-500/50')}
       />
 
       {/* Weight input */}
@@ -166,10 +143,7 @@ export function SeriesRow({
         onChange={handleWeightChange}
         disabled={isDisabled}
         placeholder={series.prescribedWeight?.toString() ?? '-'}
-        className={cn(
-          'h-7 text-center text-xs',
-          hasWeightDeviation && 'border-amber-500 ring-1 ring-amber-500/50',
-        )}
+        className={cn('h-7 text-center text-xs', hasWeightDeviation && 'border-amber-500 ring-1 ring-amber-500/50')}
       />
 
       {/* RPE input */}

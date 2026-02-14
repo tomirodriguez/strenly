@@ -1,7 +1,7 @@
 import {
   type MovementPattern,
-  movementPatternSchema,
   type MuscleGroup,
+  movementPatternSchema,
   muscleGroupSchema,
 } from '@strenly/contracts/exercises/muscle-group'
 import { useMemo } from 'react'

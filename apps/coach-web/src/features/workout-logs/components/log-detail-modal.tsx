@@ -6,15 +6,10 @@
  */
 
 import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface LogDetailModalProps {
   log: WorkoutLogAggregate | null
@@ -26,7 +21,7 @@ export function LogDetailModal({ log, onClose }: LogDetailModalProps) {
 
   return (
     <Dialog open={!!log} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Detalle del Registro</DialogTitle>
         </DialogHeader>
@@ -40,9 +35,7 @@ export function LogDetailModal({ log, onClose }: LogDetailModalProps) {
             </div>
             <div>
               <span className="text-muted-foreground">Estado:</span>{' '}
-              <Badge variant={log.status === 'completed' ? 'default' : 'secondary'}>
-                {log.status}
-              </Badge>
+              <Badge variant={log.status === 'completed' ? 'default' : 'secondary'}>{log.status}</Badge>
             </div>
             {log.sessionRpe && (
               <div>
@@ -51,8 +44,7 @@ export function LogDetailModal({ log, onClose }: LogDetailModalProps) {
             )}
             {log.sessionNotes && (
               <div className="col-span-2">
-                <span className="text-muted-foreground">Notas:</span>{' '}
-                {log.sessionNotes}
+                <span className="text-muted-foreground">Notas:</span> {log.sessionNotes}
               </div>
             )}
           </div>
@@ -61,35 +53,26 @@ export function LogDetailModal({ log, onClose }: LogDetailModalProps) {
           <div className="space-y-4">
             <h3 className="font-medium">Ejercicios</h3>
             {log.exercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className={exercise.skipped ? 'opacity-50' : ''}
-              >
-                <div className="flex items-center gap-2 mb-2">
+              <div key={exercise.id} className={exercise.skipped ? 'opacity-50' : ''}>
+                <div className="mb-2 flex items-center gap-2">
                   <span className="font-medium">Ejercicio</span>
-                  {exercise.skipped && (
-                    <Badge variant="outline">Saltado</Badge>
-                  )}
+                  {exercise.skipped && <Badge variant="outline">Saltado</Badge>}
                 </div>
                 {!exercise.skipped && (
-                  <div className="pl-4 space-y-1">
+                  <div className="space-y-1 pl-4">
                     {exercise.series.map((series, idx) => (
-                      <div key={series.orderIndex} className="text-sm grid grid-cols-4 gap-2">
+                      <div key={series.orderIndex} className="grid grid-cols-4 gap-2 text-sm">
                         <span>Serie {idx + 1}</span>
                         <span>
                           {series.repsPerformed ?? '-'} reps
                           {series.repsPerformed !== series.prescribedReps && (
-                            <span className="text-amber-500 ml-1">
-                              (plan: {series.prescribedReps})
-                            </span>
+                            <span className="ml-1 text-amber-500">(plan: {series.prescribedReps})</span>
                           )}
                         </span>
                         <span>
                           {series.weightUsed ?? '-'}kg
                           {series.weightUsed !== series.prescribedWeight && (
-                            <span className="text-amber-500 ml-1">
-                              (plan: {series.prescribedWeight}kg)
-                            </span>
+                            <span className="ml-1 text-amber-500">(plan: {series.prescribedWeight}kg)</span>
                           )}
                         </span>
                         <span>RPE: {series.rpe ?? '-'}</span>
@@ -97,11 +80,7 @@ export function LogDetailModal({ log, onClose }: LogDetailModalProps) {
                     ))}
                   </div>
                 )}
-                {exercise.notes && (
-                  <p className="text-sm text-muted-foreground pl-4 mt-1">
-                    {exercise.notes}
-                  </p>
-                )}
+                {exercise.notes && <p className="mt-1 pl-4 text-muted-foreground text-sm">{exercise.notes}</p>}
               </div>
             ))}
           </div>

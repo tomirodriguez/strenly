@@ -19,9 +19,7 @@ interface LoggingGridProps {
  * Group exercises by their groupLabel.
  * Handles null labels with fallback to orderIndex-based keys.
  */
-function groupExercisesByLabel(
-  exercises: readonly LoggedExercise[],
-): Map<string, LoggedExercise[]> {
+function groupExercisesByLabel(exercises: readonly LoggedExercise[]): Map<string, LoggedExercise[]> {
   const groups = new Map<string, LoggedExercise[]>()
 
   for (const exercise of exercises) {
@@ -48,9 +46,7 @@ export function LoggingGrid({ exercises, exercisesMap }: LoggingGridProps) {
   const groupedExercises = groupExercisesByLabel(exercises)
 
   // Sort groups alphabetically (A, B, C... then fallbacks)
-  const sortedGroups = [...groupedExercises.entries()].sort((a, b) =>
-    a[0].localeCompare(b[0]),
-  )
+  const sortedGroups = [...groupedExercises.entries()].sort((a, b) => a[0].localeCompare(b[0]))
 
   if (sortedGroups.length === 0) {
     return (
@@ -63,12 +59,7 @@ export function LoggingGrid({ exercises, exercisesMap }: LoggingGridProps) {
   return (
     <div className="space-y-4">
       {sortedGroups.map(([label, groupExercises]) => (
-        <ExerciseGroupSection
-          key={label}
-          exercises={groupExercises}
-          exercisesMap={exercisesMap}
-          groupLabel={label}
-        />
+        <ExerciseGroupSection key={label} exercises={groupExercises} exercisesMap={exercisesMap} groupLabel={label} />
       ))}
     </div>
   )

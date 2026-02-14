@@ -5,19 +5,19 @@
  * Shows weeks/sessions with "Registrar" buttons for logging workouts.
  */
 
+import type { ProgramAggregate, WeekAggregate } from '@strenly/contracts/programs/program'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, ChevronDown, ChevronRight, ClipboardList, History, Mail, Phone, User } from 'lucide-react'
 import { useState } from 'react'
 import { useAthlete } from '../hooks/queries/use-athlete'
-import { usePrograms } from '@/features/programs/hooks/queries/use-programs'
-import { useProgram } from '@/features/programs/hooks/queries/use-program'
-import { useOrgSlug } from '@/hooks/use-org-slug'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { ProgramAggregate, WeekAggregate } from '@strenly/contracts/programs/program'
+import { useProgram } from '@/features/programs/hooks/queries/use-program'
+import { usePrograms } from '@/features/programs/hooks/queries/use-programs'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 
 interface AthleteDetailViewProps {
   athleteId: string
@@ -74,7 +74,7 @@ export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
               </div>
               <div>
                 <CardTitle className="text-xl">{athlete.name}</CardTitle>
-                <CardDescription className="flex flex-wrap items-center gap-3 mt-1">
+                <CardDescription className="mt-1 flex flex-wrap items-center gap-3">
                   {athlete.email && (
                     <span className="flex items-center gap-1">
                       <Mail className="h-3 w-3" />
@@ -103,14 +103,9 @@ export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
             <Button
               variant="outline"
               size="sm"
-              render={
-                <Link
-                  to="/$orgSlug/athletes/$athleteId/logs"
-                  params={{ orgSlug, athleteId }}
-                />
-              }
+              render={<Link to="/$orgSlug/athletes/$athleteId/logs" params={{ orgSlug, athleteId }} />}
             >
-              <History className="h-4 w-4 mr-2" />
+              <History className="mr-2 h-4 w-4" />
               Ver Historial
             </Button>
           </div>
@@ -124,9 +119,7 @@ export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
             <ClipboardList className="h-5 w-5" />
             Programa Asignado
           </CardTitle>
-          {program && (
-            <CardDescription>{program.name}</CardDescription>
-          )}
+          {program && <CardDescription>{program.name}</CardDescription>}
         </CardHeader>
         <CardContent>
           {programsLoading || programLoading ? (
@@ -135,17 +128,13 @@ export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
               <Skeleton className="h-10 w-full" />
             </div>
           ) : !programId ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <div className="py-8 text-center text-muted-foreground">
+              <ClipboardList className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p>Este atleta no tiene un programa asignado</p>
               <p className="text-sm">Asigna un programa desde la seccion de Programas</p>
             </div>
           ) : program ? (
-            <ProgramWeeksList
-              program={program}
-              athleteId={athleteId}
-              orgSlug={orgSlug}
-            />
+            <ProgramWeeksList program={program} athleteId={athleteId} orgSlug={orgSlug} />
           ) : null}
         </CardContent>
       </Card>
@@ -155,13 +144,8 @@ export function AthleteDetailView({ athleteId }: AthleteDetailViewProps) {
 
 function BackButton({ orgSlug }: { orgSlug: string }) {
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="-ml-2"
-      render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}
-    >
-      <ArrowLeft className="h-4 w-4 mr-2" />
+    <Button variant="ghost" size="sm" className="-ml-2" render={<Link to="/$orgSlug/athletes" params={{ orgSlug }} />}>
+      <ArrowLeft className="mr-2 h-4 w-4" />
       Volver a Atletas
     </Button>
   )
@@ -206,7 +190,7 @@ interface ProgramWeeksListProps {
 function ProgramWeeksList({ program, athleteId, orgSlug }: ProgramWeeksListProps) {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(
     // Default: expand first week
-    new Set(program.weeks.length > 0 ? [program.weeks[0]?.id ?? ''] : [])
+    new Set(program.weeks.length > 0 ? [program.weeks[0]?.id ?? ''] : []),
   )
 
   const toggleWeek = (weekId: string) => {
@@ -222,11 +206,7 @@ function ProgramWeeksList({ program, athleteId, orgSlug }: ProgramWeeksListProps
   }
 
   if (program.weeks.length === 0) {
-    return (
-      <div className="text-center py-4 text-muted-foreground">
-        El programa no tiene semanas configuradas
-      </div>
-    )
+    return <div className="py-4 text-center text-muted-foreground">El programa no tiene semanas configuradas</div>
   }
 
   return (
@@ -257,37 +237,26 @@ interface WeekCollapsibleProps {
   onToggle: () => void
 }
 
-function WeekCollapsible({
-  week,
-  programId,
-  athleteId,
-  orgSlug,
-  isExpanded,
-  onToggle,
-}: WeekCollapsibleProps) {
+function WeekCollapsible({ week, programId, athleteId, orgSlug, isExpanded, onToggle }: WeekCollapsibleProps) {
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggle}>
       <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left hover:bg-muted/50">
         <span className="font-medium">{week.name}</span>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             {week.sessions.length} {week.sessions.length === 1 ? 'sesion' : 'sesiones'}
           </span>
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
+          {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="pl-4 pr-2 py-2 space-y-1 border-l-2 border-muted ml-3">
+        <div className="ml-3 space-y-1 border-muted border-l-2 py-2 pr-2 pl-4">
           {week.sessions
             .sort((a, b) => a.orderIndex - b.orderIndex)
             .map((session) => (
               <div
                 key={session.id}
-                className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/30"
+                className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted/30"
               >
                 <span className="text-sm">{session.name}</span>
                 <Button
@@ -308,7 +277,7 @@ function WeekCollapsible({
                     />
                   }
                 >
-                  <ClipboardList className="h-4 w-4 mr-2" />
+                  <ClipboardList className="mr-2 h-4 w-4" />
                   Registrar
                 </Button>
               </div>

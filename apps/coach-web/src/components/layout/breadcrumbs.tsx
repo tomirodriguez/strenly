@@ -1,6 +1,5 @@
 import { Link, useMatches } from '@tanstack/react-router'
 import { ChevronRightIcon } from 'lucide-react'
-import { useOrgSlug } from '@/hooks/use-org-slug'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { useOrgSlug } from '@/hooks/use-org-slug'
 
 const routeLabels: Record<string, string> = {
   dashboard: 'Panel',

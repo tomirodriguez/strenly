@@ -5,14 +5,14 @@
  * Shows date, status, RPE, and actions (view, edit, delete).
  */
 
+import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
+import { History } from 'lucide-react'
 import { useState } from 'react'
-import { useAthleteLogs } from '../hooks/queries/use-athlete-logs'
-import { LogHistoryTable } from '../components/log-history-table'
 import { LogDetailModal } from '../components/log-detail-modal'
+import { LogHistoryTable } from '../components/log-history-table'
+import { useAthleteLogs } from '../hooks/queries/use-athlete-logs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { History } from 'lucide-react'
-import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
 
 interface LogHistoryViewProps {
   athleteId: string
@@ -33,10 +33,8 @@ export function LogHistoryView({ athleteId }: LogHistoryViewProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Historial de Entrenamientos</h1>
-        <p className="text-muted-foreground">
-          Registros de entrenamientos pasados
-        </p>
+        <h1 className="font-bold text-2xl tracking-tight">Historial de Entrenamientos</h1>
+        <p className="text-muted-foreground">Registros de entrenamientos pasados</p>
       </div>
 
       {/* History table */}
@@ -46,9 +44,7 @@ export function LogHistoryView({ athleteId }: LogHistoryViewProps) {
             <History className="h-5 w-5" />
             Registros
           </CardTitle>
-          <CardDescription>
-            {data?.totalCount ?? 0} registros en total
-          </CardDescription>
+          <CardDescription>{data?.totalCount ?? 0} registros en total</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -58,23 +54,18 @@ export function LogHistoryView({ athleteId }: LogHistoryViewProps) {
               <Skeleton className="h-10 w-full" />
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Error al cargar historial
-            </div>
+            <div className="py-8 text-center text-muted-foreground">Error al cargar historial</div>
           ) : data && data.items.length > 0 ? (
             <>
-              <LogHistoryTable
-                items={data.items}
-                onViewLog={setSelectedLog}
-              />
+              <LogHistoryTable items={data.items} onViewLog={setSelectedLog} />
               {/* Pagination */}
               {data.totalCount > pageSize && (
-                <div className="flex justify-center gap-2 mt-4">
+                <div className="mt-4 flex justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
                     disabled={page === 0}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="rounded border px-3 py-1 disabled:opacity-50"
                   >
                     Anterior
                   </button>
@@ -85,7 +76,7 @@ export function LogHistoryView({ athleteId }: LogHistoryViewProps) {
                     type="button"
                     onClick={() => setPage((p) => p + 1)}
                     disabled={(page + 1) * pageSize >= data.totalCount}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="rounded border px-3 py-1 disabled:opacity-50"
                   >
                     Siguiente
                   </button>
@@ -93,22 +84,17 @@ export function LogHistoryView({ athleteId }: LogHistoryViewProps) {
               )}
             </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <div className="py-8 text-center text-muted-foreground">
+              <History className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p>No hay registros</p>
-              <p className="text-sm">
-                Los entrenamientos registrados apareceran aqui
-              </p>
+              <p className="text-sm">Los entrenamientos registrados apareceran aqui</p>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Detail modal */}
-      <LogDetailModal
-        log={selectedLog}
-        onClose={() => setSelectedLog(null)}
-      />
+      <LogDetailModal log={selectedLog} onClose={() => setSelectedLog(null)} />
     </div>
   )
 }

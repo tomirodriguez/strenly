@@ -8,9 +8,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LogHistoryView } from '@/features/workout-logs/views/log-history-view'
 
-export const Route = createFileRoute(
-  '/_authenticated/$orgSlug/athletes/$athleteId/logs/'
-)({
+export const Route = createFileRoute('/_authenticated/$orgSlug/athletes/$athleteId/logs/')({
   component: LogHistoryPage,
 })
 

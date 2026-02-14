@@ -24,30 +24,19 @@ interface ExerciseGroupSectionProps {
   groupLabel: string
 }
 
-export function ExerciseGroupSection({
-  exercises,
-  exercisesMap,
-  groupLabel,
-}: ExerciseGroupSectionProps) {
+export function ExerciseGroupSection({ exercises, exercisesMap, groupLabel }: ExerciseGroupSectionProps) {
   const isSuperset = exercises.length > 1
   // Check if this is a fallback label (starts with _)
   const isFallbackLabel = groupLabel.startsWith('_')
 
   return (
-    <div
-      className={cn(
-        'rounded-lg border bg-card',
-        isSuperset && 'border-l-4 border-l-primary',
-      )}
-    >
+    <div className={cn('rounded-lg border bg-card', isSuperset && 'border-l-4 border-l-primary')}>
       {/* Group header - only for supersets */}
       {isSuperset && (
         <div className="border-b px-4 py-2">
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             {exercises.map((ex, idx) => {
-              const label = isFallbackLabel
-                ? `${idx + 1}`
-                : `${groupLabel}${ex.groupOrder}`
+              const label = isFallbackLabel ? `${idx + 1}` : `${groupLabel}${ex.groupOrder}`
               const name = exercisesMap.get(ex.exerciseId) ?? 'Ejercicio'
               return (
                 <span key={ex.id} className="flex items-center gap-1">
@@ -86,11 +75,7 @@ interface ExerciseCardProps {
   groupLabel: string | null
 }
 
-function ExerciseCard({
-  exercise,
-  exerciseName,
-  groupLabel,
-}: ExerciseCardProps) {
+function ExerciseCard({ exercise, exerciseName, groupLabel }: ExerciseCardProps) {
   const actions = useLogActions()
 
   const handleToggleSkip = useCallback(() => {
@@ -117,30 +102,12 @@ function ExerciseCard({
       {/* Exercise header */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {displayLabel && (
-            <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-              {displayLabel}
-            </span>
-          )}
-          <h4
-            className={cn(
-              'font-medium text-sm',
-              exercise.skipped && 'line-through',
-            )}
-          >
-            {exerciseName}
-          </h4>
-          <span className="text-muted-foreground text-xs">
-            ({exercise.series.length} series)
-          </span>
+          {displayLabel && <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{displayLabel}</span>}
+          <h4 className={cn('font-medium text-sm', exercise.skipped && 'line-through')}>{exerciseName}</h4>
+          <span className="text-muted-foreground text-xs">({exercise.series.length} series)</span>
         </div>
 
-        <Button
-          variant={exercise.skipped ? 'secondary' : 'ghost'}
-          size="sm"
-          onClick={handleToggleSkip}
-          className="h-7"
-        >
+        <Button variant={exercise.skipped ? 'secondary' : 'ghost'} size="sm" onClick={handleToggleSkip} className="h-7">
           <SkipForwardIcon className="h-3 w-3" />
           {exercise.skipped ? 'Omitido' : 'Omitir'}
         </Button>
