@@ -13,7 +13,7 @@ import type {
   SaveDraftInput,
   SessionWithRows,
 } from '@strenly/core'
-import { createProgram, isProgramStatus, type Program, type Series } from '@strenly/core'
+import { isProgramStatus, type Program, type Series } from '@strenly/core'
 import { type Program as ProgramAggregate, reconstituteProgram } from '@strenly/core/domain/entities/program/program'
 import {
   type ExerciseGroup,
@@ -72,10 +72,10 @@ type ExerciseGroupRow = typeof exerciseGroups.$inferSelect
 // Domain Mappers
 // ============================================================================
 
-function mapProgramToDomain(row: ProgramRow): Program | null {
+function mapProgramToDomain(row: ProgramRow): Program {
   const status = isProgramStatus(row.status) ? row.status : 'draft'
 
-  const result = createProgram({
+  return reconstituteProgram({
     id: row.id,
     organizationId: row.organizationId,
     name: row.name,
@@ -83,11 +83,10 @@ function mapProgramToDomain(row: ProgramRow): Program | null {
     athleteId: row.athleteId,
     isTemplate: row.isTemplate,
     status,
+    weeks: [],
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   })
-
-  return result.isOk() ? result.value : null
 }
 
 function mapWeekToDomain(row: WeekRow): ProgramWeek {
@@ -450,9 +449,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
     loadProgramAggregate(
       ctx: OrganizationContext,
       programId: string,
-    ): ResultAsync<ProgramAggregate, ProgramRepositoryError> {
+    ): ResultAsync<ProgramAggregate | null, ProgramRepositoryError> {
       return RA.fromPromise(
-        (async (): Promise<{ ok: true; data: ProgramAggregate } | { ok: false; error: ProgramRepositoryError }> => {
+        (async (): Promise<
+          { ok: true; data: ProgramAggregate | null } | { ok: false; error: ProgramRepositoryError }
+        > => {
           // 1. Load program row
           const programRows = await db
             .select()
@@ -461,7 +462,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
 
           const programRow = programRows[0]
           if (!programRow) {
-            return { ok: false, error: notFoundError('program', programId) }
+            return { ok: true, data: null }
           }
 
           // 2. Load weeks ordered by orderIndex
@@ -693,11 +694,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         if (!row) {
           return err(dbError('Failed to create program'))
         }
-        const created = mapProgramToDomain(row)
-        if (!created) {
-          return err(dbError('Invalid program data after create'))
-        }
-        return ok(created)
+        return ok(mapProgramToDomain(row))
       })
     },
 
@@ -713,11 +710,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         if (!row) {
           return err(notFoundError('program', id))
         }
-        const program = mapProgramToDomain(row)
-        if (!program) {
-          return err(dbError('Invalid program data'))
-        }
-        return ok(program)
+        return ok(mapProgramToDomain(row))
       })
     },
 
@@ -741,27 +734,23 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
         if (!row) {
           return err(notFoundError('program', program.id))
         }
-        const updated = mapProgramToDomain(row)
-        if (!updated) {
-          return err(dbError('Invalid program data after update'))
-        }
-        return ok(updated)
+        return ok(mapProgramToDomain(row))
       })
     },
 
     list(
       ctx: OrganizationContext,
-      filters?: ProgramFilters,
+      filters: ProgramFilters,
     ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError> {
       return RA.fromPromise(
         (async () => {
           const conditions = [eq(programs.organizationId, ctx.organizationId)]
 
-          if (filters?.status) {
+          if (filters.status) {
             conditions.push(eq(programs.status, filters.status))
           }
 
-          if (filters?.athleteId !== undefined) {
+          if (filters.athleteId !== undefined) {
             if (filters.athleteId === null) {
               conditions.push(isNull(programs.athleteId))
             } else {
@@ -769,11 +758,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             }
           }
 
-          if (filters?.isTemplate !== undefined) {
+          if (filters.isTemplate !== undefined) {
             conditions.push(eq(programs.isTemplate, filters.isTemplate))
           }
 
-          if (filters?.search) {
+          if (filters.search) {
             const escaped = filters.search.replace(/[%_]/g, '\\$&')
             conditions.push(ilike(programs.name, `%${escaped}%`))
           }
@@ -787,11 +776,11 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
               .from(programs)
               .where(whereClause)
               .orderBy(asc(programs.name))
-              .limit(filters?.limit ?? 100)
-              .offset(filters?.offset ?? 0),
+              .limit(filters.limit)
+              .offset(filters.offset),
           ])
 
-          const items = rows.map(mapProgramToDomain).filter((p): p is Program => p !== null)
+          const items = rows.map(mapProgramToDomain)
 
           return { items, totalCount: countResult[0]?.count ?? 0 }
         })(),
@@ -814,9 +803,6 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
           }
 
           const program = mapProgramToDomain(programRow)
-          if (!program) {
-            return { ok: false, error: dbError('Invalid program data') }
-          }
 
           // 2. Fetch weeks
           const weekRows = await db
@@ -973,7 +959,7 @@ export function createProgramRepository(db: DbClient): ProgramRepositoryPort {
             db.select().from(programs).where(whereClause).orderBy(asc(programs.name)),
           ])
 
-          const items = rows.map(mapProgramToDomain).filter((p): p is Program => p !== null)
+          const items = rows.map(mapProgramToDomain)
 
           return { items, totalCount: countResult[0]?.count ?? 0 }
         })(),

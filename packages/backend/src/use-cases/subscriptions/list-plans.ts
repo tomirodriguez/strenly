@@ -11,6 +11,13 @@ type Dependencies = {
   planRepository: PlanRepositoryPort
 }
 
+/**
+ * List available subscription plans.
+ *
+ * PUBLIC: No authorization needed -- plans are public reference data
+ * used during onboarding and pricing display before the user has
+ * an organization or membership context.
+ */
 export const makeListPlans =
   (deps: Dependencies) =>
   (input: ListPlansInput): ResultAsync<{ items: Plan[]; totalCount: number }, ListPlansError> => {

@@ -48,13 +48,20 @@ export const makeCreateFromTemplate =
     // Load the aggregate to check isTemplate
     return deps.programRepository
       .loadProgramAggregate(ctx, input.templateId)
-      .mapErr((e): CreateFromTemplateError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', templateId: input.templateId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): CreateFromTemplateError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((program) => {
+        if (program === null) {
+          return errAsync<Program, CreateFromTemplateError>({
+            type: 'not_found',
+            templateId: input.templateId,
+          })
+        }
+
         if (!program.isTemplate) {
           return errAsync<Program, CreateFromTemplateError>({
             type: 'not_a_template',

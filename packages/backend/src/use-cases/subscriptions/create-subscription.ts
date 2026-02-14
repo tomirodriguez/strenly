@@ -31,8 +31,9 @@ type Dependencies = {
 /**
  * Create a subscription for an organization during onboarding.
  *
- * No authorization check needed as this is called during onboarding
- * when the user is creating their own organization.
+ * PUBLIC: No authorization needed -- this is called during onboarding
+ * when the user is creating their own organization. The procedure-level
+ * session guard ensures the caller is authenticated.
  */
 export const makeCreateSubscription =
   (deps: Dependencies) =>

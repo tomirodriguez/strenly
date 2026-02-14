@@ -114,13 +114,20 @@ export const makeDuplicateProgram =
     // 2. Load source program aggregate
     return deps.programRepository
       .loadProgramAggregate(ctx, input.sourceProgramId)
-      .mapErr((e): DuplicateProgramError => {
-        if (e.type === 'NOT_FOUND') {
-          return { type: 'not_found', programId: input.sourceProgramId }
-        }
-        return { type: 'repository_error', message: e.message }
-      })
+      .mapErr(
+        (e): DuplicateProgramError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
       .andThen((sourceProgram) => {
+        if (sourceProgram === null) {
+          return errAsync<Program, DuplicateProgramError>({
+            type: 'not_found',
+            programId: input.sourceProgramId,
+          })
+        }
+
         // 3. Clone weeks with new IDs (this recursively clones sessions, groups, items)
         const clonedWeeks = sourceProgram.weeks.map((week) => cloneWeek(week, deps.generateId))
 

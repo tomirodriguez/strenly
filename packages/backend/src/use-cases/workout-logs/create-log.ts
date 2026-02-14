@@ -209,11 +209,20 @@ export const makeCreateLog =
         // 3. Load program and athlete in parallel for display context
         const programResult = deps.programRepository
           .loadProgramAggregate(ctx, input.programId)
-          .mapErr((e): CreateLogError => {
-            if (e.type === 'NOT_FOUND') {
-              return { type: 'program_not_found', programId: input.programId }
+          .mapErr(
+            (e): CreateLogError => ({
+              type: 'repository_error',
+              message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+            }),
+          )
+          .andThen((program) => {
+            if (program === null) {
+              return errAsync<Program, CreateLogError>({
+                type: 'program_not_found',
+                programId: input.programId,
+              })
             }
-            return { type: 'repository_error', message: e.message }
+            return okAsync(program)
           })
 
         const athleteResult = deps.athleteRepository

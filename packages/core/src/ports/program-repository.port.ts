@@ -187,7 +187,7 @@ export type ProgramRepositoryPort = {
   loadProgramAggregate(
     ctx: OrganizationContext,
     programId: string,
-  ): ResultAsync<Program, ProgramRepositoryError>
+  ): ResultAsync<Program | null, ProgramRepositoryError>
 
   /**
    * Save a complete program aggregate (replace-on-save)
@@ -227,7 +227,7 @@ export type ProgramRepositoryPort = {
    */
   list(
     ctx: OrganizationContext,
-    filters?: ProgramFilters,
+    filters: ProgramFilters,
   ): ResultAsync<{ items: Program[]; totalCount: number }, ProgramRepositoryError>
 
   /**

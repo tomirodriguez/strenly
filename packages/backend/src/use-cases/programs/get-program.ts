@@ -1,6 +1,6 @@
 import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
 import type { Program } from '@strenly/core/domain/entities/program/program'
-import { errAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetProgramInput = OrganizationContext & {
   programId: string
@@ -41,10 +41,18 @@ export const makeGetProgram =
     }
 
     // 2. Load full program aggregate
-    return deps.programRepository.loadProgramAggregate(ctx, input.programId).mapErr((e): GetProgramError => {
-      if (e.type === 'NOT_FOUND') {
-        return { type: 'not_found', programId: input.programId }
-      }
-      return { type: 'repository_error', message: e.message }
-    })
+    return deps.programRepository
+      .loadProgramAggregate(ctx, input.programId)
+      .mapErr(
+        (e): GetProgramError => ({
+          type: 'repository_error',
+          message: e.type === 'DATABASE_ERROR' ? e.message : `Not found: ${e.id}`,
+        }),
+      )
+      .andThen((program) => {
+        if (program === null) {
+          return errAsync<Program, GetProgramError>({ type: 'not_found', programId: input.programId })
+        }
+        return okAsync(program)
+      })
   }

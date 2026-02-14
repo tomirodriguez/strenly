@@ -22,5 +22,5 @@ export type MuscleGroupRepositoryError =
  */
 export type MuscleGroupRepositoryPort = {
   findAll(): ResultAsync<MuscleGroupData[], MuscleGroupRepositoryError>
-  findById(id: string): ResultAsync<MuscleGroupData, MuscleGroupRepositoryError>
+  findById(id: string): ResultAsync<MuscleGroupData | null, MuscleGroupRepositoryError>
 }

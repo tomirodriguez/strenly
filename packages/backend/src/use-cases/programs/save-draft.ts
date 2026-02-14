@@ -1,4 +1,9 @@
-import { hasPermission, type OrganizationContext, type ProgramRepositoryPort } from '@strenly/core'
+import {
+  hasPermission,
+  type OrganizationContext,
+  type ProgramRepositoryError,
+  type ProgramRepositoryPort,
+} from '@strenly/core'
 import { createProgram, type Program } from '@strenly/core/domain/entities/program/program'
 import type { CreateProgramInput, ProgramStatus, WeekInput } from '@strenly/core/domain/entities/program/types'
 import { errAsync, type ResultAsync } from 'neverthrow'
@@ -45,11 +50,11 @@ type Dependencies = {
 /**
  * Map repository error to use case error.
  */
-function mapRepoError(e: { type: 'NOT_FOUND' | 'DATABASE_ERROR'; message?: string; id?: string }): SaveDraftError {
+function mapRepoError(e: ProgramRepositoryError): SaveDraftError {
   if (e.type === 'DATABASE_ERROR') {
-    return { type: 'repository_error', message: e.message ?? 'Database error' }
+    return { type: 'repository_error', message: e.message }
   }
-  return { type: 'program_not_found', programId: e.id ?? 'unknown' }
+  return { type: 'program_not_found', programId: e.id }
 }
 
 /**
@@ -116,6 +121,13 @@ export const makeSaveDraft =
         .loadProgramAggregate(ctx, input.programId)
         .mapErr(mapRepoError)
         .andThen((currentProgram) => {
+          if (currentProgram === null) {
+            return errAsync<SaveDraftResult, SaveDraftError>({
+              type: 'program_not_found',
+              programId: input.programId,
+            })
+          }
+
           const conflictWarning =
             currentProgram.updatedAt > lastLoadedAt
               ? 'Program was modified by another user. Your changes were saved but may overwrite recent changes.'

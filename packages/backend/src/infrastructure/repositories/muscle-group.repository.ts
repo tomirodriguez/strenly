@@ -2,7 +2,7 @@ import type { MuscleGroupData, MuscleGroupRepositoryError, MuscleGroupRepository
 import type { DbClient } from '@strenly/database'
 import { muscleGroups } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
-import { err, ok, ResultAsync } from 'neverthrow'
+import { ok, ResultAsync } from 'neverthrow'
 
 function wrapDbError(error: unknown): MuscleGroupRepositoryError {
   console.error('MuscleGroup repository error:', error)
@@ -49,7 +49,7 @@ export function createMuscleGroupRepository(db: DbClient): MuscleGroupRepository
       )
     },
 
-    findById(id: string): ResultAsync<MuscleGroupData, MuscleGroupRepositoryError> {
+    findById(id: string): ResultAsync<MuscleGroupData | null, MuscleGroupRepositoryError> {
       return ResultAsync.fromPromise(
         db
           .select()
@@ -59,7 +59,7 @@ export function createMuscleGroupRepository(db: DbClient): MuscleGroupRepository
         wrapDbError,
       ).andThen((row) => {
         if (!row) {
-          return err({ type: 'NOT_FOUND', muscleGroupId: id } as const)
+          return ok(null)
         }
         return ok(mapToData(row))
       })
