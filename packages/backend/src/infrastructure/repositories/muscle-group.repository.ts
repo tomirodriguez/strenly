@@ -1,4 +1,9 @@
-import type { MuscleGroupData, MuscleGroupRepositoryError, MuscleGroupRepositoryPort } from '@strenly/core'
+import {
+  isValidMuscleGroup,
+  type MuscleGroupData,
+  type MuscleGroupRepositoryError,
+  type MuscleGroupRepositoryPort,
+} from '@strenly/core'
 import type { DbClient } from '@strenly/database'
 import { muscleGroups } from '@strenly/database/schema'
 import { eq } from 'drizzle-orm'
@@ -21,9 +26,14 @@ function parseBodyRegion(value: string): 'upper' | 'lower' | 'core' {
 }
 
 /**
- * Map database row to MuscleGroupData
+ * Map database row to MuscleGroupData.
+ * Validates the name against known muscle groups.
+ * Returns null if the name is not a recognized muscle group.
  */
-function mapToData(row: typeof muscleGroups.$inferSelect): MuscleGroupData {
+function mapToData(row: typeof muscleGroups.$inferSelect): MuscleGroupData | null {
+  if (!isValidMuscleGroup(row.name)) {
+    return null
+  }
   return {
     id: row.id,
     name: row.name,
@@ -44,7 +54,7 @@ export function createMuscleGroupRepository(db: DbClient): MuscleGroupRepository
           .select()
           .from(muscleGroups)
           .orderBy(muscleGroups.displayName)
-          .then((rows) => rows.map(mapToData)),
+          .then((rows) => rows.map(mapToData).filter((mg): mg is MuscleGroupData => mg !== null)),
         wrapDbError,
       )
     },

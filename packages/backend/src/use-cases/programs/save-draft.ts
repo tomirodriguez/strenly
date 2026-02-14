@@ -23,9 +23,9 @@ export type ProgramDataInput = {
 
 /**
  * Input for saveDraft use case.
- * Receives the full program aggregate input (not delta changes).
+ * Includes OrganizationContext (standard single-input signature).
  */
-export type SaveDraftInput = {
+export type SaveDraftInput = OrganizationContext & {
   programId: string
   program: ProgramDataInput
   lastLoadedAt?: Date // For optimistic locking
@@ -85,20 +85,26 @@ function saveProgram(
  */
 export const makeSaveDraft =
   (deps: Dependencies) =>
-  (ctx: OrganizationContext, input: SaveDraftInput): ResultAsync<SaveDraftResult, SaveDraftError> => {
+  (input: SaveDraftInput): ResultAsync<SaveDraftResult, SaveDraftError> => {
     // 1. Authorization FIRST
-    if (!hasPermission(ctx.memberRole, 'programs:write')) {
+    if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
         type: 'forbidden',
         message: 'No permission to edit programs',
       })
     }
 
+    const ctx: OrganizationContext = {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      memberRole: input.memberRole,
+    }
+
     // 2. Build CreateProgramInput by adding id and organizationId
     const createInput: CreateProgramInput = {
       ...input.program,
       id: input.programId,
-      organizationId: ctx.organizationId,
+      organizationId: input.organizationId,
     }
 
     // 3. Validate aggregate via domain factory

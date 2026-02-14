@@ -1,4 +1,4 @@
-import { muscleGroupInfoSchema, muscleGroupSchema } from '@strenly/contracts/exercises'
+import { muscleGroupInfoSchema } from '@strenly/contracts/exercises'
 import { z } from 'zod'
 import { createMuscleGroupRepository } from '../../infrastructure/repositories/muscle-group.repository'
 import { authProcedure } from '../../lib/orpc'
@@ -36,14 +36,6 @@ export const listMuscleGroups = authProcedure
       }
     }
 
-    // Parse the names through the schema to ensure type safety
-    return result.value.map((mg) => {
-      const parsedName = muscleGroupSchema.parse(mg.name)
-      return {
-        id: mg.id,
-        name: parsedName,
-        displayName: mg.displayName,
-        bodyRegion: mg.bodyRegion,
-      }
-    })
+    // Repository validates names, return directly
+    return result.value
   })

@@ -13,7 +13,7 @@ import type {
   SaveDraftInput,
   SessionWithRows,
 } from '@strenly/core'
-import { isProgramStatus, type Program, type Series } from '@strenly/core'
+import { isProgramStatus, mapIntensityTypeToUnit, type Program, type Series } from '@strenly/core'
 import { type Program as ProgramAggregate, reconstituteProgram } from '@strenly/core/domain/entities/program/program'
 import {
   type ExerciseGroup,
@@ -171,23 +171,6 @@ function mapSeriesToDb(series: Series[]): DbPrescriptionSeriesData[] {
     tempo: s.tempo,
     restSeconds: s.restSeconds,
   }))
-}
-
-/**
- * Map IntensityType to database intensityUnit
- */
-function mapIntensityTypeToUnit(type: IntensityType | null): 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null {
-  if (!type) return null
-  switch (type) {
-    case 'absolute':
-      return 'kg'
-    case 'percentage':
-      return '%'
-    case 'rpe':
-      return 'rpe'
-    case 'rir':
-      return 'rir'
-  }
 }
 
 /**

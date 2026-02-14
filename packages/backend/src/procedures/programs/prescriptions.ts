@@ -1,5 +1,5 @@
 import { updatePrescriptionSchema } from '@strenly/contracts/programs'
-import { formatSeriesToNotation, updatePrescriptionOutputSchema } from '@strenly/contracts/programs/prescription'
+import { updatePrescriptionOutputSchema } from '@strenly/contracts/programs/prescription'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { authProcedure } from '../../lib/orpc'
 import { makeUpdatePrescription } from '../../use-cases/programs/update-prescription'
@@ -53,46 +53,7 @@ export const updatePrescriptionProcedure = authProcedure
       }
     }
 
-    // Return null if prescription was cleared, otherwise return formatted notation
-    const series = result.value
-    if (!series) {
-      return null
-    }
-
-    // Convert Series[] to PrescriptionSeriesInput[] format for formatting
-    const formattedNotation = formatSeriesToNotation(
-      series.map((s) => ({
-        orderIndex: s.orderIndex,
-        reps: s.reps,
-        repsMax: s.repsMax,
-        isAmrap: s.isAmrap,
-        intensityType: s.intensityType,
-        intensityValue: s.intensityValue,
-        intensityUnit: mapIntensityTypeToUnit(s.intensityType),
-        tempo: s.tempo,
-      })),
-    )
-
-    return {
-      notation: formattedNotation,
-    }
+    // Use case returns formatted notation or null (cleared)
+    const notation = result.value
+    return notation !== null ? { notation } : null
   })
-
-/**
- * Map intensity type to intensity unit for formatting
- */
-function mapIntensityTypeToUnit(
-  intensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null,
-): 'kg' | 'lb' | '%' | 'rpe' | 'rir' | null {
-  if (!intensityType) return null
-  switch (intensityType) {
-    case 'absolute':
-      return 'kg' // Default to kg
-    case 'percentage':
-      return '%'
-    case 'rpe':
-      return 'rpe'
-    case 'rir':
-      return 'rir'
-  }
-}

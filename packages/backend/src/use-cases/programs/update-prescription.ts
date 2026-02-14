@@ -1,8 +1,9 @@
-import { parsePrescriptionToSeries } from '@strenly/contracts/programs/prescription'
 import {
+  formatDomainSeriesToNotation,
   hasPermission,
   type OrganizationContext,
   type ProgramRepositoryPort,
+  parsePrescriptionToSeries,
   type Role,
   type Series,
 } from '@strenly/core'
@@ -31,10 +32,12 @@ type Dependencies = {
  *
  * Parses notation like "3x8@120kg" into structured data (Series[]).
  * Pass "-" or empty string to clear the cell.
+ *
+ * Returns the formatted notation string for display, or null if cleared.
  */
 export const makeUpdatePrescription =
   (deps: Dependencies) =>
-  (input: UpdatePrescriptionInput): ResultAsync<Series[] | null, UpdatePrescriptionError> => {
+  (input: UpdatePrescriptionInput): ResultAsync<string | null, UpdatePrescriptionError> => {
     // 1. Authorization FIRST
     if (!hasPermission(input.memberRole, 'programs:write')) {
       return errAsync({
@@ -69,7 +72,7 @@ export const makeUpdatePrescription =
         .map(() => null)
     }
 
-    // 5. Convert PrescriptionSeriesInput[] to Series[]
+    // 5. Convert ParsedSeriesData[] to domain Series[]
     const series: Series[] = parsedSeries.map((s, idx) => ({
       orderIndex: idx,
       reps: s.reps,
@@ -90,5 +93,5 @@ export const makeUpdatePrescription =
         }
         return { type: 'repository_error', message: e.message }
       })
-      .map(() => series)
+      .map(() => formatDomainSeriesToNotation(series))
   }

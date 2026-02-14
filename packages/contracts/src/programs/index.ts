@@ -28,12 +28,21 @@ export {
 } from './exercise-row'
 // Re-export prescription notation utilities
 export {
+  formatDomainSeriesToNotation,
   formatPrescription,
+  formatSeriesToNotation,
   type IntensityType,
+  type IntensityUnit,
   intensityTypeSchema,
+  intensityUnitSchema,
+  mapIntensityTypeToUnit,
   type ParsedPrescription,
+  type ParsedSeriesData,
+  type PrescriptionSeriesInput,
   parsedPrescriptionSchema,
   parsePrescriptionNotation,
+  parsePrescriptionToSeries,
+  prescriptionSeriesInputSchema,
   SKIP_PRESCRIPTION,
   type UnilateralUnit,
   type UpdatePrescriptionInput,

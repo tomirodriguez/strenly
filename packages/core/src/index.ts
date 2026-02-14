@@ -11,6 +11,7 @@ export * from './domain/entities/subscription'
 // Program Aggregate
 export * from './domain/entities/program/types'
 export * from './domain/entities/program/program'
+export * from './domain/entities/program/prescription-notation'
 // Ports
 export * from './ports/athlete-invitation-repository.port'
 export * from './ports/athlete-repository.port'

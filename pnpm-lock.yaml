@@ -288,6 +288,9 @@ importers:
 
   packages/contracts:
     dependencies:
+      '@strenly/core':
+        specifier: workspace:*
+        version: link:../core
       zod:
         specifier: ^3.24.2
         version: 3.25.76

@@ -1,12 +1,14 @@
 import type { ResultAsync } from 'neverthrow'
+import type { MuscleGroup } from '../domain/entities/muscle-group'
 
 /**
  * Muscle group data from database.
  * Global lookup data - no organization scoping needed.
+ * `name` is validated to be a known MuscleGroup value.
  */
 export type MuscleGroupData = {
   readonly id: string
-  readonly name: string
+  readonly name: MuscleGroup
   readonly displayName: string
   readonly bodyRegion: 'upper' | 'lower' | 'core'
 }

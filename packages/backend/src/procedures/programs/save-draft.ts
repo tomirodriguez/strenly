@@ -23,18 +23,14 @@ export const saveDraftProcedure = authProcedure
       programRepository: createProgramRepository(context.db),
     })
 
-    const result = await useCase(
-      {
-        organizationId: context.organization.id,
-        userId: context.user.id,
-        memberRole: context.membership.role,
-      },
-      {
-        programId: input.programId,
-        program: input.program,
-        lastLoadedAt: input.lastLoadedAt,
-      },
-    )
+    const result = await useCase({
+      organizationId: context.organization.id,
+      userId: context.user.id,
+      memberRole: context.membership.role,
+      programId: input.programId,
+      program: input.program,
+      lastLoadedAt: input.lastLoadedAt,
+    })
 
     if (result.isErr()) {
       switch (result.error.type) {

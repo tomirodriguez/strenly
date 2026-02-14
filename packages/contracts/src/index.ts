@@ -40,11 +40,17 @@ export { type MemberRole, memberRoleSchema } from './common/roles'
 // Programs
 export {
   formatPrescription,
+  formatSeriesToNotation,
   type IntensityType,
+  type IntensityUnit,
   intensityTypeSchema,
+  intensityUnitSchema,
+  mapIntensityTypeToUnit,
   type ParsedPrescription,
+  type ParsedSeriesData,
   parsedPrescriptionSchema,
   parsePrescriptionNotation,
+  parsePrescriptionToSeries,
   SKIP_PRESCRIPTION,
   type UnilateralUnit,
   unilateralUnitSchema,

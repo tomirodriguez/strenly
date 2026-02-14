@@ -162,6 +162,7 @@ export const duplicateWeekProcedure = authProcedure
   .handler(async ({ input, context, errors }) => {
     const useCase = makeDuplicateWeek({
       programRepository: createProgramRepository(context.db),
+      generateId: () => crypto.randomUUID(),
     })
 
     const result = await useCase({

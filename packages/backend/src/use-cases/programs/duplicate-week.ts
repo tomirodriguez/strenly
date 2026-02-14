@@ -22,6 +22,7 @@ export type DuplicateWeekError =
 
 type Dependencies = {
   programRepository: ProgramRepositoryPort
+  generateId: () => string
 }
 
 export const makeDuplicateWeek =

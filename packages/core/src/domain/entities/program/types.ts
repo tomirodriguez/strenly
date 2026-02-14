@@ -10,6 +10,27 @@ export type ProgramStatus = (typeof PROGRAM_STATUSES)[number]
 export const INTENSITY_TYPES = ['absolute', 'percentage', 'rpe', 'rir'] as const
 export type IntensityType = (typeof INTENSITY_TYPES)[number]
 
+export const INTENSITY_UNITS = ['kg', 'lb', '%', 'rpe', 'rir'] as const
+export type IntensityUnit = (typeof INTENSITY_UNITS)[number]
+
+/**
+ * Derive intensity unit from intensity type.
+ * Domain knowledge: each intensity type has a default display unit.
+ */
+export function mapIntensityTypeToUnit(type: IntensityType | null | undefined): IntensityUnit | null {
+  if (!type) return null
+  switch (type) {
+    case 'absolute':
+      return 'kg' // Default to kg for absolute weights
+    case 'percentage':
+      return '%'
+    case 'rpe':
+      return 'rpe'
+    case 'rir':
+      return 'rir'
+  }
+}
+
 // Type guards
 export function isProgramStatus(value: unknown): value is ProgramStatus {
   return typeof value === 'string' && PROGRAM_STATUSES.includes(value as ProgramStatus)
