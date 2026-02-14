@@ -4,7 +4,8 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Archive, Copy, Edit } from 'lucide-react'
 import { createDataTableColumns } from '@/components/data-table/create-data-table-columns'
-import type { RowAction } from '@/components/data-table/data-table-row-actions'
+import type { RowAction } from '@/components/data-table/data-table'
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { Badge } from '@/components/ui/badge'
 
 /**
@@ -40,7 +41,8 @@ type ProgramsColumnsCallbacks = {
 export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): ColumnDef<ProgramRow, unknown>[] {
   return createDataTableColumns<ProgramRow>((helper) => [
     helper.accessor('name', {
-      header: 'Nombre',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
+      enableSorting: true,
       cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
     }),
     helper.accessor('status', {
@@ -81,7 +83,9 @@ export function createProgramsColumns(callbacks: ProgramsColumnsCallbacks): Colu
       },
     }),
     helper.accessor('updatedAt', {
-      header: 'Actualizado',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Actualizado" />,
+      enableSorting: true,
+      sortDescFirst: true,
       cell: ({ row }) => {
         const updatedAt = new Date(row.original.updatedAt)
         return (

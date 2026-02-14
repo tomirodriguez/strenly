@@ -1,9 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { Loader2Icon } from 'lucide-react'
 import { AuthProvider } from '@/contexts/auth-context'
 import { OnboardingView } from '@/features/auth/views/onboarding-view'
 import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/onboarding')({
+  pendingComponent: OnboardingPending,
   beforeLoad: async () => {
     const session = await authClient.getSession()
     if (!session.data) {
@@ -23,6 +25,14 @@ export const Route = createFileRoute('/onboarding')({
   },
   component: OnboardingLayout,
 })
+
+function OnboardingPending() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <Loader2Icon className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  )
+}
 
 function OnboardingLayout() {
   const { authData } = Route.useRouteContext()

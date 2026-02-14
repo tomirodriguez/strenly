@@ -1,3 +1,4 @@
+import type { LoginInput } from '@strenly/contracts'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -7,17 +8,11 @@ import { OAuthButtons } from '../components/oauth-buttons'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
-interface LoginFormData {
-  email: string
-  password: string
-  rememberMe: boolean
-}
-
 export function LoginView() {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = async (data: LoginFormData) => {
+  const handleLogin = async (data: LoginInput) => {
     setIsLoading(true)
     try {
       const result = await authClient.signIn.email({

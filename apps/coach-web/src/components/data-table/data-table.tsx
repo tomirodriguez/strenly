@@ -10,6 +10,11 @@ import {
 } from '@tanstack/react-table'
 import { AlertCircle } from 'lucide-react'
 import { createContext, type ReactNode, useContext } from 'react'
+import { DataTableColumnHeader } from './data-table-column-header'
+import { DataTablePagination } from './data-table-pagination'
+import type { RowAction } from './data-table-row-actions'
+import { DataTableSearch } from './data-table-search'
+import { DataTableToolbar } from './data-table-toolbar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -95,9 +100,8 @@ function DataTableRoot<TData>({
     },
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: onSortingChange ? getSortedRowModel() : undefined,
+    getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
-    manualSorting: onSortingChange !== undefined,
   })
 
   const contextValue: DataTableContextValue<TData> = {
@@ -217,10 +221,33 @@ function DataTableContent<TData>({ onRowClick, emptyState }: DataTableContentPro
   )
 }
 
+type DataTableHeaderProps = {
+  title: string
+  description?: string
+  children?: ReactNode
+}
+
+function DataTableHeader({ title, description, children }: DataTableHeaderProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="font-semibold text-lg">{title}</h2>
+        {description && <p className="text-muted-foreground text-sm">{description}</p>}
+      </div>
+      {children && <div className="flex items-center gap-2">{children}</div>}
+    </div>
+  )
+}
+
 export const DataTable = {
   Root: DataTableRoot,
   Content: DataTableContent,
+  Header: DataTableHeader,
+  Toolbar: DataTableToolbar,
+  Search: DataTableSearch,
+  Pagination: DataTablePagination,
+  ColumnHeader: DataTableColumnHeader,
 }
 
 export { useDataTableContext }
-export type { ErrorConfig, EmptyStateConfig }
+export type { ErrorConfig, EmptyStateConfig, SortingState, RowAction }

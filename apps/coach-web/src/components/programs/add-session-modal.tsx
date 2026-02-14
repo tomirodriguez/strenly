@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { type Session, sessionSchema } from '@strenly/contracts/programs/session'
+import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,9 +11,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useGridActions } from '@/stores/grid-store'
+
+/**
+ * Local-only schema derived from the session entity schema.
+ * The addSessionSchema from contracts requires programId (for API calls),
+ * but this form operates on local grid state only, so we pick just the name field.
+ */
+const addSessionFormSchema = sessionSchema.pick({ name: true })
+
+type AddSessionFormValues = Pick<Session, 'name'>
 
 type AddSessionModalProps = {
   open: boolean
@@ -24,22 +35,24 @@ type AddSessionModalProps = {
  * Updates local state only - persisted via saveDraft.
  */
 export function AddSessionModal({ open, onOpenChange }: AddSessionModalProps) {
-  const [name, setName] = useState('')
   const { addSession } = useGridActions()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const trimmedName = name.trim()
-    if (!trimmedName) return
+  const { handleSubmit, control, reset } = useForm<AddSessionFormValues>({
+    resolver: zodResolver(addSessionFormSchema),
+    defaultValues: {
+      name: '',
+    },
+  })
 
-    addSession(trimmedName) // Local state only - no API call
-    setName('')
+  const handleFormSubmit = (data: AddSessionFormValues) => {
+    addSession(data.name.trim())
+    reset()
     onOpenChange(false)
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
-      setName('')
+      reset()
     }
     onOpenChange(nextOpen)
   }
@@ -54,33 +67,36 @@ export function AddSessionModal({ open, onOpenChange }: AddSessionModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form id="add-session-form" onSubmit={handleSubmit(handleFormSubmit)}>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="session-name">Nombre de la sesion *</Label>
-              <Input
-                id="session-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="DIA 1 - PUSH"
-                maxLength={100}
-                required
-                autoFocus
-              />
-            </div>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="session-name">
+                    Nombre de la sesion <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <FieldContent>
+                    <Input id="session-name" placeholder="DIA 1 - PUSH" maxLength={100} autoFocus {...field} />
+                    <FieldError errors={[fieldState.error]} />
+                  </FieldContent>
+                </Field>
+              )}
+            />
           </div>
-
-          <DialogFooter>
-            <DialogClose>
-              <Button type="button" variant="outline">
-                Cancelar
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={!name.trim()}>
-              Agregar Sesion
-            </Button>
-          </DialogFooter>
         </form>
+
+        <DialogFooter>
+          <DialogClose>
+            <Button type="button" variant="outline">
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button type="submit" form="add-session-form">
+            Agregar Sesion
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

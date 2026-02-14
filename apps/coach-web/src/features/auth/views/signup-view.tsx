@@ -1,3 +1,4 @@
+import type { SignupInput } from '@strenly/contracts'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -7,17 +8,11 @@ import { SignupForm } from '../components/signup-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
-interface SignupFormData {
-  name: string
-  email: string
-  password: string
-}
-
 export function SignupView() {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSignup = async (data: SignupFormData) => {
+  const handleSignup = async (data: SignupInput) => {
     setIsLoading(true)
     try {
       const result = await authClient.signUp.email({

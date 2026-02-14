@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { Loader2Icon } from 'lucide-react'
 import { AppShell } from '@/components/layout/app-shell'
 import { type AuthContextValue, AuthProvider } from '@/contexts/auth-context'
 import type { OrganizationContextValue } from '@/contexts/organization-context'
@@ -32,6 +33,7 @@ export function clearAuthCache(): void {
 }
 
 export const Route = createFileRoute('/_authenticated')({
+  pendingComponent: AuthenticatedPending,
   beforeLoad: async () => {
     // Use cached auth if available and fresh
     const cached = getCachedAuth()
@@ -76,6 +78,14 @@ export const Route = createFileRoute('/_authenticated')({
   },
   component: AuthenticatedLayout,
 })
+
+function AuthenticatedPending() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <Loader2Icon className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  )
+}
 
 function AuthenticatedLayout() {
   const { authData } = Route.useRouteContext()

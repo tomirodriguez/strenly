@@ -16,6 +16,8 @@ type AthleteFormProps = {
   id?: string
   onSubmit: (data: CreateAthleteInput) => void
   defaultValues?: Partial<CreateAthleteInput>
+  /** Whether the form is currently submitting (disables all fields) */
+  isSubmitting?: boolean
 }
 
 /**
@@ -23,7 +25,7 @@ type AthleteFormProps = {
  * Uses React Hook Form with Zod validation.
  * Accepts an optional id prop to link with external submit buttons.
  */
-export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
+export function AthleteForm({ id, onSubmit, defaultValues, isSubmitting }: AthleteFormProps) {
   const { handleSubmit, control } = useForm<CreateAthleteInput>({
     resolver: zodResolver(createAthleteInputSchema),
     defaultValues,
@@ -31,103 +33,105 @@ export function AthleteForm({ id, onSubmit, defaultValues }: AthleteFormProps) {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <Controller
-        name="name"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="name">
-              Nombre <span className="text-destructive">*</span>
-            </FieldLabel>
-            <FieldContent>
-              <Input id="name" placeholder="Ingresa el nombre del atleta" {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+      <fieldset disabled={isSubmitting} className="flex flex-col gap-6">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="name">
+                Nombre <span className="text-destructive">*</span>
+              </FieldLabel>
+              <FieldContent>
+                <Input id="name" placeholder="Ingresa el nombre del atleta" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="email"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
-            <FieldContent>
-              <Input id="email" type="email" placeholder="atleta@ejemplo.com" {...field} />
-              <FieldDescription>Opcional. Se usa para enviar invitaciones a la app de atletas.</FieldDescription>
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="email"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
+              <FieldContent>
+                <Input id="email" type="email" placeholder="atleta@ejemplo.com" {...field} />
+                <FieldDescription>Opcional. Se usa para enviar invitaciones a la app de atletas.</FieldDescription>
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="phone"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="phone">Telefono</FieldLabel>
-            <FieldContent>
-              <Input id="phone" placeholder="+1 (555) 000-0000" {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="phone">Telefono</FieldLabel>
+              <FieldContent>
+                <Input id="phone" placeholder="+1 (555) 000-0000" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="birthdate"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="birthdate">Fecha de nacimiento</FieldLabel>
-            <FieldContent>
-              <Input id="birthdate" type="date" {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="birthdate"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="birthdate">Fecha de nacimiento</FieldLabel>
+              <FieldContent>
+                <Input id="birthdate" type="date" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="gender"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="gender">Genero</FieldLabel>
-            <FieldContent>
-              <Select value={field.value ?? ''} onValueChange={field.onChange}>
-                <SelectTrigger id="gender">
-                  <SelectValue placeholder="Seleccionar genero" />
-                </SelectTrigger>
-                <SelectContent>
-                  {GENDER_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="gender"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="gender">Genero</FieldLabel>
+              <FieldContent>
+                <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                  <SelectTrigger id="gender">
+                    <SelectValue placeholder="Seleccionar genero" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GENDER_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="notes"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="notes">Notas</FieldLabel>
-            <FieldContent>
-              <Textarea id="notes" placeholder="Notas adicionales sobre el atleta..." rows={4} {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="notes"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="notes">Notas</FieldLabel>
+              <FieldContent>
+                <Textarea id="notes" placeholder="Notas adicionales sobre el atleta..." rows={4} {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
+      </fieldset>
     </form>
   )
 }

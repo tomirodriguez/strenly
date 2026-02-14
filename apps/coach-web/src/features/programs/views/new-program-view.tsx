@@ -151,6 +151,7 @@ export function NewProgramView() {
             athletes={athletes}
             isLoadingAthletes={isLoadingAthletes}
             onAthleteSearch={setAthleteSearch}
+            isSubmitting={isSubmitting}
             defaultValues={
               selectedTemplate
                 ? {

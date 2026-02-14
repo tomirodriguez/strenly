@@ -6,6 +6,7 @@ import { Edit, Eye, History, Mail, Trash } from 'lucide-react'
 import { useMemo } from 'react'
 import { InvitationStatus } from './invitation-status'
 import { createDataTableColumns } from '@/components/data-table/create-data-table-columns'
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { Badge } from '@/components/ui/badge'
 import { useOrgSlug } from '@/hooks/use-org-slug'
 
@@ -31,7 +32,8 @@ export function useAthletesColumns({
     () =>
       createDataTableColumns<Athlete>((helper) => [
         helper.accessor('name', {
-          header: 'Nombre',
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
+          enableSorting: true,
           cell: ({ row }) => (
             <Link
               to="/$orgSlug/athletes/$athleteId"
@@ -63,7 +65,9 @@ export function useAthletesColumns({
           cell: ({ row }) => <InvitationStatus athlete={row.original} />,
         }),
         helper.accessor('createdAt', {
-          header: 'Creado',
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Creado" />,
+          enableSorting: true,
+          sortDescFirst: true,
           cell: ({ row }) => {
             const createdAt = new Date(row.original.createdAt)
             return (

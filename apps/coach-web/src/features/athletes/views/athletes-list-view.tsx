@@ -1,4 +1,5 @@
 import type { Athlete, CreateAthleteInput } from '@strenly/contracts/athletes/athlete'
+import type { SortingState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { AthleteForm } from '../components/athlete-form'
@@ -9,9 +10,6 @@ import { useCreateAthlete } from '../hooks/mutations/use-create-athlete'
 import { useUpdateAthlete } from '../hooks/mutations/use-update-athlete'
 import { useAthletes } from '../hooks/queries/use-athletes'
 import { DataTable } from '@/components/data-table/data-table'
-import { DataTablePagination } from '@/components/data-table/data-table-pagination'
-import { DataTableSearch } from '@/components/data-table/data-table-search'
-import { DataTableToolbar } from '@/components/data-table/data-table-toolbar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -34,6 +32,7 @@ export function AthletesListView() {
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [showArchived, setShowArchived] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null)
   const [invitationAthlete, setInvitationAthlete] = useState<Athlete | null>(null)
@@ -157,16 +156,18 @@ export function AthletesListView() {
         onPageChange={handlePageChange}
         isLoading={isLoading}
         error={error ? { message: 'Error al cargar atletas', retry: refetch } : null}
+        sorting={sorting}
+        onSortingChange={setSorting}
       >
-        <DataTableToolbar>
-          <DataTableSearch value={search} onValueChange={handleSearchChange} placeholder="Buscar atletas..." />
+        <DataTable.Toolbar>
+          <DataTable.Search value={search} onValueChange={handleSearchChange} placeholder="Buscar atletas..." />
           <Field orientation="horizontal" className="gap-2">
             <Checkbox id="show-archived" checked={showArchived} onCheckedChange={handleShowArchivedChange} />
             <FieldLabel htmlFor="show-archived" className="font-normal text-sm">
               Mostrar archivados
             </FieldLabel>
           </Field>
-        </DataTableToolbar>
+        </DataTable.Toolbar>
 
         <DataTable.Content
           emptyState={{
@@ -181,7 +182,7 @@ export function AthletesListView() {
           }}
         />
 
-        <DataTablePagination />
+        <DataTable.Pagination />
       </DataTable.Root>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -197,6 +198,7 @@ export function AthletesListView() {
           <AthleteForm
             id="athlete-form"
             onSubmit={handleFormSubmit}
+            isSubmitting={isSubmitting}
             defaultValues={
               editingAthlete
                 ? {

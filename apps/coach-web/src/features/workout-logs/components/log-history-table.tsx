@@ -1,28 +1,25 @@
 /**
  * Log History Table
  *
- * Displays workout logs in a table format with view, edit, and delete actions.
- * Shows date, session, status, and RPE for each log.
+ * Displays workout logs using DataTable compound component with
+ * pagination, loading/error/empty states, and row actions.
  */
 
 import type { WorkoutLogAggregate } from '@strenly/contracts/workout-logs'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import type { OnChangeFn, SortingState } from '@tanstack/react-table'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Edit, Eye, MoreVertical, Trash } from 'lucide-react'
+import { Edit, Eye, History, Trash } from 'lucide-react'
+import { useMemo } from 'react'
 import { useDeleteLog } from '../hooks/mutations/use-delete-log'
+import { createDataTableColumns } from '@/components/data-table/create-data-table-columns'
+import { DataTable, type ErrorConfig } from '@/components/data-table/data-table'
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from '@/lib/toast'
 
-interface LogHistoryTableProps {
-  items: WorkoutLogAggregate[]
-  onViewLog: (log: WorkoutLogAggregate) => void
-}
-
-const statusLabels: Record<
+const STATUS_LABELS: Record<
   'completed' | 'partial' | 'skipped',
   { label: string; variant: 'default' | 'secondary' | 'outline' }
 > = {
@@ -31,7 +28,75 @@ const statusLabels: Record<
   skipped: { label: 'Saltado', variant: 'outline' },
 }
 
-export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
+type UseLogColumnsOptions = {
+  onViewLog: (log: WorkoutLogAggregate) => void
+  onEdit: (log: WorkoutLogAggregate) => void
+  onDelete: (log: WorkoutLogAggregate) => void
+}
+
+function useLogColumns({ onViewLog, onEdit, onDelete }: UseLogColumnsOptions) {
+  return useMemo(
+    () =>
+      createDataTableColumns<WorkoutLogAggregate>((helper) => [
+        helper.accessor('logDate', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha" />,
+          enableSorting: true,
+          sortDescFirst: true,
+          cell: ({ row }) => format(new Date(row.original.logDate), 'PPP', { locale: es }),
+        }),
+        helper.display({
+          id: 'sessionName',
+          header: 'Sesion',
+          cell: ({ row }) => <span className="text-muted-foreground">{row.original.sessionName ?? 'Sesion'}</span>,
+        }),
+        helper.accessor('status', {
+          header: 'Estado',
+          cell: ({ row }) => {
+            const status = STATUS_LABELS[row.original.status]
+            return <Badge variant={status.variant}>{status.label}</Badge>
+          },
+        }),
+        helper.accessor('sessionRpe', {
+          header: 'RPE',
+          cell: ({ row }) => row.original.sessionRpe ?? '-',
+        }),
+        helper.actions({
+          actions: (log) => [
+            { label: 'Ver detalles', icon: Eye, onClick: () => onViewLog(log) },
+            { label: 'Editar', icon: Edit, onClick: () => onEdit(log) },
+            { label: 'Eliminar', icon: Trash, onClick: () => onDelete(log), variant: 'destructive' },
+          ],
+        }),
+      ]),
+    [onViewLog, onEdit, onDelete],
+  )
+}
+
+type LogHistoryTableProps = {
+  data: WorkoutLogAggregate[]
+  totalCount: number
+  pageIndex: number
+  pageSize: number
+  onPageChange: (pageIndex: number, pageSize: number) => void
+  isLoading?: boolean
+  error?: ErrorConfig | null
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
+  onViewLog: (log: WorkoutLogAggregate) => void
+}
+
+export function LogHistoryTable({
+  data,
+  totalCount,
+  pageIndex,
+  pageSize,
+  onPageChange,
+  isLoading,
+  error,
+  sorting,
+  onSortingChange,
+  onViewLog,
+}: LogHistoryTableProps) {
   const { orgSlug, athleteId } = useParams({
     from: '/_authenticated/$orgSlug/athletes/$athleteId/logs/',
   })
@@ -54,10 +119,10 @@ export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
     })
   }
 
-  const handleDelete = (logId: string) => {
+  const handleDelete = (log: WorkoutLogAggregate) => {
     if (confirm('Estas seguro de eliminar este registro?')) {
       deleteLogMutation.mutate(
-        { logId },
+        { logId: log.id },
         {
           onSuccess: () => {
             toast.success('Workout eliminado')
@@ -67,58 +132,29 @@ export function LogHistoryTable({ items, onViewLog }: LogHistoryTableProps) {
     }
   }
 
+  const columns = useLogColumns({ onViewLog, onEdit: handleEdit, onDelete: handleDelete })
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Fecha</TableHead>
-          <TableHead>Sesion</TableHead>
-          <TableHead>Estado</TableHead>
-          <TableHead>RPE</TableHead>
-          <TableHead className="w-[80px]" />
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {items.map((log) => {
-          const status = statusLabels[log.status]
-          return (
-            <TableRow key={log.id}>
-              <TableCell>{format(new Date(log.logDate), 'PPP', { locale: es })}</TableCell>
-              <TableCell>
-                {/* TODO: Get session name from program */}
-                Sesion
-              </TableCell>
-              <TableCell>
-                <Badge variant={status.variant}>{status.label}</Badge>
-              </TableCell>
-              <TableCell>{log.sessionRpe ?? '-'}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onViewLog(log)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver detalles
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEdit(log)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(log.id)} variant="destructive">
-                      <Trash className="mr-2 h-4 w-4" />
-                      Eliminar
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          )
-        })}
-      </TableBody>
-    </Table>
+    <DataTable.Root
+      columns={columns}
+      data={data}
+      totalCount={totalCount}
+      pageIndex={pageIndex}
+      pageSize={pageSize}
+      onPageChange={onPageChange}
+      isLoading={isLoading}
+      error={error}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
+    >
+      <DataTable.Content
+        emptyState={{
+          icon: <History className="h-12 w-12" />,
+          title: 'No hay registros',
+          description: 'Los entrenamientos registrados apareceran aqui',
+        }}
+      />
+      <DataTable.Pagination />
+    </DataTable.Root>
   )
 }

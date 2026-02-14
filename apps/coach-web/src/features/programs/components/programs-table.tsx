@@ -1,7 +1,8 @@
+import type { OnChangeFn, SortingState } from '@tanstack/react-table'
+import type React from 'react'
 import { useMemo } from 'react'
 import { createProgramsColumns, type ProgramRow } from './programs-table-columns'
-import { DataTable, type ErrorConfig } from '@/components/data-table/data-table'
-import { DataTablePagination } from '@/components/data-table/data-table-pagination'
+import { DataTable, type EmptyStateConfig, type ErrorConfig } from '@/components/data-table/data-table'
 
 type ProgramsTableProps = {
   data: ProgramRow[]
@@ -11,9 +12,13 @@ type ProgramsTableProps = {
   onPageChange: (pageIndex: number, pageSize: number) => void
   isLoading?: boolean
   error?: ErrorConfig | null
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
+  emptyState?: EmptyStateConfig
   onEdit: (program: ProgramRow) => void
   onDuplicate: (program: ProgramRow) => void
   onArchive: (program: ProgramRow) => void
+  children?: React.ReactNode
 }
 
 /**
@@ -28,9 +33,13 @@ export function ProgramsTable({
   onPageChange,
   isLoading = false,
   error,
+  sorting,
+  onSortingChange,
+  emptyState,
   onEdit,
   onDuplicate,
   onArchive,
+  children,
 }: ProgramsTableProps) {
   const columns = useMemo(
     () => createProgramsColumns({ onEdit, onDuplicate, onArchive }),
@@ -47,14 +56,19 @@ export function ProgramsTable({
       onPageChange={onPageChange}
       isLoading={isLoading}
       error={error}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
     >
+      {children}
       <DataTable.Content
-        emptyState={{
-          title: 'No se encontraron programas',
-          description: 'Intenta ajustar los filtros o crear un nuevo programa.',
-        }}
+        emptyState={
+          emptyState ?? {
+            title: 'No se encontraron programas',
+            description: 'Intenta ajustar los filtros o crear un nuevo programa.',
+          }
+        }
       />
-      <DataTablePagination />
+      <DataTable.Pagination />
     </DataTable.Root>
   )
 }
