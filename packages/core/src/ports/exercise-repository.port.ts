@@ -9,8 +9,6 @@ export type ExerciseRepositoryError =
   | { type: 'DATABASE_ERROR'; message: string }
 
 export type ListExercisesOptions = {
-  // null = curated only, string = org-specific, undefined = all available
-  organizationId?: string | null
   movementPattern?: MovementPattern
   muscleGroup?: MuscleGroup
   search?: string
@@ -23,11 +21,10 @@ export type ExerciseRepositoryPort = {
   /**
    * Find exercise by ID with organization scope.
    * Returns exercise if it's curated (organizationId is null) OR belongs to the specified organization.
-   * @param organizationId - The organization to scope the query to (null returns only curated)
-   * @param id - The exercise ID to find
    */
-  findById(organizationId: string | null, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError>
+  findById(ctx: OrganizationContext, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError>
   findAll(
+    ctx: OrganizationContext,
     options: ListExercisesOptions,
   ): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError>
   /**

@@ -1,14 +1,7 @@
-import {
-  type Exercise,
-  type ExerciseRepositoryPort,
-  hasPermission,
-  type OrganizationContext,
-  type Role,
-} from '@strenly/core'
+import { type Exercise, type ExerciseRepositoryPort, hasPermission, type OrganizationContext } from '@strenly/core'
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
 
 export type GetExerciseInput = OrganizationContext & {
-  memberRole: Role
   exerciseId: string
 }
 
@@ -33,8 +26,9 @@ export const makeGetExercise =
     }
 
     // 2. Fetch exercise with organization scope (repository handles access control)
+    const ctx = { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole }
     return deps.exerciseRepository
-      .findById(input.organizationId, input.exerciseId)
+      .findById(ctx, input.exerciseId)
       .mapErr(
         (e): GetExerciseError => ({
           type: 'repository_error',

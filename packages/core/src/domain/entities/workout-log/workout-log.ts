@@ -17,7 +17,7 @@ import { err, ok, type Result } from 'neverthrow'
 import { validateLoggedExercise } from './logged-exercise'
 import type { CreateWorkoutLogInput, LoggedExercise, WorkoutLog, WorkoutLogError } from './types'
 
-export { type WorkoutLog, type WorkoutLogError } from './types'
+export type { WorkoutLog, WorkoutLogError } from './types'
 
 /**
  * Create a new WorkoutLog with full hierarchy validation.

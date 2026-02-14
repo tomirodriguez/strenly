@@ -44,6 +44,15 @@ export function reconstituteAthlete(props: Athlete): Athlete {
   return { ...props }
 }
 
+export type UpdateAthleteInput = {
+  name?: string
+  email?: string | null
+  phone?: string | null
+  birthdate?: Date | null
+  gender?: AthleteGender | null
+  notes?: string | null
+}
+
 export function createAthlete(input: CreateAthleteInput): Result<Athlete, AthleteError> {
   // Validate and normalize name
   const trimmedName = input.name.trim()
@@ -76,4 +85,49 @@ export function createAthlete(input: CreateAthleteInput): Result<Athlete, Athlet
     createdAt: now,
     updatedAt: now,
   })
+}
+
+/**
+ * Update an athlete's details with validation.
+ * Only the provided fields are updated; undefined fields are kept unchanged.
+ */
+export function updateAthlete(athlete: Athlete, updates: UpdateAthleteInput): Result<Athlete, AthleteError> {
+  // Validate name if provided
+  if (updates.name !== undefined) {
+    const trimmedName = updates.name.trim()
+    if (trimmedName.length === 0) {
+      return err({ type: 'INVALID_NAME', message: 'Name is required' })
+    }
+    if (trimmedName.length > 100) {
+      return err({ type: 'INVALID_NAME', message: 'Name must not exceed 100 characters' })
+    }
+  }
+
+  // Validate email if provided
+  const email = updates.email !== undefined ? (updates.email ?? null) : athlete.email
+  if (email !== null && !EMAIL_REGEX.test(email)) {
+    return err({ type: 'INVALID_EMAIL', message: 'Invalid email format' })
+  }
+
+  return ok({
+    ...athlete,
+    name: updates.name !== undefined ? updates.name.trim() : athlete.name,
+    email,
+    phone: updates.phone !== undefined ? (updates.phone ?? null) : athlete.phone,
+    birthdate: updates.birthdate !== undefined ? (updates.birthdate ?? null) : athlete.birthdate,
+    gender: updates.gender !== undefined ? (updates.gender ?? null) : athlete.gender,
+    notes: updates.notes !== undefined ? (updates.notes ?? null) : athlete.notes,
+    updatedAt: new Date(),
+  })
+}
+
+/**
+ * Deactivate an athlete (set status to inactive).
+ */
+export function deactivateAthlete(athlete: Athlete): Athlete {
+  return {
+    ...athlete,
+    status: 'inactive',
+    updatedAt: new Date(),
+  }
 }

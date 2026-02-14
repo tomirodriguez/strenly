@@ -1,14 +1,7 @@
-import {
-  type ExerciseRepositoryPort,
-  hasPermission,
-  isCurated,
-  type OrganizationContext,
-  type Role,
-} from '@strenly/core'
+import { type ExerciseRepositoryPort, hasPermission, isCurated, type OrganizationContext } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ArchiveExerciseInput = OrganizationContext & {
-  memberRole: Role
   exerciseId: string
 }
 
@@ -34,8 +27,13 @@ export const makeArchiveExercise =
     }
 
     // 2. Fetch exercise to verify ownership (repository handles org scope)
+    const ctx: OrganizationContext = {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      memberRole: input.memberRole,
+    }
     return deps.exerciseRepository
-      .findById(input.organizationId, input.exerciseId)
+      .findById(ctx, input.exerciseId)
       .mapErr(
         (e): ArchiveExerciseError => ({
           type: 'repository_error',
@@ -60,12 +58,6 @@ export const makeArchiveExercise =
         }
 
         // 5. Archive the exercise (soft delete via archivedAt timestamp) with organization scope
-        const ctx: OrganizationContext = {
-          organizationId: input.organizationId,
-          userId: input.userId,
-          memberRole: input.memberRole,
-        }
-
         return deps.exerciseRepository.archive(ctx, input.exerciseId).mapErr(
           (e): ArchiveExerciseError => ({
             type: 'repository_error',

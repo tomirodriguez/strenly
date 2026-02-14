@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { createWorkoutLog, reconstituteWorkoutLog } from './workout-log'
 import type { CreateWorkoutLogInput, LoggedExerciseInput, WorkoutLog } from './types'
 import { isLogStatus } from './types'
+import { createWorkoutLog, reconstituteWorkoutLog } from './workout-log'
 
 describe('WorkoutLog Aggregate', () => {
   // Helper to create valid input

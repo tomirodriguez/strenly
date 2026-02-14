@@ -7,10 +7,7 @@ import { err, ok, type Result } from 'neverthrow'
 import { validateSession } from './session'
 import type { ProgramError, Session, Week, WeekInput } from './types'
 
-export function validateWeek(
-  input: WeekInput,
-  weekIndex: number,
-): Result<Week, ProgramError> {
+export function validateWeek(input: WeekInput, weekIndex: number): Result<Week, ProgramError> {
   // Default name: "Semana {orderIndex + 1}"
   const name = input.name?.trim() || `Semana ${input.orderIndex + 1}`
 

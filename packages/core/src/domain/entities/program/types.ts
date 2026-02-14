@@ -149,7 +149,8 @@ export type ProgramError =
   | { type: 'NAME_REQUIRED'; message: string }
   | { type: 'NAME_TOO_SHORT'; message: string }
   | { type: 'NAME_TOO_LONG'; message: string }
-  | { type: 'INVALID_STATUS_TRANSITION'; message: string }
+  | { type: 'INVALID_STATUS_TRANSITION'; message: string; from: ProgramStatus; to: ProgramStatus }
+  | { type: 'WEEK_NOT_FOUND'; message: string; weekId: string }
   // Week-level errors
   | { type: 'WEEK_NAME_TOO_LONG'; message: string; weekIndex: number }
   | { type: 'WEEK_INVALID_ORDER_INDEX'; message: string; weekIndex: number }
@@ -161,20 +162,127 @@ export type ProgramError =
   | { type: 'SESSION_DUPLICATE_ORDER_INDEX'; message: string; weekIndex: number; orderIndex: number }
   // ExerciseGroup-level errors
   | { type: 'GROUP_INVALID_ORDER_INDEX'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number }
-  | { type: 'GROUP_DUPLICATE_ORDER_INDEX'; message: string; weekIndex: number; sessionIndex: number; orderIndex: number }
+  | {
+      type: 'GROUP_DUPLICATE_ORDER_INDEX'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      orderIndex: number
+    }
   | { type: 'GROUP_EMPTY'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number }
   // GroupItem-level errors
-  | { type: 'ITEM_EXERCISE_ID_REQUIRED'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number }
-  | { type: 'ITEM_INVALID_ORDER_INDEX'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number }
-  | { type: 'ITEM_DUPLICATE_ORDER_INDEX'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; orderIndex: number }
+  | {
+      type: 'ITEM_EXERCISE_ID_REQUIRED'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+    }
+  | {
+      type: 'ITEM_INVALID_ORDER_INDEX'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+    }
+  | {
+      type: 'ITEM_DUPLICATE_ORDER_INDEX'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      orderIndex: number
+    }
   // Series-level errors
-  | { type: 'SERIES_INVALID_ORDER_INDEX'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_REPS_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_REPS_RANGE_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_AMRAP_WITH_REPS'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_PERCENTAGE_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_RPE_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_RIR_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_ABSOLUTE_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_INTENSITY_VALUE_REQUIRED'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
-  | { type: 'SERIES_TEMPO_INVALID'; message: string; weekIndex: number; sessionIndex: number; groupIndex: number; itemIndex: number; seriesIndex: number }
+  | {
+      type: 'SERIES_INVALID_ORDER_INDEX'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_REPS_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_REPS_RANGE_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_AMRAP_WITH_REPS'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_PERCENTAGE_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_RPE_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_RIR_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_ABSOLUTE_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_INTENSITY_VALUE_REQUIRED'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }
+  | {
+      type: 'SERIES_TEMPO_INVALID'
+      message: string
+      weekIndex: number
+      sessionIndex: number
+      groupIndex: number
+      itemIndex: number
+      seriesIndex: number
+    }

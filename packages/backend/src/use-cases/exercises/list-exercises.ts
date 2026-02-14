@@ -5,12 +5,10 @@ import {
   type MovementPattern,
   type MuscleGroup,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type ListExercisesInput = OrganizationContext & {
-  memberRole: Role
   movementPattern?: MovementPattern
   muscleGroup?: MuscleGroup
   search?: string
@@ -42,9 +40,9 @@ export const makeListExercises =
     }
 
     // 2. Query repository - includes curated (null orgId) + org's custom exercises
+    const ctx = { organizationId: input.organizationId, userId: input.userId, memberRole: input.memberRole }
     return deps.exerciseRepository
-      .findAll({
-        organizationId: input.organizationId,
+      .findAll(ctx, {
         movementPattern: input.movementPattern,
         muscleGroup: input.muscleGroup,
         search: input.search,

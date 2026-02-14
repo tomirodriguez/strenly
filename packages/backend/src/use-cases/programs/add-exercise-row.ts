@@ -4,12 +4,10 @@ import {
   type OrganizationContext,
   type ProgramExerciseRow,
   type ProgramRepositoryPort,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type AddExerciseRowInput = OrganizationContext & {
-  memberRole: Role
   sessionId: string
   exerciseId: string
   groupId?: string | null
@@ -82,7 +80,7 @@ export const makeAddExerciseRow =
           .andThen((createdRow) => {
             // 4. Fetch exercise name for the response
             return deps.exerciseRepository
-              .findById(input.organizationId, createdRow.exerciseId)
+              .findById(ctx, createdRow.exerciseId)
               .map(
                 (exercise): AddExerciseRowResult => ({
                   row: createdRow,

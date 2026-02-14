@@ -184,10 +184,7 @@ export type ProgramRepositoryPort = {
    * Load a complete program aggregate with full hierarchy
    * Used for editing - returns Program with weeks/sessions/groups/items/series
    */
-  loadProgramAggregate(
-    ctx: OrganizationContext,
-    programId: string,
-  ): ResultAsync<Program | null, ProgramRepositoryError>
+  loadProgramAggregate(ctx: OrganizationContext, programId: string): ResultAsync<Program | null, ProgramRepositoryError>
 
   /**
    * Save a complete program aggregate (replace-on-save)
@@ -273,6 +270,11 @@ export type ProgramRepositoryPort = {
   // ---------------------------------------------------------------------------
   // Session Operations
   // ---------------------------------------------------------------------------
+
+  /**
+   * Find a session by ID
+   */
+  findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession, ProgramRepositoryError>
 
   /**
    * Create a session (training day) for a program

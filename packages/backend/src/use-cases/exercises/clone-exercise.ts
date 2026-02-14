@@ -4,12 +4,10 @@ import {
   type ExerciseRepositoryPort,
   hasPermission,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type CloneExerciseInput = OrganizationContext & {
-  memberRole: Role
   sourceExerciseId: string
   name?: string
 }
@@ -37,8 +35,13 @@ export const makeCloneExercise =
     }
 
     // 2. Fetch source exercise with organization scope (repository handles access control)
+    const ctx: OrganizationContext = {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      memberRole: input.memberRole,
+    }
     return deps.exerciseRepository
-      .findById(input.organizationId, input.sourceExerciseId)
+      .findById(ctx, input.sourceExerciseId)
       .mapErr(
         (e): CloneExerciseError => ({
           type: 'repository_error',
@@ -78,12 +81,6 @@ export const makeCloneExercise =
         }
 
         // 5. Persist cloned exercise with organization scope
-        const ctx: OrganizationContext = {
-          organizationId: input.organizationId,
-          userId: input.userId,
-          memberRole: input.memberRole,
-        }
-
         return deps.exerciseRepository.create(ctx, clonedResult.value).mapErr(
           (e): CloneExerciseError => ({
             type: 'repository_error',

@@ -16,7 +16,10 @@ import type { LoggedExercise, LoggedExerciseInput, LoggedSeries, WorkoutLogError
  * @param exerciseIndex - The exercise position (0-based, for error context)
  * @returns Result<LoggedExercise, WorkoutLogError>
  */
-export function validateLoggedExercise(input: LoggedExerciseInput, exerciseIndex: number): Result<LoggedExercise, WorkoutLogError> {
+export function validateLoggedExercise(
+  input: LoggedExerciseInput,
+  exerciseIndex: number,
+): Result<LoggedExercise, WorkoutLogError> {
   // Validate exerciseId required
   if (!input.exerciseId || input.exerciseId.trim() === '') {
     return err({

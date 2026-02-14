@@ -6,12 +6,11 @@ export * from './domain/entities/exercise'
 export * from './domain/entities/movement-pattern'
 export * from './domain/entities/muscle-group'
 export * from './domain/entities/plan'
-export * from './domain/entities/subscription'
-
+export * from './domain/entities/program/prescription-notation'
+export * from './domain/entities/program/program'
 // Program Aggregate
 export * from './domain/entities/program/types'
-export * from './domain/entities/program/program'
-export * from './domain/entities/program/prescription-notation'
+export * from './domain/entities/subscription'
 // Ports
 export * from './ports/athlete-invitation-repository.port'
 export * from './ports/athlete-repository.port'

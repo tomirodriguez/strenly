@@ -11,10 +11,7 @@ type SessionContext = {
   weekIndex: number
 }
 
-export function validateSession(
-  input: SessionInput,
-  ctx: SessionContext,
-): Result<Session, ProgramError> {
+export function validateSession(input: SessionInput, ctx: SessionContext): Result<Session, ProgramError> {
   const sessionIndex = input.orderIndex
 
   // Validate name

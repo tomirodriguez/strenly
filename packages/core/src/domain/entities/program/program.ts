@@ -10,10 +10,17 @@
  */
 
 import { err, ok, type Result } from 'neverthrow'
-import type { CreateProgramInput, Program, ProgramError, Week } from './types'
+import type { CreateProgramInput, Program, ProgramError, ProgramStatus, Week, WeekInput } from './types'
 import { validateWeek } from './week'
 
-export { type Program, type ProgramError } from './types'
+export type { Program, ProgramError } from './types'
+
+// Valid status transitions: draft -> active, active -> archived, draft -> archived
+const VALID_STATUS_TRANSITIONS: Record<ProgramStatus, ProgramStatus[]> = {
+  draft: ['active', 'archived'],
+  active: ['archived'],
+  archived: [],
+}
 
 /**
  * Create a new Program with full hierarchy validation.
@@ -91,4 +98,85 @@ export function createProgram(input: CreateProgramInput): Result<Program, Progra
  */
 export function reconstituteProgram(props: Program): Program {
   return { ...props }
+}
+
+/**
+ * Activate a program (draft -> active).
+ */
+export function activateProgram(program: Program): Result<Program, ProgramError> {
+  return transitionStatus(program, 'active')
+}
+
+/**
+ * Archive a program (draft -> archived or active -> archived).
+ */
+export function archiveProgram(program: Program): Result<Program, ProgramError> {
+  return transitionStatus(program, 'archived')
+}
+
+/**
+ * Transition a program to a new status with validation.
+ */
+function transitionStatus(program: Program, newStatus: ProgramStatus): Result<Program, ProgramError> {
+  if (!VALID_STATUS_TRANSITIONS[program.status].includes(newStatus)) {
+    return err({
+      type: 'INVALID_STATUS_TRANSITION',
+      message: `Cannot transition from ${program.status} to ${newStatus}`,
+      from: program.status,
+      to: newStatus,
+    })
+  }
+
+  return ok({
+    ...program,
+    status: newStatus,
+    updatedAt: new Date(),
+  })
+}
+
+/**
+ * Add a week to the program. Validates the new week and checks for duplicate orderIndexes.
+ */
+export function addWeek(program: Program, input: WeekInput): Result<Program, ProgramError> {
+  // Check for duplicate orderIndex
+  const existingOrderIndexes = new Set(program.weeks.map((w) => w.orderIndex))
+  if (existingOrderIndexes.has(input.orderIndex)) {
+    return err({
+      type: 'WEEK_DUPLICATE_ORDER_INDEX',
+      message: `Duplicate week orderIndex: ${input.orderIndex}`,
+      orderIndex: input.orderIndex,
+    })
+  }
+
+  // Validate the new week
+  const weekResult = validateWeek(input, program.weeks.length)
+  if (weekResult.isErr()) {
+    return err(weekResult.error)
+  }
+
+  return ok({
+    ...program,
+    weeks: [...program.weeks, weekResult.value],
+    updatedAt: new Date(),
+  })
+}
+
+/**
+ * Remove a week from the program by ID.
+ */
+export function removeWeek(program: Program, weekId: string): Result<Program, ProgramError> {
+  const weekExists = program.weeks.some((w) => w.id === weekId)
+  if (!weekExists) {
+    return err({
+      type: 'WEEK_NOT_FOUND',
+      message: `Week not found: ${weekId}`,
+      weekId,
+    })
+  }
+
+  return ok({
+    ...program,
+    weeks: program.weeks.filter((w) => w.id !== weekId),
+    updatedAt: new Date(),
+  })
 }

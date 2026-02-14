@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createProgram, reconstituteProgram } from './program'
+import { activateProgram, addWeek, archiveProgram, createProgram, reconstituteProgram, removeWeek } from './program'
 import type { CreateProgramInput, Program, SeriesInput } from './types'
 import { isIntensityType, isProgramStatus } from './types'
 
@@ -30,13 +30,26 @@ describe('Program Aggregate', () => {
     return group
   }
 
-  const getItem = (program: Program, weekIndex: number, sessionIndex: number, groupIndex: number, itemIndex: number) => {
+  const getItem = (
+    program: Program,
+    weekIndex: number,
+    sessionIndex: number,
+    groupIndex: number,
+    itemIndex: number,
+  ) => {
     const item = getGroup(program, weekIndex, sessionIndex, groupIndex).items[itemIndex]
     if (!item) throw new Error(`Item at index ${itemIndex} not found`)
     return item
   }
 
-  const getSeries = (program: Program, weekIndex: number, sessionIndex: number, groupIndex: number, itemIndex: number, seriesIndex: number) => {
+  const getSeries = (
+    program: Program,
+    weekIndex: number,
+    sessionIndex: number,
+    groupIndex: number,
+    itemIndex: number,
+    seriesIndex: number,
+  ) => {
     const series = getItem(program, weekIndex, sessionIndex, groupIndex, itemIndex).series[seriesIndex]
     if (!series) throw new Error(`Series at index ${seriesIndex} not found`)
     return series
@@ -892,9 +905,7 @@ describe('Program Aggregate', () => {
                           id: 'item-3',
                           exerciseId: 'ex-curls',
                           orderIndex: 1,
-                          series: [
-                            { reps: 12, repsMax: 15, isAmrap: false },
-                          ],
+                          series: [{ reps: 12, repsMax: 15, isAmrap: false }],
                         },
                       ],
                     },
@@ -913,9 +924,7 @@ describe('Program Aggregate', () => {
                           id: 'item-4',
                           exerciseId: 'ex-squat',
                           orderIndex: 0,
-                          series: [
-                            { reps: 5, isAmrap: false, intensityType: 'rpe', intensityValue: 8, tempo: '31X0' },
-                          ],
+                          series: [{ reps: 5, isAmrap: false, intensityType: 'rpe', intensityValue: 8, tempo: '31X0' }],
                         },
                       ],
                     },
@@ -1081,6 +1090,173 @@ describe('Program Aggregate', () => {
 
       expect(getSeries(program, 0, 0, 0, 0, 0).intensityType).toBe('percentage')
       expect(getSeries(program, 0, 0, 0, 0, 0).tempo).toBe('3010')
+    })
+  })
+
+  describe('activateProgram', () => {
+    it('should activate a draft program', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      expect(program).not.toBeNull()
+      if (!program) return
+
+      const result = activateProgram(program)
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.status).toBe('active')
+        expect(result.value.updatedAt.getTime()).toBeGreaterThanOrEqual(program.updatedAt.getTime())
+      }
+    })
+
+    it('should reject activating an already active program', () => {
+      const program = createProgram({ ...validInput, status: 'active' }).unwrapOr(null)
+      if (!program) return
+
+      const result = activateProgram(program)
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_STATUS_TRANSITION')
+      }
+    })
+
+    it('should reject activating an archived program', () => {
+      const program = createProgram({ ...validInput, status: 'archived' }).unwrapOr(null)
+      if (!program) return
+
+      const result = activateProgram(program)
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_STATUS_TRANSITION')
+      }
+    })
+  })
+
+  describe('archiveProgram', () => {
+    it('should archive a draft program', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      if (!program) return
+
+      const result = archiveProgram(program)
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.status).toBe('archived')
+      }
+    })
+
+    it('should archive an active program', () => {
+      const program = createProgram({ ...validInput, status: 'active' }).unwrapOr(null)
+      if (!program) return
+
+      const result = archiveProgram(program)
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.status).toBe('archived')
+      }
+    })
+
+    it('should reject archiving an already archived program', () => {
+      const program = createProgram({ ...validInput, status: 'archived' }).unwrapOr(null)
+      if (!program) return
+
+      const result = archiveProgram(program)
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_STATUS_TRANSITION')
+      }
+    })
+  })
+
+  describe('addWeek', () => {
+    it('should add a valid week to a program', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      if (!program) return
+
+      const result = addWeek(program, { id: 'week-1', orderIndex: 0 })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.weeks.length).toBe(1)
+        expect(result.value.weeks[0]?.id).toBe('week-1')
+      }
+    })
+
+    it('should reject duplicate orderIndex', () => {
+      const program = createProgram({
+        ...validInput,
+        weeks: [{ id: 'week-1', orderIndex: 0 }],
+      }).unwrapOr(null)
+      if (!program) return
+
+      const result = addWeek(program, { id: 'week-2', orderIndex: 0 })
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('WEEK_DUPLICATE_ORDER_INDEX')
+      }
+    })
+
+    it('should validate the new week', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      if (!program) return
+
+      const result = addWeek(program, { id: 'week-1', orderIndex: -1 })
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('WEEK_INVALID_ORDER_INDEX')
+      }
+    })
+
+    it('should update updatedAt timestamp', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      if (!program) return
+
+      const result = addWeek(program, { id: 'week-1', orderIndex: 0 })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.updatedAt.getTime()).toBeGreaterThanOrEqual(program.updatedAt.getTime())
+      }
+    })
+  })
+
+  describe('removeWeek', () => {
+    it('should remove a week by ID', () => {
+      const program = createProgram({
+        ...validInput,
+        weeks: [
+          { id: 'week-1', orderIndex: 0 },
+          { id: 'week-2', orderIndex: 1 },
+        ],
+      }).unwrapOr(null)
+      if (!program) return
+
+      const result = removeWeek(program, 'week-1')
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.weeks.length).toBe(1)
+        expect(result.value.weeks[0]?.id).toBe('week-2')
+      }
+    })
+
+    it('should return error for non-existent week', () => {
+      const program = createProgram(validInput).unwrapOr(null)
+      if (!program) return
+
+      const result = removeWeek(program, 'non-existent')
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('WEEK_NOT_FOUND')
+      }
+    })
+
+    it('should update updatedAt timestamp', () => {
+      const program = createProgram({
+        ...validInput,
+        weeks: [{ id: 'week-1', orderIndex: 0 }],
+      }).unwrapOr(null)
+      if (!program) return
+
+      const result = removeWeek(program, 'week-1')
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.updatedAt.getTime()).toBeGreaterThanOrEqual(program.updatedAt.getTime())
+      }
     })
   })
 

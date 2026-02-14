@@ -7,12 +7,10 @@ import {
   type MovementPattern,
   type MuscleGroup,
   type OrganizationContext,
-  type Role,
 } from '@strenly/core'
 import { errAsync, type ResultAsync } from 'neverthrow'
 
 export type UpdateExerciseInput = OrganizationContext & {
-  memberRole: Role
   exerciseId: string
   name?: string
   description?: string | null
@@ -47,8 +45,13 @@ export const makeUpdateExercise =
     }
 
     // 2. Fetch existing exercise (repository handles org scope)
+    const ctx: OrganizationContext = {
+      organizationId: input.organizationId,
+      userId: input.userId,
+      memberRole: input.memberRole,
+    }
     return deps.exerciseRepository
-      .findById(input.organizationId, input.exerciseId)
+      .findById(ctx, input.exerciseId)
       .mapErr(
         (e): UpdateExerciseError => ({
           type: 'repository_error',
@@ -96,12 +99,6 @@ export const makeUpdateExercise =
         }
 
         // 6. Persist update with organization scope
-        const ctx: OrganizationContext = {
-          organizationId: input.organizationId,
-          userId: input.userId,
-          memberRole: input.memberRole,
-        }
-
         return deps.exerciseRepository.update(ctx, updatedResult.value).mapErr(
           (e): UpdateExerciseError => ({
             type: 'repository_error',

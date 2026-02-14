@@ -111,14 +111,14 @@ export function createExercise(input: CreateExerciseInput): Result<Exercise, Exe
 }
 
 // Helper functions
-export function isCurated(exercise: Exercise): boolean {
+export function isCurated(exercise: Pick<Exercise, 'organizationId'>): boolean {
   return exercise.organizationId === null
 }
 
-export function isCustom(exercise: Exercise): boolean {
+export function isCustom(exercise: Pick<Exercise, 'organizationId'>): boolean {
   return exercise.organizationId !== null
 }
 
-export function isArchived(exercise: Exercise): boolean {
+export function isArchived(exercise: Pick<Exercise, 'archivedAt'>): boolean {
   return exercise.archivedAt !== null
 }

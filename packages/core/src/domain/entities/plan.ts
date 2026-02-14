@@ -112,11 +112,11 @@ export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
 }
 
 // Helper to check if athlete can be added to a plan
-export function canAddAthlete(plan: Plan, currentCount: number): boolean {
+export function canAddAthlete(plan: Pick<Plan, 'athleteLimit'>, currentCount: number): boolean {
   return currentCount < plan.athleteLimit
 }
 
 // Helper to check feature access
-export function hasFeature(plan: Plan, feature: keyof PlanFeatures): boolean {
+export function hasFeature(plan: Pick<Plan, 'features'>, feature: keyof PlanFeatures): boolean {
   return plan.features[feature]
 }

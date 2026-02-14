@@ -13,10 +13,7 @@ type GroupItemContext = {
   groupIndex: number
 }
 
-export function validateGroupItem(
-  input: GroupItemInput,
-  ctx: GroupItemContext,
-): Result<GroupItem, ProgramError> {
+export function validateGroupItem(input: GroupItemInput, ctx: GroupItemContext): Result<GroupItem, ProgramError> {
   const itemIndex = input.orderIndex
 
   // Validate exerciseId

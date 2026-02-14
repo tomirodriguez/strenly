@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAthlete } from './athlete'
+import { createAthlete, deactivateAthlete, updateAthlete } from './athlete'
 
 const validInput = {
   id: 'athlete-123',
@@ -197,6 +197,150 @@ describe('createAthlete', () => {
       if (result.isOk()) {
         expect(result.value.gender).toBeNull()
       }
+    })
+  })
+
+  describe('updateAthlete', () => {
+    it('updates name with validation', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { name: 'Jane Doe' })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.name).toBe('Jane Doe')
+        expect(result.value.updatedAt.getTime()).toBeGreaterThanOrEqual(athlete.updatedAt.getTime())
+      }
+    })
+
+    it('rejects empty name', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { name: '' })
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_NAME')
+      }
+    })
+
+    it('rejects name over 100 chars', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { name: 'x'.repeat(101) })
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_NAME')
+      }
+    })
+
+    it('trims whitespace from name', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { name: '  Jane  ' })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.name).toBe('Jane')
+      }
+    })
+
+    it('updates email with validation', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { email: 'new@example.com' })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.email).toBe('new@example.com')
+      }
+    })
+
+    it('rejects invalid email', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { email: 'not-an-email' })
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('INVALID_EMAIL')
+      }
+    })
+
+    it('clears email with null', () => {
+      const athlete = createAthlete({ ...validInput, email: 'john@example.com' }).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { email: null })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.email).toBeNull()
+      }
+    })
+
+    it('keeps unchanged fields when only updating one field', () => {
+      const athlete = createAthlete({
+        ...validInput,
+        email: 'john@example.com',
+        phone: '+1234567890',
+        notes: 'Test notes',
+      }).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, { name: 'New Name' })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.name).toBe('New Name')
+        expect(result.value.email).toBe('john@example.com')
+        expect(result.value.phone).toBe('+1234567890')
+        expect(result.value.notes).toBe('Test notes')
+      }
+    })
+
+    it('updates multiple fields at once', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = updateAthlete(athlete, {
+        name: 'New Name',
+        email: 'new@example.com',
+        phone: '+9999999999',
+        notes: 'Updated notes',
+      })
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.name).toBe('New Name')
+        expect(result.value.email).toBe('new@example.com')
+        expect(result.value.phone).toBe('+9999999999')
+        expect(result.value.notes).toBe('Updated notes')
+      }
+    })
+  })
+
+  describe('deactivateAthlete', () => {
+    it('sets status to inactive', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = deactivateAthlete(athlete)
+      expect(result.status).toBe('inactive')
+      expect(result.updatedAt.getTime()).toBeGreaterThanOrEqual(athlete.updatedAt.getTime())
+    })
+
+    it('preserves all other fields', () => {
+      const athlete = createAthlete({
+        ...validInput,
+        email: 'john@example.com',
+        phone: '+1234567890',
+      }).unwrapOr(null)
+      if (!athlete) return
+
+      const result = deactivateAthlete(athlete)
+      expect(result.name).toBe('John Doe')
+      expect(result.email).toBe('john@example.com')
+      expect(result.phone).toBe('+1234567890')
+      expect(result.id).toBe('athlete-123')
     })
   })
 

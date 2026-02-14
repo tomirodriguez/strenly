@@ -88,19 +88,14 @@ function mapToDomain(row: ExerciseRow, muscleMappings: MuscleMapping[]): Exercis
 
 export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
   return {
-    findById(organizationId: string | null, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError> {
+    findById(ctx: OrganizationContext, id: string): ResultAsync<Exercise | null, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         (async () => {
           // Build where clause: match ID AND (curated OR belongs to org)
-          const whereClause =
-            organizationId === null
-              ? // Only return curated exercises when organizationId is null
-                and(eq(exercises.id, id), isNull(exercises.organizationId))
-              : // Return exercise if curated OR belongs to the organization
-                and(
-                  eq(exercises.id, id),
-                  or(isNull(exercises.organizationId), eq(exercises.organizationId, organizationId)),
-                )
+          const whereClause = and(
+            eq(exercises.id, id),
+            or(isNull(exercises.organizationId), eq(exercises.organizationId, ctx.organizationId)),
+          )
 
           const row = await db
             .select()
@@ -126,23 +121,15 @@ export function createExerciseRepository(db: DbClient): ExerciseRepositoryPort {
     },
 
     findAll(
+      ctx: OrganizationContext,
       options: ListExercisesOptions,
     ): ResultAsync<{ items: Exercise[]; totalCount: number }, ExerciseRepositoryError> {
       return ResultAsync.fromPromise(
         (async () => {
           const conditions = []
 
-          // Filter by organization:
-          // - null = curated only (organizationId IS NULL)
-          // - string = curated OR org's custom
-          // - undefined = all exercises (no filter)
-          if (options?.organizationId === null) {
-            // Only curated exercises
-            conditions.push(isNull(exercises.organizationId))
-          } else if (options?.organizationId !== undefined) {
-            // Curated OR org-specific
-            conditions.push(or(isNull(exercises.organizationId), eq(exercises.organizationId, options.organizationId)))
-          }
+          // Always scope to curated exercises + org-specific exercises
+          conditions.push(or(isNull(exercises.organizationId), eq(exercises.organizationId, ctx.organizationId)))
 
           // Filter by movement pattern
           if (options?.movementPattern) {

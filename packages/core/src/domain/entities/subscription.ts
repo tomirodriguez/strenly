@@ -112,10 +112,10 @@ export function decrementAthleteCount(subscription: Subscription): Result<Subscr
   })
 }
 
-export function isActive(subscription: Subscription): boolean {
+export function isActive(subscription: Pick<Subscription, 'status'>): boolean {
   return subscription.status === 'active'
 }
 
-export function isPastDue(subscription: Subscription): boolean {
+export function isPastDue(subscription: Pick<Subscription, 'status'>): boolean {
   return subscription.status === 'past_due'
 }

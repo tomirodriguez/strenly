@@ -61,9 +61,7 @@ export function reconstituteAthleteInvitation(props: AthleteInvitation): Athlete
 /**
  * Accept an invitation. Returns error if already accepted, revoked, or expired.
  */
-export function acceptInvitation(
-  invitation: AthleteInvitation,
-): Result<AthleteInvitation, AthleteInvitationError> {
+export function acceptInvitation(invitation: AthleteInvitation): Result<AthleteInvitation, AthleteInvitationError> {
   if (invitation.acceptedAt !== null) {
     return err({ type: 'ALREADY_ACCEPTED', message: 'Invitation has already been accepted' })
   }
@@ -83,9 +81,7 @@ export function acceptInvitation(
 /**
  * Revoke an invitation. Returns error if already accepted or already revoked.
  */
-export function revokeInvitation(
-  invitation: AthleteInvitation,
-): Result<AthleteInvitation, AthleteInvitationError> {
+export function revokeInvitation(invitation: AthleteInvitation): Result<AthleteInvitation, AthleteInvitationError> {
   if (invitation.acceptedAt !== null) {
     return err({ type: 'ALREADY_ACCEPTED', message: 'Cannot revoke an accepted invitation' })
   }
@@ -102,27 +98,27 @@ export function revokeInvitation(
 /**
  * Checks if the invitation has expired.
  */
-export function isExpired(invitation: AthleteInvitation): boolean {
+export function isExpired(invitation: Pick<AthleteInvitation, 'expiresAt'>): boolean {
   return invitation.expiresAt < new Date()
 }
 
 /**
  * Checks if the invitation has been revoked.
  */
-export function isRevoked(invitation: AthleteInvitation): boolean {
+export function isRevoked(invitation: Pick<AthleteInvitation, 'revokedAt'>): boolean {
   return invitation.revokedAt !== null
 }
 
 /**
  * Checks if the invitation has been accepted.
  */
-export function isAccepted(invitation: AthleteInvitation): boolean {
+export function isAccepted(invitation: Pick<AthleteInvitation, 'acceptedAt'>): boolean {
   return invitation.acceptedAt !== null
 }
 
 /**
  * Checks if the invitation is still valid (not expired, not revoked, not accepted).
  */
-export function isValid(invitation: AthleteInvitation): boolean {
+export function isValid(invitation: Pick<AthleteInvitation, 'expiresAt' | 'revokedAt' | 'acceptedAt'>): boolean {
   return !isExpired(invitation) && !isRevoked(invitation) && !isAccepted(invitation)
 }
