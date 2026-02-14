@@ -151,14 +151,29 @@ describe('transitionStatus', () => {
 describe('incrementAthleteCount', () => {
   it('increments count by 1', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
-    const updated = incrementAthleteCount(subscription)
-    expect(updated.athleteCount).toBe(6)
+    const result = incrementAthleteCount(subscription)
+    expect(result.isOk()).toBe(true)
+    if (result.isOk()) {
+      expect(result.value.athleteCount).toBe(6)
+    }
   })
 
   it('increments from zero', () => {
     const subscription = createSubscription({ ...validInput, athleteCount: 0 })._unsafeUnwrap()
-    const updated = incrementAthleteCount(subscription)
-    expect(updated.athleteCount).toBe(1)
+    const result = incrementAthleteCount(subscription)
+    expect(result.isOk()).toBe(true)
+    if (result.isOk()) {
+      expect(result.value.athleteCount).toBe(1)
+    }
+  })
+
+  it('rejects increment on canceled subscription', () => {
+    const subscription = createSubscription({ ...validInput, status: 'canceled' })._unsafeUnwrap()
+    const result = incrementAthleteCount(subscription)
+    expect(result.isErr()).toBe(true)
+    if (result.isErr()) {
+      expect(result.error.type).toBe('SUBSCRIPTION_CANCELED')
+    }
   })
 })
 

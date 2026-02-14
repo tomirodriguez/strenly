@@ -35,6 +35,26 @@ export function validateLoggedSeries(
     }
   }
 
+  // Validate weightUsed (>= 0 if provided)
+  if (input.weightUsed !== undefined && input.weightUsed !== null && input.weightUsed < 0) {
+    return err({
+      type: 'INVALID_WEIGHT',
+      message: `Weight used cannot be negative, got ${input.weightUsed}`,
+      exerciseIndex,
+      seriesIndex: orderIndex,
+    })
+  }
+
+  // Validate repsPerformed (>= 0 if provided)
+  if (input.repsPerformed !== undefined && input.repsPerformed !== null && input.repsPerformed < 0) {
+    return err({
+      type: 'INVALID_REPS',
+      message: `Reps performed cannot be negative, got ${input.repsPerformed}`,
+      exerciseIndex,
+      seriesIndex: orderIndex,
+    })
+  }
+
   // If exercise is skipped, mark all series as skipped
   const skipped = exerciseSkipped || (input.skipped ?? false)
 

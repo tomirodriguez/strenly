@@ -7,6 +7,8 @@
  * and prescribed snapshot for deviation display.
  */
 
+import type { IntensityType } from '../program/types'
+
 // Constants
 export const LOG_STATUSES = ['completed', 'partial', 'skipped'] as const
 export type LogStatus = (typeof LOG_STATUSES)[number]
@@ -29,7 +31,7 @@ export type LoggedSeries = {
   // Extended prescription snapshot for display
   readonly prescribedRepsMax: number | null // For rep ranges like 8-10
   readonly prescribedIsAmrap: boolean
-  readonly prescribedIntensityType: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  readonly prescribedIntensityType: IntensityType | null
   readonly prescribedIntensityValue: number | null
   readonly prescribedTempo: string | null // "3010"
   readonly prescribedRestSeconds: number | null // 90
@@ -80,7 +82,7 @@ export type LoggedSeriesInput = {
   // Extended prescription snapshot
   prescribedRepsMax?: number | null
   prescribedIsAmrap?: boolean
-  prescribedIntensityType?: 'absolute' | 'percentage' | 'rpe' | 'rir' | null
+  prescribedIntensityType?: IntensityType | null
   prescribedIntensityValue?: number | null
   prescribedTempo?: string | null
   prescribedRestSeconds?: number | null
@@ -133,3 +135,7 @@ export type WorkoutLogError =
   | { type: 'GROUP_ITEM_ID_REQUIRED'; message: string; exerciseIndex: number }
   | { type: 'INVALID_ORDER_INDEX'; message: string; exerciseIndex: number }
   | { type: 'SERIES_INVALID_ORDER'; message: string; exerciseIndex: number; seriesIndex: number }
+  | { type: 'INVALID_STATUS_TRANSITION'; message: string; from: LogStatus; to: LogStatus }
+  | { type: 'LOG_NOT_STARTED'; message: string }
+  | { type: 'INVALID_WEIGHT'; message: string; exerciseIndex: number; seriesIndex: number }
+  | { type: 'INVALID_REPS'; message: string; exerciseIndex: number; seriesIndex: number }

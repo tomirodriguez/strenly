@@ -22,6 +22,8 @@ export type Plan = {
   readonly priceMonthly: number // cents
   readonly priceYearly: number // cents
   readonly isActive: boolean
+  readonly createdAt: Date
+  readonly updatedAt: Date
 }
 
 export type PlanError =
@@ -43,6 +45,8 @@ type CreatePlanInput = {
   priceMonthly: number
   priceYearly: number
   isActive: boolean
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 /**
@@ -51,6 +55,77 @@ type CreatePlanInput = {
  */
 export function reconstitutePlan(props: Plan): Plan {
   return { ...props }
+}
+
+type UpdatePlanInput = {
+  name?: string
+  athleteLimit?: number
+  coachLimit?: number | null
+  features?: PlanFeatures
+  priceMonthly?: number
+  priceYearly?: number
+  isActive?: boolean
+}
+
+/**
+ * Update a plan's details with validation.
+ * Only the provided fields are updated; undefined fields are kept unchanged.
+ */
+export function updatePlan(plan: Plan, updates: UpdatePlanInput): Result<Plan, PlanError> {
+  // Validate name if provided
+  if (updates.name !== undefined) {
+    if (!updates.name || updates.name.trim().length < 2) {
+      return err({ type: 'INVALID_NAME', message: 'Plan name must be at least 2 characters' })
+    }
+    if (updates.name.length > 50) {
+      return err({ type: 'INVALID_NAME', message: 'Plan name must not exceed 50 characters' })
+    }
+  }
+
+  // Validate athlete limit if provided
+  if (updates.athleteLimit !== undefined) {
+    if (updates.athleteLimit < 1) {
+      return err({ type: 'INVALID_ATHLETE_LIMIT', message: 'Athlete limit must be at least 1' })
+    }
+    if (updates.athleteLimit > 10000) {
+      return err({ type: 'INVALID_ATHLETE_LIMIT', message: 'Athlete limit cannot exceed 10000' })
+    }
+  }
+
+  // Validate coach limit if provided
+  if (updates.coachLimit !== undefined && updates.coachLimit !== null && updates.coachLimit < 1) {
+    return err({ type: 'INVALID_COACH_LIMIT', message: 'Coach limit must be at least 1 or null for unlimited' })
+  }
+
+  // Validate prices if provided
+  const priceMonthly = updates.priceMonthly !== undefined ? updates.priceMonthly : plan.priceMonthly
+  const priceYearly = updates.priceYearly !== undefined ? updates.priceYearly : plan.priceYearly
+
+  if (updates.priceMonthly !== undefined && updates.priceMonthly < 0) {
+    return err({ type: 'INVALID_PRICE', message: 'Monthly price cannot be negative' })
+  }
+  if (updates.priceYearly !== undefined && updates.priceYearly < 0) {
+    return err({ type: 'INVALID_PRICE', message: 'Yearly price cannot be negative' })
+  }
+
+  if (priceMonthly > 0 && priceYearly > priceMonthly * 12) {
+    return err({
+      type: 'INVALID_YEARLY_DISCOUNT',
+      message: 'Yearly price should not exceed 12 months of monthly price',
+    })
+  }
+
+  return ok({
+    ...plan,
+    name: updates.name !== undefined ? updates.name.trim() : plan.name,
+    athleteLimit: updates.athleteLimit !== undefined ? updates.athleteLimit : plan.athleteLimit,
+    coachLimit: updates.coachLimit !== undefined ? updates.coachLimit : plan.coachLimit,
+    features: updates.features !== undefined ? updates.features : plan.features,
+    priceMonthly,
+    priceYearly,
+    isActive: updates.isActive !== undefined ? updates.isActive : plan.isActive,
+    updatedAt: new Date(),
+  })
 }
 
 export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
@@ -97,6 +172,8 @@ export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
     })
   }
 
+  const now = new Date()
+
   return ok({
     id: input.id,
     name: input.name.trim(),
@@ -108,6 +185,8 @@ export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
     priceMonthly: input.priceMonthly,
     priceYearly: input.priceYearly,
     isActive: input.isActive,
+    createdAt: input.createdAt ?? now,
+    updatedAt: input.updatedAt ?? now,
   })
 }
 

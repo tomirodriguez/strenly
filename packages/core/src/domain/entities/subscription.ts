@@ -17,6 +17,7 @@ export type SubscriptionError =
   | { type: 'INVALID_ATHLETE_COUNT'; message: string }
   | { type: 'INVALID_PERIOD'; message: string }
   | { type: 'INVALID_STATUS_TRANSITION'; message: string; from: SubscriptionStatus; to: SubscriptionStatus }
+  | { type: 'SUBSCRIPTION_CANCELED'; message: string }
 
 type CreateSubscriptionInput = {
   id: string
@@ -94,11 +95,15 @@ export function transitionStatus(
   })
 }
 
-export function incrementAthleteCount(subscription: Subscription): Subscription {
-  return {
+export function incrementAthleteCount(subscription: Subscription): Result<Subscription, SubscriptionError> {
+  if (subscription.status === 'canceled') {
+    return err({ type: 'SUBSCRIPTION_CANCELED', message: 'Cannot increment athlete count on a canceled subscription' })
+  }
+
+  return ok({
     ...subscription,
     athleteCount: subscription.athleteCount + 1,
-  }
+  })
 }
 
 export function decrementAthleteCount(subscription: Subscription): Result<Subscription, SubscriptionError> {

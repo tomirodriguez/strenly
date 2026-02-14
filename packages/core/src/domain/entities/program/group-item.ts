@@ -59,3 +59,34 @@ export function validateGroupItem(input: GroupItemInput, ctx: GroupItemContext):
     series: validatedSeries,
   })
 }
+
+// ---- Standalone factory for creating a GroupItem outside aggregate context ----
+
+export type GroupItemValidationError =
+  | { type: 'EXERCISE_ID_REQUIRED'; message: string }
+  | { type: 'INVALID_ORDER_INDEX'; message: string }
+
+type CreateGroupItemInput = {
+  id: string
+  exerciseId: string
+  orderIndex: number
+  series?: ReadonlyArray<Series>
+}
+
+export function createGroupItem(input: CreateGroupItemInput): Result<GroupItem, GroupItemValidationError> {
+  const trimmedExerciseId = input.exerciseId.trim()
+  if (!trimmedExerciseId) {
+    return err({ type: 'EXERCISE_ID_REQUIRED', message: 'Exercise ID is required' })
+  }
+
+  if (input.orderIndex < 0) {
+    return err({ type: 'INVALID_ORDER_INDEX', message: 'Order index cannot be negative' })
+  }
+
+  return ok({
+    id: input.id,
+    exerciseId: trimmedExerciseId,
+    orderIndex: input.orderIndex,
+    series: input.series ?? [],
+  })
+}

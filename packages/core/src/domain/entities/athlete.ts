@@ -18,7 +18,11 @@ export type Athlete = {
   readonly updatedAt: Date
 }
 
-export type AthleteError = { type: 'INVALID_NAME'; message: string } | { type: 'INVALID_EMAIL'; message: string }
+export type AthleteError =
+  | { type: 'INVALID_NAME'; message: string }
+  | { type: 'INVALID_EMAIL'; message: string }
+  | { type: 'ALREADY_INACTIVE'; message: string }
+  | { type: 'ALREADY_ACTIVE'; message: string }
 
 type CreateAthleteInput = {
   id: string
@@ -123,11 +127,32 @@ export function updateAthlete(athlete: Athlete, updates: UpdateAthleteInput): Re
 
 /**
  * Deactivate an athlete (set status to inactive).
+ * Returns error if athlete is already inactive.
  */
-export function deactivateAthlete(athlete: Athlete): Athlete {
-  return {
+export function deactivateAthlete(athlete: Athlete): Result<Athlete, AthleteError> {
+  if (athlete.status === 'inactive') {
+    return err({ type: 'ALREADY_INACTIVE', message: 'Athlete is already inactive' })
+  }
+
+  return ok({
     ...athlete,
     status: 'inactive',
     updatedAt: new Date(),
+  })
+}
+
+/**
+ * Reactivate an athlete (set status to active).
+ * Returns error if athlete is already active.
+ */
+export function reactivateAthlete(athlete: Athlete): Result<Athlete, AthleteError> {
+  if (athlete.status === 'active') {
+    return err({ type: 'ALREADY_ACTIVE', message: 'Athlete is already active' })
   }
+
+  return ok({
+    ...athlete,
+    status: 'active',
+    updatedAt: new Date(),
+  })
 }

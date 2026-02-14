@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAthlete, deactivateAthlete, updateAthlete } from './athlete'
+import { createAthlete, deactivateAthlete, reactivateAthlete, updateAthlete } from './athlete'
 
 const validInput = {
   id: 'athlete-123',
@@ -324,8 +324,11 @@ describe('createAthlete', () => {
       if (!athlete) return
 
       const result = deactivateAthlete(athlete)
-      expect(result.status).toBe('inactive')
-      expect(result.updatedAt.getTime()).toBeGreaterThanOrEqual(athlete.updatedAt.getTime())
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.status).toBe('inactive')
+        expect(result.value.updatedAt.getTime()).toBeGreaterThanOrEqual(athlete.updatedAt.getTime())
+      }
     })
 
     it('preserves all other fields', () => {
@@ -337,10 +340,48 @@ describe('createAthlete', () => {
       if (!athlete) return
 
       const result = deactivateAthlete(athlete)
-      expect(result.name).toBe('John Doe')
-      expect(result.email).toBe('john@example.com')
-      expect(result.phone).toBe('+1234567890')
-      expect(result.id).toBe('athlete-123')
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.name).toBe('John Doe')
+        expect(result.value.email).toBe('john@example.com')
+        expect(result.value.phone).toBe('+1234567890')
+        expect(result.value.id).toBe('athlete-123')
+      }
+    })
+
+    it('rejects deactivating already inactive athlete', () => {
+      const athlete = createAthlete({ ...validInput, status: 'inactive' }).unwrapOr(null)
+      if (!athlete) return
+
+      const result = deactivateAthlete(athlete)
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('ALREADY_INACTIVE')
+      }
+    })
+  })
+
+  describe('reactivateAthlete', () => {
+    it('sets status to active', () => {
+      const athlete = createAthlete({ ...validInput, status: 'inactive' }).unwrapOr(null)
+      if (!athlete) return
+
+      const result = reactivateAthlete(athlete)
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.status).toBe('active')
+      }
+    })
+
+    it('rejects reactivating already active athlete', () => {
+      const athlete = createAthlete(validInput).unwrapOr(null)
+      if (!athlete) return
+
+      const result = reactivateAthlete(athlete)
+      expect(result.isErr()).toBe(true)
+      if (result.isErr()) {
+        expect(result.error.type).toBe('ALREADY_ACTIVE')
+      }
     })
   })
 

@@ -60,3 +60,35 @@ export function validateWeek(input: WeekInput, weekIndex: number): Result<Week, 
     sessions: validatedSessions,
   })
 }
+
+// ---- Standalone factory for creating a Week outside aggregate context ----
+
+export type WeekValidationError =
+  | { type: 'NAME_TOO_LONG'; message: string }
+  | { type: 'INVALID_ORDER_INDEX'; message: string }
+
+type CreateWeekInput = {
+  id: string
+  name?: string
+  orderIndex: number
+  sessions?: ReadonlyArray<Session>
+}
+
+export function createWeek(input: CreateWeekInput): Result<Week, WeekValidationError> {
+  const name = input.name?.trim() || `Semana ${input.orderIndex + 1}`
+
+  if (name.length > 50) {
+    return err({ type: 'NAME_TOO_LONG', message: 'Week name must not exceed 50 characters' })
+  }
+
+  if (input.orderIndex < 0) {
+    return err({ type: 'INVALID_ORDER_INDEX', message: 'Order index cannot be negative' })
+  }
+
+  return ok({
+    id: input.id,
+    name,
+    orderIndex: input.orderIndex,
+    sessions: input.sessions ?? [],
+  })
+}

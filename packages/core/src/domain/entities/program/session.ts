@@ -79,3 +79,39 @@ export function validateSession(input: SessionInput, ctx: SessionContext): Resul
     exerciseGroups: validatedGroups,
   })
 }
+
+// ---- Standalone factory for creating a Session outside aggregate context ----
+
+export type SessionValidationError =
+  | { type: 'NAME_REQUIRED'; message: string }
+  | { type: 'NAME_TOO_LONG'; message: string }
+  | { type: 'INVALID_ORDER_INDEX'; message: string }
+
+type CreateSessionInput = {
+  id: string
+  name: string
+  orderIndex: number
+  exerciseGroups?: ReadonlyArray<ExerciseGroup>
+}
+
+export function createSession(input: CreateSessionInput): Result<Session, SessionValidationError> {
+  const trimmedName = input.name.trim()
+  if (!trimmedName) {
+    return err({ type: 'NAME_REQUIRED', message: 'Session name is required' })
+  }
+
+  if (trimmedName.length > 50) {
+    return err({ type: 'NAME_TOO_LONG', message: 'Session name must not exceed 50 characters' })
+  }
+
+  if (input.orderIndex < 0) {
+    return err({ type: 'INVALID_ORDER_INDEX', message: 'Order index cannot be negative' })
+  }
+
+  return ok({
+    id: input.id,
+    name: trimmedName,
+    orderIndex: input.orderIndex,
+    exerciseGroups: input.exerciseGroups ?? [],
+  })
+}

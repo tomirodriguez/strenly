@@ -72,3 +72,33 @@ export function validateExerciseGroup(
     items: validatedItems,
   })
 }
+
+// ---- Standalone factory for creating an ExerciseGroup outside aggregate context ----
+
+export type ExerciseGroupValidationError =
+  | { type: 'INVALID_ORDER_INDEX'; message: string }
+  | { type: 'GROUP_EMPTY'; message: string }
+
+type CreateExerciseGroupInput = {
+  id: string
+  orderIndex: number
+  items: ReadonlyArray<GroupItem>
+}
+
+export function createExerciseGroup(
+  input: CreateExerciseGroupInput,
+): Result<ExerciseGroup, ExerciseGroupValidationError> {
+  if (input.orderIndex < 0) {
+    return err({ type: 'INVALID_ORDER_INDEX', message: 'Order index cannot be negative' })
+  }
+
+  if (input.items.length === 0) {
+    return err({ type: 'GROUP_EMPTY', message: 'Exercise group must have at least one exercise' })
+  }
+
+  return ok({
+    id: input.id,
+    orderIndex: input.orderIndex,
+    items: input.items,
+  })
+}

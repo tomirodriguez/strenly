@@ -15,7 +15,7 @@
 
 import { err, ok, type Result } from 'neverthrow'
 import { validateLoggedExercise } from './logged-exercise'
-import type { CreateWorkoutLogInput, LoggedExercise, WorkoutLog, WorkoutLogError } from './types'
+import type { CreateWorkoutLogInput, LoggedExercise, LogStatus, WorkoutLog, WorkoutLogError } from './types'
 
 export type { WorkoutLog, WorkoutLogError } from './types'
 
@@ -121,4 +121,54 @@ export function createWorkoutLog(input: CreateWorkoutLogInput): Result<WorkoutLo
  */
 export function reconstituteWorkoutLog(props: WorkoutLog): WorkoutLog {
   return { ...props }
+}
+
+// Valid log status transitions
+const VALID_LOG_TRANSITIONS: Record<LogStatus, LogStatus[]> = {
+  partial: ['completed', 'skipped'],
+  completed: ['partial'],
+  skipped: ['partial'],
+}
+
+/**
+ * Update the log status with transition validation.
+ */
+export function updateLogStatus(log: WorkoutLog, newStatus: LogStatus): Result<WorkoutLog, WorkoutLogError> {
+  if (log.status === newStatus) {
+    return ok(log)
+  }
+
+  if (!VALID_LOG_TRANSITIONS[log.status].includes(newStatus)) {
+    return err({
+      type: 'INVALID_STATUS_TRANSITION',
+      message: `Cannot transition from ${log.status} to ${newStatus}`,
+      from: log.status,
+      to: newStatus,
+    })
+  }
+
+  return ok({
+    ...log,
+    status: newStatus,
+    updatedAt: new Date(),
+  })
+}
+
+/**
+ * Set the session RPE. Only allowed on non-skipped logs.
+ */
+export function setSessionRpe(log: WorkoutLog, rpe: number): Result<WorkoutLog, WorkoutLogError> {
+  if (log.status === 'skipped') {
+    return err({ type: 'LOG_NOT_STARTED', message: 'Cannot set RPE on a skipped log' })
+  }
+
+  if (rpe < 1 || rpe > 10) {
+    return err({ type: 'INVALID_SESSION_RPE', message: `Session RPE must be between 1 and 10, got ${rpe}` })
+  }
+
+  return ok({
+    ...log,
+    sessionRpe: rpe,
+    updatedAt: new Date(),
+  })
 }

@@ -67,6 +67,8 @@ function mapToDomain(row: typeof plans.$inferSelect): Plan {
     priceMonthly: row.priceMonthly,
     priceYearly: row.priceYearly,
     isActive: row.isActive,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
   })
 }
 
