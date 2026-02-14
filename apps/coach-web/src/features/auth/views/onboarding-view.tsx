@@ -1,5 +1,4 @@
 import type { OrganizationType } from '@strenly/contracts/subscriptions/plan'
-import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Check, Dumbbell, LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -7,9 +6,9 @@ import { toast } from 'sonner'
 import { CoachTypeStep } from '../components/coach-type-step'
 import { OrgFormStep } from '../components/org-form-step'
 import { PlanSelectionStep } from '../components/plan-selection-step'
+import { useCreateSubscription } from '../hooks/mutations/use-create-subscription'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
-import { orpc } from '@/lib/api-client'
 import { authClient, signOut } from '@/lib/auth-client'
 
 type OnboardingStep = 'coach-type' | 'plan' | 'org'
@@ -79,7 +78,7 @@ export function OnboardingView() {
     navigate({ to: '/' })
   }
 
-  const createSubscriptionMutation = useMutation(orpc.subscriptions.createSubscription.mutationOptions())
+  const createSubscriptionMutation = useCreateSubscription()
 
   const handleCoachTypeNext = (type: OrganizationType) => {
     setState((prev) => ({ ...prev, coachType: type }))
@@ -130,11 +129,9 @@ export function OnboardingView() {
 
       toast.success('Organización creada exitosamente')
 
-      // 4. Navigate to org-prefixed dashboard
+      // 3. Navigate to org-prefixed dashboard
       navigate({ to: '/$orgSlug/dashboard', params: { orgSlug: orgData.slug } })
-    } catch (error) {
-      console.error('Onboarding error:', error)
-      toast.error(error instanceof Error ? error.message : 'Error durante el registro')
+    } catch {
       setIsSubmitting(false)
     }
   }

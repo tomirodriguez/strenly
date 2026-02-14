@@ -32,57 +32,59 @@ export function OrgForm({ onSubmit, isSubmitting }: OrgFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Controller
-        name="name"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
-            <FieldContent>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Mi Gimnasio"
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e)
-                  // Auto-generate slug if user hasn't manually edited it
-                  if (!userEditedSlug.current) {
-                    setValue('slug', generateSlug(e.target.value))
-                  }
-                }}
-              />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+      <fieldset disabled={isSubmitting} className="space-y-4">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="name">Nombre de la organizacion</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Mi Gimnasio"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    // Auto-generate slug if user hasn't manually edited it
+                    if (!userEditedSlug.current) {
+                      setValue('slug', generateSlug(e.target.value))
+                    }
+                  }}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="slug"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
-            <FieldContent>
-              <Input
-                id="slug"
-                type="text"
-                placeholder="mi-gimnasio"
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e)
-                  userEditedSlug.current = true
-                }}
-              />
-              <FieldDescription>
-                Se usara en la URL de tu organizacion. Solo se permiten letras minusculas, numeros y guiones.
-              </FieldDescription>
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="slug"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="slug">URL personalizada</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="slug"
+                  type="text"
+                  placeholder="mi-gimnasio"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    userEditedSlug.current = true
+                  }}
+                />
+                <FieldDescription>
+                  Se usara en la URL de tu organizacion. Solo se permiten letras minusculas, numeros y guiones.
+                </FieldDescription>
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
+      </fieldset>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (

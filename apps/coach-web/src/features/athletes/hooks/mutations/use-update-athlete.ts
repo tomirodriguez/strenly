@@ -16,7 +16,7 @@ export function useUpdateAthlete() {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
-      handleMutationError(error, { fallbackMessage: 'Failed to update athlete' })
+      handleMutationError(error, { fallbackMessage: 'Error al actualizar el atleta' })
     },
   })
 }

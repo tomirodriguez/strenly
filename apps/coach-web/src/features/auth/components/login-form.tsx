@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type LoginInput, loginInputSchema } from '@strenly/contracts'
+import { type LoginInput, loginInputSchema } from '@strenly/contracts/auth/auth'
 import { Controller, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,46 +23,48 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <Controller
-        name="email"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
-            <FieldContent>
-              <Input id="email" type="email" autoComplete="email" {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+      <fieldset disabled={isSubmitting} className="space-y-4">
+        <Controller
+          name="email"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email">Correo electronico</FieldLabel>
+              <FieldContent>
+                <Input id="email" type="email" autoComplete="email" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="password"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="password">Contrasena</FieldLabel>
-            <FieldContent>
-              <Input id="password" type="password" autoComplete="current-password" {...field} />
-              <FieldError errors={[fieldState.error]} />
-            </FieldContent>
-          </Field>
-        )}
-      />
+        <Controller
+          name="password"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="password">Contrasena</FieldLabel>
+              <FieldContent>
+                <Input id="password" type="password" autoComplete="current-password" {...field} />
+                <FieldError errors={[fieldState.error]} />
+              </FieldContent>
+            </Field>
+          )}
+        />
 
-      <Controller
-        name="rememberMe"
-        control={control}
-        render={({ field }) => (
-          <Field orientation="horizontal">
-            <FieldLabel htmlFor="rememberMe" className="flex cursor-pointer items-center gap-2">
-              <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />
-              <span className="text-sm">Recordarme</span>
-            </FieldLabel>
-          </Field>
-        )}
-      />
+        <Controller
+          name="rememberMe"
+          control={control}
+          render={({ field }) => (
+            <Field orientation="horizontal">
+              <FieldLabel htmlFor="rememberMe" className="flex cursor-pointer items-center gap-2">
+                <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />
+                <span className="text-sm">Recordarme</span>
+              </FieldLabel>
+            </Field>
+          )}
+        />
+      </fieldset>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (

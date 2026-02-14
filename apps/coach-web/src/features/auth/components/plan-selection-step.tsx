@@ -1,8 +1,7 @@
 import type { OrganizationType, Plan } from '@strenly/contracts/subscriptions/plan'
-import { useQuery } from '@tanstack/react-query'
 import { Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { orpc } from '@/lib/api-client'
+import { usePlans } from '@/features/subscriptions/hooks/queries/use-plans'
 import { cn } from '@/lib/utils'
 
 interface PlanSelectionStepProps {
@@ -89,11 +88,7 @@ function PlanCard({ plan, isRecommended, onSelect }: PlanCardProps) {
 }
 
 export function PlanSelectionStep({ organizationType, onNext, onBack }: PlanSelectionStepProps) {
-  const { data, isLoading, error } = useQuery(
-    orpc.subscriptions.listPlans.queryOptions({
-      input: { organizationType },
-    }),
-  )
+  const { data, isLoading, error } = usePlans(organizationType)
 
   if (isLoading) {
     return (

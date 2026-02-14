@@ -65,7 +65,7 @@ export function AddWeekModal({ programId, weekCount, open, onOpenChange, onSubmi
         </DialogHeader>
 
         <form id="add-week-form" onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="space-y-4 py-4">
+          <fieldset disabled={isSubmitting} className="space-y-4 py-4">
             <Controller
               name="name"
               control={control}
@@ -79,7 +79,7 @@ export function AddWeekModal({ programId, weekCount, open, onOpenChange, onSubmi
                 </Field>
               )}
             />
-          </div>
+          </fieldset>
         </form>
 
         <DialogFooter>

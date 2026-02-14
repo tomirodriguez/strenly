@@ -25,7 +25,7 @@ export function useUpdatePrescription(programId: string) {
     onMutate: async (_newPrescription) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: orpc.programs.get.key(),
+        queryKey: orpc.programs.get.key({ input: { programId } }),
       })
 
       // Snapshot previous value

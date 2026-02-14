@@ -16,7 +16,7 @@ export function useCreateAthlete() {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
-      handleMutationError(error, { fallbackMessage: 'Failed to create athlete' })
+      handleMutationError(error, { fallbackMessage: 'Error al crear el atleta' })
     },
   })
 }

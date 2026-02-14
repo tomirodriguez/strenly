@@ -16,7 +16,7 @@ export function useArchiveAthlete() {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
-      handleMutationError(error, { fallbackMessage: 'Failed to archive athlete' })
+      handleMutationError(error, { fallbackMessage: 'Error al archivar el atleta' })
     },
   })
 }

@@ -16,7 +16,7 @@ export function useGenerateInvitation() {
       queryClient.invalidateQueries({ queryKey: orpc.athletes.key() })
     },
     onError: (error) => {
-      handleMutationError(error, { fallbackMessage: 'Failed to generate invitation' })
+      handleMutationError(error, { fallbackMessage: 'Error al generar la invitacion' })
     },
   })
 }
