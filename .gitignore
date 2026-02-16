@@ -32,4 +32,5 @@ playwright-storage/
 playwright-report/
 test-results/
 
-templates
+_bmad-output/
+_bmad/
