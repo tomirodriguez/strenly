@@ -1,4 +1,4 @@
-import { test } from '../../fixtures/test'
+import { expect, test } from '../../fixtures/test'
 
 test.describe('Arrow Key Navigation', () => {
   test.beforeEach(async ({ gridPage }) => {
@@ -46,10 +46,13 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.expectActiveCellAt(0, 0)
   })
 
-  test('ArrowDown at last exercise row stays put', async ({ gridPage }) => {
+  test('ArrowDown at last exercise row reaches add-exercise row', async ({ gridPage }) => {
     await gridPage.clickCell(6, 1) // Barbell Row (last exercise)
     await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(6, 1)
+
+    // Focus should move to the add-exercise row for session 3 (last session)
+    const addExInput = gridPage.addExerciseInput(2)
+    await expect(addExInput).toBeFocused({ timeout: 3_000 })
   })
 
   test('ArrowUp at first exercise row stays put', async ({ gridPage }) => {
@@ -60,19 +63,21 @@ test.describe('Arrow Key Navigation', () => {
 
   // ── Session boundary crossing ──
 
-  test('ArrowDown from last exercise in session 1 skips to session 2 first exercise', async ({
-    gridPage,
-  }) => {
-    // Leg Press (index 1) → Barbell Bench Press (index 2)
-    // Skips: add-exercise row + session 2 header
+  test('ArrowDown from last exercise in session 1 reaches add-exercise then session 2', async ({ gridPage }) => {
+    // Leg Press (index 1) → add-exercise row → Barbell Bench Press (index 2)
     await gridPage.clickCell(1, 1)
+
+    // First ArrowDown: reaches add-exercise row
+    await gridPage.pressKey('ArrowDown')
+    const addExInput = gridPage.addExerciseInput(0)
+    await expect(addExInput).toBeFocused({ timeout: 3_000 })
+
+    // Second ArrowDown: reaches first exercise in session 2
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(2, 1)
   })
 
-  test('ArrowUp from first exercise in session 2 skips to session 1 last exercise', async ({
-    gridPage,
-  }) => {
+  test('ArrowUp from first exercise in session 2 skips to session 1 last exercise', async ({ gridPage }) => {
     // Barbell Bench Press (index 2) → Leg Press (index 1)
     // Skips: session 2 header + add-exercise row
     await gridPage.clickCell(2, 1)
@@ -89,7 +94,11 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(1, 1)
 
-    // Cross session boundary: LegPress(1) → BenchPress(2)
+    // Cross session boundary: LegPress(1) → add-exercise (session 1)
+    await gridPage.pressKey('ArrowDown')
+    await expect(gridPage.addExerciseInput(0)).toBeFocused({ timeout: 3_000 })
+
+    // add-exercise (session 1) → BenchPress(2)
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(2, 1)
 
@@ -100,7 +109,11 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(4, 1)
 
-    // Cross session boundary: Tricep(4) → Deadlift(5)
+    // Cross session boundary: Tricep(4) → add-exercise (session 2)
+    await gridPage.pressKey('ArrowDown')
+    await expect(gridPage.addExerciseInput(1)).toBeFocused({ timeout: 3_000 })
+
+    // add-exercise (session 2) → Deadlift(5)
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(5, 1)
 
@@ -108,8 +121,8 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.pressKey('ArrowDown')
     await gridPage.expectActiveCellAt(6, 1)
 
-    // Boundary: already at last row
+    // Boundary: last exercise → add-exercise (session 3)
     await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(6, 1)
+    await expect(gridPage.addExerciseInput(2)).toBeFocused({ timeout: 3_000 })
   })
 })

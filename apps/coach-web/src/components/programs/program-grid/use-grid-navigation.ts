@@ -59,6 +59,45 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
     [rows],
   )
 
+  /**
+   * Find an add-exercise row immediately after the given index.
+   * Skips no rows — only checks adjacent rows moving forward.
+   */
+  const findAddExerciseRowAfter = useCallback(
+    (startIndex: number): number => {
+      for (let i = startIndex; i < rows.length; i++) {
+        const row = rows[i]
+        if (!row) break
+        if (row.type === 'add-exercise') return i
+        // Stop if we hit the next exercise row (didn't find add-exercise in between)
+        if (row.type === 'exercise') break
+      }
+      return -1
+    },
+    [rows],
+  )
+
+  /**
+   * Focus the add-exercise row's combobox input for a given session.
+   */
+  const focusAddExerciseRow = useCallback(
+    (sessionId: string) => {
+      if (!tableRef?.current) return
+      requestAnimationFrame(() => {
+        const addRow = tableRef.current?.querySelector(
+          `tr[data-row-type="add-exercise"][data-session-id="${sessionId}"]`,
+        )
+        if (addRow) {
+          const input = addRow.querySelector('input')
+          if (input) {
+            input.focus()
+          }
+        }
+      })
+    },
+    [tableRef],
+  )
+
   const moveTo = useCallback(
     (targetRowIndex: number, targetColIndex: number, direction: 1 | -1 = 1) => {
       // Clamp column to valid range
@@ -99,10 +138,26 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
           e.preventDefault()
           moveTo(rowIndex - 1, colIndex, -1)
           break
-        case 'ArrowDown':
+        case 'ArrowDown': {
           e.preventDefault()
-          moveTo(rowIndex + 1, colIndex, 1)
+          // Check if the next row(s) contain an add-exercise row before the next exercise
+          const addExIdx = findAddExerciseRowAfter(rowIndex + 1)
+          const nextExIdx = findNextNavigableRow(rowIndex + 1, 1)
+          // If add-exercise row comes before next exercise (or there is no next exercise),
+          // and we're on the exercise column, focus the add-exercise input
+          if (addExIdx >= 0 && (nextExIdx < 0 || addExIdx < nextExIdx)) {
+            const addExRow = rows[addExIdx]
+            if (addExRow) {
+              // Clear active cell since focus moves out of grid cells
+              setActiveCellState(null)
+              onCellChange?.(null)
+              focusAddExerciseRow(addExRow.sessionId)
+            }
+          } else {
+            moveTo(rowIndex + 1, colIndex, 1)
+          }
           break
+        }
         case 'ArrowLeft':
           e.preventDefault()
           moveTo(rowIndex, colIndex - 1, 1)
@@ -151,7 +206,17 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
           break
       }
     },
-    [activeCell, moveTo, columns.length, rows.length],
+    [
+      activeCell,
+      moveTo,
+      columns.length,
+      rows.length,
+      findAddExerciseRowAfter,
+      findNextNavigableRow,
+      focusAddExerciseRow,
+      onCellChange,
+      rows,
+    ],
   )
 
   const setActiveCell = useCallback(
@@ -173,11 +238,23 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
     onCellChange?.(null)
   }, [onCellChange])
 
+  /**
+   * Re-focus the current active cell in the DOM.
+   * Used after edit mode ends (Escape, combobox submit) where activeCell
+   * doesn't change and the useEffect won't fire.
+   */
+  const restoreFocus = useCallback(() => {
+    if (activeCell) {
+      focusCell(activeCell.rowId, activeCell.colId)
+    }
+  }, [activeCell, focusCell])
+
   return {
     activeCell,
     setActiveCell,
     clearActiveCell,
     handleKeyDown,
     focusCell,
+    restoreFocus,
   }
 }

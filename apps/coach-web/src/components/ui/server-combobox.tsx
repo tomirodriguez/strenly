@@ -58,6 +58,8 @@ interface ServerComboboxProps<T> {
   showTrigger?: boolean
   /** Whether to show the clear (X) button. Defaults to true. */
   showClear?: boolean
+  /** Default value for the input field (for pre-filling search from keypress) */
+  defaultInputValue?: string
   className?: string
 }
 
@@ -83,6 +85,7 @@ export function ServerCombobox<T>({
   autoFocus = false,
   showTrigger = true,
   showClear = true,
+  defaultInputValue,
   className,
 }: ServerComboboxProps<T>) {
   // Merge selected item into items to prevent deselection when search results change
@@ -115,6 +118,7 @@ export function ServerCombobox<T>({
       isItemEqualToValue={isItemEqualToValue}
       inputRef={inputRef}
       open={open}
+      defaultInputValue={defaultInputValue}
       onInputValueChange={(value, { reason }) => {
         // Don't update search when an item is pressed (would search for the label text)
         if (reason !== 'item-press') {

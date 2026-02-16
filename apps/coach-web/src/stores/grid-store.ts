@@ -34,6 +34,9 @@ interface GridState {
   isDirty: boolean
   lastLoadedAt: Date | null
 
+  // ID of the last added exercise item (for cursor placement)
+  lastAddedItemId: string | null
+
   // Exercises map for display (exerciseId -> exerciseName)
   exercisesMap: Map<string, string>
 }
@@ -59,6 +62,9 @@ interface GridActions {
 
   // Add a new week to the program
   addWeek: () => void
+
+  // Clear last added item ID (after cursor placement)
+  clearLastAddedItemId: () => void
 
   // Add a new session to the program
   addSession: (name: string) => void
@@ -148,7 +154,7 @@ function aggregateToGridData(aggregate: ProgramAggregate, exercisesMap: Map<stri
           const weekSession = week.sessions.find((s) => s.id === session.id)
           const weekGroup = weekSession?.exerciseGroups.find((g) => g.id === group.id)
           const weekItem = weekGroup?.items.find((i) => i.id === item.id)
-          if (weekItem?.series) {
+          if (weekItem?.series && weekItem.series.length > 0) {
             // Convert series to PrescriptionSeriesInput format for formatter
             const seriesInput = weekItem.series.map((s, idx) => ({
               orderIndex: idx,
@@ -246,6 +252,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
   data: null,
   isDirty: false,
   lastLoadedAt: null,
+  lastAddedItemId: null,
   exercisesMap: new Map(),
 
   // Initialize store with program aggregate
@@ -312,8 +319,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
         }
       }
 
-      // Update grid display data
-      const notationDisplay = formatSeriesToNotation(parsedSeries)
+      // Update grid display data — empty series should store '' not em dash
+      const notationDisplay = parsedSeries.length > 0 ? formatSeriesToNotation(parsedSeries) : ''
       const updatedRows = state.data.rows.map((row) => {
         if (row.type === 'exercise' && row.id === itemId) {
           return {
@@ -426,8 +433,12 @@ export const useGridStore = create<GridStore>((set, get) => ({
         data: gridData,
         exercisesMap: newExercisesMap,
         isDirty: true,
+        lastAddedItemId: itemId,
       }
     }),
+
+  // Clear last added item ID
+  clearLastAddedItemId: () => set({ lastAddedItemId: null }),
 
   // Add week
   addWeek: () =>
@@ -713,6 +724,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
 export const useGridProgramId = () => useGridStore((state) => state.programId)
 export const useGridData = () => useGridStore((state) => state.data)
 export const useGridIsDirty = () => useGridStore((state) => state.isDirty)
+export const useGridLastAddedItemId = () => useGridStore((state) => state.lastAddedItemId)
 export const useGridActions = () =>
   useGridStore(
     useShallow((state) => ({
@@ -720,6 +732,7 @@ export const useGridActions = () =>
       updatePrescription: state.updatePrescription,
       updateExercise: state.updateExercise,
       addExercise: state.addExercise,
+      clearLastAddedItemId: state.clearLastAddedItemId,
       addWeek: state.addWeek,
       addSession: state.addSession,
       updateSupersetGroup: state.updateSupersetGroup,

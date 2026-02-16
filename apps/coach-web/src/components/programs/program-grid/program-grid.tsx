@@ -37,6 +37,14 @@ interface ProgramGridProps {
    * NOTE: Local-only until saveDraft backend supports structural changes.
    */
   onAddExercise?: (sessionId: string, exerciseId: string, exerciseName: string) => void
+  /**
+   * ID of the last added exercise item. When set, grid will focus that row's exercise cell.
+   */
+  lastAddedItemId?: string | null
+  /**
+   * Called after lastAddedItemId has been handled (cursor placed).
+   */
+  onLastAddedHandled?: () => void
 }
 
 /**
@@ -62,6 +70,8 @@ export function ProgramGrid({
   onPrescriptionChange,
   onExerciseChange,
   onAddExercise,
+  lastAddedItemId,
+  onLastAddedHandled,
 }: ProgramGridProps) {
   const tableRef = useRef<HTMLTableElement>(null)
 
@@ -72,13 +82,15 @@ export function ProgramGrid({
   const { rows, columns } = gridData ?? emptyData
 
   // Grid state hooks - pass tableRef for DOM focus management
-  const { activeCell, setActiveCell, handleKeyDown } = useGridNavigation({
+  const { activeCell, setActiveCell, handleKeyDown, restoreFocus } = useGridNavigation({
     rows,
     columns,
     tableRef,
   })
-  // Cell editing state - navigation keys in cells update activeCell before calling stopEditing
-  const { editingCell, startEditing, stopEditing } = useCellEditing()
+  // Cell editing state - restoreFocus re-focuses active cell after edit stops
+  const { editingCell, startEditing, stopEditing } = useCellEditing({
+    onEditStop: restoreFocus,
+  })
 
   // Mutation hooks
   const updatePrescription = useUpdatePrescription(program.id)
@@ -151,6 +163,50 @@ export function ProgramGrid({
     }
   }
 
+  // Handle navigation from add-exercise row (ArrowUp/ArrowDown)
+  const handleNavigateFromAddRow = useCallback(
+    (sessionId: string, direction: 'up' | 'down') => {
+      if (direction === 'up') {
+        // Find the last exercise row in this session
+        for (let i = rows.length - 1; i >= 0; i--) {
+          const row = rows[i]
+          if (row && row.type === 'exercise' && row.sessionId === sessionId) {
+            setActiveCell(row.id, 'exercise')
+            return
+          }
+        }
+      } else {
+        // Find the first exercise row in the next session
+        const addExRow = rows.find((r) => r.type === 'add-exercise' && r.sessionId === sessionId)
+        if (addExRow) {
+          const addExIdx = rows.indexOf(addExRow)
+          for (let i = addExIdx + 1; i < rows.length; i++) {
+            const row = rows[i]
+            if (row && row.type === 'exercise') {
+              setActiveCell(row.id, 'exercise')
+              return
+            }
+          }
+        }
+      }
+    },
+    [rows, setActiveCell],
+  )
+
+  // Place cursor on newly added exercise row (ref-based, no useEffect)
+  const handledAddedItemRef = useRef<string | null>(null)
+  if (
+    lastAddedItemId &&
+    lastAddedItemId !== handledAddedItemRef.current &&
+    rows.some((r) => r.id === lastAddedItemId)
+  ) {
+    handledAddedItemRef.current = lastAddedItemId
+    requestAnimationFrame(() => {
+      setActiveCell(lastAddedItemId, 'exercise')
+      onLastAddedHandled?.()
+    })
+  }
+
   // Handle navigation from cell (called by PrescriptionCell after committing)
   // This creates a synthetic keyboard event to trigger useGridNavigation
   const handleNavigate = (direction: 'up' | 'down' | 'left' | 'right' | 'tab' | 'shift-tab') => {
@@ -218,6 +274,7 @@ export function ProgramGrid({
             onCommitPrescription={handleCommitPrescription}
             onNavigate={handleNavigate}
             onAddExercise={handleAddExercise}
+            onNavigateFromAddRow={handleNavigateFromAddRow}
           />
         </table>
       </div>

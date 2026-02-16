@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ExerciseRowActions } from '../exercise-row-actions'
 import { ExerciseRowPrefix } from './exercise-row-prefix'
 import type { GridRow } from './types'
@@ -49,6 +49,7 @@ export function ExerciseCell({
   onCancel,
 }: ExerciseCellProps) {
   const [searchValue, setSearchValue] = useState('')
+  const initialSearchRef = useRef('')
   const debouncedSearch = useDebounce(searchValue, 300)
 
   const { data: exercisesData, isLoading } = useExercises({
@@ -69,6 +70,12 @@ export function ExerciseCell({
   const handleCellKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'F2') {
       e.preventDefault()
+      initialSearchRef.current = ''
+      onStartEdit()
+    } else if (/^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault()
+      initialSearchRef.current = e.key
+      setSearchValue(e.key)
       onStartEdit()
     }
   }
@@ -85,6 +92,7 @@ export function ExerciseCell({
               selectedItem={selectedItem}
               onValueChange={(item) => {
                 if (item) {
+                  initialSearchRef.current = ''
                   onCommit(item.id, item.name)
                 }
               }}
@@ -96,11 +104,15 @@ export function ExerciseCell({
               placeholder="Buscar ejercicio..."
               open
               onOpenChange={(open) => {
-                if (!open) onCancel()
+                if (!open) {
+                  initialSearchRef.current = ''
+                  onCancel()
+                }
               }}
               autoFocus
               showTrigger={false}
               showClear={false}
+              defaultInputValue={initialSearchRef.current}
               className="border-none shadow-none"
             />
           </div>

@@ -16,6 +16,7 @@ interface GridBodyProps {
   onCommitPrescription: (rowId: string, weekId: string, value: string) => void
   onNavigate: (direction: 'up' | 'down' | 'left' | 'right' | 'tab' | 'shift-tab') => void
   onAddExercise: (sessionId: string, exerciseId: string, exerciseName: string) => void
+  onNavigateFromAddRow?: (sessionId: string, direction: 'up' | 'down') => void
 }
 
 /**
@@ -45,6 +46,7 @@ export function GridBody({
   onCommitPrescription,
   onNavigate,
   onAddExercise,
+  onNavigateFromAddRow,
 }: GridBodyProps) {
   // Group rows by session to get row IDs for each session
   // This is needed for reordering exercises within a session
@@ -86,7 +88,14 @@ export function GridBody({
 
           case 'add-exercise':
             return (
-              <AddExerciseRow key={row.id} sessionId={row.sessionId} columns={columns} onAddExercise={onAddExercise} />
+              <AddExerciseRow
+                key={row.id}
+                sessionId={row.sessionId}
+                columns={columns}
+                onAddExercise={onAddExercise}
+                onNavigateUp={() => onNavigateFromAddRow?.(row.sessionId, 'up')}
+                onNavigateDown={() => onNavigateFromAddRow?.(row.sessionId, 'down')}
+              />
             )
 
           default:

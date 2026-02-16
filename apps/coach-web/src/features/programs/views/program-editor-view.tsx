@@ -11,7 +11,7 @@ import { useExercisesMap } from '@/features/programs/hooks/queries/use-exercises
 import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { toast } from '@/lib/toast'
-import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
+import { useGridActions, useGridData, useGridIsDirty, useGridLastAddedItemId } from '@/stores/grid-store'
 
 interface ProgramEditorViewProps {
   orgSlug: string
@@ -35,6 +35,7 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
   // Zustand store - select only what you need
   const gridData = useGridData()
   const isDirty = useGridIsDirty()
+  const lastAddedItemId = useGridLastAddedItemId()
   const actions = useGridActions()
 
   // Initialize store when program and exercises load (ref-based, no useEffect)
@@ -91,6 +92,8 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
           onPrescriptionChange={actions.updatePrescription}
           onExerciseChange={actions.updateExercise}
           onAddExercise={actions.addExercise}
+          lastAddedItemId={lastAddedItemId}
+          onLastAddedHandled={actions.clearLastAddedItemId}
         />
       </div>
 
