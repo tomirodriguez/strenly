@@ -25,6 +25,4 @@ catalog:
 
   # Build tools (shared across vite-based apps and server)
   vite: ^7.1.2
-  wrangler: ^4.50.0
   "@vitejs/plugin-react": ^5.0.0
-  "@cloudflare/vite-plugin": ^1.15.0

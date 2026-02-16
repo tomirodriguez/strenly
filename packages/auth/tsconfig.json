@@ -14,7 +14,7 @@
     "isolatedModules": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "types": ["@cloudflare/workers-types"]
+    "types": []
   },
   "include": ["src"],
   "exclude": ["node_modules"]

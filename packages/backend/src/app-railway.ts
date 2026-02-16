@@ -31,17 +31,19 @@ const app = new Hono()
 const TRUSTED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:5174',
-  ...(env.ENVIRONMENT === 'production'
-    ? ['https://app.strenly.com.ar', 'https://athlete.strenly.com.ar']
-    : []),
+  'https://strenly-coach-web.vercel.app',
+  ...(env.ENVIRONMENT === 'production' ? ['https://app.strenly.com.ar', 'https://athlete.strenly.com.ar'] : []),
 ]
 
-app.use('*', cors({
-  origin: TRUSTED_ORIGINS,
-  allowHeaders: ['Content-Type', 'Authorization', 'X-Organization-Slug'],
-  allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-}))
+app.use(
+  '*',
+  cors({
+    origin: TRUSTED_ORIGINS,
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Organization-Slug'],
+    allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  }),
+)
 
 app.get('/health', (c) => {
   return c.json({
