@@ -177,7 +177,7 @@ describe('createAthlete use case', () => {
       if (result.isErr()) {
         const error = result.error
         expect(error.type).toBe('validation_error')
-        expect(error.message).toContain('name')
+        expect(error.message).toContain('Name')
       }
 
       // Repository should NOT be called for invalid input

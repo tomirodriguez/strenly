@@ -192,6 +192,10 @@ export function createPlan(input: CreatePlanInput): Result<Plan, PlanError> {
 
 // Helper to check if athlete can be added to a plan
 export function canAddAthlete(plan: Pick<Plan, 'athleteLimit'>, currentCount: number): boolean {
+  // -1 means unlimited
+  if (plan.athleteLimit === -1) {
+    return true
+  }
   return currentCount < plan.athleteLimit
 }
 

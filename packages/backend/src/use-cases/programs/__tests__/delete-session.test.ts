@@ -29,7 +29,11 @@ function createProgramWithSessions(sessions: Omit<Session, 'exerciseGroups'>[]):
       orderIndex: w.orderIndex,
       createdAt: new Date(),
     })),
-    sessions: sessions.map((s) => ({ ...s, exerciseGroups: [], rows: [] })) as any,
+    sessions: sessions.map((s) => ({
+      ...s,
+      exerciseGroups: [],
+      rows: [],
+    })) as unknown as ProgramWithDetails['sessions'],
   } as ProgramWithDetails
 }
 

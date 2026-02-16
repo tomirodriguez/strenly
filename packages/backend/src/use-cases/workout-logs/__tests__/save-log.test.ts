@@ -32,17 +32,25 @@ describe('saveLog use case', () => {
           exerciseId: 'exercise-1',
           groupItemId: 'group-item-1',
           orderIndex: 0,
-          sets: [
+          notes: null,
+          skipped: false,
+          groupLabel: null,
+          groupOrder: 0,
+          series: [
             {
-              setNumber: 1,
+              orderIndex: 0,
+              repsPerformed: 10,
+              weightUsed: 100,
+              rpe: null,
+              skipped: false,
               prescribedReps: 10,
-              prescribedIntensity: 80,
-              performedReps: 10,
-              performedWeight: 100,
+              prescribedWeight: null,
+              prescribedRepsMax: null,
+              prescribedIsAmrap: false,
+              prescribedIntensityType: null,
+              prescribedIntensityValue: null,
               prescribedTempo: null,
-              prescribedRest: 90,
-              notes: null,
-              status: 'complete' as const,
+              prescribedRestSeconds: null,
             },
           ],
         },
@@ -230,15 +238,16 @@ describe('saveLog use case', () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
-      // Pass invalid ID (empty string)
+      // Pass invalid sessionRpe (must be 1-10)
       const result = await saveLog({
         ...ctx,
-        id: '',
+        id: logId,
         athleteId,
         programId,
         sessionId,
         weekId,
         logDate: new Date(),
+        sessionRpe: 15, // Invalid - must be 1-10
         exercises: [],
       })
 

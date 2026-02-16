@@ -99,20 +99,14 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'organization:read',
     // Members (read only)
     'members:read',
-    // Athletes
+    // Athletes (read only for members)
     'athletes:read',
-    'athletes:write',
-    // Programs
+    // Programs (read only for members)
     'programs:read',
-    'programs:write',
-    // Exercises
+    // Exercises (read only for members)
     'exercises:read',
-    'exercises:write',
-    // Workout Logs (members/coaches can log workouts)
-    'workout_log:create',
+    // Workout Logs (read only for members)
     'workout_log:read',
-    'workout_log:update',
-    'workout_log:delete',
   ],
 }
 

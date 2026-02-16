@@ -1,8 +1,30 @@
-import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import type { Week } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryPort, ProgramWithDetails } from '@strenly/core/ports/program-repository.port'
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createProgramWithStructure } from '../../../__tests__/factories/program-structure-factory'
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeDeleteWeek } from '../delete-week'
+
+// Helper to create program with custom weeks for ProgramWithDetails structure
+function createProgramWithWeeks(weeks: Omit<Week, 'sessions'>[]): ProgramWithDetails {
+  const program = createProgramWithStructure({
+    weeks: weeks.map((w) => ({ ...w, sessions: [] })),
+  })
+
+  // Convert to ProgramWithDetails structure
+  return {
+    ...program,
+    weeks: weeks.map((w) => ({
+      id: w.id,
+      programId: program.id,
+      name: w.name,
+      orderIndex: w.orderIndex,
+      createdAt: new Date(),
+    })),
+    sessions: [],
+  } as unknown as ProgramWithDetails
+}
 
 describe('deleteWeek use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
@@ -22,17 +44,11 @@ describe('deleteWeek use case', () => {
 
   describe('Happy Path', () => {
     it('should delete week successfully', async () => {
-      const programWithWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: weekId, name: 'Week 2', orderIndex: 1 },
-          { id: 'week-3', name: 'Week 3', orderIndex: 2 },
-        ],
-        sessions: [],
-      }
+      const programWithWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: weekId, name: 'Week 2', orderIndex: 1 },
+        { id: 'week-3', name: 'Week 3', orderIndex: 2 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
       vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
@@ -52,16 +68,10 @@ describe('deleteWeek use case', () => {
     })
 
     it('should delete last week when more than one week exists', async () => {
-      const programWithWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: weekId, name: 'Week 2', orderIndex: 1 },
-        ],
-        sessions: [],
-      }
+      const programWithWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: weekId, name: 'Week 2', orderIndex: 1 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
       vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
@@ -131,16 +141,10 @@ describe('deleteWeek use case', () => {
     })
 
     it('should return not_found when week does not exist in program', async () => {
-      const programWithWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: 'week-2', name: 'Week 2', orderIndex: 1 },
-        ],
-        sessions: [],
-      }
+      const programWithWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: 'week-2', name: 'Week 2', orderIndex: 1 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
 
@@ -169,13 +173,7 @@ describe('deleteWeek use case', () => {
 
   describe('Validation Errors', () => {
     it('should return last_week error when trying to delete the only week', async () => {
-      const programWithOneWeek = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [{ id: weekId, name: 'Only Week', orderIndex: 0 }],
-        sessions: [],
-      }
+      const programWithOneWeek = createProgramWithWeeks([{ id: weekId, name: 'Only Week', orderIndex: 0 }])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithOneWeek))
 
@@ -228,16 +226,10 @@ describe('deleteWeek use case', () => {
     })
 
     it('should return repository error when deleteWeek fails', async () => {
-      const programWithWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: weekId, name: 'Week 2', orderIndex: 1 },
-        ],
-        sessions: [],
-      }
+      const programWithWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: weekId, name: 'Week 2', orderIndex: 1 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
       vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(
@@ -266,16 +258,10 @@ describe('deleteWeek use case', () => {
 
   describe('Edge Cases', () => {
     it('should allow deletion when exactly 2 weeks exist', async () => {
-      const programWithTwoWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: weekId, name: 'Week 2', orderIndex: 1 },
-        ],
-        sessions: [],
-      }
+      const programWithTwoWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: weekId, name: 'Week 2', orderIndex: 1 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithTwoWeeks))
       vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
@@ -295,18 +281,12 @@ describe('deleteWeek use case', () => {
     })
 
     it('should handle deletion from middle of week list', async () => {
-      const programWithWeeks = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [
-          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
-          { id: weekId, name: 'Week 2', orderIndex: 1 },
-          { id: 'week-3', name: 'Week 3', orderIndex: 2 },
-          { id: 'week-4', name: 'Week 4', orderIndex: 3 },
-        ],
-        sessions: [],
-      }
+      const programWithWeeks = createProgramWithWeeks([
+        { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+        { id: weekId, name: 'Week 2', orderIndex: 1 },
+        { id: 'week-3', name: 'Week 3', orderIndex: 2 },
+        { id: 'week-4', name: 'Week 4', orderIndex: 3 },
+      ])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
       vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))

@@ -4,6 +4,7 @@ import type { ProgramRepositoryPort } from '@strenly/core/ports/program-reposito
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createAthleteEntity } from '../../../__tests__/factories/athlete-factory'
 import { createProgramWithStructure } from '../../../__tests__/factories/program-structure-factory'
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeCreateLog } from '../create-log'
@@ -316,6 +317,9 @@ describe('createLog use case', () => {
     it('should return program_not_found when program does not exist', async () => {
       vi.mocked(mockWorkoutLogRepository.findByAthleteSessionWeek).mockReturnValue(okAsync(null))
       vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(null))
+      vi.mocked(mockAthleteRepository.findById).mockReturnValue(
+        okAsync(createAthleteEntity({ id: athleteId, organizationId: orgId, name: 'Test Athlete' })),
+      )
 
       const ctx = createTestContext({ organizationId: orgId })
       const createLog = makeCreateLog({
@@ -514,6 +518,9 @@ describe('createLog use case', () => {
           type: 'DATABASE_ERROR',
           message: 'Query timeout',
         }),
+      )
+      vi.mocked(mockAthleteRepository.findById).mockReturnValue(
+        okAsync(createAthleteEntity({ id: athleteId, organizationId: orgId, name: 'Test Athlete' })),
       )
 
       const ctx = createTestContext({ organizationId: orgId })

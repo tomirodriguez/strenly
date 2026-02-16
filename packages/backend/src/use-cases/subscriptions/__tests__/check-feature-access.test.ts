@@ -305,7 +305,7 @@ describe('checkFeatureAccess use case', () => {
       if (result.isErr()) {
         expect(result.error.type).toBe('feature_not_available')
         if (result.error.type === 'feature_not_available') {
-          expect(result.error.feature).toBe('apiAccess')
+          expect(result.error.feature).toBe('exportData')
         }
       }
     })

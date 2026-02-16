@@ -1,9 +1,43 @@
 import { faker } from '@faker-js/faker'
-import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import type { Session } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryPort, ProgramWithDetails } from '@strenly/core/ports/program-repository.port'
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createProgramWithStructure } from '../../../__tests__/factories/program-structure-factory'
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeAddSession } from '../add-session'
+
+// Helper to create program with custom sessions
+function createProgramWithSessions(sessions: Omit<Session, 'exerciseGroups'>[]): ProgramWithDetails {
+  const program = createProgramWithStructure({
+    weeks: [
+      {
+        id: 'week-1',
+        name: 'Week 1',
+        orderIndex: 0,
+        sessions: sessions.map((s) => ({ ...s, exerciseGroups: [] })),
+      },
+    ],
+  })
+
+  return {
+    ...program,
+    weeks: [
+      {
+        id: 'week-1',
+        programId: program.id,
+        name: 'Week 1',
+        orderIndex: 0,
+        createdAt: new Date(),
+      },
+    ],
+    sessions: sessions.map((s) => ({
+      ...s,
+      exerciseGroups: [],
+      rows: [],
+    })) as unknown as ProgramWithDetails['sessions'],
+  } as unknown as ProgramWithDetails
+}
 
 describe('addSession use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
@@ -24,15 +58,10 @@ describe('addSession use case', () => {
 
   describe('Happy Path', () => {
     it('should add session successfully to existing program', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [
-          { id: 'session-1', name: 'Day 1', orderIndex: 0 },
-          { id: 'session-2', name: 'Day 2', orderIndex: 1 },
-        ],
-      }
+      const existingProgram = createProgramWithSessions([
+        { id: 'session-1', name: 'Day 1', orderIndex: 0 },
+        { id: 'session-2', name: 'Day 2', orderIndex: 1 },
+      ])
 
       const newSessionId = 'session-new-123'
       vi.mocked(mockGenerateId).mockReturnValue(newSessionId)
@@ -82,12 +111,7 @@ describe('addSession use case', () => {
     })
 
     it('should add session to empty program with orderIndex 0', async () => {
-      const emptyProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Empty Program',
-        sessions: [],
-      }
+      const emptyProgram = createProgramWithSessions([])
 
       const newSessionId = 'session-first-123'
       vi.mocked(mockGenerateId).mockReturnValue(newSessionId)
@@ -124,12 +148,7 @@ describe('addSession use case', () => {
     })
 
     it('should trim session name', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       const createdSession = {
         id: 'session-123',
@@ -223,12 +242,7 @@ describe('addSession use case', () => {
 
   describe('Validation Errors', () => {
     it('should return validation error when name is empty', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
 
@@ -258,12 +272,7 @@ describe('addSession use case', () => {
     })
 
     it('should return validation error when name is only whitespace', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
 
@@ -287,12 +296,7 @@ describe('addSession use case', () => {
     })
 
     it('should return validation error when name is too long', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
 
@@ -345,12 +349,7 @@ describe('addSession use case', () => {
     })
 
     it('should return repository error when createSession fails', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
       vi.mocked(mockProgramRepository.createSession).mockReturnValue(
@@ -382,22 +381,12 @@ describe('addSession use case', () => {
 
   describe('Edge Cases', () => {
     it('should handle adding multiple sessions sequentially', async () => {
-      const initialProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const initialProgram = createProgramWithSessions([])
 
       // First call returns empty, second returns with 1 session
       vi.mocked(mockProgramRepository.findWithDetails)
         .mockReturnValueOnce(okAsync(initialProgram))
-        .mockReturnValueOnce(
-          okAsync({
-            ...initialProgram,
-            sessions: [{ id: 'session-1', name: 'Day 1', orderIndex: 0 }],
-          }),
-        )
+        .mockReturnValueOnce(okAsync(createProgramWithSessions([{ id: 'session-1', name: 'Day 1', orderIndex: 0 }])))
 
       vi.mocked(mockProgramRepository.createSession)
         .mockReturnValueOnce(
@@ -443,12 +432,7 @@ describe('addSession use case', () => {
     })
 
     it('should use generateId for new session ID', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        sessions: [],
-      }
+      const existingProgram = createProgramWithSessions([])
 
       const generatedId = 'generated-uuid-123'
       vi.mocked(mockGenerateId).mockReturnValue(generatedId)

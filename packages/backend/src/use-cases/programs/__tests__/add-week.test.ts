@@ -1,9 +1,30 @@
 import { faker } from '@faker-js/faker'
-import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import type { Week } from '@strenly/core/domain/entities/program/types'
+import type { ProgramRepositoryPort, ProgramWithDetails } from '@strenly/core/ports/program-repository.port'
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createProgramWithStructure } from '../../../__tests__/factories/program-structure-factory'
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeAddWeek } from '../add-week'
+
+// Helper to create program with custom weeks
+function createProgramWithWeeks(weeks: Omit<Week, 'sessions'>[]): ProgramWithDetails {
+  const program = createProgramWithStructure({
+    weeks: weeks.map((w) => ({ ...w, sessions: [] })),
+  })
+
+  return {
+    ...program,
+    weeks: weeks.map((w) => ({
+      id: w.id,
+      programId: program.id,
+      name: w.name,
+      orderIndex: w.orderIndex,
+      createdAt: new Date(),
+    })),
+    sessions: [],
+  } as unknown as ProgramWithDetails
+}
 
 describe('addWeek use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
@@ -24,13 +45,7 @@ describe('addWeek use case', () => {
 
   describe('Happy Path', () => {
     it('should add week successfully with explicit name', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [{ id: 'week-1', name: 'Week 1', orderIndex: 0 }],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([{ id: 'week-1', name: 'Week 1', orderIndex: 0 }])
 
       const newWeekId = 'week-new-123'
       vi.mocked(mockGenerateId).mockReturnValue(newWeekId)
@@ -80,13 +95,7 @@ describe('addWeek use case', () => {
     })
 
     it('should add week with auto-generated name when not provided', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([])
 
       const newWeekId = 'week-first-123'
       vi.mocked(mockGenerateId).mockReturnValue(newWeekId)
@@ -123,13 +132,7 @@ describe('addWeek use case', () => {
     })
 
     it('should add week to empty program with orderIndex 0', async () => {
-      const emptyProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Empty Program',
-        weeks: [],
-        sessions: [],
-      }
+      const emptyProgram = createProgramWithWeeks([])
 
       const newWeekId = 'week-first-123'
       vi.mocked(mockGenerateId).mockReturnValue(newWeekId)
@@ -166,13 +169,7 @@ describe('addWeek use case', () => {
     })
 
     it('should trim week name when provided', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([])
 
       const createdWeek = {
         id: 'week-123',
@@ -266,13 +263,7 @@ describe('addWeek use case', () => {
 
   describe('Validation Errors', () => {
     it('should return validation error when name is too long', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
 
@@ -328,13 +319,7 @@ describe('addWeek use case', () => {
     })
 
     it('should return repository error when createWeek fails', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
       vi.mocked(mockProgramRepository.createWeek).mockReturnValue(
@@ -366,23 +351,13 @@ describe('addWeek use case', () => {
 
   describe('Edge Cases', () => {
     it('should handle adding multiple weeks sequentially', async () => {
-      const initialProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const initialProgram = createProgramWithWeeks([])
+      const programWithWeek = createProgramWithWeeks([{ id: 'week-1', name: 'Week 1', orderIndex: 0 }])
 
       // First call returns empty, second returns with 1 week
       vi.mocked(mockProgramRepository.findWithDetails)
         .mockReturnValueOnce(okAsync(initialProgram))
-        .mockReturnValueOnce(
-          okAsync({
-            ...initialProgram,
-            weeks: [{ id: 'week-1', name: 'Week 1', orderIndex: 0 }],
-          }),
-        )
+        .mockReturnValueOnce(okAsync(programWithWeek))
 
       vi.mocked(mockProgramRepository.createWeek)
         .mockReturnValueOnce(
@@ -428,13 +403,7 @@ describe('addWeek use case', () => {
     })
 
     it('should use generateId for new week ID', async () => {
-      const existingProgram = {
-        id: programId,
-        organizationId: orgId,
-        name: 'Test Program',
-        weeks: [],
-        sessions: [],
-      }
+      const existingProgram = createProgramWithWeeks([])
 
       const generatedId = 'generated-uuid-456'
       vi.mocked(mockGenerateId).mockReturnValue(generatedId)

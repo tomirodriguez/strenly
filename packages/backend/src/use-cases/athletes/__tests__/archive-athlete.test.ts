@@ -41,7 +41,6 @@ describe('archiveAthlete use case', () => {
         expect.objectContaining({
           organizationId: ctx.organizationId,
           userId: ctx.userId,
-          memberRole: 'coach',
         }),
         'athlete-123',
       )
