@@ -24,8 +24,8 @@ interface AddExerciseRowProps {
  * Faded appearance until hover for visual hierarchy.
  *
  * Keyboard navigation:
- * - ArrowUp (combobox closed): navigates to last exercise in session
- * - ArrowDown (combobox closed): navigates to first exercise in next session
+ * - ArrowUp: navigates to last exercise in session
+ * - ArrowDown: navigates to first exercise in next session
  */
 export function AddExerciseRow({
   sessionId,
@@ -35,7 +35,6 @@ export function AddExerciseRow({
   onNavigateDown,
 }: AddExerciseRowProps) {
   const [searchValue, setSearchValue] = useState('')
-  const [isComboboxOpen, setIsComboboxOpen] = useState(false)
   const debouncedSearch = useDebounce(searchValue, 300)
 
   const { data: exercisesData, isLoading } = useExercises({
@@ -49,9 +48,8 @@ export function AddExerciseRow({
   )
 
   const handleKeyDownCapture = (e: React.KeyboardEvent) => {
-    // Only intercept arrow keys when combobox popup is closed
-    if (isComboboxOpen) return
-
+    // ArrowUp/ArrowDown always navigate the grid, even when combobox is open.
+    // The combobox will close on blur when focus moves to the grid cell.
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       e.stopPropagation()
@@ -91,7 +89,6 @@ export function AddExerciseRow({
               loading={isLoading}
               placeholder="Agregar ejercicio..."
               showClear={false}
-              onOpenChange={setIsComboboxOpen}
               className="border-none shadow-none"
             />
           </div>
