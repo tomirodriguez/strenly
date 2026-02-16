@@ -8,8 +8,7 @@ import { z } from 'zod'
 export const env = createEnv({
   clientPrefix: 'VITE_',
   client: {
-    VITE_API_URL: z.string().url(),
-    VITE_GOOGLE_OAUTH_ENABLED: z.enum(['true', 'false']).default('true'),
+    VITE_API_URL: z.url(),
   },
   runtimeEnv: import.meta.env,
   emptyStringAsUndefined: true,

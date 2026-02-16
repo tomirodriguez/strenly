@@ -4,11 +4,6 @@ import { createAuthClient } from 'better-auth/react'
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8787'
 
 /**
- * Check if Google OAuth is enabled (VITE_GOOGLE_OAUTH_ENABLED must be set to 'true')
- */
-export const isGoogleOAuthEnabled = import.meta.env.VITE_GOOGLE_OAUTH_ENABLED === 'true'
-
-/**
  * Organization additional fields schema.
  * This must match the schema defined in the backend auth.ts.
  */

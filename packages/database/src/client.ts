@@ -21,9 +21,9 @@ export function createDb(connectionString: string) {
   }
 
   const sql = postgres(connectionString, {
-    max: 10,                // Connection pool size
-    idle_timeout: 20,       // Seconds before idle connection closes
-    connect_timeout: 10,    // Connection timeout
+    max: 10, // Connection pool size
+    idle_timeout: 20, // Seconds before idle connection closes
+    connect_timeout: 10, // Connection timeout
   })
 
   return drizzle({ client: sql, schema })
