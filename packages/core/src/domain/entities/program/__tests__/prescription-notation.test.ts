@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ParsedPrescription, ParsedSeriesData } from './prescription-notation'
+import type { ParsedPrescription, ParsedSeriesData } from '../prescription-notation'
 import {
   formatDomainSeriesToNotation,
   formatPrescription,
@@ -7,7 +7,7 @@ import {
   parsePrescriptionNotation,
   parsePrescriptionToSeries,
   SKIP_PRESCRIPTION,
-} from './prescription-notation'
+} from '../prescription-notation'
 
 // ---- parsePrescriptionNotation ----
 

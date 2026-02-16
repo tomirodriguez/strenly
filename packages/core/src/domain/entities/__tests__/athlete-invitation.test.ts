@@ -8,7 +8,7 @@ import {
   isValid,
   reconstituteAthleteInvitation,
   revokeInvitation,
-} from './athlete-invitation'
+} from '../athlete-invitation'
 
 const validInput = {
   id: 'invitation-123',

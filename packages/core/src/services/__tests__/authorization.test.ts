@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getPermissions, hasHigherOrEqualRole, hasPermission, isValidRole } from './authorization'
+import { getPermissions, hasHigherOrEqualRole, hasPermission, isValidRole } from '../authorization'
 
 describe('hasPermission', () => {
   describe('owner role', () => {

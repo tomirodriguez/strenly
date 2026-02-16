@@ -6,6 +6,7 @@
   "exports": {
     "./domain/entities/*": "./src/domain/entities/*.ts",
     "./domain/entities/program/*": "./src/domain/entities/program/*.ts",
+    "./domain/value-objects/*": "./src/domain/value-objects/*.ts",
     "./ports/*": "./src/ports/*.ts",
     "./services/*": "./src/services/*.ts",
     "./types/*": "./src/types/*.ts"

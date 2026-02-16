@@ -1,8 +1,8 @@
 import type { Exercise } from '@strenly/core/domain/entities/exercise'
 import { reconstituteExercise } from '@strenly/core/domain/entities/exercise'
-import { isValidMovementPattern } from '@strenly/core/domain/entities/movement-pattern'
-import type { MuscleGroup } from '@strenly/core/domain/entities/muscle-group'
-import { isValidMuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import { isValidMovementPattern } from '@strenly/core/domain/value-objects/movement-pattern'
+import type { MuscleGroup } from '@strenly/core/domain/value-objects/muscle-group'
+import { isValidMuscleGroup } from '@strenly/core/domain/value-objects/muscle-group'
 import type {
   ExerciseRepositoryError,
   ExerciseRepositoryPort,

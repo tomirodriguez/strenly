@@ -1,4 +1,4 @@
-import { isValidMuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import { isValidMuscleGroup } from '@strenly/core/domain/value-objects/muscle-group'
 import type {
   MuscleGroupData,
   MuscleGroupRepositoryError,

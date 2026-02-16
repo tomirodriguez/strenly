@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAthlete, deactivateAthlete, reactivateAthlete, updateAthlete } from './athlete'
+import { createAthlete, deactivateAthlete, reactivateAthlete, updateAthlete } from '../athlete'
 
 const validInput = {
   id: 'athlete-123',

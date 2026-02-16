@@ -1,6 +1,7 @@
 import type { ResultAsync } from 'neverthrow'
 import type { WorkoutLog } from '../domain/entities/workout-log/types'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
 // ============================================================================
 // Error Types
@@ -9,7 +10,7 @@ import type { OrganizationContext } from '../types/organization-context'
 export type WorkoutLogRepositoryError =
   | { type: 'NOT_FOUND'; message: string }
   | { type: 'CONFLICT'; message: string } // Duplicate log for session/week
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+  | RepositoryError
 
 // ============================================================================
 // Filter Types

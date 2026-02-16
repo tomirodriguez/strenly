@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { Session } from '../program/types'
-import { buildLoggedExercises, buildLoggedSeries } from './build-logged-exercises'
+import type { Session } from '../../program/types'
+import { buildLoggedExercises, buildLoggedSeries } from '../build-logged-exercises'
 
 describe('buildLoggedSeries', () => {
   it('pre-fills repsPerformed from prescribed reps', () => {

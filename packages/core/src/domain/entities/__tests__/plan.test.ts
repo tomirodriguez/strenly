@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canAddAthlete, createPlan, hasFeature, type PlanFeatures } from './plan'
+import { canAddAthlete, createPlan, hasFeature, type PlanFeatures } from '../plan'
 
 const validFeatures: PlanFeatures = {
   templates: true,

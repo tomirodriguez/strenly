@@ -1,6 +1,7 @@
 import type { ResultAsync } from 'neverthrow'
 import type { Program, ProgramStatus, Series } from '../domain/entities/program/types'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
 // ============================================================================
 // Error Types
@@ -12,7 +13,7 @@ export type ProgramRepositoryError =
       entityType: 'program' | 'week' | 'session' | 'exercise_row' | 'prescription' | 'group'
       id: string
     }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+  | RepositoryError
 
 // ============================================================================
 // Filter Types
@@ -266,7 +267,10 @@ export type ProgramRepositoryPort = {
   /**
    * Find a session by ID
    */
-  findSessionById(ctx: OrganizationContext, sessionId: string): ResultAsync<ProgramSession | null, ProgramRepositoryError>
+  findSessionById(
+    ctx: OrganizationContext,
+    sessionId: string,
+  ): ResultAsync<ProgramSession | null, ProgramRepositoryError>
 
   /**
    * Create a session (training day) for a program
@@ -327,7 +331,10 @@ export type ProgramRepositoryPort = {
   /**
    * Find an exercise row by ID
    */
-  findExerciseRowById(ctx: OrganizationContext, rowId: string): ResultAsync<ProgramExerciseRow | null, ProgramRepositoryError>
+  findExerciseRowById(
+    ctx: OrganizationContext,
+    rowId: string,
+  ): ResultAsync<ProgramExerciseRow | null, ProgramRepositoryError>
 
   /**
    * Get the maximum order index for exercise rows in a session

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ensureGroupAdjacency } from './ensure-group-adjacency'
+import { ensureGroupAdjacency } from '../ensure-group-adjacency'
 
 describe('ensureGroupAdjacency', () => {
   it('returns standalone rows in original order', () => {

@@ -1,7 +1,8 @@
 import type { ResultAsync } from 'neverthrow'
 import type { OrganizationType, Plan } from '../domain/entities/plan'
+import type { RepositoryError } from './types'
 
-export type PlanRepositoryError = { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+export type PlanRepositoryError = RepositoryError
 
 export type ListPlansOptions = {
   organizationType?: OrganizationType

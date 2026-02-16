@@ -1,12 +1,11 @@
 import type { ResultAsync } from 'neverthrow'
 import type { Exercise } from '../domain/entities/exercise'
-import type { MovementPattern } from '../domain/entities/movement-pattern'
-import type { MuscleGroup } from '../domain/entities/muscle-group'
+import type { MovementPattern } from '../domain/value-objects/movement-pattern'
+import type { MuscleGroup } from '../domain/value-objects/muscle-group'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
-export type ExerciseRepositoryError =
-  | { type: 'NOT_FOUND'; exerciseId: string }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+export type ExerciseRepositoryError = { type: 'NOT_FOUND'; exerciseId: string } | RepositoryError
 
 export type ListExercisesOptions = {
   movementPattern?: MovementPattern

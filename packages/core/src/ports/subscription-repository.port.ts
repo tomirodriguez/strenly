@@ -1,10 +1,9 @@
 import type { ResultAsync } from 'neverthrow'
 import type { Subscription } from '../domain/entities/subscription'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
-export type SubscriptionRepositoryError =
-  | { type: 'NOT_FOUND'; organizationId: string }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+export type SubscriptionRepositoryError = { type: 'NOT_FOUND'; organizationId: string } | RepositoryError
 
 export type SubscriptionRepositoryPort = {
   findByOrganizationId(ctx: OrganizationContext): ResultAsync<Subscription | null, SubscriptionRepositoryError>

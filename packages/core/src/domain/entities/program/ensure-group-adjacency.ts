@@ -5,10 +5,7 @@
  * This enforces the domain invariant that exercises in the same group
  * must be contiguous in the ordering.
  */
-export function ensureGroupAdjacency(
-  rowIds: string[],
-  rowMetadata: Map<string, { groupId: string | null }>,
-): string[] {
+export function ensureGroupAdjacency(rowIds: string[], rowMetadata: Map<string, { groupId: string | null }>): string[] {
   // Track which rows we've placed
   const placed = new Set<string>()
   const result: string[] = []

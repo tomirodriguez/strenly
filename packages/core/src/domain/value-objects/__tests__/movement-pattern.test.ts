@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isValidMovementPattern, MOVEMENT_PATTERNS } from './movement-pattern'
+import { isValidMovementPattern, MOVEMENT_PATTERNS } from '../movement-pattern'
 
 describe('MovementPattern Value Object', () => {
   describe('MOVEMENT_PATTERNS', () => {

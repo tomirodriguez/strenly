@@ -1,11 +1,12 @@
 import type { ResultAsync } from 'neverthrow'
 import type { AthleteInvitation } from '../domain/entities/athlete-invitation'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
 export type AthleteInvitationRepositoryError =
   | { type: 'NOT_FOUND'; invitationId: string }
   | { type: 'TOKEN_NOT_FOUND'; token: string }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+  | RepositoryError
 
 export type AthleteInvitationRepositoryPort = {
   /**

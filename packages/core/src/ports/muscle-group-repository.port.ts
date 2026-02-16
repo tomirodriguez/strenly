@@ -1,5 +1,6 @@
 import type { ResultAsync } from 'neverthrow'
-import type { MuscleGroup } from '../domain/entities/muscle-group'
+import type { MuscleGroup } from '../domain/value-objects/muscle-group'
+import type { RepositoryError } from './types'
 
 /**
  * Muscle group data from database.
@@ -13,9 +14,7 @@ export type MuscleGroupData = {
   readonly bodyRegion: 'upper' | 'lower' | 'core'
 }
 
-export type MuscleGroupRepositoryError =
-  | { type: 'NOT_FOUND'; muscleGroupId: string }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+export type MuscleGroupRepositoryError = { type: 'NOT_FOUND'; muscleGroupId: string } | RepositoryError
 
 /**
  * MuscleGroup Repository Interface.

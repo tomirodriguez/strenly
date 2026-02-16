@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createExercise, isArchived, isCurated, isCustom } from './exercise'
+import { createExercise, isArchived, isCurated, isCustom } from '../exercise'
 
 const validInput = {
   id: 'exercise-123',

@@ -10,10 +10,13 @@ This is the innermost layer of Clean Architecture. Code here defines the busines
 
 ```
 src/
-  domain/entities/     # Domain entities with validation
-  ports/               # Repository interfaces (contracts)
-  services/            # Domain services (authorization)
-  types/               # Shared types (OrganizationContext)
+  domain/
+    entities/            # Domain entities with validation
+    value-objects/       # Value objects (no identity)
+  ports/                 # Repository interfaces (contracts)
+    types.ts             # Shared base types (RepositoryError, PaginationOptions)
+  services/              # Domain services (authorization)
+  types/                 # Shared types (OrganizationContext)
 ```
 
 ## Relevant Skills
@@ -31,7 +34,7 @@ src/
 - Validate all business rules in the factory method
 - Return `Result<Entity, DomainError>` from factory methods
 - Keep entities immutable (return new instances on state changes)
-- Co-locate tests: `entity.test.ts` next to `entity.ts`
+- Tests in `__tests__/` subfolders: `__tests__/entity.test.ts`
 
 ### Ports
 - Define interfaces that repositories must implement

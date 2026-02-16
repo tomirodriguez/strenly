@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getBodyRegion, isValidMuscleGroup, MUSCLE_GROUPS, type MuscleGroup } from './muscle-group'
+import { getBodyRegion, isValidMuscleGroup, MUSCLE_GROUPS, type MuscleGroup } from '../muscle-group'
 
 describe('MuscleGroup Value Object', () => {
   describe('MUSCLE_GROUPS', () => {

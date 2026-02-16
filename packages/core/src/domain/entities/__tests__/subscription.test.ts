@@ -7,7 +7,7 @@ import {
   isActive,
   isPastDue,
   transitionStatus,
-} from './subscription'
+} from '../subscription'
 
 const now = new Date()
 const oneMonthLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)

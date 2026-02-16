@@ -1,10 +1,9 @@
 import type { ResultAsync } from 'neverthrow'
 import type { Athlete, AthleteStatus } from '../domain/entities/athlete'
 import type { OrganizationContext } from '../types/organization-context'
+import type { RepositoryError } from './types'
 
-export type AthleteRepositoryError =
-  | { type: 'NOT_FOUND'; athleteId: string }
-  | { type: 'DATABASE_ERROR'; message: string; cause?: unknown }
+export type AthleteRepositoryError = { type: 'NOT_FOUND'; athleteId: string } | RepositoryError
 
 export type ListAthletesOptions = {
   status?: AthleteStatus

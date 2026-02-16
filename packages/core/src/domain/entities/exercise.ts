@@ -1,6 +1,6 @@
 import { err, ok, type Result } from 'neverthrow'
-import { isValidMovementPattern, type MovementPattern } from './movement-pattern'
-import { isValidMuscleGroup, type MuscleGroup } from './muscle-group'
+import { isValidMovementPattern, type MovementPattern } from '../value-objects/movement-pattern'
+import { isValidMuscleGroup, type MuscleGroup } from '../value-objects/muscle-group'
 
 export type Exercise = {
   readonly id: string

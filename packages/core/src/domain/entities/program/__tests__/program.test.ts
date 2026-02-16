@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { activateProgram, addWeek, archiveProgram, createProgram, reconstituteProgram, removeWeek } from './program'
-import type { CreateProgramInput, Program, SeriesInput } from './types'
-import { isIntensityType, isProgramStatus } from './types'
+import { activateProgram, addWeek, archiveProgram, createProgram, reconstituteProgram, removeWeek } from '../program'
+import type { CreateProgramInput, Program, SeriesInput } from '../types'
+import { isIntensityType, isProgramStatus } from '../types'
 
 describe('Program Aggregate', () => {
   // Helper to create valid input

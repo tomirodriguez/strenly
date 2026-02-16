@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { calculateStatus } from './calculate-status'
-import type { LoggedExerciseInput } from './types'
+import { calculateStatus } from '../calculate-status'
+import type { LoggedExerciseInput } from '../types'
 
 const makeExercise = (overrides: Partial<LoggedExerciseInput> = {}): LoggedExerciseInput => ({
   id: 'ex-1',

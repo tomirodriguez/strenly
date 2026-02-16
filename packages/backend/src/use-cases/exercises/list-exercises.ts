@@ -1,6 +1,6 @@
 import type { Exercise } from '@strenly/core/domain/entities/exercise'
-import type { MovementPattern } from '@strenly/core/domain/entities/movement-pattern'
-import type { MuscleGroup } from '@strenly/core/domain/entities/muscle-group'
+import type { MovementPattern } from '@strenly/core/domain/value-objects/movement-pattern'
+import type { MuscleGroup } from '@strenly/core/domain/value-objects/muscle-group'
 import type { ExerciseRepositoryPort } from '@strenly/core/ports/exercise-repository.port'
 import { hasPermission } from '@strenly/core/services/authorization'
 import type { OrganizationContext } from '@strenly/core/types/organization-context'
