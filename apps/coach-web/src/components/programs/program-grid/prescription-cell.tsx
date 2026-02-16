@@ -181,6 +181,7 @@ export function PrescriptionCell({
       tabIndex={isActive ? 0 : -1}
       data-row-id={rowId}
       data-week-id={weekId}
+      aria-selected={isActive || undefined}
     >
       <div
         className={cn(

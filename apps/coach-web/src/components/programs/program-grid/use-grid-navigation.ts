@@ -46,8 +46,8 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
       // Keep moving in direction until we find a navigable row or hit bounds
       while (index >= 0 && index < rows.length) {
         const row = rows[index]
-        // Skip session-header rows - they are not navigable
-        if (row && row.type !== 'session-header') {
+        // Only exercise rows are navigable — skip session-header and add-exercise rows
+        if (row && row.type === 'exercise') {
           return index
         }
         index += direction

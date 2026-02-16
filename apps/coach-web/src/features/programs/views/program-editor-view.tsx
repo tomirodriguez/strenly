@@ -12,7 +12,6 @@ import { useProgram } from '@/features/programs/hooks/queries/use-program'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { toast } from '@/lib/toast'
 import { useGridActions, useGridData, useGridIsDirty } from '@/stores/grid-store'
-import '@/styles/program-grid.css'
 
 interface ProgramEditorViewProps {
   orgSlug: string

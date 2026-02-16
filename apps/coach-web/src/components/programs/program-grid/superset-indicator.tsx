@@ -17,6 +17,7 @@ export function SupersetIndicator({ position }: SupersetIndicatorProps) {
 
   return (
     <div
+      data-testid="superset-indicator"
       className={cn(
         'absolute left-[15px] z-20 w-[1.5px] bg-primary/40',
         position === 'start' && 'top-1/2 bottom-[-50%]',

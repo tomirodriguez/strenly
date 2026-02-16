@@ -11,7 +11,6 @@ import {
   useUpdateExerciseRow,
   useUpdatePrescription,
 } from '@/features/programs/hooks/mutations/use-grid-mutations'
-import '@/styles/program-grid.css'
 
 interface ProgramGridProps {
   program: ProgramAggregate
@@ -198,10 +197,10 @@ export function ProgramGrid({
   return (
     <div className="flex h-full flex-col">
       {/* Grid container */}
-      <div className="program-grid-container flex-1">
+      <div className="flex-1 overflow-x-auto overflow-y-visible">
         <table
           ref={tableRef}
-          className="program-grid"
+          className="w-full min-w-[800px] table-fixed border-separate border-spacing-0"
           aria-label={`Programa: ${program.name}`}
           onKeyDown={handleTableKeyDown}
         >

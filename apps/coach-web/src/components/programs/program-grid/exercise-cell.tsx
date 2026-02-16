@@ -1,18 +1,16 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ExerciseRowActions } from '../exercise-row-actions'
 import { ExerciseRowPrefix } from './exercise-row-prefix'
 import type { GridRow } from './types'
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from '@/components/ui/combobox'
+import { ServerCombobox } from '@/components/ui/server-combobox'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
 import { useDebounce } from '@/hooks/use-debounce'
 import { cn } from '@/lib/utils'
+
+interface ExerciseItem {
+  id: string
+  name: string
+}
 
 interface ExerciseCellProps {
   row: GridRow
@@ -51,67 +49,60 @@ export function ExerciseCell({
   onCancel,
 }: ExerciseCellProps) {
   const [searchValue, setSearchValue] = useState('')
-  // Debounce search to prevent excessive API calls during rapid typing
   const debouncedSearch = useDebounce(searchValue, 300)
 
-  const { data: exercisesData } = useExercises({
+  const { data: exercisesData, isLoading } = useExercises({
     search: debouncedSearch || undefined,
     limit: 10,
   })
 
-  const exercises = exercisesData?.items ?? []
+  const exercises = useMemo<ExerciseItem[]>(
+    () => (exercisesData?.items ?? []).map((e) => ({ id: e.id, name: e.name })),
+    [exercisesData],
+  )
 
-  const handleInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      onCancel()
-    }
-  }
+  const selectedItem = useMemo<ExerciseItem | null>(() => {
+    if (!row.exercise) return null
+    return { id: row.exercise.exerciseId, name: row.exercise.exerciseName }
+  }, [row.exercise])
 
   const handleCellKeyDown = (e: React.KeyboardEvent) => {
-    // Enter or F2 to start editing (Excel convention)
     if (e.key === 'Enter' || e.key === 'F2') {
       e.preventDefault()
       onStartEdit()
     }
   }
 
-  const handleSelect = (value: string | null) => {
-    if (!value) return
-    const exercise = exercises.find((e) => e.id === value)
-    if (exercise) {
-      onCommit(exercise.id, exercise.name)
-    }
-  }
-
-  // Edit mode - show combobox
+  // Edit mode - show server combobox
   if (isEditing) {
     return (
       <td className="sticky left-0 z-10 border-border border-r border-b bg-background p-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">
         <div className="flex h-10 items-center">
           <ExerciseRowPrefix row={row} />
           <div className="flex-1 px-2">
-            <Combobox open onOpenChange={(open) => !open && onCancel()} onValueChange={handleSelect}>
-              <ComboboxInput
-                placeholder="Buscar ejercicio..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onKeyDown={handleInputKeyDown}
-                className="h-8 w-full border-none bg-transparent text-sm shadow-none focus-visible:ring-0"
-                showTrigger={false}
-                autoFocus
-              />
-              <ComboboxContent sideOffset={4}>
-                <ComboboxList>
-                  {exercises.map((exercise) => (
-                    <ComboboxItem key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                    </ComboboxItem>
-                  ))}
-                </ComboboxList>
-                <ComboboxEmpty>No se encontraron ejercicios</ComboboxEmpty>
-              </ComboboxContent>
-            </Combobox>
+            <ServerCombobox
+              items={exercises}
+              selectedItem={selectedItem}
+              onValueChange={(item) => {
+                if (item) {
+                  onCommit(item.id, item.name)
+                }
+              }}
+              onSearchChange={setSearchValue}
+              isItemEqualToValue={(a, b) => a.id === b.id}
+              itemToStringLabel={(item) => item.name}
+              itemToKey={(item) => item.id}
+              loading={isLoading}
+              placeholder="Buscar ejercicio..."
+              open
+              onOpenChange={(open) => {
+                if (!open) onCancel()
+              }}
+              autoFocus
+              showTrigger={false}
+              showClear={false}
+              className="border-none shadow-none"
+            />
           </div>
         </div>
       </td>
@@ -128,6 +119,7 @@ export function ExerciseCell({
       )}
       data-row-id={row.id}
       data-col-id={colId}
+      aria-selected={isActive || undefined}
       onClick={onSelect}
       onDoubleClick={onStartEdit}
       onKeyDown={handleCellKeyDown}
@@ -138,6 +130,7 @@ export function ExerciseCell({
 
         <div className="flex min-w-0 flex-1 items-center justify-between px-3">
           <span
+            data-testid="exercise-name"
             className={cn(
               'truncate font-semibold text-[13px]',
               row.isSubRow ? 'text-foreground/50' : 'text-foreground',

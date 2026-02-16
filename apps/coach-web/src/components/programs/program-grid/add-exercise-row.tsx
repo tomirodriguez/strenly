@@ -1,16 +1,14 @@
 import { PlusIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { GridColumn } from './types'
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from '@/components/ui/combobox'
+import { ServerCombobox } from '@/components/ui/server-combobox'
 import { useExercises } from '@/features/exercises/hooks/queries/use-exercises'
-import { cn } from '@/lib/utils'
+import { useDebounce } from '@/hooks/use-debounce'
+
+interface ExerciseItem {
+  id: string
+  name: string
+}
 
 interface AddExerciseRowProps {
   sessionId: string
@@ -20,61 +18,49 @@ interface AddExerciseRowProps {
 
 /**
  * "Add exercise" row that appears at the end of each session.
- * Features a searchable combobox for exercise selection.
+ * Features a searchable server combobox for exercise selection.
  * Faded appearance until hover for visual hierarchy.
  */
 export function AddExerciseRow({ sessionId, columns, onAddExercise }: AddExerciseRowProps) {
   const [searchValue, setSearchValue] = useState('')
+  const debouncedSearch = useDebounce(searchValue, 300)
 
-  // Fetch exercises with search
   const { data: exercisesData, isLoading } = useExercises({
-    search: searchValue || undefined,
+    search: debouncedSearch || undefined,
     limit: 10,
   })
 
-  const exercises = useMemo(() => exercisesData?.items ?? [], [exercisesData])
-
-  const handleSelect = (exerciseId: string | null) => {
-    if (!exerciseId) return
-    const exercise = exercises.find((e) => e.id === exerciseId)
-    if (exercise) {
-      onAddExercise(sessionId, exercise.id, exercise.name)
-      setSearchValue('')
-    }
-  }
+  const exercises = useMemo<ExerciseItem[]>(
+    () => (exercisesData?.items ?? []).map((e) => ({ id: e.id, name: e.name })),
+    [exercisesData],
+  )
 
   return (
-    <tr className="group opacity-30 transition-opacity hover:opacity-100">
-      <td className={cn('sticky left-0 z-10 border-border border-r border-b bg-zinc-900/10 p-0')}>
+    <tr className="group opacity-30 transition-opacity hover:opacity-100" data-row-type="add-exercise">
+      <td className="sticky left-0 z-10 border-border border-r border-b bg-zinc-900/10 p-0">
         <div className="flex h-10 items-center">
           <span className="flex h-full w-10 items-center justify-center border-border border-r">
             <PlusIcon className="size-4 text-muted-foreground" />
           </span>
           <div className="flex-1 px-2">
-            <Combobox value="" onValueChange={handleSelect}>
-              <ComboboxInput
-                placeholder="Agregar ejercicio..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                showTrigger={false}
-                className={cn(
-                  'h-8 border-none bg-transparent text-sm italic',
-                  'placeholder:text-muted-foreground/50',
-                  '[&_input]:border-none [&_input]:bg-transparent [&_input]:shadow-none',
-                  '[&_input]:focus-within:border-none [&_input]:focus-within:ring-0',
-                )}
-              />
-              <ComboboxContent>
-                <ComboboxList>
-                  {exercises.map((exercise) => (
-                    <ComboboxItem key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                    </ComboboxItem>
-                  ))}
-                </ComboboxList>
-                <ComboboxEmpty>{isLoading ? 'Buscando...' : 'No se encontraron ejercicios'}</ComboboxEmpty>
-              </ComboboxContent>
-            </Combobox>
+            <ServerCombobox
+              items={exercises}
+              selectedItem={null}
+              onValueChange={(item) => {
+                if (item) {
+                  onAddExercise(sessionId, item.id, item.name)
+                  setSearchValue('')
+                }
+              }}
+              onSearchChange={setSearchValue}
+              isItemEqualToValue={(a, b) => a.id === b.id}
+              itemToStringLabel={(item) => item.name}
+              itemToKey={(item) => item.id}
+              loading={isLoading}
+              placeholder="Agregar ejercicio..."
+              showClear={false}
+              className="border-none shadow-none"
+            />
           </div>
         </div>
       </td>
