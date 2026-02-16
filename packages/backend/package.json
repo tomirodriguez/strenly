@@ -14,9 +14,9 @@
     "lint": "pnpm biome check --write src",
     "lint:fix": "pnpm biome check --write --unsafe src",
     "typecheck": "tsc --noEmit",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest run",
+    "test:ui": "vitest run --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@orpc/server": "^1.4.3",

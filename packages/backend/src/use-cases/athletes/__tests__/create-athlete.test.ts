@@ -126,7 +126,9 @@ describe('createAthlete use case', () => {
       if (result.isErr()) {
         const error = result.error
         expect(error.type).toBe('forbidden')
-        expect(error.message).toContain('No permission')
+        if (error.type === 'forbidden') {
+          expect(error.message).toContain('No permission')
+        }
       }
 
       // Repository should NOT be called
@@ -177,7 +179,9 @@ describe('createAthlete use case', () => {
       if (result.isErr()) {
         const error = result.error
         expect(error.type).toBe('validation_error')
-        expect(error.message).toContain('Name')
+        if (error.type === 'validation_error') {
+          expect(error.message).toContain('Name')
+        }
       }
 
       // Repository should NOT be called for invalid input
@@ -200,7 +204,9 @@ describe('createAthlete use case', () => {
       if (result.isErr()) {
         const error = result.error
         expect(error.type).toBe('validation_error')
-        expect(error.message.toLowerCase()).toContain('email')
+        if (error.type === 'validation_error') {
+          expect(error.message.toLowerCase()).toContain('email')
+        }
       }
     })
   })
@@ -230,7 +236,9 @@ describe('createAthlete use case', () => {
       if (result.isErr()) {
         const error = result.error
         expect(error.type).toBe('repository_error')
-        expect(error.message).toContain('Connection failed')
+        if (error.type === 'repository_error') {
+          expect(error.message).toContain('Connection failed')
+        }
       }
     })
   })
