@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useEffect, useState } from 'react'
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import type { GridCell, GridColumn, GridRow } from './types'
 
 interface UseGridNavigationOptions {
@@ -10,6 +10,7 @@ interface UseGridNavigationOptions {
 
 export function useGridNavigation({ rows, columns, tableRef, onCellChange }: UseGridNavigationOptions) {
   const [activeCell, setActiveCellState] = useState<GridCell | null>(null)
+  const lastColumnRef = useRef<string | null>(null)
 
   /**
    * Focus a specific cell in the DOM by finding it via data attributes.
@@ -25,6 +26,7 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
           `[data-row-id="${rowId}"][data-col-id="${colId}"], [data-row-id="${rowId}"][data-week-id="${colId}"]`,
         )
         if (cell instanceof HTMLElement) {
+          cell.scrollIntoView({ block: 'nearest', inline: 'nearest' })
           cell.focus()
         }
       })
@@ -121,6 +123,7 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
         colId: targetCol.id,
       }
 
+      lastColumnRef.current = targetCol.id
       setActiveCellState(newCell)
       onCellChange?.(newCell)
     },
@@ -226,6 +229,7 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
 
       if (rowIndex >= 0 && colIndex >= 0) {
         const cell: GridCell = { rowIndex, colIndex, rowId, colId }
+        lastColumnRef.current = colId
         setActiveCellState(cell)
         onCellChange?.(cell)
       }
@@ -255,6 +259,8 @@ export function useGridNavigation({ rows, columns, tableRef, onCellChange }: Use
     clearActiveCell,
     handleKeyDown,
     focusCell,
+    focusAddExerciseRow,
     restoreFocus,
+    lastColumnRef,
   }
 }

@@ -82,11 +82,12 @@ export function ProgramGrid({
   const { rows, columns } = gridData ?? emptyData
 
   // Grid state hooks - pass tableRef for DOM focus management
-  const { activeCell, setActiveCell, handleKeyDown, restoreFocus } = useGridNavigation({
-    rows,
-    columns,
-    tableRef,
-  })
+  const { activeCell, setActiveCell, handleKeyDown, restoreFocus, focusAddExerciseRow, lastColumnRef } =
+    useGridNavigation({
+      rows,
+      columns,
+      tableRef,
+    })
   // Cell editing state - restoreFocus re-focuses active cell after edit stops
   const { editingCell, startEditing, stopEditing } = useCellEditing({
     onEditStop: restoreFocus,
@@ -166,12 +167,14 @@ export function ProgramGrid({
   // Handle navigation from add-exercise row (ArrowUp/ArrowDown)
   const handleNavigateFromAddRow = useCallback(
     (sessionId: string, direction: 'up' | 'down') => {
+      const targetCol = lastColumnRef.current ?? columns[0]?.id ?? 'exercise'
+
       if (direction === 'up') {
         // Find the last exercise row in this session
         for (let i = rows.length - 1; i >= 0; i--) {
           const row = rows[i]
           if (row && row.type === 'exercise' && row.sessionId === sessionId) {
-            setActiveCell(row.id, 'exercise')
+            setActiveCell(row.id, targetCol)
             return
           }
         }
@@ -183,15 +186,38 @@ export function ProgramGrid({
           for (let i = addExIdx + 1; i < rows.length; i++) {
             const row = rows[i]
             if (row && row.type === 'exercise') {
-              setActiveCell(row.id, 'exercise')
+              setActiveCell(row.id, targetCol)
+              return
+            }
+            // If we hit another add-exercise row (empty session), focus it
+            if (row && row.type === 'add-exercise') {
+              focusAddExerciseRow(row.sessionId)
               return
             }
           }
         }
       }
     },
-    [rows, setActiveCell],
+    [rows, columns, setActiveCell, lastColumnRef, focusAddExerciseRow],
   )
+
+  // Auto-focus first exercise cell on initial load (ref-based, no useEffect).
+  // Uses focusCell directly instead of setActiveCell to avoid double-RAF timing issues.
+  const initialFocusRef = useRef(false)
+  if (!initialFocusRef.current && rows.length > 0 && !lastAddedItemId) {
+    initialFocusRef.current = true
+    const firstExercise = rows.find((r) => r.type === 'exercise')
+    if (firstExercise) {
+      const colId = columns[0]?.id ?? 'exercise'
+      setActiveCell(firstExercise.id, colId)
+    } else {
+      // No exercises — focus first add-exercise input
+      const firstAddEx = rows.find((r) => r.type === 'add-exercise')
+      if (firstAddEx) {
+        focusAddExerciseRow(firstAddEx.sessionId)
+      }
+    }
+  }
 
   // Place cursor on newly added exercise row (ref-based, no useEffect)
   const handledAddedItemRef = useRef<string | null>(null)
