@@ -6,7 +6,7 @@ import { createProgramRepositoryMock } from '../../../__tests__/factories/progra
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeDuplicateProgram } from '../duplicate-program'
 
-describe('duplicateProgram use case', () => {
+describe('[3.24-UNIT] @p2 duplicateProgram use case', () => {
 	let mockProgramRepository: ProgramRepositoryPort
 	let mockGenerateId: () => string
 
@@ -18,20 +18,20 @@ describe('duplicateProgram use case', () => {
 		mockGenerateId = vi.fn(() => `test-id-${++idCounter}`)
 	})
 
-	describe('Happy Path', () => {
-		it('should duplicate program successfully with all nested structure', async () => {
+	describe('[3.24-UNIT] @p0 Happy Path', () => {
+		it('[3.24-UNIT-001] @p0 should duplicate program successfully with all nested structure', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-1'
 
 			// Create a source program with nested structure
-			const sourceProgram = createProgram({
+			const sourceProgramResult = createProgram({
 				id: sourceProgramId,
 				organizationId: ctx.organizationId,
 				name: 'Original Program',
 				description: 'Original description',
 				athleteId: 'athlete-1',
 				isTemplate: false,
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'week-1',
@@ -70,7 +70,13 @@ describe('duplicateProgram use case', () => {
 						],
 					},
 				],
-			}).value!
+			})
+
+			if (!sourceProgramResult.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			const sourceProgram = sourceProgramResult.value
 
 			// Mock successful load
 			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
@@ -109,24 +115,38 @@ describe('duplicateProgram use case', () => {
 
 				// Verify nested structure is cloned with new IDs
 				expect(duplicated.weeks).toHaveLength(1)
-				expect(duplicated.weeks[0].id).toContain('test-id-') // New week ID
-				expect(duplicated.weeks[0].id).not.toBe('week-1') // Different from source
-				expect(duplicated.weeks[0].name).toBe('Week 1') // Name preserved
-				expect(duplicated.weeks[0].sessions).toHaveLength(1)
-				expect(duplicated.weeks[0].sessions[0].id).toContain('test-id-') // New session ID
-				expect(duplicated.weeks[0].sessions[0].id).not.toBe('session-1') // Different from source
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups).toHaveLength(1)
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups[0].id).toContain('test-id-') // New group ID
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups[0].id).not.toBe('group-1') // Different from source
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups[0].items).toHaveLength(1)
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups[0].items[0].id).toContain('test-id-') // New item ID
-				expect(duplicated.weeks[0].sessions[0].exerciseGroups[0].items[0].id).not.toBe('item-1') // Different from source
+				const firstWeek = duplicated.weeks[0]
+				if (firstWeek) {
+					expect(firstWeek.id).toContain('test-id-') // New week ID
+					expect(firstWeek.id).not.toBe('week-1') // Different from source
+					expect(firstWeek.name).toBe('Week 1') // Name preserved
+					expect(firstWeek.sessions).toHaveLength(1)
+					const firstSession = firstWeek.sessions[0]
+					if (firstSession) {
+						expect(firstSession.id).toContain('test-id-') // New session ID
+						expect(firstSession.id).not.toBe('session-1') // Different from source
+						expect(firstSession.exerciseGroups).toHaveLength(1)
+						const firstGroup = firstSession.exerciseGroups[0]
+						if (firstGroup) {
+							expect(firstGroup.id).toContain('test-id-') // New group ID
+							expect(firstGroup.id).not.toBe('group-1') // Different from source
+							expect(firstGroup.items).toHaveLength(1)
+							const firstItem = firstGroup.items[0]
+							if (firstItem) {
+								expect(firstItem.id).toContain('test-id-') // New item ID
+								expect(firstItem.id).not.toBe('item-1') // Different from source
 
-				// Verify series data is preserved (series don't have IDs)
-				const clonedSeries = duplicated.weeks[0].sessions[0].exerciseGroups[0].items[0].series[0]
-				expect(clonedSeries.reps).toBe(10)
-				expect(clonedSeries.intensityValue).toBe(80)
-				expect(clonedSeries.tempo).toBe('2010')
+								// Verify series data is preserved (series don't have IDs)
+								const clonedSeries = firstItem.series[0]
+								if (clonedSeries) {
+									expect(clonedSeries.reps).toBe(10)
+									expect(clonedSeries.intensityValue).toBe(80)
+									expect(clonedSeries.tempo).toBe('2010')
+								}
+							}
+						}
+					}
+				}
 			}
 
 			// Verify repository calls
@@ -145,19 +165,19 @@ describe('duplicateProgram use case', () => {
 			)
 		})
 
-		it('should duplicate program with custom isTemplate and athleteId flags', async () => {
+		it('[3.24-UNIT-002] @p2 should duplicate program with custom isTemplate and athleteId flags', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-2'
 
 			// Create a minimal source program
-			const sourceProgram = createProgram({
+			const sourceProgramResult = createProgram({
 				id: sourceProgramId,
 				organizationId: ctx.organizationId,
 				name: 'Source Program',
 				description: null,
 				athleteId: 'athlete-1',
 				isTemplate: false,
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'week-1',
@@ -166,7 +186,13 @@ describe('duplicateProgram use case', () => {
 						sessions: [],
 					},
 				],
-			}).value!
+			})
+
+			if (!sourceProgramResult.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			const sourceProgram = sourceProgramResult.value
 
 			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
 			vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
@@ -197,8 +223,8 @@ describe('duplicateProgram use case', () => {
 		})
 	})
 
-	describe('Authorization', () => {
-		it('should return forbidden when user lacks programs:write permission', async () => {
+	describe('[3.24-UNIT] @p0 Authorization', () => {
+		it('[3.24-UNIT-003] @p0 should return forbidden when user lacks programs:write permission', async () => {
 			const ctx = createMemberContext() // Member has no write permission
 
 			const duplicateProgram = makeDuplicateProgram({
@@ -215,8 +241,11 @@ describe('duplicateProgram use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('forbidden')
-				expect(result.error.message).toBe('No permission to create programs')
+				const error = result.error
+				expect(error.type).toBe('forbidden')
+				if (error.type === 'forbidden') {
+					expect(error.message).toBe('No permission to create programs')
+				}
 			}
 
 			// Should not call repository
@@ -224,8 +253,8 @@ describe('duplicateProgram use case', () => {
 		})
 	})
 
-	describe('Not Found', () => {
-		it('should return not_found when source program does not exist', async () => {
+	describe('[3.24-UNIT] @p1 Not Found', () => {
+		it('[3.24-UNIT-004] @p2 should return not_found when source program does not exist', async () => {
 			const ctx = createAdminContext()
 			const nonExistentId = 'non-existent-program'
 
@@ -246,19 +275,22 @@ describe('duplicateProgram use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('not_found')
-				expect(result.error.programId).toBe(nonExistentId)
+				const error = result.error
+				expect(error.type).toBe('not_found')
+				if (error.type === 'not_found') {
+					expect(error.programId).toBe(nonExistentId)
+				}
 			}
 		})
 	})
 
-	describe('Validation Errors', () => {
-		it('should return validation_error when createProgram fails due to invalid name', async () => {
+	describe('[3.24-UNIT] @p1 Validation Errors', () => {
+		it('[3.24-UNIT-005] @p1 should return validation_error when createProgram fails due to invalid name', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-3'
 
 			// Create source program with valid data
-			const sourceProgram = createProgram({
+			const sourceProgramResult = createProgram({
 				id: sourceProgramId,
 				organizationId: ctx.organizationId,
 				name: 'Valid Name',
@@ -267,7 +299,13 @@ describe('duplicateProgram use case', () => {
 				isTemplate: false,
 				status: 'draft',
 				weeks: [],
-			}).value!
+			})
+
+			if (!sourceProgramResult.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			const sourceProgram = sourceProgramResult.value
 
 			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
 
@@ -286,12 +324,15 @@ describe('duplicateProgram use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('validation_error')
-				expect(result.error.message).toContain('name')
+				const error = result.error
+				expect(error.type).toBe('validation_error')
+				if (error.type === 'validation_error') {
+					expect(error.message).toContain('name')
+				}
 			}
 		})
 
-		it('should return validation_error when weeks structure is invalid', async () => {
+		it('[3.24-UNIT-006] @p1 should return validation_error when weeks structure is invalid', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-4'
 
@@ -346,8 +387,8 @@ describe('duplicateProgram use case', () => {
 		})
 	})
 
-	describe('Repository Errors', () => {
-		it('should return repository_error when loadProgramAggregate fails', async () => {
+	describe('[3.24-UNIT] @p1 Repository Errors', () => {
+		it('[3.24-UNIT-007] @p1 should return repository_error when loadProgramAggregate fails', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-5'
 
@@ -370,17 +411,20 @@ describe('duplicateProgram use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('repository_error')
-				expect(result.error.message).toBe('Connection timeout')
+				const error = result.error
+				expect(error.type).toBe('repository_error')
+				if (error.type === 'repository_error') {
+					expect(error.message).toBe('Connection timeout')
+				}
 			}
 		})
 
-		it('should return repository_error when saveProgramAggregate fails', async () => {
+		it('[3.24-UNIT-008] @p1 should return repository_error when saveProgramAggregate fails', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'source-program-6'
 
 			// Create valid source program
-			const sourceProgram = createProgram({
+			const sourceProgramResult = createProgram({
 				id: sourceProgramId,
 				organizationId: ctx.organizationId,
 				name: 'Source Program',
@@ -389,7 +433,13 @@ describe('duplicateProgram use case', () => {
 				isTemplate: false,
 				status: 'draft',
 				weeks: [],
-			}).value!
+			})
+
+			if (!sourceProgramResult.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			const sourceProgram = sourceProgramResult.value
 
 			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
 
@@ -412,8 +462,11 @@ describe('duplicateProgram use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('repository_error')
-				expect(result.error.message).toBe('Disk full')
+				const error = result.error
+				expect(error.type).toBe('repository_error')
+				if (error.type === 'repository_error') {
+					expect(error.message).toBe('Disk full')
+				}
 			}
 		})
 	})

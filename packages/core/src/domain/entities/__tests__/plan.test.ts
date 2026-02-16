@@ -23,7 +23,7 @@ const validInput = {
 }
 
 describe('createPlan', () => {
-  it('creates a valid plan', () => {
+  it('[PLAN.1-UNIT-001] @p0 creates a valid plan', () => {
     const result = createPlan(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -32,7 +32,7 @@ describe('createPlan', () => {
     }
   })
 
-  it('trims whitespace from name', () => {
+  it('[PLAN.1-UNIT-002] @p1 trims whitespace from name', () => {
     const result = createPlan({ ...validInput, name: '  Gym Pro  ' })
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -41,7 +41,7 @@ describe('createPlan', () => {
   })
 
   describe('name validation', () => {
-    it('rejects empty name', () => {
+    it('[PLAN.2-UNIT-003] @p0 rejects empty name', () => {
       const result = createPlan({ ...validInput, name: '' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -49,7 +49,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects name shorter than 2 characters', () => {
+    it('[PLAN.2-UNIT-004] @p1 rejects name shorter than 2 characters', () => {
       const result = createPlan({ ...validInput, name: 'A' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -57,7 +57,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects name longer than 50 characters', () => {
+    it('[PLAN.2-UNIT-005] @p1 rejects name longer than 50 characters', () => {
       const result = createPlan({ ...validInput, name: 'A'.repeat(51) })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -67,7 +67,7 @@ describe('createPlan', () => {
   })
 
   describe('slug validation', () => {
-    it('rejects uppercase in slug', () => {
+    it('[PLAN.3-UNIT-006] @p1 rejects uppercase in slug', () => {
       const result = createPlan({ ...validInput, slug: 'Coach-Starter' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -75,7 +75,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects spaces in slug', () => {
+    it('[PLAN.3-UNIT-007] @p1 rejects spaces in slug', () => {
       const result = createPlan({ ...validInput, slug: 'coach starter' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -83,14 +83,14 @@ describe('createPlan', () => {
       }
     })
 
-    it('accepts valid slug with hyphens', () => {
+    it('[PLAN.3-UNIT-008] @p2 accepts valid slug with hyphens', () => {
       const result = createPlan({ ...validInput, slug: 'gym-pro-2024' })
       expect(result.isOk()).toBe(true)
     })
   })
 
   describe('athlete limit validation', () => {
-    it('rejects zero athlete limit', () => {
+    it('[PLAN.4-UNIT-009] @p1 rejects zero athlete limit', () => {
       const result = createPlan({ ...validInput, athleteLimit: 0 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -98,7 +98,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects negative athlete limit', () => {
+    it('[PLAN.4-UNIT-010] @p1 rejects negative athlete limit', () => {
       const result = createPlan({ ...validInput, athleteLimit: -1 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -106,7 +106,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects athlete limit over 10000', () => {
+    it('[PLAN.4-UNIT-011] @p1 rejects athlete limit over 10000', () => {
       const result = createPlan({ ...validInput, athleteLimit: 10001 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -114,14 +114,14 @@ describe('createPlan', () => {
       }
     })
 
-    it('accepts maximum athlete limit of 10000', () => {
+    it('[PLAN.4-UNIT-012] @p2 accepts maximum athlete limit of 10000', () => {
       const result = createPlan({ ...validInput, athleteLimit: 10000 })
       expect(result.isOk()).toBe(true)
     })
   })
 
   describe('coach limit validation', () => {
-    it('accepts null for unlimited coaches', () => {
+    it('[PLAN.5-UNIT-013] @p2 accepts null for unlimited coaches', () => {
       const result = createPlan({ ...validInput, coachLimit: null })
       expect(result.isOk()).toBe(true)
       if (result.isOk()) {
@@ -129,7 +129,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects zero coach limit', () => {
+    it('[PLAN.5-UNIT-014] @p1 rejects zero coach limit', () => {
       const result = createPlan({ ...validInput, coachLimit: 0 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -137,7 +137,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects negative coach limit', () => {
+    it('[PLAN.5-UNIT-015] @p1 rejects negative coach limit', () => {
       const result = createPlan({ ...validInput, coachLimit: -1 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -147,7 +147,7 @@ describe('createPlan', () => {
   })
 
   describe('price validation', () => {
-    it('rejects negative monthly price', () => {
+    it('[PLAN.6-UNIT-016] @p1 rejects negative monthly price', () => {
       const result = createPlan({ ...validInput, priceMonthly: -100 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -155,7 +155,7 @@ describe('createPlan', () => {
       }
     })
 
-    it('rejects negative yearly price', () => {
+    it('[PLAN.6-UNIT-017] @p1 rejects negative yearly price', () => {
       const result = createPlan({ ...validInput, priceYearly: -100 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -163,12 +163,12 @@ describe('createPlan', () => {
       }
     })
 
-    it('accepts free tier (zero prices)', () => {
+    it('[PLAN.6-UNIT-018] @p2 accepts free tier (zero prices)', () => {
       const result = createPlan({ ...validInput, priceMonthly: 0, priceYearly: 0 })
       expect(result.isOk()).toBe(true)
     })
 
-    it('rejects yearly price higher than 12x monthly', () => {
+    it('[PLAN.6-UNIT-019] @p1 rejects yearly price higher than 12x monthly', () => {
       const result = createPlan({ ...validInput, priceMonthly: 1000, priceYearly: 15000 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -176,12 +176,12 @@ describe('createPlan', () => {
       }
     })
 
-    it('accepts yearly price equal to 12x monthly (no discount)', () => {
+    it('[PLAN.6-UNIT-020] @p2 accepts yearly price equal to 12x monthly (no discount)', () => {
       const result = createPlan({ ...validInput, priceMonthly: 1000, priceYearly: 12000 })
       expect(result.isOk()).toBe(true)
     })
 
-    it('accepts yearly price with discount', () => {
+    it('[PLAN.6-UNIT-021] @p2 accepts yearly price with discount', () => {
       const result = createPlan({ ...validInput, priceMonthly: 1000, priceYearly: 10000 })
       expect(result.isOk()).toBe(true)
     })
@@ -189,35 +189,35 @@ describe('createPlan', () => {
 })
 
 describe('canAddAthlete', () => {
-  it('returns true when under limit', () => {
+  it('[PLAN.7-UNIT-022] @p0 returns true when under limit', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(canAddAthlete(plan, 5)).toBe(true)
   })
 
-  it('returns true when at limit minus one', () => {
+  it('[PLAN.7-UNIT-023] @p1 returns true when at limit minus one', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(canAddAthlete(plan, 9)).toBe(true)
   })
 
-  it('returns false when at limit', () => {
+  it('[PLAN.7-UNIT-024] @p0 returns false when at limit', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(canAddAthlete(plan, 10)).toBe(false)
   })
 
-  it('returns false when over limit', () => {
+  it('[PLAN.7-UNIT-025] @p1 returns false when over limit', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(canAddAthlete(plan, 15)).toBe(false)
   })
 })
 
 describe('hasFeature', () => {
-  it('returns true for enabled feature', () => {
+  it('[PLAN.8-UNIT-026] @p1 returns true for enabled feature', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(hasFeature(plan, 'templates')).toBe(true)
     expect(hasFeature(plan, 'customExercises')).toBe(true)
   })
 
-  it('returns false for disabled feature', () => {
+  it('[PLAN.8-UNIT-027] @p1 returns false for disabled feature', () => {
     const plan = createPlan(validInput)._unsafeUnwrap()
     expect(hasFeature(plan, 'analytics')).toBe(false)
     expect(hasFeature(plan, 'exportData')).toBe(false)

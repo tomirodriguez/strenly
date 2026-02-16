@@ -19,7 +19,7 @@ const validInput = {
 }
 
 describe('createAthleteInvitation', () => {
-  it('creates invitation with all required fields', () => {
+  it('[INVITATION.1-UNIT-001] @p0 creates invitation with all required fields', () => {
     const result = createAthleteInvitation(validInput)
 
     expect(result.isOk()).toBe(true)
@@ -30,7 +30,7 @@ describe('createAthleteInvitation', () => {
     expect(invitation.createdByUserId).toBe('user-111')
   })
 
-  it('uses provided token', () => {
+  it('[INVITATION.1-UNIT-002] @p1 uses provided token', () => {
     const result = createAthleteInvitation(validInput)
 
     expect(result.isOk()).toBe(true)
@@ -38,7 +38,7 @@ describe('createAthleteInvitation', () => {
     expect(invitation.token).toBe('test-token-abc123-xyz789-secure-value')
   })
 
-  it('sets expiresAt to 7 days from creation', () => {
+  it('[INVITATION.1-UNIT-003] @p1 sets expiresAt to 7 days from creation', () => {
     const before = new Date()
     const result = createAthleteInvitation(validInput)
     const after = new Date()
@@ -55,17 +55,17 @@ describe('createAthleteInvitation', () => {
     expect(invitation.expiresAt.getTime()).toBeLessThanOrEqual(expectedMaxExpiry.getTime())
   })
 
-  it('defaults acceptedAt to null', () => {
+  it('[INVITATION.1-UNIT-004] @p2 defaults acceptedAt to null', () => {
     const result = createAthleteInvitation(validInput)
     expect(result._unsafeUnwrap().acceptedAt).toBeNull()
   })
 
-  it('defaults revokedAt to null', () => {
+  it('[INVITATION.1-UNIT-005] @p2 defaults revokedAt to null', () => {
     const result = createAthleteInvitation(validInput)
     expect(result._unsafeUnwrap().revokedAt).toBeNull()
   })
 
-  it('sets createdAt to now', () => {
+  it('[INVITATION.1-UNIT-006] @p2 sets createdAt to now', () => {
     const before = new Date()
     const result = createAthleteInvitation(validInput)
     const after = new Date()
@@ -77,7 +77,7 @@ describe('createAthleteInvitation', () => {
 })
 
 describe('reconstituteAthleteInvitation', () => {
-  it('reconstitutes an invitation from database props', () => {
+  it('[INVITATION.2-UNIT-007] @p1 reconstitutes an invitation from database props', () => {
     const dbProps = {
       id: 'inv-1',
       athleteId: 'athlete-1',
@@ -98,7 +98,7 @@ describe('reconstituteAthleteInvitation', () => {
 })
 
 describe('acceptInvitation', () => {
-  it('accepts a valid invitation', () => {
+  it('[INVITATION.3-UNIT-008] @p0 accepts a valid invitation', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const result = acceptInvitation(invitation)
 
@@ -107,7 +107,7 @@ describe('acceptInvitation', () => {
     expect(accepted.acceptedAt).toBeInstanceOf(Date)
   })
 
-  it('returns error when already accepted', () => {
+  it('[INVITATION.3-UNIT-009] @p1 returns error when already accepted', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const accepted = { ...invitation, acceptedAt: new Date() }
     const result = acceptInvitation(accepted)
@@ -116,7 +116,7 @@ describe('acceptInvitation', () => {
     expect(result._unsafeUnwrapErr().type).toBe('ALREADY_ACCEPTED')
   })
 
-  it('returns error when revoked', () => {
+  it('[INVITATION.3-UNIT-010] @p1 returns error when revoked', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const revoked = { ...invitation, revokedAt: new Date() }
     const result = acceptInvitation(revoked)
@@ -125,7 +125,7 @@ describe('acceptInvitation', () => {
     expect(result._unsafeUnwrapErr().type).toBe('ALREADY_REVOKED')
   })
 
-  it('returns error when expired', () => {
+  it('[INVITATION.3-UNIT-011] @p1 returns error when expired', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const expired = { ...invitation, expiresAt: new Date(Date.now() - 1000) }
     const result = acceptInvitation(expired)
@@ -136,7 +136,7 @@ describe('acceptInvitation', () => {
 })
 
 describe('revokeInvitation', () => {
-  it('revokes a valid invitation', () => {
+  it('[INVITATION.4-UNIT-012] @p0 revokes a valid invitation', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const result = revokeInvitation(invitation)
 
@@ -145,7 +145,7 @@ describe('revokeInvitation', () => {
     expect(revoked.revokedAt).toBeInstanceOf(Date)
   })
 
-  it('returns error when already accepted', () => {
+  it('[INVITATION.4-UNIT-013] @p1 returns error when already accepted', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const accepted = { ...invitation, acceptedAt: new Date() }
     const result = revokeInvitation(accepted)
@@ -154,7 +154,7 @@ describe('revokeInvitation', () => {
     expect(result._unsafeUnwrapErr().type).toBe('ALREADY_ACCEPTED')
   })
 
-  it('returns error when already revoked', () => {
+  it('[INVITATION.4-UNIT-014] @p1 returns error when already revoked', () => {
     const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
     const revoked = { ...invitation, revokedAt: new Date() }
     const result = revokeInvitation(revoked)
@@ -166,12 +166,12 @@ describe('revokeInvitation', () => {
 
 describe('helper functions', () => {
   describe('isExpired', () => {
-    it('returns false for non-expired invitation', () => {
+    it('[INVITATION.5-UNIT-015] @p1 returns false for non-expired invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isExpired(invitation)).toBe(false)
     })
 
-    it('returns true for expired invitation', () => {
+    it('[INVITATION.5-UNIT-016] @p1 returns true for expired invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const expiredInvitation = {
         ...invitation,
@@ -182,12 +182,12 @@ describe('helper functions', () => {
   })
 
   describe('isRevoked', () => {
-    it('returns false when revokedAt is null', () => {
+    it('[INVITATION.6-UNIT-017] @p1 returns false when revokedAt is null', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isRevoked(invitation)).toBe(false)
     })
 
-    it('returns true when revokedAt is set', () => {
+    it('[INVITATION.6-UNIT-018] @p1 returns true when revokedAt is set', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const revokedInvitation = {
         ...invitation,
@@ -198,12 +198,12 @@ describe('helper functions', () => {
   })
 
   describe('isAccepted', () => {
-    it('returns false when acceptedAt is null', () => {
+    it('[INVITATION.7-UNIT-019] @p1 returns false when acceptedAt is null', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isAccepted(invitation)).toBe(false)
     })
 
-    it('returns true when acceptedAt is set', () => {
+    it('[INVITATION.7-UNIT-020] @p1 returns true when acceptedAt is set', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const acceptedInvitation = {
         ...invitation,
@@ -214,12 +214,12 @@ describe('helper functions', () => {
   })
 
   describe('isValid', () => {
-    it('returns true for fresh invitation', () => {
+    it('[INVITATION.8-UNIT-021] @p0 returns true for fresh invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       expect(isValid(invitation)).toBe(true)
     })
 
-    it('returns false for expired invitation', () => {
+    it('[INVITATION.8-UNIT-022] @p1 returns false for expired invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const expiredInvitation = {
         ...invitation,
@@ -228,7 +228,7 @@ describe('helper functions', () => {
       expect(isValid(expiredInvitation)).toBe(false)
     })
 
-    it('returns false for revoked invitation', () => {
+    it('[INVITATION.8-UNIT-023] @p1 returns false for revoked invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const revokedInvitation = {
         ...invitation,
@@ -237,7 +237,7 @@ describe('helper functions', () => {
       expect(isValid(revokedInvitation)).toBe(false)
     })
 
-    it('returns false for accepted invitation', () => {
+    it('[INVITATION.8-UNIT-024] @p1 returns false for accepted invitation', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const acceptedInvitation = {
         ...invitation,
@@ -246,7 +246,7 @@ describe('helper functions', () => {
       expect(isValid(acceptedInvitation)).toBe(false)
     })
 
-    it('returns false when both expired and revoked', () => {
+    it('[INVITATION.8-UNIT-025] @p2 returns false when both expired and revoked', () => {
       const invitation = createAthleteInvitation(validInput)._unsafeUnwrap()
       const invalidInvitation = {
         ...invitation,

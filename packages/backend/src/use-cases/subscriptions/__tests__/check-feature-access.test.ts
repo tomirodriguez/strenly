@@ -25,7 +25,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should return true when feature is available in plan', async () => {
+    it('[4.1-UNIT-001] @p0 should return true when feature is available in plan', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -79,7 +79,7 @@ describe('checkFeatureAccess use case', () => {
       }
     })
 
-    it('should work for different features', async () => {
+    it('[4.1-UNIT-002] @p0 should work for different features', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -136,7 +136,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should allow viewer role to check features', async () => {
+    it('[4.2-UNIT-001] @p0 should allow viewer role to check features', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -188,7 +188,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return subscription_not_found when organization has no subscription', async () => {
+    it('[4.3-UNIT-001] @p0 should return subscription_not_found when organization has no subscription', async () => {
       vi.mocked(mockSubscriptionRepository.findByOrganizationId).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -215,7 +215,7 @@ describe('checkFeatureAccess use case', () => {
       expect(mockPlanRepository.findById).not.toHaveBeenCalled()
     })
 
-    it('should return plan_not_found when plan does not exist', async () => {
+    it('[4.3-UNIT-002] @p1 should return plan_not_found when plan does not exist', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -253,7 +253,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Feature Not Available', () => {
-    it('should return feature_not_available when feature is disabled in plan', async () => {
+    it('[4.4-UNIT-001] @p0 should return feature_not_available when feature is disabled in plan', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -310,7 +310,7 @@ describe('checkFeatureAccess use case', () => {
       }
     })
 
-    it('should return feature_not_available for analytics on basic plan', async () => {
+    it('[4.4-UNIT-002] @p1 should return feature_not_available for analytics on basic plan', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -366,7 +366,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when subscription lookup fails', async () => {
+    it('[4.5-UNIT-001] @p1 should return repository error when subscription lookup fails', async () => {
       vi.mocked(mockSubscriptionRepository.findByOrganizationId).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -392,7 +392,7 @@ describe('checkFeatureAccess use case', () => {
       }
     })
 
-    it('should return repository error when plan lookup fails', async () => {
+    it('[4.5-UNIT-002] @p1 should return repository error when plan lookup fails', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,
@@ -432,7 +432,7 @@ describe('checkFeatureAccess use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle checking multiple features for same organization', async () => {
+    it('[4.6-UNIT-001] @p2 should handle checking multiple features for same organization', async () => {
       const subscription = {
         id: 'sub-123',
         organizationId: orgId,

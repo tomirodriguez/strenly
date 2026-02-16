@@ -24,7 +24,7 @@ const validInput = {
 }
 
 describe('createSubscription', () => {
-  it('creates a valid subscription', () => {
+  it('[SUBSCRIPTION.1-UNIT-001] @p0 creates a valid subscription', () => {
     const result = createSubscription(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -35,12 +35,12 @@ describe('createSubscription', () => {
   })
 
   describe('athlete count validation', () => {
-    it('accepts zero athlete count', () => {
+    it('[SUBSCRIPTION.2-UNIT-002] @p1 accepts zero athlete count', () => {
       const result = createSubscription({ ...validInput, athleteCount: 0 })
       expect(result.isOk()).toBe(true)
     })
 
-    it('rejects negative athlete count', () => {
+    it('[SUBSCRIPTION.2-UNIT-003] @p1 rejects negative athlete count', () => {
       const result = createSubscription({ ...validInput, athleteCount: -1 })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -50,7 +50,7 @@ describe('createSubscription', () => {
   })
 
   describe('period validation', () => {
-    it('rejects period end before period start', () => {
+    it('[SUBSCRIPTION.3-UNIT-004] @p1 rejects period end before period start', () => {
       const result = createSubscription({
         ...validInput,
         currentPeriodStart: oneMonthLater,
@@ -62,7 +62,7 @@ describe('createSubscription', () => {
       }
     })
 
-    it('rejects period end equal to period start', () => {
+    it('[SUBSCRIPTION.3-UNIT-005] @p1 rejects period end equal to period start', () => {
       const result = createSubscription({
         ...validInput,
         currentPeriodStart: now,
@@ -77,37 +77,37 @@ describe('createSubscription', () => {
 })
 
 describe('canTransitionTo', () => {
-  it('allows active -> canceled', () => {
+  it('[SUBSCRIPTION.4-UNIT-006] @p0 allows active -> canceled', () => {
     expect(canTransitionTo('active', 'canceled')).toBe(true)
   })
 
-  it('allows active -> past_due', () => {
+  it('[SUBSCRIPTION.4-UNIT-007] @p0 allows active -> past_due', () => {
     expect(canTransitionTo('active', 'past_due')).toBe(true)
   })
 
-  it('allows past_due -> active', () => {
+  it('[SUBSCRIPTION.4-UNIT-008] @p0 allows past_due -> active', () => {
     expect(canTransitionTo('past_due', 'active')).toBe(true)
   })
 
-  it('allows past_due -> canceled', () => {
+  it('[SUBSCRIPTION.4-UNIT-009] @p0 allows past_due -> canceled', () => {
     expect(canTransitionTo('past_due', 'canceled')).toBe(true)
   })
 
-  it('allows canceled -> active (reactivation)', () => {
+  it('[SUBSCRIPTION.4-UNIT-010] @p1 allows canceled -> active (reactivation)', () => {
     expect(canTransitionTo('canceled', 'active')).toBe(true)
   })
 
-  it('disallows canceled -> past_due', () => {
+  it('[SUBSCRIPTION.4-UNIT-011] @p1 disallows canceled -> past_due', () => {
     expect(canTransitionTo('canceled', 'past_due')).toBe(false)
   })
 
-  it('disallows active -> active (no-op handled separately)', () => {
+  it('[SUBSCRIPTION.4-UNIT-012] @p2 disallows active -> active (no-op handled separately)', () => {
     expect(canTransitionTo('active', 'active')).toBe(false)
   })
 })
 
 describe('transitionStatus', () => {
-  it('returns same subscription when status unchanged', () => {
+  it('[SUBSCRIPTION.5-UNIT-013] @p1 returns same subscription when status unchanged', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     const result = transitionStatus(subscription, 'active')
     expect(result.isOk()).toBe(true)
@@ -116,7 +116,7 @@ describe('transitionStatus', () => {
     }
   })
 
-  it('transitions active to canceled', () => {
+  it('[SUBSCRIPTION.5-UNIT-014] @p0 transitions active to canceled', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     const result = transitionStatus(subscription, 'canceled')
     expect(result.isOk()).toBe(true)
@@ -125,7 +125,7 @@ describe('transitionStatus', () => {
     }
   })
 
-  it('transitions active to past_due', () => {
+  it('[SUBSCRIPTION.5-UNIT-015] @p0 transitions active to past_due', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     const result = transitionStatus(subscription, 'past_due')
     expect(result.isOk()).toBe(true)
@@ -134,7 +134,7 @@ describe('transitionStatus', () => {
     }
   })
 
-  it('rejects invalid transition from canceled to past_due', () => {
+  it('[SUBSCRIPTION.5-UNIT-016] @p1 rejects invalid transition from canceled to past_due', () => {
     const subscription = createSubscription({ ...validInput, status: 'canceled' })._unsafeUnwrap()
     const result = transitionStatus(subscription, 'past_due')
     expect(result.isErr()).toBe(true)
@@ -149,7 +149,7 @@ describe('transitionStatus', () => {
 })
 
 describe('incrementAthleteCount', () => {
-  it('increments count by 1', () => {
+  it('[SUBSCRIPTION.6-UNIT-017] @p0 increments count by 1', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     const result = incrementAthleteCount(subscription)
     expect(result.isOk()).toBe(true)
@@ -158,7 +158,7 @@ describe('incrementAthleteCount', () => {
     }
   })
 
-  it('increments from zero', () => {
+  it('[SUBSCRIPTION.6-UNIT-018] @p1 increments from zero', () => {
     const subscription = createSubscription({ ...validInput, athleteCount: 0 })._unsafeUnwrap()
     const result = incrementAthleteCount(subscription)
     expect(result.isOk()).toBe(true)
@@ -167,7 +167,7 @@ describe('incrementAthleteCount', () => {
     }
   })
 
-  it('rejects increment on canceled subscription', () => {
+  it('[SUBSCRIPTION.6-UNIT-019] @p1 rejects increment on canceled subscription', () => {
     const subscription = createSubscription({ ...validInput, status: 'canceled' })._unsafeUnwrap()
     const result = incrementAthleteCount(subscription)
     expect(result.isErr()).toBe(true)
@@ -178,7 +178,7 @@ describe('incrementAthleteCount', () => {
 })
 
 describe('decrementAthleteCount', () => {
-  it('decrements count by 1', () => {
+  it('[SUBSCRIPTION.7-UNIT-020] @p0 decrements count by 1', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     const result = decrementAthleteCount(subscription)
     expect(result.isOk()).toBe(true)
@@ -187,7 +187,7 @@ describe('decrementAthleteCount', () => {
     }
   })
 
-  it('rejects decrement when count is zero', () => {
+  it('[SUBSCRIPTION.7-UNIT-021] @p1 rejects decrement when count is zero', () => {
     const subscription = createSubscription({ ...validInput, athleteCount: 0 })._unsafeUnwrap()
     const result = decrementAthleteCount(subscription)
     expect(result.isErr()).toBe(true)
@@ -198,22 +198,22 @@ describe('decrementAthleteCount', () => {
 })
 
 describe('status helpers', () => {
-  it('isActive returns true for active subscription', () => {
+  it('[SUBSCRIPTION.8-UNIT-022] @p1 isActive returns true for active subscription', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     expect(isActive(subscription)).toBe(true)
   })
 
-  it('isActive returns false for canceled subscription', () => {
+  it('[SUBSCRIPTION.8-UNIT-023] @p1 isActive returns false for canceled subscription', () => {
     const subscription = createSubscription({ ...validInput, status: 'canceled' })._unsafeUnwrap()
     expect(isActive(subscription)).toBe(false)
   })
 
-  it('isPastDue returns true for past_due subscription', () => {
+  it('[SUBSCRIPTION.8-UNIT-024] @p1 isPastDue returns true for past_due subscription', () => {
     const subscription = createSubscription({ ...validInput, status: 'past_due' })._unsafeUnwrap()
     expect(isPastDue(subscription)).toBe(true)
   })
 
-  it('isPastDue returns false for active subscription', () => {
+  it('[SUBSCRIPTION.8-UNIT-025] @p1 isPastDue returns false for active subscription', () => {
     const subscription = createSubscription(validInput)._unsafeUnwrap()
     expect(isPastDue(subscription)).toBe(false)
   })

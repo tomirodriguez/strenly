@@ -6,15 +6,15 @@ import { createExerciseRepositoryMock } from '../../../__tests__/factories/exerc
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeGetExercise } from '../get-exercise'
 
-describe('getExercise use case', () => {
+describe('[2.5-UNIT] getExercise use case', () => {
   let mockExerciseRepository: ExerciseRepositoryPort
 
   beforeEach(() => {
     mockExerciseRepository = createExerciseRepositoryMock()
   })
 
-  describe('Happy Path', () => {
-    it('should get exercise successfully with admin role', async () => {
+  describe('[2.5-UNIT] Happy Path', () => {
+    it('[2.5-UNIT-001] @p0 should get exercise successfully with admin role', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -47,7 +47,7 @@ describe('getExercise use case', () => {
       )
     })
 
-    it('should get exercise with complete data', async () => {
+    it('[2.5-UNIT-002] @p1 should get exercise with complete data', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -74,8 +74,8 @@ describe('getExercise use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found error when exercise does not exist', async () => {
+  describe('[2.5-UNIT] Not Found Errors', () => {
+    it('[2.5-UNIT-003] @p1 should return not_found error when exercise does not exist', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'non-existent-exercise'
 
@@ -102,8 +102,8 @@ describe('getExercise use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[2.5-UNIT] Repository Errors', () => {
+    it('[2.5-UNIT-004] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -135,8 +135,8 @@ describe('getExercise use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle getting multiple exercises in sequence', async () => {
+  describe('[2.5-UNIT] Edge Cases', () => {
+    it('[2.5-UNIT-005] @p2 should handle getting multiple exercises in sequence', async () => {
       const ctx = createAdminContext()
       const exerciseId1 = 'exercise-1'
       const exerciseId2 = 'exercise-2'

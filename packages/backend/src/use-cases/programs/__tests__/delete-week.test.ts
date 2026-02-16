@@ -26,7 +26,7 @@ function createProgramWithWeeks(weeks: Omit<Week, 'sessions'>[]): ProgramWithDet
   } as unknown as ProgramWithDetails
 }
 
-describe('deleteWeek use case', () => {
+describe('[3.23-UNIT] @p2 deleteWeek use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   const programId = 'program-123'
   const weekId = 'week-456'
@@ -42,8 +42,8 @@ describe('deleteWeek use case', () => {
     } as unknown as ProgramRepositoryPort
   })
 
-  describe('Happy Path', () => {
-    it('should delete week successfully', async () => {
+  describe('[3.23-UNIT] @p0 Happy Path', () => {
+    it('[3.23-UNIT-001] @p0 should delete week successfully', async () => {
       const programWithWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: weekId, name: 'Week 2', orderIndex: 1 },
@@ -67,7 +67,7 @@ describe('deleteWeek use case', () => {
       expect(mockProgramRepository.deleteWeek).toHaveBeenCalledWith(ctx, weekId)
     })
 
-    it('should delete last week when more than one week exists', async () => {
+    it('[3.23-UNIT-002] @p2 should delete last week when more than one week exists', async () => {
       const programWithWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: weekId, name: 'Week 2', orderIndex: 1 },
@@ -89,8 +89,8 @@ describe('deleteWeek use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.23-UNIT] @p0 Authorization', () => {
+    it('[3.23-UNIT-003] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
 
@@ -114,8 +114,8 @@ describe('deleteWeek use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return program_not_found when program does not exist', async () => {
+  describe('[3.23-UNIT] @p1 Not Found Errors', () => {
+    it('[3.23-UNIT-004] @p2 should return program_not_found when program does not exist', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -140,7 +140,7 @@ describe('deleteWeek use case', () => {
       expect(mockProgramRepository.deleteWeek).not.toHaveBeenCalled()
     })
 
-    it('should return not_found when week does not exist in program', async () => {
+    it('[3.23-UNIT-005] @p2 should return not_found when week does not exist in program', async () => {
       const programWithWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: 'week-2', name: 'Week 2', orderIndex: 1 },
@@ -171,8 +171,8 @@ describe('deleteWeek use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return last_week error when trying to delete the only week', async () => {
+  describe('[3.23-UNIT] @p1 Validation Errors', () => {
+    it('[3.23-UNIT-006] @p1 should return last_week error when trying to delete the only week', async () => {
       const programWithOneWeek = createProgramWithWeeks([{ id: weekId, name: 'Only Week', orderIndex: 0 }])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithOneWeek))
@@ -200,8 +200,8 @@ describe('deleteWeek use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findWithDetails fails', async () => {
+  describe('[3.23-UNIT] @p1 Repository Errors', () => {
+    it('[3.23-UNIT-007] @p1 should return repository error when findWithDetails fails', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -225,7 +225,7 @@ describe('deleteWeek use case', () => {
       }
     })
 
-    it('should return repository error when deleteWeek fails', async () => {
+    it('[3.23-UNIT-008] @p1 should return repository error when deleteWeek fails', async () => {
       const programWithWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: weekId, name: 'Week 2', orderIndex: 1 },
@@ -256,8 +256,8 @@ describe('deleteWeek use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should allow deletion when exactly 2 weeks exist', async () => {
+  describe('[3.23-UNIT] @p2 Edge Cases', () => {
+    it('[3.23-UNIT-009] @p2 should allow deletion when exactly 2 weeks exist', async () => {
       const programWithTwoWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: weekId, name: 'Week 2', orderIndex: 1 },
@@ -280,7 +280,7 @@ describe('deleteWeek use case', () => {
       expect(mockProgramRepository.deleteWeek).toHaveBeenCalledWith(ctx, weekId)
     })
 
-    it('should handle deletion from middle of week list', async () => {
+    it('[3.23-UNIT-010] @p2 should handle deletion from middle of week list', async () => {
       const programWithWeeks = createProgramWithWeeks([
         { id: 'week-1', name: 'Week 1', orderIndex: 0 },
         { id: weekId, name: 'Week 2', orderIndex: 1 },

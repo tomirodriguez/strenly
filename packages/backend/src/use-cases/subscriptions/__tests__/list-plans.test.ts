@@ -43,7 +43,7 @@ describe('listPlans use case', () => {
   // NOTE: No Authorization tests - this is a PUBLIC endpoint
 
   describe('Happy Path', () => {
-    it('should list all active plans successfully', async () => {
+    it('[4.1-UNIT-001] @p0 should list all active plans successfully', async () => {
       const plans = [
         createPlan({ id: 'plan-1', name: 'Starter', slug: 'starter', athleteLimit: 10 }),
         createPlan({ id: 'plan-2', name: 'Pro', slug: 'pro', athleteLimit: 50 }),
@@ -85,7 +85,7 @@ describe('listPlans use case', () => {
       )
     })
 
-    it('should list plans filtered by organization type (coach_solo)', async () => {
+    it('[4.1-UNIT-002] @p1 should list plans filtered by organization type (coach_solo)', async () => {
       const soloPlans = [
         createPlan({ id: 'plan-1', name: 'Solo Starter', organizationType: 'coach_solo' }),
         createPlan({ id: 'plan-2', name: 'Solo Pro', organizationType: 'coach_solo' }),
@@ -122,7 +122,7 @@ describe('listPlans use case', () => {
       )
     })
 
-    it('should list plans filtered by organization type (gym)', async () => {
+    it('[4.1-UNIT-003] @p1 should list plans filtered by organization type (gym)', async () => {
       const gymPlans = [createPlan({ id: 'plan-1', name: 'Gym Plan', organizationType: 'gym', coachLimit: 10 })]
 
       vi.mocked(mockPlanRepository.findAll).mockReturnValue(
@@ -148,7 +148,7 @@ describe('listPlans use case', () => {
       }
     })
 
-    it('should list plans with their feature sets', async () => {
+    it('[4.1-UNIT-004] @p2 should list plans with their feature sets', async () => {
       const plans = [
         createPlan({
           id: 'plan-1',
@@ -195,7 +195,7 @@ describe('listPlans use case', () => {
       }
     })
 
-    it('should list plans with pricing information', async () => {
+    it('[4.1-UNIT-005] @p2 should list plans with pricing information', async () => {
       const plans = [
         createPlan({
           id: 'plan-1',
@@ -236,7 +236,7 @@ describe('listPlans use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+    it('[4.2-UNIT-001] @p1 should return repository error when database fails', async () => {
       // Mock repository failure
       vi.mocked(mockPlanRepository.findAll).mockReturnValue(
         errAsync({
@@ -264,7 +264,7 @@ describe('listPlans use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should return empty list when no active plans exist', async () => {
+    it('[4.3-UNIT-001] @p2 should return empty list when no active plans exist', async () => {
       // No active plans
       vi.mocked(mockPlanRepository.findAll).mockReturnValue(
         okAsync({
@@ -287,7 +287,7 @@ describe('listPlans use case', () => {
       }
     })
 
-    it('should only return active plans (isActive: true)', async () => {
+    it('[4.3-UNIT-002] @p1 should only return active plans (isActive: true)', async () => {
       // Repository should filter to activeOnly: true
       const activePlans = [
         createPlan({ id: 'plan-1', name: 'Active Plan 1', isActive: true }),
@@ -321,7 +321,7 @@ describe('listPlans use case', () => {
       )
     })
 
-    it('should handle plans with different athlete limits', async () => {
+    it('[4.3-UNIT-003] @p3 should handle plans with different athlete limits', async () => {
       const plans = [
         createPlan({ id: 'plan-1', name: 'Small', athleteLimit: 10 }),
         createPlan({ id: 'plan-2', name: 'Medium', athleteLimit: 50 }),
@@ -351,7 +351,7 @@ describe('listPlans use case', () => {
       }
     })
 
-    it('should handle plans with multipleCoaches feature', async () => {
+    it('[4.3-UNIT-004] @p3 should handle plans with multipleCoaches feature', async () => {
       const plans = [
         createPlan({
           id: 'plan-1',

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdateWeek } from '../update-week'
 
-describe('updateWeek use case', () => {
+describe('[3.33-UNIT] @p2 updateWeek use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
@@ -43,8 +43,8 @@ describe('updateWeek use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should update week name successfully', async () => {
+  describe('[3.33-UNIT] @p0 Happy Path', () => {
+    it('[3.33-UNIT-001] @p0 should update week name successfully', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 
@@ -105,7 +105,7 @@ describe('updateWeek use case', () => {
       )
     })
 
-    it('should update with same name (idempotent)', async () => {
+    it('[3.33-UNIT-002] @p2 should update with same name (idempotent)', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 
@@ -144,7 +144,7 @@ describe('updateWeek use case', () => {
       }
     })
 
-    it('should update week in multi-week program', async () => {
+    it('[3.33-UNIT-003] @p2 should update week in multi-week program', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-2'
 
@@ -186,8 +186,8 @@ describe('updateWeek use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.33-UNIT] @p0 Authorization', () => {
+    it('[3.33-UNIT-004] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const weekId = 'week-1'
 
@@ -217,7 +217,7 @@ describe('updateWeek use case', () => {
       expect(mockProgramRepository.updateWeek).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.33-UNIT-005] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const weekId = 'week-1'
 
@@ -253,8 +253,8 @@ describe('updateWeek use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return not_found when weekId does not exist', async () => {
+  describe('[3.33-UNIT] @p1 Validation Errors', () => {
+    it('[3.33-UNIT-006] @p2 should return not_found when weekId does not exist', async () => {
       const ctx = createAdminContext()
       const weekId = 'non-existent-week'
 
@@ -285,7 +285,7 @@ describe('updateWeek use case', () => {
       expect(mockProgramRepository.updateWeek).not.toHaveBeenCalled()
     })
 
-    it('should return validation_error when name is too long', async () => {
+    it('[3.33-UNIT-007] @p1 should return validation_error when name is too long', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 
@@ -325,8 +325,8 @@ describe('updateWeek use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findWeekById fails', async () => {
+  describe('[3.33-UNIT] @p1 Repository Errors', () => {
+    it('[3.33-UNIT-008] @p1 should return repository error when findWeekById fails', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 
@@ -360,8 +360,8 @@ describe('updateWeek use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should update week with special characters in name', async () => {
+  describe('[3.33-UNIT] @p2 Edge Cases', () => {
+    it('[3.33-UNIT-009] @p2 should update week with special characters in name', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 
@@ -401,7 +401,7 @@ describe('updateWeek use case', () => {
       }
     })
 
-    it('should use default name when input is empty', async () => {
+    it('[3.33-UNIT-010] @p3 should use default name when input is empty', async () => {
       const ctx = createAdminContext()
       const weekId = 'week-1'
 

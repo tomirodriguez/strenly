@@ -5,7 +5,7 @@ import { createExerciseEntity } from '../../../__tests__/factories/exercise-fact
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdateExercise } from '../update-exercise'
 
-describe('updateExercise use case', () => {
+describe('[2.2-UNIT] updateExercise use case', () => {
   let mockExerciseRepository: ExerciseRepositoryPort
 
   beforeEach(() => {
@@ -19,8 +19,8 @@ describe('updateExercise use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should update exercise successfully with owner role', async () => {
+  describe('[2.2-UNIT] Happy Path', () => {
+    it('[2.2-UNIT-001] @p0 should update exercise successfully with owner role', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -72,7 +72,7 @@ describe('updateExercise use case', () => {
       )
     })
 
-    it('should update only specified fields, leaving others unchanged', async () => {
+    it('[2.2-UNIT-002] @p0 should update only specified fields, leaving others unchanged', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -113,7 +113,7 @@ describe('updateExercise use case', () => {
       }
     })
 
-    it('should allow setting optional fields to null', async () => {
+    it('[2.2-UNIT-003] @p1 should allow setting optional fields to null', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -155,8 +155,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks exercises:write permission', async () => {
+  describe('[2.2-UNIT] Authorization', () => {
+    it('[2.2-UNIT-004] @p0 should return forbidden error when user lacks exercises:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const exerciseId = 'exercise-1'
 
@@ -186,7 +186,7 @@ describe('updateExercise use case', () => {
       expect(mockExerciseRepository.update).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has exercises:write)', async () => {
+    it('[2.2-UNIT-005] @p0 should succeed when user has admin role (has exercises:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const exerciseId = 'exercise-1'
 
@@ -218,8 +218,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+  describe('[2.2-UNIT] Validation Errors', () => {
+    it('[2.2-UNIT-006] @p1 should return validation error when name is empty', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -256,8 +256,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found error when exercise does not exist', async () => {
+  describe('[2.2-UNIT] Not Found Errors', () => {
+    it('[2.2-UNIT-007] @p1 should return not_found error when exercise does not exist', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'non-existent-exercise'
 
@@ -289,8 +289,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Curated Exercise Protection', () => {
-    it('should return cannot_edit_curated error when trying to edit curated exercise', async () => {
+  describe('[2.2-UNIT] Curated Exercise Protection', () => {
+    it('[2.2-UNIT-008] @p1 should return cannot_edit_curated error when trying to edit curated exercise', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'curated-exercise-1'
 
@@ -329,8 +329,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[2.2-UNIT] Repository Errors', () => {
+    it('[2.2-UNIT-009] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -363,7 +363,7 @@ describe('updateExercise use case', () => {
       }
     })
 
-    it('should return repository error when update fails', async () => {
+    it('[2.2-UNIT-010] @p1 should return repository error when update fails', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -405,8 +405,8 @@ describe('updateExercise use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should preserve clonedFromId when updating cloned exercise', async () => {
+  describe('[2.2-UNIT] Edge Cases', () => {
+    it('[2.2-UNIT-011] @p2 should preserve clonedFromId when updating cloned exercise', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'cloned-exercise-1'
 
@@ -443,7 +443,7 @@ describe('updateExercise use case', () => {
       }
     })
 
-    it('should handle updating all fields at once', async () => {
+    it('[2.2-UNIT-012] @p2 should handle updating all fields at once', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 

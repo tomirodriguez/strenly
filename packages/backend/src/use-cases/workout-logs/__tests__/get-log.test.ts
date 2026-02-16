@@ -14,7 +14,7 @@ describe('getLog use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get workout log successfully with admin role', async () => {
+    it('[5.1-UNIT-001] @p0 should get workout log successfully with admin role', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -49,7 +49,7 @@ describe('getLog use case', () => {
       )
     })
 
-    it('should get completed log', async () => {
+    it('[5.1-UNIT-002] @p1 should get completed log', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -78,7 +78,7 @@ describe('getLog use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return not_found error when log does not exist', async () => {
+    it('[5.2-UNIT-001] @p0 should return not_found error when log does not exist', async () => {
       const ctx = createAdminContext()
       const logId = 'non-existent-log'
 
@@ -106,7 +106,7 @@ describe('getLog use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+    it('[5.3-UNIT-001] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -139,7 +139,7 @@ describe('getLog use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle getting multiple logs in sequence', async () => {
+    it('[5.4-UNIT-001] @p2 should handle getting multiple logs in sequence', async () => {
       const ctx = createAdminContext()
       const logId1 = 'log-1'
       const logId2 = 'log-2'

@@ -14,7 +14,7 @@ describe('listAthleteLogs use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should list athlete logs successfully', async () => {
+    it('[5.1-UNIT-001] @p0 should list athlete logs successfully', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -54,7 +54,7 @@ describe('listAthleteLogs use case', () => {
       )
     })
 
-    it('should filter by status', async () => {
+    it('[5.1-UNIT-002] @p1 should filter by status', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -81,7 +81,7 @@ describe('listAthleteLogs use case', () => {
       )
     })
 
-    it('should apply pagination', async () => {
+    it('[5.1-UNIT-003] @p2 should apply pagination', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -112,7 +112,7 @@ describe('listAthleteLogs use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when listByAthlete fails', async () => {
+    it('[5.2-UNIT-001] @p1 should return repository error when listByAthlete fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -145,7 +145,7 @@ describe('listAthleteLogs use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should return empty list when athlete has no logs', async () => {
+    it('[5.3-UNIT-001] @p2 should return empty list when athlete has no logs', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeArchiveAthlete } from '../archive-athlete'
 
-describe('archiveAthlete use case', () => {
+describe('[1.1-UNIT] archiveAthlete use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('archiveAthlete use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should archive athlete successfully', async () => {
+    it('[1.1-UNIT-001] @p0 should archive athlete successfully', async () => {
       const ctx = createAdminContext()
 
       // Mock successful archive
@@ -48,7 +48,7 @@ describe('archiveAthlete use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
+    it('[1.1-UNIT-002] @p0 should return forbidden error when user lacks athletes:write permission', async () => {
       const ctx = createMemberContext()
 
       const archiveAthlete = makeArchiveAthlete({
@@ -75,7 +75,7 @@ describe('archiveAthlete use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return not_found when athlete does not exist', async () => {
+    it('[1.1-UNIT-003] @p1 should return not_found when athlete does not exist', async () => {
       const ctx = createAdminContext()
 
       // Mock athlete not found
@@ -107,7 +107,7 @@ describe('archiveAthlete use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+    it('[1.1-UNIT-004] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
 
       // Mock database failure
@@ -139,7 +139,7 @@ describe('archiveAthlete use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle archiving multiple athletes in sequence', async () => {
+    it('[1.1-UNIT-005] @p2 should handle archiving multiple athletes in sequence', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.archive).mockReturnValue(okAsync(undefined))
@@ -163,7 +163,7 @@ describe('archiveAthlete use case', () => {
       expect(mockAthleteRepository.archive).toHaveBeenCalledTimes(3)
     })
 
-    it('should be idempotent - archiving already archived athlete should succeed', async () => {
+    it('[1.1-UNIT-006] @p2 should be idempotent - archiving already archived athlete should succeed', async () => {
       const ctx = createAdminContext()
 
       // Mock successful archive (repository handles idempotence)

@@ -5,7 +5,7 @@ import { createExerciseEntity } from '../../../__tests__/factories/exercise-fact
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeCloneExercise } from '../clone-exercise'
 
-describe('cloneExercise use case', () => {
+describe('[2.4-UNIT] cloneExercise use case', () => {
   let mockExerciseRepository: ExerciseRepositoryPort
   let mockGenerateId: () => string
 
@@ -23,8 +23,8 @@ describe('cloneExercise use case', () => {
     mockGenerateId = vi.fn(() => 'cloned-exercise-id')
   })
 
-  describe('Happy Path', () => {
-    it('should clone curated exercise successfully with custom name', async () => {
+  describe('[2.4-UNIT] Happy Path', () => {
+    it('[2.4-UNIT-001] @p0 should clone curated exercise successfully with custom name', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'curated-bench-press'
 
@@ -91,7 +91,7 @@ describe('cloneExercise use case', () => {
       )
     })
 
-    it('should clone exercise with default "(Custom)" suffix when name not provided', async () => {
+    it('[2.4-UNIT-002] @p0 should clone exercise with default "(Custom)" suffix when name not provided', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'curated-squat'
 
@@ -130,7 +130,7 @@ describe('cloneExercise use case', () => {
       }
     })
 
-    it('should clone custom exercise from organization', async () => {
+    it('[2.4-UNIT-003] @p1 should clone custom exercise from organization', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'org-custom-exercise'
 
@@ -171,8 +171,8 @@ describe('cloneExercise use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks exercises:write permission', async () => {
+  describe('[2.4-UNIT] Authorization', () => {
+    it('[2.4-UNIT-004] @p0 should return forbidden error when user lacks exercises:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const sourceExerciseId = 'exercise-1'
 
@@ -202,7 +202,7 @@ describe('cloneExercise use case', () => {
       expect(mockExerciseRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has exercises:write)', async () => {
+    it('[2.4-UNIT-005] @p0 should succeed when user has admin role (has exercises:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const sourceExerciseId = 'exercise-1'
 
@@ -236,8 +236,8 @@ describe('cloneExercise use case', () => {
     })
   })
 
-  describe('Source Not Found Errors', () => {
-    it('should return source_not_found error when source exercise does not exist', async () => {
+  describe('[2.4-UNIT] Source Not Found Errors', () => {
+    it('[2.4-UNIT-006] @p1 should return source_not_found error when source exercise does not exist', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'non-existent-exercise'
 
@@ -269,8 +269,8 @@ describe('cloneExercise use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[2.4-UNIT] Repository Errors', () => {
+    it('[2.4-UNIT-007] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'exercise-1'
 
@@ -303,7 +303,7 @@ describe('cloneExercise use case', () => {
       }
     })
 
-    it('should return repository error when create fails', async () => {
+    it('[2.4-UNIT-008] @p1 should return repository error when create fails', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'exercise-1'
 
@@ -345,8 +345,8 @@ describe('cloneExercise use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should preserve all source exercise properties except ID and organizationId', async () => {
+  describe('[2.4-UNIT] Edge Cases', () => {
+    it('[2.4-UNIT-009] @p2 should preserve all source exercise properties except ID and organizationId', async () => {
       const ctx = createAdminContext()
       const sourceExerciseId = 'source-1'
 

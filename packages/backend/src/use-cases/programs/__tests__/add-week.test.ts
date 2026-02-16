@@ -26,7 +26,7 @@ function createProgramWithWeeks(weeks: Omit<Week, 'sessions'>[]): ProgramWithDet
   } as unknown as ProgramWithDetails
 }
 
-describe('addWeek use case', () => {
+describe('[3.19-UNIT] @p2 addWeek use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   let mockGenerateId: () => string
   const programId = 'program-123'
@@ -43,8 +43,8 @@ describe('addWeek use case', () => {
     mockGenerateId = vi.fn(() => faker.string.uuid())
   })
 
-  describe('Happy Path', () => {
-    it('should add week successfully with explicit name', async () => {
+  describe('[3.19-UNIT] @p0 Happy Path', () => {
+    it('[3.19-UNIT-001] @p0 should add week successfully with explicit name', async () => {
       const existingProgram = createProgramWithWeeks([{ id: 'week-1', name: 'Week 1', orderIndex: 0 }])
 
       const newWeekId = 'week-new-123'
@@ -94,7 +94,7 @@ describe('addWeek use case', () => {
       )
     })
 
-    it('should add week with auto-generated name when not provided', async () => {
+    it('[3.19-UNIT-002] @p2 should add week with auto-generated name when not provided', async () => {
       const existingProgram = createProgramWithWeeks([])
 
       const newWeekId = 'week-first-123'
@@ -131,7 +131,7 @@ describe('addWeek use case', () => {
       }
     })
 
-    it('should add week to empty program with orderIndex 0', async () => {
+    it('[3.19-UNIT-003] @p3 should add week to empty program with orderIndex 0', async () => {
       const emptyProgram = createProgramWithWeeks([])
 
       const newWeekId = 'week-first-123'
@@ -168,7 +168,7 @@ describe('addWeek use case', () => {
       }
     })
 
-    it('should trim week name when provided', async () => {
+    it('[3.19-UNIT-004] @p2 should trim week name when provided', async () => {
       const existingProgram = createProgramWithWeeks([])
 
       const createdWeek = {
@@ -203,8 +203,8 @@ describe('addWeek use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.19-UNIT] @p0 Authorization', () => {
+    it('[3.19-UNIT-005] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const addWeek = makeAddWeek({
         programRepository: mockProgramRepository,
@@ -231,8 +231,8 @@ describe('addWeek use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found when program does not exist', async () => {
+  describe('[3.19-UNIT] @p1 Not Found Errors', () => {
+    it('[3.19-UNIT-006] @p2 should return not_found when program does not exist', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -261,8 +261,8 @@ describe('addWeek use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is too long', async () => {
+  describe('[3.19-UNIT] @p1 Validation Errors', () => {
+    it('[3.19-UNIT-007] @p1 should return validation error when name is too long', async () => {
       const existingProgram = createProgramWithWeeks([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -290,8 +290,8 @@ describe('addWeek use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findWithDetails fails', async () => {
+  describe('[3.19-UNIT] @p1 Repository Errors', () => {
+    it('[3.19-UNIT-008] @p1 should return repository error when findWithDetails fails', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -318,7 +318,7 @@ describe('addWeek use case', () => {
       }
     })
 
-    it('should return repository error when createWeek fails', async () => {
+    it('[3.19-UNIT-009] @p1 should return repository error when createWeek fails', async () => {
       const existingProgram = createProgramWithWeeks([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -349,8 +349,8 @@ describe('addWeek use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle adding multiple weeks sequentially', async () => {
+  describe('[3.19-UNIT] @p2 Edge Cases', () => {
+    it('[3.19-UNIT-010] @p2 should handle adding multiple weeks sequentially', async () => {
       const initialProgram = createProgramWithWeeks([])
       const programWithWeek = createProgramWithWeeks([{ id: 'week-1', name: 'Week 1', orderIndex: 0 }])
 
@@ -402,7 +402,7 @@ describe('addWeek use case', () => {
       }
     })
 
-    it('should use generateId for new week ID', async () => {
+    it('[3.19-UNIT-011] @p2 should use generateId for new week ID', async () => {
       const existingProgram = createProgramWithWeeks([])
 
       const generatedId = 'generated-uuid-456'

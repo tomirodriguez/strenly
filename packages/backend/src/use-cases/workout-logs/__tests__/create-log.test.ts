@@ -47,7 +47,7 @@ describe('createLog use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should create log from program prescription successfully', async () => {
+    it('[5.1-UNIT-001] @p0 should create log from program prescription successfully', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -132,7 +132,7 @@ describe('createLog use case', () => {
       expect(mockWorkoutLogRepository.findByAthleteSessionWeek).toHaveBeenCalledWith(ctx, athleteId, sessionId, weekId)
     })
 
-    it('should pre-fill exercises from program prescription', async () => {
+    it('[5.1-UNIT-002] @p1 should pre-fill exercises from program prescription', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -224,7 +224,7 @@ describe('createLog use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks workout_log:create permission', async () => {
+    it('[5.2-UNIT-001] @p0 should return forbidden error when user lacks workout_log:create permission', async () => {
       const ctx = createMemberContext()
       const createLog = makeCreateLog({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -257,7 +257,7 @@ describe('createLog use case', () => {
   })
 
   describe('Log Already Exists', () => {
-    it('should return log_already_exists when log exists for athlete/session/week', async () => {
+    it('[5.3-UNIT-001] @p0 should return log_already_exists when log exists for athlete/session/week', async () => {
       const existingLog = {
         id: 'existing-log-123',
         organizationId: orgId,
@@ -314,7 +314,7 @@ describe('createLog use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return program_not_found when program does not exist', async () => {
+    it('[5.4-UNIT-001] @p0 should return program_not_found when program does not exist', async () => {
       vi.mocked(mockWorkoutLogRepository.findByAthleteSessionWeek).mockReturnValue(okAsync(null))
       vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(null))
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(
@@ -348,7 +348,7 @@ describe('createLog use case', () => {
       }
     })
 
-    it('should return week_not_found when week does not exist in program', async () => {
+    it('[5.4-UNIT-002] @p1 should return week_not_found when week does not exist in program', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -409,7 +409,7 @@ describe('createLog use case', () => {
       }
     })
 
-    it('should return session_not_found when session does not exist in week', async () => {
+    it('[5.4-UNIT-003] @p1 should return session_not_found when session does not exist in week', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -479,7 +479,7 @@ describe('createLog use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when log check fails', async () => {
+    it('[5.5-UNIT-001] @p1 should return repository error when log check fails', async () => {
       vi.mocked(mockWorkoutLogRepository.findByAthleteSessionWeek).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -511,7 +511,7 @@ describe('createLog use case', () => {
       }
     })
 
-    it('should return repository error when program load fails', async () => {
+    it('[5.5-UNIT-002] @p1 should return repository error when program load fails', async () => {
       vi.mocked(mockWorkoutLogRepository.findByAthleteSessionWeek).mockReturnValue(okAsync(null))
       vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(
         errAsync({
@@ -547,7 +547,7 @@ describe('createLog use case', () => {
       }
     })
 
-    it('should return repository error when athlete lookup fails', async () => {
+    it('[5.5-UNIT-003] @p1 should return repository error when athlete lookup fails', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -601,7 +601,7 @@ describe('createLog use case', () => {
       }
     })
 
-    it('should return repository error when athlete not found', async () => {
+    it('[5.5-UNIT-004] @p1 should return repository error when athlete not found', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -655,7 +655,7 @@ describe('createLog use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should not persist the log (returned for client-side editing)', async () => {
+    it('[5.6-UNIT-001] @p2 should not persist the log (returned for client-side editing)', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -719,7 +719,7 @@ describe('createLog use case', () => {
       expect(mockWorkoutLogRepository.save).not.toHaveBeenCalled()
     })
 
-    it('should use generateId for workout log ID', async () => {
+    it('[5.6-UNIT-002] @p2 should use generateId for workout log ID', async () => {
       const program = createProgramWithStructure({
         id: programId,
         organizationId: orgId,

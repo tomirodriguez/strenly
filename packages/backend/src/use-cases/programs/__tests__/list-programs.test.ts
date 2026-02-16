@@ -23,15 +23,15 @@ function createProgramListItem(overrides: Partial<Program> = {}): Program {
   }
 }
 
-describe('listPrograms use case', () => {
+describe('[3.16-UNIT] @p2 [3.16-UNIT] listPrograms use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
     mockProgramRepository = createProgramRepositoryMock()
   })
 
-  describe('Happy Path', () => {
-    it('should list programs successfully with member role', async () => {
+  describe('[3.16-UNIT] @p0 Happy Path', () => {
+    it('[3.16-UNIT-001] @p0 should list programs successfully with member role', async () => {
       const ctx = createMemberContext() // Member has read permission
 
       const programs = [
@@ -77,7 +77,7 @@ describe('listPrograms use case', () => {
       )
     })
 
-    it('should list programs with custom pagination', async () => {
+    it('[3.16-UNIT-002] @p2 should list programs with custom pagination', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockProgramRepository.list).mockReturnValue(
@@ -111,7 +111,7 @@ describe('listPrograms use case', () => {
       )
     })
 
-    it('should list programs filtered by athleteId', async () => {
+    it('[3.16-UNIT-003] @p2 should list programs filtered by athleteId', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -152,7 +152,7 @@ describe('listPrograms use case', () => {
       )
     })
 
-    it('should list template programs when isTemplate is true', async () => {
+    it('[3.16-UNIT-004] @p2 should list template programs when isTemplate is true', async () => {
       const ctx = createAdminContext()
 
       const templates = [
@@ -192,7 +192,7 @@ describe('listPrograms use case', () => {
       )
     })
 
-    it('should list programs filtered by status', async () => {
+    it('[3.16-UNIT-005] @p2 should list programs filtered by status', async () => {
       const ctx = createAdminContext()
 
       const activePrograms = [
@@ -231,7 +231,7 @@ describe('listPrograms use case', () => {
       )
     })
 
-    it('should list programs filtered by search term', async () => {
+    it('[3.16-UNIT-006] @p2 should list programs filtered by search term', async () => {
       const ctx = createAdminContext()
 
       const searchResults = [createProgramListItem({ name: 'Strength Training' })]
@@ -268,8 +268,8 @@ describe('listPrograms use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[3.16-UNIT] @p1 Repository Errors', () => {
+    it('[3.16-UNIT-007] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
 
       // Mock repository failure
@@ -298,8 +298,8 @@ describe('listPrograms use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should return empty list when no programs exist', async () => {
+  describe('[3.16-UNIT] @p2 Edge Cases', () => {
+    it('[3.16-UNIT-008] @p3 should return empty list when no programs exist', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockProgramRepository.list).mockReturnValue(
@@ -323,7 +323,7 @@ describe('listPrograms use case', () => {
       }
     })
 
-    it('should handle pagination at boundary', async () => {
+    it('[3.16-UNIT-009] @p3 should handle pagination at boundary', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockProgramRepository.list).mockReturnValue(
@@ -351,7 +351,7 @@ describe('listPrograms use case', () => {
       }
     })
 
-    it('should combine multiple filters', async () => {
+    it('[3.16-UNIT-010] @p2 should combine multiple filters', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 

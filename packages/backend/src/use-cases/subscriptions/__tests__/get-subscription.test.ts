@@ -69,7 +69,7 @@ describe('getSubscription use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get subscription with plan successfully', async () => {
+    it('[4.1-UNIT-001] @p0 should get subscription with plan successfully', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 
@@ -109,7 +109,7 @@ describe('getSubscription use case', () => {
       expect(mockPlanRepository.findById).toHaveBeenCalledWith(planId)
     })
 
-    it('should get active subscription', async () => {
+    it('[4.1-UNIT-002] @p1 should get active subscription', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 
@@ -133,7 +133,7 @@ describe('getSubscription use case', () => {
       }
     })
 
-    it('should get subscription with athlete count', async () => {
+    it('[4.1-UNIT-003] @p2 should get subscription with athlete count', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 
@@ -160,7 +160,7 @@ describe('getSubscription use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks billing:read permission', async () => {
+    it('[4.2-UNIT-001] @p0 should return forbidden error when user lacks billing:read permission', async () => {
       // Create context with role that lacks billing permission
       const ctx = createMemberContext() // Member lacks billing:read
 
@@ -187,7 +187,7 @@ describe('getSubscription use case', () => {
       expect(mockPlanRepository.findById).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has billing:read)', async () => {
+    it('[4.2-UNIT-002] @p0 should succeed when user has admin role (has billing:read)', async () => {
       const ctx = createAdminContext() // Admin has billing permission
       const planId = 'plan-456'
 
@@ -209,7 +209,7 @@ describe('getSubscription use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return subscription_not_found error when organization has no subscription', async () => {
+    it('[4.3-UNIT-001] @p0 should return subscription_not_found error when organization has no subscription', async () => {
       const ctx = createAdminContext()
 
       // Mock repository returning null (no subscription)
@@ -236,7 +236,7 @@ describe('getSubscription use case', () => {
       expect(mockPlanRepository.findById).not.toHaveBeenCalled()
     })
 
-    it('should return plan_not_found error when subscription references non-existent plan', async () => {
+    it('[4.3-UNIT-002] @p1 should return plan_not_found error when subscription references non-existent plan', async () => {
       const ctx = createAdminContext()
       const planId = 'non-existent-plan'
 
@@ -266,7 +266,7 @@ describe('getSubscription use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when subscription lookup fails', async () => {
+    it('[4.4-UNIT-001] @p1 should return repository error when subscription lookup fails', async () => {
       const ctx = createAdminContext()
 
       // Mock repository failure
@@ -295,7 +295,7 @@ describe('getSubscription use case', () => {
       }
     })
 
-    it('should return repository error when plan lookup fails', async () => {
+    it('[4.4-UNIT-002] @p1 should return repository error when plan lookup fails', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 
@@ -331,7 +331,7 @@ describe('getSubscription use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle subscription with cancelAtPeriodEnd flag', async () => {
+    it('[4.5-UNIT-001] @p2 should handle subscription with cancelAtPeriodEnd flag', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 
@@ -371,7 +371,7 @@ describe('getSubscription use case', () => {
       }
     })
 
-    it('should handle subscription near period end', async () => {
+    it('[4.5-UNIT-002] @p3 should handle subscription near period end', async () => {
       const ctx = createAdminContext()
       const planId = 'plan-456'
 

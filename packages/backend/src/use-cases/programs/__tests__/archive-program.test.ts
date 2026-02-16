@@ -9,7 +9,7 @@ import {
 import { createAdminContext, createMemberContext, createOwnerContext } from '../../../__tests__/helpers/test-context'
 import { makeArchiveProgram } from '../archive-program'
 
-describe('archiveProgram use case', () => {
+describe('[3.11-UNIT] archiveProgram use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
@@ -48,8 +48,8 @@ describe('archiveProgram use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should archive active program', async () => {
+  describe('[3.11-UNIT] @p0 Happy Path', () => {
+    it('[3.11-UNIT-001] @p0 should archive active program', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -106,7 +106,7 @@ describe('archiveProgram use case', () => {
       )
     })
 
-    it('should archive draft program', async () => {
+    it('[3.11-UNIT-002] @p0 should archive draft program', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -143,7 +143,7 @@ describe('archiveProgram use case', () => {
       }
     })
 
-    it('should verify updatedAt timestamp is set', async () => {
+    it('[3.11-UNIT-003] @p2 should verify updatedAt timestamp is set', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -181,8 +181,8 @@ describe('archiveProgram use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:delete permission', async () => {
+  describe('[3.12-UNIT] @p0 Authorization', () => {
+    it('[3.12-UNIT-001] @p0 should return forbidden error when user lacks programs:delete permission', async () => {
       const ctx = createMemberContext() // Member role lacks delete permission
       const programId = 'program-1'
 
@@ -211,7 +211,7 @@ describe('archiveProgram use case', () => {
       expect(mockProgramRepository.update).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin/owner role', async () => {
+    it('[3.12-UNIT-002] @p0 should succeed when user has admin/owner role', async () => {
       const ctx = createOwnerContext() // Owner role has delete permission
       const programId = 'program-1'
 
@@ -243,8 +243,8 @@ describe('archiveProgram use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return not_found when program does not exist', async () => {
+  describe('[3.13-UNIT] @p1 Validation Errors', () => {
+    it('[3.13-UNIT-001] @p1 should return not_found when program does not exist', async () => {
       const ctx = createAdminContext()
       const programId = 'non-existent-program'
 
@@ -274,7 +274,7 @@ describe('archiveProgram use case', () => {
       expect(mockProgramRepository.update).not.toHaveBeenCalled()
     })
 
-    it('should return invalid_transition when already archived', async () => {
+    it('[3.13-UNIT-002] @p1 should return invalid_transition when already archived', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -311,8 +311,8 @@ describe('archiveProgram use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[3.14-UNIT] @p2 Repository Errors', () => {
+    it('[3.14-UNIT-001] @p2 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -345,8 +345,8 @@ describe('archiveProgram use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should archive template program', async () => {
+  describe('[3.15-UNIT] @p2 Edge Cases', () => {
+    it('[3.15-UNIT-001] @p2 should archive template program', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -385,7 +385,7 @@ describe('archiveProgram use case', () => {
       }
     })
 
-    it('should archive program with athletes assigned', async () => {
+    it('[3.15-UNIT-002] @p2 should archive program with athletes assigned', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const athleteId = 'athlete-1'

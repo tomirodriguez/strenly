@@ -28,7 +28,7 @@ describe('listPendingWorkouts use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should list pending workouts successfully', async () => {
+    it('[5.1-UNIT-001] @p0 should list pending workouts successfully', async () => {
       const ctx = createAdminContext()
 
       const pendingWorkouts = [
@@ -63,7 +63,7 @@ describe('listPendingWorkouts use case', () => {
       )
     })
 
-    it('should apply default pagination', async () => {
+    it('[5.1-UNIT-002] @p2 should apply default pagination', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
@@ -85,7 +85,7 @@ describe('listPendingWorkouts use case', () => {
       )
     })
 
-    it('should apply custom pagination', async () => {
+    it('[5.1-UNIT-003] @p2 should apply custom pagination', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
@@ -109,7 +109,7 @@ describe('listPendingWorkouts use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when listPendingWorkouts fails', async () => {
+    it('[5.2-UNIT-001] @p1 should return repository error when listPendingWorkouts fails', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
@@ -138,7 +138,7 @@ describe('listPendingWorkouts use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should return empty list when no pending workouts exist', async () => {
+    it('[5.3-UNIT-001] @p2 should return empty list when no pending workouts exist', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(

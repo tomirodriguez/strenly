@@ -37,15 +37,15 @@ function createProgramAggregate(overrides: Partial<Program> = {}): Program {
   }
 }
 
-describe('getProgram use case', () => {
+describe('[3.7-UNIT] getProgram use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
     mockProgramRepository = createProgramRepositoryMock()
   })
 
-  describe('Happy Path', () => {
-    it('should get program successfully with member role', async () => {
+  describe('[3.7-UNIT] @p0 Happy Path', () => {
+    it('[3.7-UNIT-001] @p0 should get program successfully with member role', async () => {
       const ctx = createMemberContext() // Member has read permission
       const programId = 'program-1'
 
@@ -84,7 +84,7 @@ describe('getProgram use case', () => {
       )
     })
 
-    it('should get template program', async () => {
+    it('[3.7-UNIT-002] @p1 should get template program', async () => {
       const ctx = createAdminContext()
       const programId = 'template-1'
 
@@ -114,7 +114,7 @@ describe('getProgram use case', () => {
       }
     })
 
-    it('should get program assigned to athlete', async () => {
+    it('[3.7-UNIT-003] @p1 should get program assigned to athlete', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const athleteId = 'athlete-1'
@@ -143,7 +143,7 @@ describe('getProgram use case', () => {
       }
     })
 
-    it('should get program with complete aggregate hierarchy', async () => {
+    it('[3.7-UNIT-004] @p2 should get program with complete aggregate hierarchy', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -204,8 +204,8 @@ describe('getProgram use case', () => {
   })
 
 
-  describe('Not Found Errors', () => {
-    it('should return not_found error when program does not exist', async () => {
+  describe('[3.8-UNIT] @p1 Not Found Errors', () => {
+    it('[3.8-UNIT-001] @p1 should return not_found error when program does not exist', async () => {
       const ctx = createAdminContext()
       const programId = 'non-existent-program'
 
@@ -232,7 +232,7 @@ describe('getProgram use case', () => {
       }
     })
 
-    it('should return not_found error when user lacks access to program from other organization', async () => {
+    it('[3.8-UNIT-002] @p1 should return not_found error when user lacks access to program from other organization', async () => {
       const ctx = createAdminContext()
       const programId = 'other-org-program'
 
@@ -257,8 +257,8 @@ describe('getProgram use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[3.9-UNIT] @p2 Repository Errors', () => {
+    it('[3.9-UNIT-001] @p2 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
 
@@ -291,8 +291,8 @@ describe('getProgram use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle program with no weeks', async () => {
+  describe('[3.10-UNIT] @p2 Edge Cases', () => {
+    it('[3.10-UNIT-001] @p2 should handle program with no weeks', async () => {
       const ctx = createAdminContext()
       const programId = 'empty-program'
 
@@ -320,7 +320,7 @@ describe('getProgram use case', () => {
       }
     })
 
-    it('should handle archived program', async () => {
+    it('[3.10-UNIT-002] @p3 should handle archived program', async () => {
       const ctx = createAdminContext()
       const programId = 'archived-program'
 

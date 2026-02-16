@@ -5,7 +5,7 @@ import { createExerciseEntity, createExerciseInput } from '../../../__tests__/fa
 import { createAdminContext, createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeCreateExercise } from '../create-exercise'
 
-describe('createExercise use case', () => {
+describe('[2.1-UNIT] createExercise use case', () => {
   let mockExerciseRepository: ExerciseRepositoryPort
   let mockGenerateId: () => string
 
@@ -23,8 +23,8 @@ describe('createExercise use case', () => {
     mockGenerateId = vi.fn(() => 'test-exercise-id')
   })
 
-  describe('Happy Path', () => {
-    it('should create exercise successfully with owner role', async () => {
+  describe('[2.1-UNIT] Happy Path', () => {
+    it('[2.1-UNIT-001] @p0 should create exercise successfully with owner role', async () => {
       const ctx = createTestContext({ memberRole: 'owner' })
       const input = createExerciseInput({ name: 'Bench Press', movementPattern: 'push' })
 
@@ -76,7 +76,7 @@ describe('createExercise use case', () => {
       )
     })
 
-    it('should create exercise with minimal required fields', async () => {
+    it('[2.1-UNIT-002] @p0 should create exercise with minimal required fields', async () => {
       const ctx = createAdminContext()
       const input = { name: 'Squat' } // Only required field
 
@@ -111,8 +111,8 @@ describe('createExercise use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks exercises:write permission', async () => {
+  describe('[2.1-UNIT] Authorization', () => {
+    it('[2.1-UNIT-003] @p0 should return forbidden error when user lacks exercises:write permission', async () => {
       const ctx = createMemberContext() // Viewer role lacks write permission
       const input = createExerciseInput()
 
@@ -138,7 +138,7 @@ describe('createExercise use case', () => {
       expect(mockExerciseRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has exercises:write)', async () => {
+    it('[2.1-UNIT-004] @p0 should succeed when user has admin role (has exercises:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const input = createExerciseInput()
 
@@ -167,8 +167,8 @@ describe('createExercise use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+  describe('[2.1-UNIT] Validation Errors', () => {
+    it('[2.1-UNIT-005] @p1 should return validation error when name is empty', async () => {
       const ctx = createAdminContext()
       const input = createExerciseInput({ name: '' }) // Invalid: empty name
 
@@ -194,8 +194,8 @@ describe('createExercise use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[2.1-UNIT] Repository Errors', () => {
+    it('[2.1-UNIT-006] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
       const input = createExerciseInput()
 
@@ -226,8 +226,8 @@ describe('createExercise use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle null optional fields correctly', async () => {
+  describe('[2.1-UNIT] Edge Cases', () => {
+    it('[2.1-UNIT-007] @p2 should handle null optional fields correctly', async () => {
       const ctx = createAdminContext()
       const input = createExerciseInput({
         description: null,
@@ -269,7 +269,7 @@ describe('createExercise use case', () => {
       }
     })
 
-    it('should create multiple exercises with unique IDs in parallel', async () => {
+    it('[2.1-UNIT-008] @p2 should create multiple exercises with unique IDs in parallel', async () => {
       const ctx = createAdminContext()
       let idCounter = 0
       const generateUniqueId = vi.fn(() => `exercise-${++idCounter}`)

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeReorderExerciseRows } from '../reorder-exercise-rows'
 
-describe('reorderExerciseRows use case', () => {
+describe('[3.26-UNIT] @p2 reorderExerciseRows use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
@@ -43,8 +43,8 @@ describe('reorderExerciseRows use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should reorder rows within single group', async () => {
+  describe('[3.26-UNIT] @p0 Happy Path', () => {
+    it('[3.26-UNIT-001] @p2 should reorder rows within single group', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
       const groupId = 'group-1'
@@ -125,7 +125,7 @@ describe('reorderExerciseRows use case', () => {
       )
     })
 
-    it('should reorder multiple groups preserving adjacency', async () => {
+    it('[3.26-UNIT-002] @p2 should reorder multiple groups preserving adjacency', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 
@@ -224,7 +224,7 @@ describe('reorderExerciseRows use case', () => {
       )
     })
 
-    it('should handle no-op reorder (same order)', async () => {
+    it('[3.26-UNIT-003] @p2 should handle no-op reorder (same order)', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 
@@ -283,8 +283,8 @@ describe('reorderExerciseRows use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.26-UNIT] @p0 Authorization', () => {
+    it('[3.26-UNIT-004] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const sessionId = 'session-1'
 
@@ -314,7 +314,7 @@ describe('reorderExerciseRows use case', () => {
       expect(mockProgramRepository.reorderExerciseRows).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.26-UNIT-005] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const sessionId = 'session-1'
 
@@ -351,8 +351,8 @@ describe('reorderExerciseRows use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return not_found when session does not exist', async () => {
+  describe('[3.26-UNIT] @p1 Validation Errors', () => {
+    it('[3.26-UNIT-006] @p2 should return not_found when session does not exist', async () => {
       const ctx = createAdminContext()
       const sessionId = 'non-existent-session'
 
@@ -390,7 +390,7 @@ describe('reorderExerciseRows use case', () => {
       expect(mockProgramRepository.reorderExerciseRows).not.toHaveBeenCalled()
     })
 
-    it('should auto-fix adjacency when group members are interleaved', async () => {
+    it('[3.26-UNIT-007] @p2 should auto-fix adjacency when group members are interleaved', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 
@@ -477,8 +477,8 @@ describe('reorderExerciseRows use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[3.26-UNIT] @p1 Repository Errors', () => {
+    it('[3.26-UNIT-008] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 
@@ -512,8 +512,8 @@ describe('reorderExerciseRows use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty session (no rows)', async () => {
+  describe('[3.26-UNIT] @p2 Edge Cases', () => {
+    it('[3.26-UNIT-009] @p3 should handle empty session (no rows)', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 
@@ -542,7 +542,7 @@ describe('reorderExerciseRows use case', () => {
       )
     })
 
-    it('should handle single row (no-op)', async () => {
+    it('[3.26-UNIT-010] @p2 should handle single row (no-op)', async () => {
       const ctx = createAdminContext()
       const sessionId = 'session-1'
 

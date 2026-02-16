@@ -37,7 +37,7 @@ function createProgramWithSessions(sessions: Omit<Session, 'exerciseGroups'>[]):
   } as ProgramWithDetails
 }
 
-describe('deleteSession use case', () => {
+describe('[3.22-UNIT] @p2 deleteSession use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   const programId = 'program-123'
   const sessionId = 'session-456'
@@ -53,8 +53,8 @@ describe('deleteSession use case', () => {
     } as unknown as ProgramRepositoryPort
   })
 
-  describe('Happy Path', () => {
-    it('should delete session successfully', async () => {
+  describe('[3.22-UNIT] @p0 Happy Path', () => {
+    it('[3.22-UNIT-001] @p0 should delete session successfully', async () => {
       const programWithSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: sessionId, name: 'Day 2', orderIndex: 1 },
@@ -78,7 +78,7 @@ describe('deleteSession use case', () => {
       expect(mockProgramRepository.deleteSession).toHaveBeenCalledWith(ctx, sessionId)
     })
 
-    it('should delete last session when more than one session exists', async () => {
+    it('[3.22-UNIT-002] @p2 should delete last session when more than one session exists', async () => {
       const programWithSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: sessionId, name: 'Day 2', orderIndex: 1 },
@@ -100,8 +100,8 @@ describe('deleteSession use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.22-UNIT] @p0 Authorization', () => {
+    it('[3.22-UNIT-003] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const deleteSession = makeDeleteSession({ programRepository: mockProgramRepository })
 
@@ -125,8 +125,8 @@ describe('deleteSession use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return program_not_found when program does not exist', async () => {
+  describe('[3.22-UNIT] @p1 Not Found Errors', () => {
+    it('[3.22-UNIT-004] @p2 should return program_not_found when program does not exist', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -151,7 +151,7 @@ describe('deleteSession use case', () => {
       expect(mockProgramRepository.deleteSession).not.toHaveBeenCalled()
     })
 
-    it('should return not_found when session does not exist in program', async () => {
+    it('[3.22-UNIT-005] @p2 should return not_found when session does not exist in program', async () => {
       const programWithSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: 'session-2', name: 'Day 2', orderIndex: 1 },
@@ -182,8 +182,8 @@ describe('deleteSession use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return last_session error when trying to delete the only session', async () => {
+  describe('[3.22-UNIT] @p1 Validation Errors', () => {
+    it('[3.22-UNIT-006] @p1 should return last_session error when trying to delete the only session', async () => {
       const programWithOneSession = createProgramWithSessions([{ id: sessionId, name: 'Only Session', orderIndex: 0 }])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithOneSession))
@@ -211,8 +211,8 @@ describe('deleteSession use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findWithDetails fails', async () => {
+  describe('[3.22-UNIT] @p1 Repository Errors', () => {
+    it('[3.22-UNIT-007] @p1 should return repository error when findWithDetails fails', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -236,7 +236,7 @@ describe('deleteSession use case', () => {
       }
     })
 
-    it('should return repository error when deleteSession fails', async () => {
+    it('[3.22-UNIT-008] @p1 should return repository error when deleteSession fails', async () => {
       const programWithSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: sessionId, name: 'Day 2', orderIndex: 1 },
@@ -267,8 +267,8 @@ describe('deleteSession use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should allow deletion when exactly 2 sessions exist', async () => {
+  describe('[3.22-UNIT] @p2 Edge Cases', () => {
+    it('[3.22-UNIT-009] @p2 should allow deletion when exactly 2 sessions exist', async () => {
       const programWithTwoSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: sessionId, name: 'Day 2', orderIndex: 1 },
@@ -291,7 +291,7 @@ describe('deleteSession use case', () => {
       expect(mockProgramRepository.deleteSession).toHaveBeenCalledWith(ctx, sessionId)
     })
 
-    it('should handle deletion from middle of session list', async () => {
+    it('[3.22-UNIT-010] @p2 should handle deletion from middle of session list', async () => {
       const programWithSessions = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: sessionId, name: 'Day 2', orderIndex: 1 },

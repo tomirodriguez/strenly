@@ -7,7 +7,7 @@ const validInput = {
 }
 
 describe('createExercise', () => {
-  it('creates exercise with valid name', () => {
+  it('[EXERCISE.1-UNIT-001] @p0 creates exercise with valid name', () => {
     const result = createExercise(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -16,7 +16,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('creates curated exercise without organizationId', () => {
+  it('[EXERCISE.1-UNIT-002] @p0 creates curated exercise without organizationId', () => {
     const result = createExercise(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -24,7 +24,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('creates custom exercise with organizationId', () => {
+  it('[EXERCISE.1-UNIT-003] @p0 creates custom exercise with organizationId', () => {
     const result = createExercise({ ...validInput, organizationId: 'org-1' })
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -32,7 +32,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts valid movement pattern', () => {
+  it('[EXERCISE.1-UNIT-004] @p1 accepts valid movement pattern', () => {
     const result = createExercise({ ...validInput, movementPattern: 'push' })
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -40,7 +40,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts valid muscle groups', () => {
+  it('[EXERCISE.1-UNIT-005] @p1 accepts valid muscle groups', () => {
     const result = createExercise({
       ...validInput,
       primaryMuscles: ['chest'],
@@ -53,7 +53,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts valid video URL', () => {
+  it('[EXERCISE.1-UNIT-006] @p2 accepts valid video URL', () => {
     const result = createExercise({
       ...validInput,
       videoUrl: 'https://youtube.com/watch?v=abc123',
@@ -64,7 +64,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('defaults isUnilateral to false', () => {
+  it('[EXERCISE.1-UNIT-007] @p2 defaults isUnilateral to false', () => {
     const result = createExercise(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -72,7 +72,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('defaults archivedAt to null', () => {
+  it('[EXERCISE.1-UNIT-008] @p2 defaults archivedAt to null', () => {
     const result = createExercise(validInput)
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -80,7 +80,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('trims whitespace from name', () => {
+  it('[EXERCISE.1-UNIT-009] @p1 trims whitespace from name', () => {
     const result = createExercise({ ...validInput, name: '  Bench Press  ' })
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -88,7 +88,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts description and instructions', () => {
+  it('[EXERCISE.1-UNIT-010] @p2 accepts description and instructions', () => {
     const result = createExercise({
       ...validInput,
       description: 'Classic chest exercise',
@@ -101,7 +101,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts clonedFromId for cloned exercises', () => {
+  it('[EXERCISE.1-UNIT-011] @p2 accepts clonedFromId for cloned exercises', () => {
     const result = createExercise({
       ...validInput,
       organizationId: 'org-1',
@@ -113,7 +113,7 @@ describe('createExercise', () => {
     }
   })
 
-  it('accepts isUnilateral flag', () => {
+  it('[EXERCISE.1-UNIT-012] @p2 accepts isUnilateral flag', () => {
     const result = createExercise({ ...validInput, isUnilateral: true })
     expect(result.isOk()).toBe(true)
     if (result.isOk()) {
@@ -122,7 +122,7 @@ describe('createExercise', () => {
   })
 
   describe('name validation', () => {
-    it('fails with empty name', () => {
+    it('[EXERCISE.2-UNIT-013] @p0 fails with empty name', () => {
       const result = createExercise({ ...validInput, name: '' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -130,7 +130,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('fails with whitespace-only name', () => {
+    it('[EXERCISE.2-UNIT-014] @p1 fails with whitespace-only name', () => {
       const result = createExercise({ ...validInput, name: '   ' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -138,7 +138,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('fails with name over 100 chars', () => {
+    it('[EXERCISE.2-UNIT-015] @p1 fails with name over 100 chars', () => {
       const result = createExercise({ ...validInput, name: 'x'.repeat(101) })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -146,14 +146,14 @@ describe('createExercise', () => {
       }
     })
 
-    it('accepts name exactly 100 chars', () => {
+    it('[EXERCISE.2-UNIT-016] @p2 accepts name exactly 100 chars', () => {
       const result = createExercise({ ...validInput, name: 'x'.repeat(100) })
       expect(result.isOk()).toBe(true)
     })
   })
 
   describe('videoUrl validation', () => {
-    it('fails with invalid video URL', () => {
+    it('[EXERCISE.3-UNIT-017] @p1 fails with invalid video URL', () => {
       const result = createExercise({ ...validInput, videoUrl: 'not-a-url' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -161,17 +161,17 @@ describe('createExercise', () => {
       }
     })
 
-    it('accepts https URL', () => {
+    it('[EXERCISE.3-UNIT-018] @p2 accepts https URL', () => {
       const result = createExercise({ ...validInput, videoUrl: 'https://vimeo.com/12345' })
       expect(result.isOk()).toBe(true)
     })
 
-    it('accepts http URL', () => {
+    it('[EXERCISE.3-UNIT-019] @p2 accepts http URL', () => {
       const result = createExercise({ ...validInput, videoUrl: 'http://example.com/video' })
       expect(result.isOk()).toBe(true)
     })
 
-    it('accepts undefined videoUrl', () => {
+    it('[EXERCISE.3-UNIT-020] @p2 accepts undefined videoUrl', () => {
       const result = createExercise({ ...validInput, videoUrl: undefined })
       expect(result.isOk()).toBe(true)
       if (result.isOk()) {
@@ -181,7 +181,7 @@ describe('createExercise', () => {
   })
 
   describe('movementPattern validation', () => {
-    it('fails with invalid movement pattern', () => {
+    it('[EXERCISE.4-UNIT-021] @p1 fails with invalid movement pattern', () => {
       const result = createExercise({ ...validInput, movementPattern: 'invalid' as 'push' })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -189,7 +189,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('accepts all valid movement patterns', () => {
+    it('[EXERCISE.4-UNIT-022] @p1 accepts all valid movement patterns', () => {
       const patterns = ['push', 'pull', 'hinge', 'squat', 'carry', 'core'] as const
       for (const pattern of patterns) {
         const result = createExercise({ ...validInput, movementPattern: pattern })
@@ -197,7 +197,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('accepts undefined movementPattern', () => {
+    it('[EXERCISE.4-UNIT-023] @p2 accepts undefined movementPattern', () => {
       const result = createExercise({ ...validInput, movementPattern: undefined })
       expect(result.isOk()).toBe(true)
       if (result.isOk()) {
@@ -207,7 +207,7 @@ describe('createExercise', () => {
   })
 
   describe('muscle group validation', () => {
-    it('fails with invalid primary muscle group', () => {
+    it('[EXERCISE.5-UNIT-024] @p1 fails with invalid primary muscle group', () => {
       const result = createExercise({ ...validInput, primaryMuscles: ['invalid' as 'chest'] })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -215,7 +215,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('fails with invalid secondary muscle group', () => {
+    it('[EXERCISE.5-UNIT-025] @p1 fails with invalid secondary muscle group', () => {
       const result = createExercise({ ...validInput, secondaryMuscles: ['invalid' as 'chest'] })
       expect(result.isErr()).toBe(true)
       if (result.isErr()) {
@@ -223,7 +223,7 @@ describe('createExercise', () => {
       }
     })
 
-    it('accepts all valid muscle groups', () => {
+    it('[EXERCISE.5-UNIT-026] @p1 accepts all valid muscle groups', () => {
       const muscles = [
         'chest',
         'back',
@@ -240,7 +240,7 @@ describe('createExercise', () => {
       expect(result.isOk()).toBe(true)
     })
 
-    it('accepts empty muscle arrays', () => {
+    it('[EXERCISE.5-UNIT-027] @p2 accepts empty muscle arrays', () => {
       const result = createExercise({
         ...validInput,
         primaryMuscles: [],
@@ -252,33 +252,33 @@ describe('createExercise', () => {
 })
 
 describe('exercise helpers', () => {
-  it('isCurated returns true when no organizationId', () => {
+  it('[EXERCISE.6-UNIT-028] @p1 isCurated returns true when no organizationId', () => {
     const exercise = createExercise(validInput)._unsafeUnwrap()
     expect(isCurated(exercise)).toBe(true)
   })
 
-  it('isCurated returns false when has organizationId', () => {
+  it('[EXERCISE.6-UNIT-029] @p1 isCurated returns false when has organizationId', () => {
     const exercise = createExercise({ ...validInput, organizationId: 'org-1' })._unsafeUnwrap()
     expect(isCurated(exercise)).toBe(false)
   })
 
-  it('isCustom returns true when has organizationId', () => {
+  it('[EXERCISE.6-UNIT-030] @p1 isCustom returns true when has organizationId', () => {
     const exercise = createExercise({ ...validInput, organizationId: 'org-1' })._unsafeUnwrap()
     expect(isCustom(exercise)).toBe(true)
   })
 
-  it('isCustom returns false when no organizationId', () => {
+  it('[EXERCISE.6-UNIT-031] @p1 isCustom returns false when no organizationId', () => {
     const exercise = createExercise(validInput)._unsafeUnwrap()
     expect(isCustom(exercise)).toBe(false)
   })
 
-  it('isArchived returns true when archivedAt is set', () => {
+  it('[EXERCISE.6-UNIT-032] @p1 isArchived returns true when archivedAt is set', () => {
     const exercise = createExercise(validInput)._unsafeUnwrap()
     const archivedExercise = { ...exercise, archivedAt: new Date() }
     expect(isArchived(archivedExercise)).toBe(true)
   })
 
-  it('isArchived returns false when archivedAt is null', () => {
+  it('[EXERCISE.6-UNIT-033] @p1 isArchived returns false when archivedAt is null', () => {
     const exercise = createExercise(validInput)._unsafeUnwrap()
     expect(isArchived(exercise)).toBe(false)
   })

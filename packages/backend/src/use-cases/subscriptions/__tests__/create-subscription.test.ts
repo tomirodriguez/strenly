@@ -55,7 +55,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should create subscription successfully with 30-day period', async () => {
+    it('[4.1-UNIT-001] @p0 should create subscription successfully with 30-day period', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       const subscriptionId = 'sub-new-123'
@@ -104,7 +104,7 @@ describe('createSubscription use case', () => {
       )
     })
 
-    it('should create subscription for basic plan', async () => {
+    it('[4.1-UNIT-002] @p0 should create subscription for basic plan', async () => {
       const plan = createPlan({
         id: planId,
         name: 'Basic Plan',
@@ -140,7 +140,7 @@ describe('createSubscription use case', () => {
       }
     })
 
-    it('should start with athleteCount at 0', async () => {
+    it('[4.1-UNIT-003] @p1 should start with athleteCount at 0', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(plan))
@@ -166,7 +166,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return plan_not_found when plan does not exist', async () => {
+    it('[4.2-UNIT-001] @p0 should return plan_not_found when plan does not exist', async () => {
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(null))
 
       const createSubscription = makeCreateSubscription({
@@ -195,7 +195,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('Validation Errors', () => {
-    it('should return validation error when subscription entity creation fails', async () => {
+    it('[4.3-UNIT-001] @p3 should return validation error when subscription entity creation fails', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(plan))
@@ -234,7 +234,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when plan lookup fails', async () => {
+    it('[4.4-UNIT-001] @p1 should return repository error when plan lookup fails', async () => {
       vi.mocked(mockPlanRepository.findById).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -260,7 +260,7 @@ describe('createSubscription use case', () => {
       }
     })
 
-    it('should return repository error when subscription creation fails', async () => {
+    it('[4.4-UNIT-002] @p1 should return repository error when subscription creation fails', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(plan))
@@ -289,7 +289,7 @@ describe('createSubscription use case', () => {
       }
     })
 
-    it('should return repository error when organization not found', async () => {
+    it('[4.4-UNIT-003] @p1 should return repository error when organization not found', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(plan))
@@ -323,7 +323,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should use generateId for subscription ID', async () => {
+    it('[4.5-UNIT-001] @p2 should use generateId for subscription ID', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       const generatedId = 'generated-subscription-uuid'
@@ -352,7 +352,7 @@ describe('createSubscription use case', () => {
       expect(mockGenerateId).toHaveBeenCalledTimes(1)
     })
 
-    it('should create subscriptions for different organizations', async () => {
+    it('[4.5-UNIT-002] @p2 should create subscriptions for different organizations', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       vi.mocked(mockPlanRepository.findById).mockReturnValue(okAsync(plan))
@@ -389,7 +389,7 @@ describe('createSubscription use case', () => {
       expect(mockSubscriptionRepository.create).toHaveBeenCalledTimes(2)
     })
 
-    it('should set currentPeriodStart to current time', async () => {
+    it('[4.5-UNIT-003] @p3 should set currentPeriodStart to current time', async () => {
       const plan = createPlan({ id: planId, name: 'Pro Plan', athleteLimit: 50 })
 
       const beforeCreation = new Date()
@@ -421,7 +421,7 @@ describe('createSubscription use case', () => {
   })
 
   describe('No Authorization', () => {
-    it('should create subscription without authorization check (public use case)', async () => {
+    it('[4.6-UNIT-001] @p0 should create subscription without authorization check (public use case)', async () => {
       // This use case is PUBLIC - used during onboarding
       // No authorization check is performed, so no role context is needed
 

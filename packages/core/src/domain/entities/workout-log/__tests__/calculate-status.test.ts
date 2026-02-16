@@ -11,11 +11,11 @@ const makeExercise = (overrides: Partial<LoggedExerciseInput> = {}): LoggedExerc
 })
 
 describe('calculateStatus', () => {
-  it('returns partial for empty exercises', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-001] @p2 returns partial for empty exercises', () => {
     expect(calculateStatus([])).toBe('partial')
   })
 
-  it('returns skipped when all exercises are skipped', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-002] @p0 returns skipped when all exercises are skipped', () => {
     const exercises = [
       makeExercise({ id: 'ex-1', skipped: true }),
       makeExercise({ id: 'ex-2', skipped: true, orderIndex: 1 }),
@@ -23,7 +23,7 @@ describe('calculateStatus', () => {
     expect(calculateStatus(exercises)).toBe('skipped')
   })
 
-  it('returns completed when all exercises have all series not skipped', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-003] @p0 returns completed when all exercises have all series not skipped', () => {
     const exercises = [
       makeExercise({
         skipped: false,
@@ -42,7 +42,7 @@ describe('calculateStatus', () => {
     expect(calculateStatus(exercises)).toBe('completed')
   })
 
-  it('returns partial when some exercises are skipped', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-004] @p1 returns partial when some exercises are skipped', () => {
     const exercises = [
       makeExercise({
         skipped: false,
@@ -53,12 +53,12 @@ describe('calculateStatus', () => {
     expect(calculateStatus(exercises)).toBe('partial')
   })
 
-  it('returns partial when exercise has no series', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-005] @p1 returns partial when exercise has no series', () => {
     const exercises = [makeExercise({ skipped: false, series: [] })]
     expect(calculateStatus(exercises)).toBe('partial')
   })
 
-  it('returns partial when some series are skipped', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-006] @p1 returns partial when some series are skipped', () => {
     const exercises = [
       makeExercise({
         skipped: false,
@@ -71,7 +71,7 @@ describe('calculateStatus', () => {
     expect(calculateStatus(exercises)).toBe('partial')
   })
 
-  it('returns partial when exercise has undefined series', () => {
+  it('[WORKOUTLOG.STATUS.1-UNIT-007] @p1 returns partial when exercise has undefined series', () => {
     const exercises = [makeExercise({ skipped: false })]
     expect(calculateStatus(exercises)).toBe('partial')
   })

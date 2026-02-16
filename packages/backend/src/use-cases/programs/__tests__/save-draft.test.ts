@@ -64,7 +64,7 @@ function createProgramAggregate(overrides: Partial<Program> = {}): Program {
   }
 }
 
-describe('saveDraft use case', () => {
+describe('[3.28-UNIT] @p2 saveDraft use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
@@ -76,8 +76,8 @@ describe('saveDraft use case', () => {
     } as unknown as ProgramRepositoryPort
   })
 
-  describe('Happy Path', () => {
-    it('should save draft successfully without conflict check', async () => {
+  describe('[3.28-UNIT] @p0 Happy Path', () => {
+    it('[3.28-UNIT-001] @p0 should save draft successfully without conflict check', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({ name: 'Updated Program' })
@@ -118,7 +118,7 @@ describe('saveDraft use case', () => {
       expect(mockProgramRepository.loadProgramAggregate).not.toHaveBeenCalled()
     })
 
-    it('should save draft with conflict check when lastLoadedAt is provided', async () => {
+    it('[3.28-UNIT-002] @p2 should save draft with conflict check when lastLoadedAt is provided', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({ name: 'Updated Program' })
@@ -163,7 +163,7 @@ describe('saveDraft use case', () => {
       )
     })
 
-    it('should detect conflict when program was modified after lastLoadedAt', async () => {
+    it('[3.28-UNIT-003] @p2 should detect conflict when program was modified after lastLoadedAt', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({ name: 'Updated Program' })
@@ -203,8 +203,8 @@ describe('saveDraft use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.28-UNIT] @p0 Authorization', () => {
+    it('[3.28-UNIT-004] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const programId = 'program-1'
       const programData = createProgramDataInput()
@@ -234,7 +234,7 @@ describe('saveDraft use case', () => {
       expect(mockProgramRepository.saveProgramAggregate).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.28-UNIT-005] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput()
@@ -257,8 +257,8 @@ describe('saveDraft use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when program name is empty', async () => {
+  describe('[3.28-UNIT] @p1 Validation Errors', () => {
+    it('[3.28-UNIT-006] @p1 should return validation error when program name is empty', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({ name: '' })
@@ -287,7 +287,7 @@ describe('saveDraft use case', () => {
       expect(mockProgramRepository.saveProgramAggregate).not.toHaveBeenCalled()
     })
 
-    it('should return validation error for aggregate validation failures', async () => {
+    it('[3.28-UNIT-007] @p1 should return validation error for aggregate validation failures', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       // Invalid: week with negative orderIndex (domain validation should catch this)
@@ -331,8 +331,8 @@ describe('saveDraft use case', () => {
     })
   })
 
-  describe('Program Not Found Errors', () => {
-    it('should return program_not_found error when conflict check finds no program', async () => {
+  describe('[3.28-UNIT] @p1 Program Not Found Errors', () => {
+    it('[3.28-UNIT-008] @p1 should return program_not_found error when conflict check finds no program', async () => {
       const ctx = createAdminContext()
       const programId = 'non-existent-program'
       const programData = createProgramDataInput()
@@ -367,8 +367,8 @@ describe('saveDraft use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when conflict check fails', async () => {
+  describe('[3.28-UNIT] @p1 Repository Errors', () => {
+    it('[3.28-UNIT-009] @p1 should return repository error when conflict check fails', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput()
@@ -404,7 +404,7 @@ describe('saveDraft use case', () => {
       }
     })
 
-    it('should return repository error when save fails', async () => {
+    it('[3.28-UNIT-010] @p1 should return repository error when save fails', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput()
@@ -439,8 +439,8 @@ describe('saveDraft use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle program with no weeks', async () => {
+  describe('[3.28-UNIT] @p2 Edge Cases', () => {
+    it('[3.28-UNIT-011] @p2 should handle program with no weeks', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({ weeks: [] })
@@ -462,7 +462,7 @@ describe('saveDraft use case', () => {
       expect(result.isOk()).toBe(true)
     })
 
-    it('should handle template program', async () => {
+    it('[3.28-UNIT-012] @p2 should handle template program', async () => {
       const ctx = createAdminContext()
       const programId = 'template-1'
       const programData = createProgramDataInput({
@@ -487,7 +487,7 @@ describe('saveDraft use case', () => {
       expect(result.isOk()).toBe(true)
     })
 
-    it('should handle complex aggregate with multiple weeks and sessions', async () => {
+    it('[3.28-UNIT-013] @p2 should handle complex aggregate with multiple weeks and sessions', async () => {
       const ctx = createAdminContext()
       const programId = 'program-1'
       const programData = createProgramDataInput({

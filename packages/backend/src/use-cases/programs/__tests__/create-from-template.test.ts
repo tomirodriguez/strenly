@@ -6,7 +6,7 @@ import { createProgramRepositoryMock } from '../../../__tests__/factories/progra
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeCreateFromTemplate } from '../create-from-template'
 
-describe('createFromTemplate use case', () => {
+describe('[3.20-UNIT] @p2 createFromTemplate use case', () => {
 	let mockProgramRepository: ProgramRepositoryPort
 	let mockGenerateId: () => string
 
@@ -18,8 +18,8 @@ describe('createFromTemplate use case', () => {
 		mockGenerateId = vi.fn(() => `program-id-${++idCounter}`)
 	})
 
-	describe('Happy Path', () => {
-		it('should create program from template successfully', async () => {
+	describe('[3.20-UNIT] @p0 Happy Path', () => {
+		it('[3.20-UNIT-001] @p0 should create program from template successfully', async () => {
 			const ctx = createAdminContext()
 			const templateId = 'template-1'
 
@@ -31,7 +31,7 @@ describe('createFromTemplate use case', () => {
 				description: 'Base template for strength training',
 				athleteId: null, // Templates have no athlete
 				isTemplate: true, // Marked as template
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'template-week-1',
@@ -70,10 +70,14 @@ describe('createFromTemplate use case', () => {
 						],
 					},
 				],
-			}).value!
+			})
+
+			if (!templateProgram.isOk()) {
+				throw new Error('Failed to create template program')
+			}
 
 			// Mock successful load and save
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram))
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram.value))
 			vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
 				okAsync({ updatedAt: new Date() }),
 			)
@@ -104,12 +108,20 @@ describe('createFromTemplate use case', () => {
 
 				// Verify structure was cloned
 				expect(newProgram.weeks).toHaveLength(1)
-				expect(newProgram.weeks[0].sessions).toHaveLength(1)
-				expect(newProgram.weeks[0].sessions[0].exerciseGroups).toHaveLength(1)
+				const firstWeek = newProgram.weeks[0]
+				if (firstWeek) {
+					expect(firstWeek.sessions).toHaveLength(1)
+					const firstSession = firstWeek.sessions[0]
+					if (firstSession) {
+						expect(firstSession.exerciseGroups).toHaveLength(1)
+					}
+				}
 
 				// Verify new IDs were generated
 				expect(newProgram.id).not.toBe(templateId)
-				expect(newProgram.weeks[0].id).not.toBe('template-week-1')
+				if (firstWeek) {
+					expect(firstWeek.id).not.toBe('template-week-1')
+				}
 			}
 
 			// Verify repository interactions
@@ -128,7 +140,7 @@ describe('createFromTemplate use case', () => {
 			)
 		})
 
-		it('should create program from template with athleteId assigned', async () => {
+		it('[3.20-UNIT-002] @p2 should create program from template with athleteId assigned', async () => {
 			const ctx = createAdminContext()
 			const templateId = 'template-2'
 			const athleteId = 'athlete-123'
@@ -141,7 +153,7 @@ describe('createFromTemplate use case', () => {
 				description: 'Muscle building template',
 				athleteId: null,
 				isTemplate: true,
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'week-1',
@@ -150,9 +162,13 @@ describe('createFromTemplate use case', () => {
 						sessions: [],
 					},
 				],
-			}).value!
+			})
 
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram))
+			if (!templateProgram.isOk()) {
+				throw new Error('Failed to create template program')
+			}
+
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram.value))
 			vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
 				okAsync({ updatedAt: new Date() }),
 			)
@@ -189,8 +205,8 @@ describe('createFromTemplate use case', () => {
 		})
 	})
 
-	describe('Authorization', () => {
-		it('should return forbidden when user lacks programs:write permission', async () => {
+	describe('[3.20-UNIT] @p0 Authorization', () => {
+		it('[3.20-UNIT-003] @p0 should return forbidden when user lacks programs:write permission', async () => {
 			const ctx = createMemberContext() // Member has no write permission
 
 			const createFromTemplate = makeCreateFromTemplate({
@@ -207,8 +223,11 @@ describe('createFromTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('forbidden')
-				expect(result.error.message).toBe('No permission to create programs')
+				const error = result.error
+				expect(error.type).toBe('forbidden')
+				if (error.type === 'forbidden') {
+					expect(error.message).toBe('No permission to create programs')
+				}
 			}
 
 			// Should not call repository
@@ -216,8 +235,8 @@ describe('createFromTemplate use case', () => {
 		})
 	})
 
-	describe('Not Found', () => {
-		it('should return not_found when template does not exist', async () => {
+	describe('[3.20-UNIT] @p1 Not Found', () => {
+		it('[3.20-UNIT-004] @p2 should return not_found when template does not exist', async () => {
 			const ctx = createAdminContext()
 			const nonExistentId = 'non-existent-template'
 
@@ -238,14 +257,17 @@ describe('createFromTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('not_found')
-				expect(result.error.templateId).toBe(nonExistentId)
+				const error = result.error
+				expect(error.type).toBe('not_found')
+				if (error.type === 'not_found') {
+					expect(error.templateId).toBe(nonExistentId)
+				}
 			}
 		})
 	})
 
-	describe('Template Validation', () => {
-		it('should return not_a_template when source program is not a template', async () => {
+	describe('[3.20-UNIT] @p1 Template Validation', () => {
+		it('[3.20-UNIT-005] @p2 should return not_a_template when source program is not a template', async () => {
 			const ctx = createAdminContext()
 			const regularProgramId = 'regular-program-1'
 
@@ -257,7 +279,7 @@ describe('createFromTemplate use case', () => {
 				description: 'Just a regular program',
 				athleteId: 'athlete-1',
 				isTemplate: false, // NOT a template
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'week-1',
@@ -266,9 +288,13 @@ describe('createFromTemplate use case', () => {
 						sessions: [],
 					},
 				],
-			}).value!
+			})
 
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(regularProgram))
+			if (!regularProgram.isOk()) {
+				throw new Error('Failed to create regular program')
+			}
+
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(regularProgram.value))
 
 			const createFromTemplate = makeCreateFromTemplate({
 				programRepository: mockProgramRepository,
@@ -284,8 +310,11 @@ describe('createFromTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('not_a_template')
-				expect(result.error.templateId).toBe(regularProgramId)
+				const error = result.error
+				expect(error.type).toBe('not_a_template')
+				if (error.type === 'not_a_template') {
+					expect(error.templateId).toBe(regularProgramId)
+				}
 			}
 
 			// Should NOT attempt to save (validation failed)
@@ -293,8 +322,8 @@ describe('createFromTemplate use case', () => {
 		})
 	})
 
-	describe('Error Delegation from duplicate-program', () => {
-		it('should return repository_error when duplicate-program repository fails', async () => {
+	describe('[3.20-UNIT] @p1 Error Delegation from duplicate-program', () => {
+		it('[3.20-UNIT-006] @p1 should return repository_error when duplicate-program repository fails', async () => {
 			const ctx = createAdminContext()
 			const templateId = 'template-3'
 
@@ -306,11 +335,15 @@ describe('createFromTemplate use case', () => {
 				description: null,
 				athleteId: null,
 				isTemplate: true,
-				status: 'published',
+				status: 'active',
 				weeks: [],
-			}).value!
+			})
 
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram))
+			if (!templateProgram.isOk()) {
+				throw new Error('Failed to create template program')
+			}
+
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(templateProgram.value))
 
 			// Mock save failure
 			vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
@@ -331,8 +364,11 @@ describe('createFromTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('repository_error')
-				expect(result.error.message).toBe('Write conflict')
+				const error = result.error
+				expect(error.type).toBe('repository_error')
+				if (error.type === 'repository_error') {
+					expect(error.message).toBe('Write conflict')
+				}
 			}
 		})
 	})

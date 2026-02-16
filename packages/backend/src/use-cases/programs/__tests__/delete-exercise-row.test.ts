@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeDeleteExerciseRow } from '../delete-exercise-row'
 
-describe('deleteExerciseRow use case', () => {
+describe('[3.21-UNIT] @p2 deleteExerciseRow use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   const rowId = 'row-123'
   const orgId = 'org-456'
@@ -18,8 +18,8 @@ describe('deleteExerciseRow use case', () => {
     } as unknown as ProgramRepositoryPort
   })
 
-  describe('Happy Path', () => {
-    it('should delete exercise row successfully', async () => {
+  describe('[3.21-UNIT] @p0 Happy Path', () => {
+    it('[3.21-UNIT-001] @p0 should delete exercise row successfully', async () => {
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(okAsync(undefined))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -37,7 +37,7 @@ describe('deleteExerciseRow use case', () => {
       expect(mockProgramRepository.deleteExerciseRow).toHaveBeenCalledWith(ctx, rowId)
     })
 
-    it('should handle deletion of multiple rows', async () => {
+    it('[3.21-UNIT-002] @p2 should handle deletion of multiple rows', async () => {
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(okAsync(undefined))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -57,8 +57,8 @@ describe('deleteExerciseRow use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.21-UNIT] @p0 Authorization', () => {
+    it('[3.21-UNIT-003] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const deleteExerciseRow = makeDeleteExerciseRow({
         programRepository: mockProgramRepository,
@@ -83,8 +83,8 @@ describe('deleteExerciseRow use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found when row does not exist', async () => {
+  describe('[3.21-UNIT] @p1 Not Found Errors', () => {
+    it('[3.21-UNIT-004] @p2 should return not_found when row does not exist', async () => {
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(
         errAsync({
           type: 'NOT_FOUND',
@@ -114,8 +114,8 @@ describe('deleteExerciseRow use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when deleteExerciseRow fails', async () => {
+  describe('[3.21-UNIT] @p1 Repository Errors', () => {
+    it('[3.21-UNIT-005] @p1 should return repository error when deleteExerciseRow fails', async () => {
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -143,7 +143,7 @@ describe('deleteExerciseRow use case', () => {
       }
     })
 
-    it('should return repository error for other database failures', async () => {
+    it('[3.21-UNIT-006] @p1 should return repository error for other database failures', async () => {
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -169,8 +169,8 @@ describe('deleteExerciseRow use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should allow deleting the last exercise row in a session', async () => {
+  describe('[3.21-UNIT] @p2 Edge Cases', () => {
+    it('[3.21-UNIT-007] @p2 should allow deleting the last exercise row in a session', async () => {
       // Unlike sessions/weeks, exercise rows can ALL be deleted (no minimum)
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(okAsync(undefined))
 
@@ -187,7 +187,7 @@ describe('deleteExerciseRow use case', () => {
       expect(result.isOk()).toBe(true)
     })
 
-    it('should handle cascade deletion of related prescriptions', async () => {
+    it('[3.21-UNIT-008] @p2 should handle cascade deletion of related prescriptions', async () => {
       // Repository handles cascading via foreign keys - use case just calls delete
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(okAsync(undefined))
 
@@ -205,7 +205,7 @@ describe('deleteExerciseRow use case', () => {
       expect(mockProgramRepository.deleteExerciseRow).toHaveBeenCalledWith(ctx, rowId)
     })
 
-    it('should handle deleting row from different organizations', async () => {
+    it('[3.21-UNIT-009] @p2 should handle deleting row from different organizations', async () => {
       // Organization scoping is enforced at repository level via context
       vi.mocked(mockProgramRepository.deleteExerciseRow).mockReturnValue(okAsync(undefined))
 

@@ -9,7 +9,7 @@ import {
 } from '../../../__tests__/factories/invitation-factory'
 import { makeGetInvitationInfo, type OrganizationLookup } from '../get-invitation-info'
 
-describe('getInvitationInfo use case', () => {
+describe('[1.9-UNIT] getInvitationInfo use case', () => {
   let mockInvitationRepository: AthleteInvitationRepositoryPort
   let mockOrganizationLookup: OrganizationLookup
 
@@ -32,7 +32,7 @@ describe('getInvitationInfo use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get invitation info successfully with all lookups', async () => {
+    it('[1.9-UNIT-001] @p0 should get invitation info successfully with all lookups', async () => {
       const token = 'valid-token-123'
       const athleteId = 'athlete-1'
       const organizationId = 'org-1'
@@ -82,7 +82,7 @@ describe('getInvitationInfo use case', () => {
       expect(mockOrganizationLookup.getAthleteName).toHaveBeenCalledWith(athleteId, organizationId)
     })
 
-    it('should return valid pending invitation', async () => {
+    it('[1.9-UNIT-002] @p0 should return valid pending invitation', async () => {
       const token = 'valid-token-123'
 
       // Create expiry date 30 days in the future
@@ -115,7 +115,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return invalid when invitation is expired', async () => {
+    it('[1.9-UNIT-003] @p1 should return invalid when invitation is expired', async () => {
       const token = 'expired-token'
 
       const invitation = createExpiredInvitation({ token })
@@ -139,7 +139,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return invalid when invitation is revoked', async () => {
+    it('[1.9-UNIT-004] @p1 should return invalid when invitation is revoked', async () => {
       const token = 'revoked-token'
 
       const invitation = createRevokedInvitation({ token })
@@ -163,7 +163,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return invalid when invitation is accepted', async () => {
+    it('[1.9-UNIT-005] @p1 should return invalid when invitation is accepted', async () => {
       const token = 'accepted-token'
 
       const invitation = createAcceptedInvitation({ token })
@@ -191,7 +191,7 @@ describe('getInvitationInfo use case', () => {
   // NOTE: NO Authorization tests - this is a public endpoint
 
   describe('Validation Errors', () => {
-    it('should return invalid_token error when token does not exist', async () => {
+    it('[1.9-UNIT-006] @p1 should return invalid_token error when token does not exist', async () => {
       const token = 'non-existent-token'
 
       // Mock repository returning null
@@ -220,7 +220,7 @@ describe('getInvitationInfo use case', () => {
       expect(mockOrganizationLookup.getAthleteName).not.toHaveBeenCalled()
     })
 
-    it('should return invalid_token error when findByToken returns TOKEN_NOT_FOUND', async () => {
+    it('[1.9-UNIT-007] @p1 should return invalid_token error when findByToken returns TOKEN_NOT_FOUND', async () => {
       const token = 'invalid-token'
 
       vi.mocked(mockInvitationRepository.findByToken).mockReturnValue(
@@ -250,7 +250,7 @@ describe('getInvitationInfo use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findByToken fails', async () => {
+    it('[1.9-UNIT-008] @p1 should return repository error when findByToken fails', async () => {
       const token = 'some-token'
 
       // Mock repository failure
@@ -279,7 +279,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return repository error when organization lookup fails', async () => {
+    it('[1.9-UNIT-009] @p1 should return repository error when organization lookup fails', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token })
@@ -311,7 +311,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return repository error when user lookup fails', async () => {
+    it('[1.9-UNIT-010] @p1 should return repository error when user lookup fails', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token, createdByUserId: 'user-1' })
@@ -344,7 +344,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should return repository error when athlete lookup fails', async () => {
+    it('[1.9-UNIT-011] @p1 should return repository error when athlete lookup fails', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token, createdByUserId: 'user-1' })
@@ -380,7 +380,7 @@ describe('getInvitationInfo use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should fallback to "Unknown" when organization name is null', async () => {
+    it('[1.9-UNIT-012] @p2 should fallback to "Unknown" when organization name is null', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token })
@@ -404,7 +404,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should fallback to "Unknown" when coach name is null', async () => {
+    it('[1.9-UNIT-013] @p2 should fallback to "Unknown" when coach name is null', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token, createdByUserId: 'user-1' })
@@ -428,7 +428,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should fallback to "Unknown" when athlete name is null', async () => {
+    it('[1.9-UNIT-014] @p2 should fallback to "Unknown" when athlete name is null', async () => {
       const token = 'valid-token'
 
       const invitation = createInvitationData({ token })
@@ -452,7 +452,7 @@ describe('getInvitationInfo use case', () => {
       }
     })
 
-    it('should handle invitation with null createdByUserId (skip user lookup)', async () => {
+    it('[1.9-UNIT-015] @p2 should handle invitation with null createdByUserId (skip user lookup)', async () => {
       const token = 'valid-token'
       const athleteId = 'athlete-1'
       const organizationId = 'org-1'
@@ -486,7 +486,7 @@ describe('getInvitationInfo use case', () => {
       expect(mockOrganizationLookup.getUserName).not.toHaveBeenCalled()
     })
 
-    it('should handle invitation near expiry', async () => {
+    it('[1.9-UNIT-016] @p2 should handle invitation near expiry', async () => {
       const token = 'valid-token'
 
       // Expires in 1 hour

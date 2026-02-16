@@ -11,7 +11,7 @@ import {
 } from '../../../__tests__/factories/invitation-factory'
 import { makeAcceptInvitation } from '../accept-invitation'
 
-describe('acceptInvitation use case', () => {
+describe('[1.6-UNIT] acceptInvitation use case', () => {
   let mockInvitationRepository: AthleteInvitationRepositoryPort
   let mockAthleteRepository: AthleteRepositoryPort
 
@@ -35,7 +35,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should accept invitation successfully', async () => {
+    it('[1.6-UNIT-001] @p0 should accept invitation successfully', async () => {
       const invitation = createInvitationData({
         token: 'valid-token',
         athleteId: 'athlete-123',
@@ -84,7 +84,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Invalid Token', () => {
-    it('should return invalid_token when token not found', async () => {
+    it('[1.6-UNIT-002] @p1 should return invalid_token when token not found', async () => {
       // Mock token not found
       vi.mocked(mockInvitationRepository.findByToken).mockReturnValue(okAsync(null))
 
@@ -111,7 +111,7 @@ describe('acceptInvitation use case', () => {
       expect(mockInvitationRepository.markAccepted).not.toHaveBeenCalled()
     })
 
-    it('should return invalid_token when repository returns TOKEN_NOT_FOUND', async () => {
+    it('[1.6-UNIT-003] @p1 should return invalid_token when repository returns TOKEN_NOT_FOUND', async () => {
       vi.mocked(mockInvitationRepository.findByToken).mockReturnValue(
         errAsync({
           type: 'TOKEN_NOT_FOUND',
@@ -138,7 +138,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Expired Invitation', () => {
-    it('should return expired error when invitation has expired', async () => {
+    it('[1.6-UNIT-004] @p1 should return expired error when invitation has expired', async () => {
       const expiredInvitation = createExpiredInvitation({
         token: 'expired-token',
       })
@@ -169,7 +169,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Revoked Invitation', () => {
-    it('should return already_revoked error when invitation was revoked', async () => {
+    it('[1.6-UNIT-005] @p1 should return already_revoked error when invitation was revoked', async () => {
       const revokedInvitation = createRevokedInvitation({
         token: 'revoked-token',
       })
@@ -200,7 +200,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Already Accepted', () => {
-    it('should return already_accepted error when invitation was already accepted', async () => {
+    it('[1.6-UNIT-006] @p1 should return already_accepted error when invitation was already accepted', async () => {
       const acceptedInvitation = createAcceptedInvitation({
         token: 'accepted-token',
       })
@@ -231,7 +231,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Athlete Not Found', () => {
-    it('should return athlete_not_found when athlete does not exist', async () => {
+    it('[1.6-UNIT-007] @p1 should return athlete_not_found when athlete does not exist', async () => {
       const invitation = createInvitationData({
         token: 'valid-token',
         athleteId: 'athlete-123',
@@ -265,7 +265,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findByToken fails', async () => {
+    it('[1.6-UNIT-008] @p1 should return repository error when findByToken fails', async () => {
       vi.mocked(mockInvitationRepository.findByToken).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -290,7 +290,7 @@ describe('acceptInvitation use case', () => {
       }
     })
 
-    it('should return repository error when markAccepted fails', async () => {
+    it('[1.6-UNIT-009] @p1 should return repository error when markAccepted fails', async () => {
       const invitation = createInvitationData({
         token: 'valid-token',
       })
@@ -320,7 +320,7 @@ describe('acceptInvitation use case', () => {
       }
     })
 
-    it('should return repository error when athlete fetch fails', async () => {
+    it('[1.6-UNIT-010] @p1 should return repository error when athlete fetch fails', async () => {
       const invitation = createInvitationData({
         token: 'valid-token',
       })
@@ -353,7 +353,7 @@ describe('acceptInvitation use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle invitation state validation in correct order', async () => {
+    it('[1.6-UNIT-011] @p2 should handle invitation state validation in correct order', async () => {
       // Test that validation happens in order: expired → revoked → accepted
 
       const invitation = createInvitationData({

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdateAthlete } from '../update-athlete'
 
-describe('updateAthlete use case', () => {
+describe('[1.4-UNIT] updateAthlete use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should update athlete successfully', async () => {
+    it('[1.4-UNIT-001] @p0 should update athlete successfully', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -71,7 +71,7 @@ describe('updateAthlete use case', () => {
       }
     })
 
-    it('should update only specified fields', async () => {
+    it('[1.4-UNIT-002] @p0 should update only specified fields', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -114,7 +114,7 @@ describe('updateAthlete use case', () => {
       }
     })
 
-    it('should allow setting fields to null', async () => {
+    it('[1.4-UNIT-003] @p1 should allow setting fields to null', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -159,7 +159,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
+    it('[1.4-UNIT-004] @p0 should return forbidden error when user lacks athletes:write permission', async () => {
       const ctx = createMemberContext()
 
       const updateAthlete = makeUpdateAthlete({
@@ -183,7 +183,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return not_found when athlete does not exist', async () => {
+    it('[1.4-UNIT-005] @p1 should return not_found when athlete does not exist', async () => {
       const ctx = createAdminContext()
 
       // Mock findById - return null (not found)
@@ -214,7 +214,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+    it('[1.4-UNIT-006] @p1 should return validation error when name is empty', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -253,7 +253,7 @@ describe('updateAthlete use case', () => {
       expect(mockAthleteRepository.update).not.toHaveBeenCalled()
     })
 
-    it('should return validation error for invalid email', async () => {
+    it('[1.4-UNIT-007] @p1 should return validation error for invalid email', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -292,7 +292,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+    it('[1.4-UNIT-008] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(
@@ -319,7 +319,7 @@ describe('updateAthlete use case', () => {
       }
     })
 
-    it('should return repository error when update fails', async () => {
+    it('[1.4-UNIT-009] @p1 should return repository error when update fails', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',
@@ -364,7 +364,7 @@ describe('updateAthlete use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle partial updates correctly', async () => {
+    it('[1.4-UNIT-010] @p2 should handle partial updates correctly', async () => {
       const ctx = createAdminContext()
       const existingAthlete = {
         id: 'athlete-123',

@@ -39,7 +39,7 @@ function createProgramWithSessions(sessions: Omit<Session, 'exerciseGroups'>[]):
   } as unknown as ProgramWithDetails
 }
 
-describe('addSession use case', () => {
+describe('[3.18-UNIT] @p2 addSession use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   let mockGenerateId: () => string
   const programId = 'program-123'
@@ -56,8 +56,8 @@ describe('addSession use case', () => {
     mockGenerateId = vi.fn(() => faker.string.uuid())
   })
 
-  describe('Happy Path', () => {
-    it('should add session successfully to existing program', async () => {
+  describe('[3.18-UNIT] @p0 Happy Path', () => {
+    it('[3.18-UNIT-001] @p0 should add session successfully to existing program', async () => {
       const existingProgram = createProgramWithSessions([
         { id: 'session-1', name: 'Day 1', orderIndex: 0 },
         { id: 'session-2', name: 'Day 2', orderIndex: 1 },
@@ -110,7 +110,7 @@ describe('addSession use case', () => {
       )
     })
 
-    it('should add session to empty program with orderIndex 0', async () => {
+    it('[3.18-UNIT-002] @p3 should add session to empty program with orderIndex 0', async () => {
       const emptyProgram = createProgramWithSessions([])
 
       const newSessionId = 'session-first-123'
@@ -147,7 +147,7 @@ describe('addSession use case', () => {
       }
     })
 
-    it('should trim session name', async () => {
+    it('[3.18-UNIT-003] @p2 should trim session name', async () => {
       const existingProgram = createProgramWithSessions([])
 
       const createdSession = {
@@ -182,8 +182,8 @@ describe('addSession use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.18-UNIT] @p0 Authorization', () => {
+    it('[3.18-UNIT-004] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const addSession = makeAddSession({
         programRepository: mockProgramRepository,
@@ -210,8 +210,8 @@ describe('addSession use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return program_not_found when program does not exist', async () => {
+  describe('[3.18-UNIT] @p1 Not Found Errors', () => {
+    it('[3.18-UNIT-005] @p2 should return program_not_found when program does not exist', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -240,8 +240,8 @@ describe('addSession use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+  describe('[3.18-UNIT] @p1 Validation Errors', () => {
+    it('[3.18-UNIT-006] @p1 should return validation error when name is empty', async () => {
       const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -271,7 +271,7 @@ describe('addSession use case', () => {
       expect(mockProgramRepository.createSession).not.toHaveBeenCalled()
     })
 
-    it('should return validation error when name is only whitespace', async () => {
+    it('[3.18-UNIT-007] @p1 should return validation error when name is only whitespace', async () => {
       const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -295,7 +295,7 @@ describe('addSession use case', () => {
       }
     })
 
-    it('should return validation error when name is too long', async () => {
+    it('[3.18-UNIT-008] @p1 should return validation error when name is too long', async () => {
       const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -320,8 +320,8 @@ describe('addSession use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findWithDetails fails', async () => {
+  describe('[3.18-UNIT] @p1 Repository Errors', () => {
+    it('[3.18-UNIT-009] @p1 should return repository error when findWithDetails fails', async () => {
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -348,7 +348,7 @@ describe('addSession use case', () => {
       }
     })
 
-    it('should return repository error when createSession fails', async () => {
+    it('[3.18-UNIT-010] @p1 should return repository error when createSession fails', async () => {
       const existingProgram = createProgramWithSessions([])
 
       vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(existingProgram))
@@ -379,8 +379,8 @@ describe('addSession use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle adding multiple sessions sequentially', async () => {
+  describe('[3.18-UNIT] @p2 Edge Cases', () => {
+    it('[3.18-UNIT-011] @p2 should handle adding multiple sessions sequentially', async () => {
       const initialProgram = createProgramWithSessions([])
 
       // First call returns empty, second returns with 1 session
@@ -431,7 +431,7 @@ describe('addSession use case', () => {
       }
     })
 
-    it('should use generateId for new session ID', async () => {
+    it('[3.18-UNIT-012] @p2 should use generateId for new session ID', async () => {
       const existingProgram = createProgramWithSessions([])
 
       const generatedId = 'generated-uuid-123'

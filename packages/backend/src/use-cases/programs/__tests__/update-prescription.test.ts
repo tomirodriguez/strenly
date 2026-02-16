@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdatePrescription } from '../update-prescription'
 
-describe('updatePrescription use case', () => {
+describe('[3.30-UNIT] @p2 updatePrescription use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
 
   beforeEach(() => {
@@ -43,8 +43,8 @@ describe('updatePrescription use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should update with valid notation "3x8@120kg"', async () => {
+  describe('[3.30-UNIT] @p0 Happy Path', () => {
+    it('[3.30-UNIT-001] @p2 should update with valid notation "3x8@120kg"', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -87,7 +87,7 @@ describe('updatePrescription use case', () => {
       )
     })
 
-    it('should update with empty string (clears cell)', async () => {
+    it('[3.30-UNIT-002] @p3 should update with empty string (clears cell)', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -123,7 +123,7 @@ describe('updatePrescription use case', () => {
       )
     })
 
-    it('should update with notation "-" (rest day)', async () => {
+    it('[3.30-UNIT-003] @p2 should update with notation "-" (rest day)', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -159,7 +159,7 @@ describe('updatePrescription use case', () => {
       )
     })
 
-    it('should update existing prescription (upsert)', async () => {
+    it('[3.30-UNIT-004] @p2 should update existing prescription (upsert)', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -190,7 +190,7 @@ describe('updatePrescription use case', () => {
       )
     })
 
-    it('should handle notation with sets and reps only', async () => {
+    it('[3.30-UNIT-005] @p2 should handle notation with sets and reps only', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -217,8 +217,8 @@ describe('updatePrescription use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.30-UNIT] @p0 Authorization', () => {
+    it('[3.30-UNIT-006] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -249,7 +249,7 @@ describe('updatePrescription use case', () => {
       expect(mockProgramRepository.upsertPrescription).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.30-UNIT-007] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -271,8 +271,8 @@ describe('updatePrescription use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return not_found when row does not exist', async () => {
+  describe('[3.30-UNIT] @p1 Validation Errors', () => {
+    it('[3.30-UNIT-008] @p2 should return not_found when row does not exist', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'non-existent-row'
       const weekId = 'week-1'
@@ -309,7 +309,7 @@ describe('updatePrescription use case', () => {
       }
     })
 
-    it('should return not_found when week does not exist', async () => {
+    it('[3.30-UNIT-009] @p2 should return not_found when week does not exist', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'non-existent-week'
@@ -346,7 +346,7 @@ describe('updatePrescription use case', () => {
       }
     })
 
-    it('should return validation_error for invalid notation format', async () => {
+    it('[3.30-UNIT-010] @p1 should return validation_error for invalid notation format', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -376,7 +376,7 @@ describe('updatePrescription use case', () => {
       expect(mockProgramRepository.upsertPrescription).not.toHaveBeenCalled()
     })
 
-    it('should return validation_error for invalid series values', async () => {
+    it('[3.30-UNIT-011] @p1 should return validation_error for invalid series values', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -405,8 +405,8 @@ describe('updatePrescription use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[3.30-UNIT] @p1 Repository Errors', () => {
+    it('[3.30-UNIT-012] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -442,8 +442,8 @@ describe('updatePrescription use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle updating multiple cells in sequence', async () => {
+  describe('[3.30-UNIT] @p2 Edge Cases', () => {
+    it('[3.30-UNIT-013] @p2 should handle updating multiple cells in sequence', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -478,7 +478,7 @@ describe('updatePrescription use case', () => {
       expect(mockProgramRepository.upsertPrescription).toHaveBeenCalledTimes(2)
     })
 
-    it('should handle notation with percentage "3x8@70%"', async () => {
+    it('[3.30-UNIT-014] @p2 should handle notation with percentage "3x8@70%"', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'
@@ -504,7 +504,7 @@ describe('updatePrescription use case', () => {
       }
     })
 
-    it('should handle whitespace in notation', async () => {
+    it('[3.30-UNIT-015] @p2 should handle whitespace in notation', async () => {
       const ctx = createAdminContext()
       const exerciseRowId = 'row-1'
       const weekId = 'week-1'

@@ -69,7 +69,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should return canAdd=true when below athlete limit', async () => {
+    it('[4.1-UNIT-001] @p0 should return canAdd=true when below athlete limit', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription with 5 athletes
@@ -103,7 +103,7 @@ describe('checkAthleteLimit use case', () => {
       }
     })
 
-    it('should return canAdd=false when at athlete limit', async () => {
+    it('[4.1-UNIT-002] @p0 should return canAdd=false when at athlete limit', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription at limit (10/10 athletes)
@@ -140,7 +140,7 @@ describe('checkAthleteLimit use case', () => {
       }
     })
 
-    it('should return canAdd=false when over athlete limit', async () => {
+    it('[4.1-UNIT-003] @p1 should return canAdd=false when over athlete limit', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription over limit (15/10 athletes - legacy data)
@@ -177,7 +177,7 @@ describe('checkAthleteLimit use case', () => {
       }
     })
 
-    it('should handle unlimited plan (athleteLimit = -1)', async () => {
+    it('[4.1-UNIT-004] @p1 should handle unlimited plan (athleteLimit = -1)', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription with many athletes
@@ -213,7 +213,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
+    it('[4.2-UNIT-001] @p0 should return forbidden error when user lacks athletes:write permission', async () => {
       const ctx = createMemberContext() // Viewer lacks write permission
 
       const checkAthleteLimit = makeCheckAthleteLimit({
@@ -240,7 +240,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return subscription_not_found when organization has no subscription', async () => {
+    it('[4.3-UNIT-001] @p0 should return subscription_not_found when organization has no subscription', async () => {
       const ctx = createAdminContext()
 
       // Mock no subscription found
@@ -267,7 +267,7 @@ describe('checkAthleteLimit use case', () => {
       expect(mockPlanRepository.findById).not.toHaveBeenCalled()
     })
 
-    it('should return plan_not_found when subscription references non-existent plan', async () => {
+    it('[4.3-UNIT-002] @p1 should return plan_not_found when subscription references non-existent plan', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription with invalid plan reference
@@ -304,7 +304,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when subscription fetch fails', async () => {
+    it('[4.4-UNIT-001] @p1 should return repository error when subscription fetch fails', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription repository failure
@@ -333,7 +333,7 @@ describe('checkAthleteLimit use case', () => {
       }
     })
 
-    it('should return repository error when plan fetch fails', async () => {
+    it('[4.4-UNIT-002] @p1 should return repository error when plan fetch fails', async () => {
       const ctx = createAdminContext()
 
       // Mock subscription success
@@ -374,7 +374,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle zero athletes correctly', async () => {
+    it('[4.5-UNIT-001] @p2 should handle zero athletes correctly', async () => {
       const ctx = createAdminContext()
 
       // Mock new subscription with no athletes yet
@@ -409,7 +409,7 @@ describe('checkAthleteLimit use case', () => {
       }
     })
 
-    it('should handle remaining calculation edge case (negative difference)', async () => {
+    it('[4.5-UNIT-002] @p2 should handle remaining calculation edge case (negative difference)', async () => {
       const ctx = createAdminContext()
 
       // Mock over limit scenario
@@ -446,7 +446,7 @@ describe('checkAthleteLimit use case', () => {
   })
 
   describe('Business Logic', () => {
-    it('should use domain helper canAddAthlete for limit check', async () => {
+    it('[4.6-UNIT-001] @p1 should use domain helper canAddAthlete for limit check', async () => {
       const ctx = createAdminContext()
 
       // Test the boundary: exactly 1 remaining spot

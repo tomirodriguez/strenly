@@ -7,7 +7,7 @@ import { createInvitationData } from '../../../__tests__/factories/invitation-fa
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeGenerateInvitation } from '../generate-invitation'
 
-describe('generateInvitation use case', () => {
+describe('[1.7-UNIT] generateInvitation use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
   let mockInvitationRepository: AthleteInvitationRepositoryPort
   let mockGenerateId: () => string
@@ -42,7 +42,7 @@ describe('generateInvitation use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should generate invitation successfully when no existing invitation', async () => {
+    it('[1.7-UNIT-001] @p0 should generate invitation successfully when no existing invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const appUrl = 'https://app.example.com'
@@ -105,7 +105,7 @@ describe('generateInvitation use case', () => {
       expect(mockInvitationRepository.revoke).not.toHaveBeenCalled()
     })
 
-    it('should revoke existing invitation before creating new one', async () => {
+    it('[1.7-UNIT-002] @p0 should revoke existing invitation before creating new one', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const appUrl = 'https://app.example.com'
@@ -163,7 +163,7 @@ describe('generateInvitation use case', () => {
       expect(mockInvitationRepository.create).toHaveBeenCalled()
     })
 
-    it('should generate unique IDs and tokens', async () => {
+    it('[1.7-UNIT-003] @p1 should generate unique IDs and tokens', async () => {
       const ctx = createAdminContext()
       const athleteId1 = 'athlete-1'
       const athleteId2 = 'athlete-2'
@@ -208,7 +208,7 @@ describe('generateInvitation use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
+    it('[1.7-UNIT-004] @p0 should return forbidden error when user lacks athletes:write permission', async () => {
       const ctx = createMemberContext() // Member lacks write permission
       const athleteId = 'athlete-1'
 
@@ -242,7 +242,7 @@ describe('generateInvitation use case', () => {
       expect(mockInvitationRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has athletes:write)', async () => {
+    it('[1.7-UNIT-005] @p0 should succeed when user has admin role (has athletes:write)', async () => {
       const ctx = createAdminContext() // Admin has write permission
       const athleteId = 'athlete-1'
 
@@ -274,7 +274,7 @@ describe('generateInvitation use case', () => {
   })
 
   describe('Validation Errors', () => {
-    it('should return athlete_not_found error when athlete does not exist', async () => {
+    it('[1.7-UNIT-006] @p1 should return athlete_not_found error when athlete does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'non-existent-athlete'
 
@@ -309,7 +309,7 @@ describe('generateInvitation use case', () => {
       expect(mockInvitationRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should return already_linked error when athlete is already linked to user', async () => {
+    it('[1.7-UNIT-007] @p1 should return already_linked error when athlete is already linked to user', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -352,7 +352,7 @@ describe('generateInvitation use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when athlete lookup fails', async () => {
+    it('[1.7-UNIT-008] @p1 should return repository error when athlete lookup fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -388,7 +388,7 @@ describe('generateInvitation use case', () => {
       }
     })
 
-    it('should return repository error when finding existing invitation fails', async () => {
+    it('[1.7-UNIT-009] @p1 should return repository error when finding existing invitation fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -432,7 +432,7 @@ describe('generateInvitation use case', () => {
       }
     })
 
-    it('should return repository error when revoke fails', async () => {
+    it('[1.7-UNIT-010] @p1 should return repository error when revoke fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -485,7 +485,7 @@ describe('generateInvitation use case', () => {
       expect(mockInvitationRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should return repository error when create fails', async () => {
+    it('[1.7-UNIT-011] @p1 should return repository error when create fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -532,7 +532,7 @@ describe('generateInvitation use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle custom appUrl with trailing slash', async () => {
+    it('[1.7-UNIT-012] @p3 should handle custom appUrl with trailing slash', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const appUrl = 'https://app.example.com/' // With trailing slash
@@ -569,7 +569,7 @@ describe('generateInvitation use case', () => {
       }
     })
 
-    it('should handle different appUrl domains', async () => {
+    it('[1.7-UNIT-013] @p3 should handle different appUrl domains', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const appUrl = 'https://staging.strenly.com'

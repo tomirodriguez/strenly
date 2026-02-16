@@ -7,7 +7,7 @@ import { createExerciseEntity } from '../../../__tests__/factories/exercise-fact
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeAddExerciseRow } from '../add-exercise-row'
 
-describe('addExerciseRow use case', () => {
+describe('[3.17-UNIT] @p2 addExerciseRow use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   let mockExerciseRepository: ExerciseRepositoryPort
   let mockGenerateId: () => string
@@ -33,8 +33,8 @@ describe('addExerciseRow use case', () => {
     mockGenerateId = vi.fn(() => faker.string.uuid())
   })
 
-  describe('Happy Path', () => {
-    it('should add exercise row successfully to empty session', async () => {
+  describe('[3.17-UNIT] @p0 Happy Path', () => {
+    it('[3.17-UNIT-001] @p0 should add exercise row successfully to empty session', async () => {
       const rowId = 'row-new-123'
       vi.mocked(mockGenerateId).mockReturnValue(rowId)
 
@@ -99,7 +99,7 @@ describe('addExerciseRow use case', () => {
       )
     })
 
-    it('should add exercise row to existing session with correct orderIndex', async () => {
+    it('[3.17-UNIT-002] @p2 should add exercise row to existing session with correct orderIndex', async () => {
       // Existing session has 2 rows (orderIndex 0, 1), so max is 1
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(1))
 
@@ -147,7 +147,7 @@ describe('addExerciseRow use case', () => {
       }
     })
 
-    it('should add exercise row with groupId when provided', async () => {
+    it('[3.17-UNIT-003] @p2 should add exercise row with groupId when provided', async () => {
       const groupId = 'group-123'
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
 
@@ -204,7 +204,7 @@ describe('addExerciseRow use case', () => {
       )
     })
 
-    it('should handle exercise name not found gracefully', async () => {
+    it('[3.17-UNIT-004] @p1 should handle exercise name not found gracefully', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(-1))
 
       const createdRow = {
@@ -247,8 +247,8 @@ describe('addExerciseRow use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.17-UNIT] @p0 Authorization', () => {
+    it('[3.17-UNIT-005] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const addExerciseRow = makeAddExerciseRow({
         programRepository: mockProgramRepository,
@@ -276,8 +276,8 @@ describe('addExerciseRow use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found when session does not exist (getMaxOrderIndex)', async () => {
+  describe('[3.17-UNIT] @p1 Not Found Errors', () => {
+    it('[3.17-UNIT-006] @p2 should return not_found when session does not exist (getMaxOrderIndex)', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(
         errAsync({
           type: 'NOT_FOUND',
@@ -313,7 +313,7 @@ describe('addExerciseRow use case', () => {
       expect(mockProgramRepository.createExerciseRow).not.toHaveBeenCalled()
     })
 
-    it('should return not_found when session does not exist (createExerciseRow)', async () => {
+    it('[3.17-UNIT-007] @p2 should return not_found when session does not exist (createExerciseRow)', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
       vi.mocked(mockProgramRepository.createExerciseRow).mockReturnValue(
         errAsync({
@@ -347,8 +347,8 @@ describe('addExerciseRow use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when exerciseId is invalid', async () => {
+  describe('[3.17-UNIT] @p1 Validation Errors', () => {
+    it('[3.17-UNIT-008] @p1 should return validation error when exerciseId is invalid', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -375,8 +375,8 @@ describe('addExerciseRow use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when getMaxExerciseRowOrderIndex fails', async () => {
+  describe('[3.17-UNIT] @p1 Repository Errors', () => {
+    it('[3.17-UNIT-009] @p1 should return repository error when getMaxExerciseRowOrderIndex fails', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -404,7 +404,7 @@ describe('addExerciseRow use case', () => {
       }
     })
 
-    it('should return repository error when createExerciseRow fails', async () => {
+    it('[3.17-UNIT-010] @p1 should return repository error when createExerciseRow fails', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
       vi.mocked(mockProgramRepository.createExerciseRow).mockReturnValue(
         errAsync({
@@ -433,7 +433,7 @@ describe('addExerciseRow use case', () => {
       }
     })
 
-    it('should return repository error when exercise lookup fails', async () => {
+    it('[3.17-UNIT-011] @p1 should return repository error when exercise lookup fails', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
 
       const createdRow = {
@@ -481,8 +481,8 @@ describe('addExerciseRow use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should use generateId for new row ID', async () => {
+  describe('[3.17-UNIT] @p2 Edge Cases', () => {
+    it('[3.17-UNIT-012] @p2 should use generateId for new row ID', async () => {
       const generatedId = 'generated-row-uuid-123'
       vi.mocked(mockGenerateId).mockReturnValue(generatedId)
 
@@ -526,7 +526,7 @@ describe('addExerciseRow use case', () => {
       expect(mockGenerateId).toHaveBeenCalledTimes(1)
     })
 
-    it('should handle null groupId correctly', async () => {
+    it('[3.17-UNIT-013] @p2 should handle null groupId correctly', async () => {
       vi.mocked(mockProgramRepository.getMaxExerciseRowOrderIndex).mockReturnValue(okAsync(0))
 
       const createdRow = {

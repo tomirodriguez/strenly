@@ -21,7 +21,7 @@ describe('deleteLog use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should delete workout log successfully with admin role', async () => {
+    it('[5.1-UNIT-001] @p0 should delete workout log successfully with admin role', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -63,7 +63,7 @@ describe('deleteLog use case', () => {
       )
     })
 
-    it('should delete completed log', async () => {
+    it('[5.1-UNIT-002] @p1 should delete completed log', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -90,7 +90,7 @@ describe('deleteLog use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks workout_log:delete permission', async () => {
+    it('[5.2-UNIT-001] @p0 should return forbidden error when user lacks workout_log:delete permission', async () => {
       const ctx = createMemberContext() // Member lacks delete permission
       const logId = 'log-1'
 
@@ -119,7 +119,7 @@ describe('deleteLog use case', () => {
       expect(mockWorkoutLogRepository.delete).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has workout_log:delete)', async () => {
+    it('[5.2-UNIT-002] @p0 should succeed when user has admin role (has workout_log:delete)', async () => {
       const ctx = createAdminContext() // Admin has delete permission
       const logId = 'log-1'
 
@@ -145,7 +145,7 @@ describe('deleteLog use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return not_found error when log does not exist', async () => {
+    it('[5.3-UNIT-001] @p0 should return not_found error when log does not exist', async () => {
       const ctx = createAdminContext()
       const logId = 'non-existent-log'
 
@@ -177,7 +177,7 @@ describe('deleteLog use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+    it('[5.4-UNIT-001] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -209,7 +209,7 @@ describe('deleteLog use case', () => {
       }
     })
 
-    it('should return repository error when delete fails', async () => {
+    it('[5.4-UNIT-002] @p1 should return repository error when delete fails', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 
@@ -250,7 +250,7 @@ describe('deleteLog use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle deleting multiple logs in sequence', async () => {
+    it('[5.5-UNIT-001] @p2 should handle deleting multiple logs in sequence', async () => {
       const ctx = createAdminContext()
       const logId1 = 'log-1'
       const logId2 = 'log-2'
@@ -277,7 +277,7 @@ describe('deleteLog use case', () => {
       expect(mockWorkoutLogRepository.delete).toHaveBeenCalledTimes(2)
     })
 
-    it('should be idempotent - trying to delete non-existent log after successful deletion', async () => {
+    it('[5.5-UNIT-002] @p2 should be idempotent - trying to delete non-existent log after successful deletion', async () => {
       const ctx = createAdminContext()
       const logId = 'log-1'
 

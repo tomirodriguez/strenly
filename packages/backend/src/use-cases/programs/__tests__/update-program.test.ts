@@ -5,7 +5,7 @@ import { createProgramWithStructure } from '../../../__tests__/factories/program
 import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdateProgram } from '../update-program'
 
-describe('updateProgram use case', () => {
+describe('[3.31-UNIT] @p2 updateProgram use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   const programId = 'program-123'
   const orgId = 'org-456'
@@ -18,8 +18,8 @@ describe('updateProgram use case', () => {
     } as unknown as ProgramRepositoryPort
   })
 
-  describe('Happy Path', () => {
-    it('should update program name successfully', async () => {
+  describe('[3.31-UNIT] @p0 Happy Path', () => {
+    it('[3.31-UNIT-001] @p0 should update program name successfully', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -54,7 +54,7 @@ describe('updateProgram use case', () => {
       )
     })
 
-    it('should update description and keep other fields unchanged', async () => {
+    it('[3.31-UNIT-002] @p2 should update description and keep other fields unchanged', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -84,7 +84,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should assign athlete to program', async () => {
+    it('[3.31-UNIT-003] @p2 should assign athlete to program', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -110,7 +110,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should unassign athlete from program', async () => {
+    it('[3.31-UNIT-004] @p2 should unassign athlete from program', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -136,7 +136,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should convert template to non-template', async () => {
+    it('[3.31-UNIT-005] @p2 should convert template to non-template', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -163,7 +163,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should update status to active', async () => {
+    it('[3.31-UNIT-006] @p2 should update status to active', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -189,8 +189,8 @@ describe('updateProgram use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.31-UNIT] @p0 Authorization', () => {
+    it('[3.31-UNIT-007] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext()
       const updateProgram = makeUpdateProgram({ programRepository: mockProgramRepository })
 
@@ -214,8 +214,8 @@ describe('updateProgram use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found when program does not exist', async () => {
+  describe('[3.31-UNIT] @p1 Not Found Errors', () => {
+    it('[3.31-UNIT-008] @p2 should return not_found when program does not exist', async () => {
       vi.mocked(mockProgramRepository.findById).mockReturnValue(okAsync(null))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -241,8 +241,8 @@ describe('updateProgram use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+  describe('[3.31-UNIT] @p1 Validation Errors', () => {
+    it('[3.31-UNIT-009] @p1 should return validation error when name is empty', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -272,7 +272,7 @@ describe('updateProgram use case', () => {
       expect(mockProgramRepository.update).not.toHaveBeenCalled()
     })
 
-    it('should return validation error when name is too short', async () => {
+    it('[3.31-UNIT-010] @p1 should return validation error when name is too short', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -296,7 +296,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should return validation error when name is too long', async () => {
+    it('[3.31-UNIT-011] @p1 should return validation error when name is too long', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -321,8 +321,8 @@ describe('updateProgram use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[3.31-UNIT] @p1 Repository Errors', () => {
+    it('[3.31-UNIT-012] @p1 should return repository error when findById fails', async () => {
       vi.mocked(mockProgramRepository.findById).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -346,7 +346,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should return repository error when update fails', async () => {
+    it('[3.31-UNIT-013] @p1 should return repository error when update fails', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -377,8 +377,8 @@ describe('updateProgram use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle partial updates without overwriting other fields', async () => {
+  describe('[3.31-UNIT] @p2 Edge Cases', () => {
+    it('[3.31-UNIT-014] @p2 should handle partial updates without overwriting other fields', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -410,7 +410,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should handle setting description to null explicitly', async () => {
+    it('[3.31-UNIT-015] @p2 should handle setting description to null explicitly', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,
@@ -436,7 +436,7 @@ describe('updateProgram use case', () => {
       }
     })
 
-    it('should handle simultaneous updates to multiple fields', async () => {
+    it('[3.31-UNIT-016] @p2 should handle simultaneous updates to multiple fields', async () => {
       const existing = createProgramWithStructure({
         id: programId,
         organizationId: orgId,

@@ -6,7 +6,7 @@ import { createProgramRepositoryMock } from '../../../__tests__/factories/progra
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeSaveAsTemplate } from '../save-as-template'
 
-describe('saveAsTemplate use case', () => {
+describe('[3.27-UNIT] @p2 saveAsTemplate use case', () => {
 	let mockProgramRepository: ProgramRepositoryPort
 	let mockGenerateId: () => string
 
@@ -18,20 +18,20 @@ describe('saveAsTemplate use case', () => {
 		mockGenerateId = vi.fn(() => `template-id-${++idCounter}`)
 	})
 
-	describe('Happy Path', () => {
-		it('should save program as template with correct flags', async () => {
+	describe('[3.27-UNIT] @p0 Happy Path', () => {
+		it('[3.27-UNIT-001] @p2 should save program as template with correct flags', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'program-1'
 
 			// Create a source program (regular program with athlete)
-			const sourceProgram = createProgram({
+			const sourceProgramResult = createProgram({
 				id: sourceProgramId,
 				organizationId: ctx.organizationId,
 				name: 'Athlete Program',
 				description: 'Program for specific athlete',
 				athleteId: 'athlete-1', // Has athlete
 				isTemplate: false, // Not a template
-				status: 'published',
+				status: 'active',
 				weeks: [
 					{
 						id: 'week-1',
@@ -47,7 +47,13 @@ describe('saveAsTemplate use case', () => {
 						],
 					},
 				],
-			}).value!
+			})
+
+			if (!sourceProgramResult.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			const sourceProgram = sourceProgramResult.value
 
 			// Mock successful load and save
 			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
@@ -81,11 +87,14 @@ describe('saveAsTemplate use case', () => {
 
 				// Verify nested structure was cloned
 				expect(template.weeks).toHaveLength(1)
-				expect(template.weeks[0].sessions).toHaveLength(1)
+				const firstWeek = template.weeks[0]
+				if (firstWeek) {
+					expect(firstWeek.sessions).toHaveLength(1)
+					expect(firstWeek.id).not.toBe('week-1')
+				}
 
 				// Verify new IDs were generated (not same as source)
 				expect(template.id).not.toBe(sourceProgramId)
-				expect(template.weeks[0].id).not.toBe('week-1')
 			}
 
 			// Verify repository interactions
@@ -105,8 +114,8 @@ describe('saveAsTemplate use case', () => {
 		})
 	})
 
-	describe('Authorization', () => {
-		it('should return forbidden when user lacks programs:write permission', async () => {
+	describe('[3.27-UNIT] @p0 Authorization', () => {
+		it('[3.27-UNIT-002] @p0 should return forbidden when user lacks programs:write permission', async () => {
 			const ctx = createMemberContext() // Member has no write permission
 
 			const saveAsTemplate = makeSaveAsTemplate({
@@ -123,8 +132,11 @@ describe('saveAsTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('forbidden')
-				expect(result.error.message).toBe('No permission to create templates')
+				const error = result.error
+				expect(error.type).toBe('forbidden')
+				if (error.type === 'forbidden') {
+					expect(error.message).toBe('No permission to create templates')
+				}
 			}
 
 			// Should not call repository
@@ -132,8 +144,8 @@ describe('saveAsTemplate use case', () => {
 		})
 	})
 
-	describe('Error Delegation from duplicate-program', () => {
-		it('should return not_found when source program does not exist', async () => {
+	describe('[3.27-UNIT] @p1 Error Delegation from duplicate-program', () => {
+		it('[3.27-UNIT-003] @p2 should return not_found when source program does not exist', async () => {
 			const ctx = createAdminContext()
 			const nonExistentId = 'non-existent-program'
 
@@ -154,12 +166,15 @@ describe('saveAsTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('not_found')
-				expect(result.error.programId).toBe(nonExistentId)
+				const error = result.error
+				expect(error.type).toBe('not_found')
+				if (error.type === 'not_found') {
+					expect(error.programId).toBe(nonExistentId)
+				}
 			}
 		})
 
-		it('should return validation_error when duplicate-program validation fails', async () => {
+		it('[3.27-UNIT-004] @p1 should return validation_error when duplicate-program validation fails', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'program-2'
 
@@ -173,9 +188,13 @@ describe('saveAsTemplate use case', () => {
 				isTemplate: false,
 				status: 'draft',
 				weeks: [],
-			}).value!
+			})
 
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
+			if (!sourceProgram.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram.value))
 
 			const saveAsTemplate = makeSaveAsTemplate({
 				programRepository: mockProgramRepository,
@@ -192,12 +211,15 @@ describe('saveAsTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('validation_error')
-				expect(result.error.message).toContain('name')
+				const error = result.error
+				expect(error.type).toBe('validation_error')
+				if (error.type === 'validation_error') {
+					expect(error.message).toContain('name')
+				}
 			}
 		})
 
-		it('should return repository_error when duplicate-program repository fails', async () => {
+		it('[3.27-UNIT-005] @p1 should return repository_error when duplicate-program repository fails', async () => {
 			const ctx = createAdminContext()
 			const sourceProgramId = 'program-3'
 
@@ -211,9 +233,13 @@ describe('saveAsTemplate use case', () => {
 				isTemplate: false,
 				status: 'draft',
 				weeks: [],
-			}).value!
+			})
 
-			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram))
+			if (!sourceProgram.isOk()) {
+				throw new Error('Failed to create source program')
+			}
+
+			vi.mocked(mockProgramRepository.loadProgramAggregate).mockReturnValue(okAsync(sourceProgram.value))
 
 			// Mock save failure
 			vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
@@ -234,8 +260,11 @@ describe('saveAsTemplate use case', () => {
 			expect(result.isErr()).toBe(true)
 
 			if (result.isErr()) {
-				expect(result.error.type).toBe('repository_error')
-				expect(result.error.message).toBe('Connection lost')
+				const error = result.error
+				expect(error.type).toBe('repository_error')
+				if (error.type === 'repository_error') {
+					expect(error.message).toBe('Connection lost')
+				}
 			}
 		})
 	})

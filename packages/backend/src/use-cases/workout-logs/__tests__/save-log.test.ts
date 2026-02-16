@@ -25,7 +25,7 @@ describe('saveLog use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should save workout log successfully', async () => {
+    it('[5.1-UNIT-001] @p0 should save workout log successfully', async () => {
       const exercises = [
         {
           id: 'ex-log-1',
@@ -98,7 +98,7 @@ describe('saveLog use case', () => {
       )
     })
 
-    it('should calculate status automatically from exercises', async () => {
+    it('[5.1-UNIT-002] @p1 should calculate status automatically from exercises', async () => {
       const partialExercises = [
         {
           id: 'ex-log-1',
@@ -145,7 +145,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should save log with null sessionRpe and sessionNotes', async () => {
+    it('[5.1-UNIT-003] @p2 should save log with null sessionRpe and sessionNotes', async () => {
       const exercises = [
         {
           id: 'ex-log-1',
@@ -180,7 +180,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should save log with empty exercises array', async () => {
+    it('[5.1-UNIT-004] @p2 should save log with empty exercises array', async () => {
       vi.mocked(mockWorkoutLogRepository.save).mockReturnValue(okAsync(undefined))
 
       const ctx = createTestContext({ organizationId: orgId })
@@ -206,7 +206,7 @@ describe('saveLog use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks workout_log:update permission', async () => {
+    it('[5.2-UNIT-001] @p0 should return forbidden error when user lacks workout_log:update permission', async () => {
       const ctx = createMemberContext()
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -234,7 +234,7 @@ describe('saveLog use case', () => {
   })
 
   describe('Validation Errors', () => {
-    it('should return validation error when domain factory fails', async () => {
+    it('[5.3-UNIT-001] @p1 should return validation error when domain factory fails', async () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -261,7 +261,7 @@ describe('saveLog use case', () => {
       expect(mockWorkoutLogRepository.save).not.toHaveBeenCalled()
     })
 
-    it('should return validation error when athleteId is invalid', async () => {
+    it('[5.3-UNIT-002] @p1 should return validation error when athleteId is invalid', async () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -283,7 +283,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should return validation error when programId is invalid', async () => {
+    it('[5.3-UNIT-003] @p1 should return validation error when programId is invalid', async () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -305,7 +305,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should return validation error when sessionId is invalid', async () => {
+    it('[5.3-UNIT-004] @p1 should return validation error when sessionId is invalid', async () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -327,7 +327,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should return validation error when weekId is invalid', async () => {
+    it('[5.3-UNIT-005] @p1 should return validation error when weekId is invalid', async () => {
       const ctx = createTestContext({ organizationId: orgId })
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
 
@@ -351,7 +351,7 @@ describe('saveLog use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when save fails', async () => {
+    it('[5.4-UNIT-001] @p1 should return repository error when save fails', async () => {
       vi.mocked(mockWorkoutLogRepository.save).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -380,7 +380,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should return repository error when database insert fails', async () => {
+    it('[5.4-UNIT-002] @p1 should return repository error when database insert fails', async () => {
       vi.mocked(mockWorkoutLogRepository.save).mockReturnValue(
         errAsync({
           type: 'DATABASE_ERROR',
@@ -411,7 +411,7 @@ describe('saveLog use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle optional fields correctly', async () => {
+    it('[5.5-UNIT-001] @p2 should handle optional fields correctly', async () => {
       const exercises = [
         {
           id: 'ex-log-1',
@@ -447,7 +447,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should pass through sessionRpe and sessionNotes to domain entity', async () => {
+    it('[5.5-UNIT-002] @p2 should pass through sessionRpe and sessionNotes to domain entity', async () => {
       const exercises = [
         {
           id: 'ex-log-1',
@@ -484,7 +484,7 @@ describe('saveLog use case', () => {
       }
     })
 
-    it('should handle saving log for different organizations', async () => {
+    it('[5.5-UNIT-003] @p2 should handle saving log for different organizations', async () => {
       vi.mocked(mockWorkoutLogRepository.save).mockReturnValue(okAsync(undefined))
 
       const saveLog = makeSaveLog({ workoutLogRepository: mockWorkoutLogRepository })
@@ -523,7 +523,7 @@ describe('saveLog use case', () => {
       expect(mockWorkoutLogRepository.save).toHaveBeenCalledTimes(2)
     })
 
-    it('should return the validated log entity after save', async () => {
+    it('[5.5-UNIT-004] @p3 should return the validated log entity after save', async () => {
       const exercises = [
         {
           id: 'ex-log-1',

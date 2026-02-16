@@ -14,7 +14,7 @@ describe('getLogBySession use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get workout log by session successfully', async () => {
+    it('[5.1-UNIT-001] @p0 should get workout log by session successfully', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const sessionId = 'session-1'
@@ -61,7 +61,7 @@ describe('getLogBySession use case', () => {
       )
     })
 
-    it('should return null when log does not exist', async () => {
+    it('[5.1-UNIT-002] @p1 should return null when log does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const sessionId = 'session-1'
@@ -88,7 +88,7 @@ describe('getLogBySession use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findByAthleteSessionWeek fails', async () => {
+    it('[5.2-UNIT-001] @p1 should return repository error when findByAthleteSessionWeek fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const sessionId = 'session-1'
@@ -125,7 +125,7 @@ describe('getLogBySession use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle querying multiple sessions in sequence', async () => {
+    it('[5.3-UNIT-001] @p2 should handle querying multiple sessions in sequence', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const sessionId1 = 'session-1'

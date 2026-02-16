@@ -5,7 +5,7 @@ import { createExerciseEntity } from '../../../__tests__/factories/exercise-fact
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeArchiveExercise } from '../archive-exercise'
 
-describe('archiveExercise use case', () => {
+describe('[2.3-UNIT] archiveExercise use case', () => {
   let mockExerciseRepository: ExerciseRepositoryPort
 
   beforeEach(() => {
@@ -19,8 +19,8 @@ describe('archiveExercise use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should archive exercise successfully with admin role', async () => {
+  describe('[2.3-UNIT] Happy Path', () => {
+    it('[2.3-UNIT-001] @p0 should archive exercise successfully with admin role', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -57,8 +57,8 @@ describe('archiveExercise use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks exercises:write permission', async () => {
+  describe('[2.3-UNIT] Authorization', () => {
+    it('[2.3-UNIT-002] @p0 should return forbidden error when user lacks exercises:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const exerciseId = 'exercise-1'
 
@@ -87,7 +87,7 @@ describe('archiveExercise use case', () => {
       expect(mockExerciseRepository.archive).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has exercises:write)', async () => {
+    it('[2.3-UNIT-003] @p0 should succeed when user has admin role (has exercises:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const exerciseId = 'exercise-1'
 
@@ -113,8 +113,8 @@ describe('archiveExercise use case', () => {
     })
   })
 
-  describe('Not Found Errors', () => {
-    it('should return not_found error when exercise does not exist', async () => {
+  describe('[2.3-UNIT] Not Found Errors', () => {
+    it('[2.3-UNIT-004] @p1 should return not_found error when exercise does not exist', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'non-existent-exercise'
 
@@ -145,8 +145,8 @@ describe('archiveExercise use case', () => {
     })
   })
 
-  describe('Curated Exercise Protection', () => {
-    it('should return cannot_archive_curated error when trying to archive curated exercise', async () => {
+  describe('[2.3-UNIT] Curated Exercise Protection', () => {
+    it('[2.3-UNIT-005] @p1 should return cannot_archive_curated error when trying to archive curated exercise', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'curated-exercise-1'
 
@@ -183,8 +183,8 @@ describe('archiveExercise use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+  describe('[2.3-UNIT] Repository Errors', () => {
+    it('[2.3-UNIT-006] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 
@@ -216,7 +216,7 @@ describe('archiveExercise use case', () => {
       }
     })
 
-    it('should return repository error when archive fails', async () => {
+    it('[2.3-UNIT-007] @p1 should return repository error when archive fails', async () => {
       const ctx = createAdminContext()
       const exerciseId = 'exercise-1'
 

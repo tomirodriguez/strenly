@@ -6,7 +6,7 @@ import { createAthleteRepositoryMock } from '../../../__tests__/factories/athlet
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeGetAthlete } from '../get-athlete'
 
-describe('getAthlete use case', () => {
+describe('[1.2-UNIT] getAthlete use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('getAthlete use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get athlete successfully with admin role', async () => {
+    it('[1.2-UNIT-001] @p0 should get athlete successfully with admin role', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -49,7 +49,7 @@ describe('getAthlete use case', () => {
       )
     })
 
-    it('should get active athlete', async () => {
+    it('[1.2-UNIT-002] @p0 should get active athlete', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -78,7 +78,7 @@ describe('getAthlete use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return not_found error when athlete does not exist', async () => {
+    it('[1.2-UNIT-003] @p1 should return not_found error when athlete does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'non-existent-athlete'
 
@@ -106,7 +106,7 @@ describe('getAthlete use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findById fails', async () => {
+    it('[1.2-UNIT-004] @p1 should return repository error when findById fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -139,7 +139,7 @@ describe('getAthlete use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle getting multiple athletes in sequence', async () => {
+    it('[1.2-UNIT-005] @p2 should handle getting multiple athletes in sequence', async () => {
       const ctx = createAdminContext()
       const athleteId1 = 'athlete-1'
       const athleteId2 = 'athlete-2'

@@ -6,7 +6,7 @@ import { createExerciseEntity } from '../../../__tests__/factories/exercise-fact
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeUpdateExerciseRow } from '../update-exercise-row'
 
-describe('updateExerciseRow use case', () => {
+describe('[3.29-UNIT] @p2 updateExerciseRow use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   let mockExerciseRepository: ExerciseRepositoryPort
 
@@ -55,8 +55,8 @@ describe('updateExerciseRow use case', () => {
     }
   })
 
-  describe('Happy Path', () => {
-    it('should update single field (exerciseId)', async () => {
+  describe('[3.29-UNIT] @p0 Happy Path', () => {
+    it('[3.29-UNIT-001] @p2 should update single field (exerciseId)', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
       const newExerciseId = 'exercise-2'
@@ -128,7 +128,7 @@ describe('updateExerciseRow use case', () => {
       )
     })
 
-    it('should update multiple fields', async () => {
+    it('[3.29-UNIT-002] @p2 should update multiple fields', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -184,7 +184,7 @@ describe('updateExerciseRow use case', () => {
       }
     })
 
-    it('should update with null values (clearing fields)', async () => {
+    it('[3.29-UNIT-003] @p2 should update with null values (clearing fields)', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -242,7 +242,7 @@ describe('updateExerciseRow use case', () => {
       }
     })
 
-    it('should return exerciseName when exerciseId provided', async () => {
+    it('[3.29-UNIT-004] @p2 should return exerciseName when exerciseId provided', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -289,8 +289,8 @@ describe('updateExerciseRow use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.29-UNIT] @p0 Authorization', () => {
+    it('[3.29-UNIT-005] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const rowId = 'row-1'
 
@@ -321,7 +321,7 @@ describe('updateExerciseRow use case', () => {
       expect(mockProgramRepository.updateExerciseRow).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.29-UNIT-006] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext() // Admin role has write permission
       const rowId = 'row-1'
 
@@ -366,8 +366,8 @@ describe('updateExerciseRow use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return not_found when rowId does not exist', async () => {
+  describe('[3.29-UNIT] @p1 Validation Errors', () => {
+    it('[3.29-UNIT-007] @p2 should return not_found when rowId does not exist', async () => {
       const ctx = createAdminContext()
       const rowId = 'non-existent-row'
 
@@ -399,7 +399,7 @@ describe('updateExerciseRow use case', () => {
       expect(mockProgramRepository.updateExerciseRow).not.toHaveBeenCalled()
     })
 
-    it('should return validation_error for invalid exerciseId', async () => {
+    it('[3.29-UNIT-008] @p1 should return validation_error for invalid exerciseId', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -445,8 +445,8 @@ describe('updateExerciseRow use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when findExerciseRowById fails', async () => {
+  describe('[3.29-UNIT] @p1 Repository Errors', () => {
+    it('[3.29-UNIT-009] @p1 should return repository error when findExerciseRowById fails', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -480,7 +480,7 @@ describe('updateExerciseRow use case', () => {
       }
     })
 
-    it('should return repository error when exercise lookup fails', async () => {
+    it('[3.29-UNIT-010] @p1 should return repository error when exercise lookup fails', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -534,8 +534,8 @@ describe('updateExerciseRow use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should update orderWithinGroup (position change)', async () => {
+  describe('[3.29-UNIT] @p2 Edge Cases', () => {
+    it('[3.29-UNIT-011] @p2 should update orderWithinGroup (position change)', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 
@@ -585,7 +585,7 @@ describe('updateExerciseRow use case', () => {
       }
     })
 
-    it('should return Unknown when exercise not found during lookup', async () => {
+    it('[3.29-UNIT-012] @p1 should return Unknown when exercise not found during lookup', async () => {
       const ctx = createAdminContext()
       const rowId = 'row-1'
 

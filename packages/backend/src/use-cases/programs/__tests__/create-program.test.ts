@@ -7,7 +7,7 @@ import { createProgramInput, createTemplateProgramInput } from '../../../__tests
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeCreateProgram } from '../create-program'
 
-describe('createProgram use case', () => {
+describe('[3.1-UNIT] createProgram use case', () => {
   let mockProgramRepository: ProgramRepositoryPort
   let mockAthleteRepository: AthleteRepositoryPort
   let mockGenerateId: () => string
@@ -34,8 +34,8 @@ describe('createProgram use case', () => {
     mockGenerateId = vi.fn(() => `test-id-${++idCounter}`)
   })
 
-  describe('Happy Path', () => {
-    it('should create program successfully with admin role', async () => {
+  describe('[3.1-UNIT] @p0 Happy Path', () => {
+    it('[3.1-UNIT-001] @p0 should create program successfully with admin role', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const input = createProgramInput({ name: 'Strength Program', athleteId })
@@ -85,7 +85,7 @@ describe('createProgram use case', () => {
       )
     })
 
-    it('should create program with default 4 weeks and 3 sessions', async () => {
+    it('[3.1-UNIT-002] @p0 should create program with default 4 weeks and 3 sessions', async () => {
       const ctx = createAdminContext()
       // Omit weeksCount and sessionsCount to use defaults
       const input = { name: 'Default Program', athleteId: null }
@@ -111,7 +111,7 @@ describe('createProgram use case', () => {
       }
     })
 
-    it('should create program with custom weeks and sessions count', async () => {
+    it('[3.1-UNIT-003] @p1 should create program with custom weeks and sessions count', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({
         name: 'Custom Program',
@@ -141,7 +141,7 @@ describe('createProgram use case', () => {
       }
     })
 
-    it('should create template program without athlete', async () => {
+    it('[3.1-UNIT-004] @p1 should create template program without athlete', async () => {
       const ctx = createAdminContext()
       const input = createTemplateProgramInput({ name: 'Template Program' })
 
@@ -170,8 +170,8 @@ describe('createProgram use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks programs:write permission', async () => {
+  describe('[3.2-UNIT] @p0 Authorization', () => {
+    it('[3.2-UNIT-001] @p0 should return forbidden error when user lacks programs:write permission', async () => {
       const ctx = createMemberContext() // Member role lacks write permission
       const input = createProgramInput()
 
@@ -198,7 +198,7 @@ describe('createProgram use case', () => {
       expect(mockProgramRepository.saveProgramAggregate).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has programs:write)', async () => {
+    it('[3.2-UNIT-002] @p0 should succeed when user has admin role (has programs:write)', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({ athleteId: null })
 
@@ -218,8 +218,8 @@ describe('createProgram use case', () => {
     })
   })
 
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
+  describe('[3.3-UNIT] @p1 Validation Errors', () => {
+    it('[3.3-UNIT-001] @p1 should return validation error when name is empty', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({ name: '', athleteId: null })
 
@@ -246,8 +246,8 @@ describe('createProgram use case', () => {
     })
   })
 
-  describe('Athlete Not Found Errors', () => {
-    it('should return athlete_not_found error when athlete does not exist', async () => {
+  describe('[3.4-UNIT] @p1 Athlete Not Found Errors', () => {
+    it('[3.4-UNIT-001] @p1 should return athlete_not_found error when athlete does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'non-existent-athlete'
       const input = createProgramInput({ athleteId })
@@ -278,8 +278,8 @@ describe('createProgram use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when athlete lookup fails', async () => {
+  describe('[3.5-UNIT] @p2 Repository Errors', () => {
+    it('[3.5-UNIT-001] @p2 should return repository error when athlete lookup fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const input = createProgramInput({ athleteId })
@@ -311,7 +311,7 @@ describe('createProgram use case', () => {
       }
     })
 
-    it('should return repository error when program save fails', async () => {
+    it('[3.5-UNIT-002] @p2 should return repository error when program save fails', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({ athleteId: null })
 
@@ -343,8 +343,8 @@ describe('createProgram use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should generate unique IDs for weeks and sessions', async () => {
+  describe('[3.6-UNIT] @p2 Edge Cases', () => {
+    it('[3.6-UNIT-001] @p2 should generate unique IDs for weeks and sessions', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({
         name: 'Program',
@@ -381,7 +381,7 @@ describe('createProgram use case', () => {
       }
     })
 
-    it('should set correct order indices for weeks and sessions', async () => {
+    it('[3.6-UNIT-002] @p2 should set correct order indices for weeks and sessions', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({
         name: 'Program',
@@ -421,7 +421,7 @@ describe('createProgram use case', () => {
       }
     })
 
-    it('should set default Spanish names for weeks and sessions', async () => {
+    it('[3.6-UNIT-003] @p3 should set default Spanish names for weeks and sessions', async () => {
       const ctx = createAdminContext()
       const input = createProgramInput({
         name: 'Program',

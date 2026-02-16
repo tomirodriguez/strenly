@@ -6,7 +6,7 @@ import { createAthleteRepositoryMock } from '../../../__tests__/factories/athlet
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeListAthletes } from '../list-athletes'
 
-describe('listAthletes use case', () => {
+describe('[1.3-UNIT] listAthletes use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('listAthletes use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should list athletes successfully', async () => {
+    it('[1.3-UNIT-001] @p0 should list athletes successfully', async () => {
       const ctx = createAdminContext()
 
       const athletes = [
@@ -49,7 +49,7 @@ describe('listAthletes use case', () => {
       )
     })
 
-    it('should filter by status', async () => {
+    it('[1.3-UNIT-002] @p2 should filter by status', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
@@ -73,7 +73,7 @@ describe('listAthletes use case', () => {
       )
     })
 
-    it('should apply search filter', async () => {
+    it('[1.3-UNIT-003] @p2 should apply search filter', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
@@ -97,7 +97,7 @@ describe('listAthletes use case', () => {
       )
     })
 
-    it('should apply pagination', async () => {
+    it('[1.3-UNIT-004] @p2 should apply pagination', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
@@ -125,7 +125,7 @@ describe('listAthletes use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findAll fails', async () => {
+    it('[1.3-UNIT-005] @p1 should return repository error when findAll fails', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
@@ -154,7 +154,7 @@ describe('listAthletes use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should return empty list when no athletes exist', async () => {
+    it('[1.3-UNIT-006] @p2 should return empty list when no athletes exist', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockAthleteRepository.findAll).mockReturnValue(

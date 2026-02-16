@@ -5,7 +5,7 @@ import { createInvitationData } from '../../../__tests__/factories/invitation-fa
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeRevokeInvitation } from '../revoke-invitation'
 
-describe('revokeInvitation use case', () => {
+describe('[1.5-UNIT] revokeInvitation use case', () => {
   let mockInvitationRepository: AthleteInvitationRepositoryPort
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('revokeInvitation use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should revoke invitation successfully with admin role', async () => {
+    it('[1.5-UNIT-001] @p0 should revoke invitation successfully with admin role', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -62,7 +62,7 @@ describe('revokeInvitation use case', () => {
       )
     })
 
-    it('should revoke pending invitation', async () => {
+    it('[1.5-UNIT-002] @p0 should revoke pending invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -90,7 +90,7 @@ describe('revokeInvitation use case', () => {
   })
 
   describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
+    it('[1.5-UNIT-003] @p0 should return forbidden error when user lacks athletes:write permission', async () => {
       const ctx = createMemberContext() // Member lacks write permission
       const athleteId = 'athlete-1'
 
@@ -119,7 +119,7 @@ describe('revokeInvitation use case', () => {
       expect(mockInvitationRepository.revoke).not.toHaveBeenCalled()
     })
 
-    it('should succeed when user has admin role (has athletes:write)', async () => {
+    it('[1.5-UNIT-004] @p0 should succeed when user has admin role (has athletes:write)', async () => {
       const ctx = createAdminContext() // Admin has write permission
       const athleteId = 'athlete-1'
 
@@ -145,7 +145,7 @@ describe('revokeInvitation use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return invitation_not_found error when no invitation exists for athlete', async () => {
+    it('[1.5-UNIT-005] @p1 should return invitation_not_found error when no invitation exists for athlete', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-without-invitation'
 
@@ -177,7 +177,7 @@ describe('revokeInvitation use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when findByAthleteId fails', async () => {
+    it('[1.5-UNIT-006] @p1 should return repository error when findByAthleteId fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -209,7 +209,7 @@ describe('revokeInvitation use case', () => {
       }
     })
 
-    it('should return repository error when revoke fails', async () => {
+    it('[1.5-UNIT-007] @p1 should return repository error when revoke fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -250,7 +250,7 @@ describe('revokeInvitation use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle revoking already accepted invitation', async () => {
+    it('[1.5-UNIT-008] @p2 should handle revoking already accepted invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -278,7 +278,7 @@ describe('revokeInvitation use case', () => {
       expect(result.isOk()).toBe(true)
     })
 
-    it('should handle revoking expired invitation', async () => {
+    it('[1.5-UNIT-009] @p2 should handle revoking expired invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 

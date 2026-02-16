@@ -14,7 +14,7 @@ import {
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeGetAthleteInvitation } from '../get-athlete-invitation'
 
-describe('getAthleteInvitation use case', () => {
+describe('[1.8-UNIT] getAthleteInvitation use case', () => {
   let mockAthleteRepository: AthleteRepositoryPort
   let mockInvitationRepository: AthleteInvitationRepositoryPort
 
@@ -24,7 +24,7 @@ describe('getAthleteInvitation use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should get pending invitation successfully', async () => {
+    it('[1.8-UNIT-001] @p0 should get pending invitation successfully', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
       const appUrl = 'https://app.example.com'
@@ -68,7 +68,7 @@ describe('getAthleteInvitation use case', () => {
       )
     })
 
-    it('should get accepted invitation', async () => {
+    it('[1.8-UNIT-002] @p0 should get accepted invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -103,7 +103,7 @@ describe('getAthleteInvitation use case', () => {
       }
     })
 
-    it('should get expired invitation', async () => {
+    it('[1.8-UNIT-003] @p1 should get expired invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -137,7 +137,7 @@ describe('getAthleteInvitation use case', () => {
       }
     })
 
-    it('should get revoked invitation', async () => {
+    it('[1.8-UNIT-004] @p1 should get revoked invitation', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -173,7 +173,7 @@ describe('getAthleteInvitation use case', () => {
   })
 
   describe('Not Found Errors', () => {
-    it('should return athlete_not_found error when athlete does not exist', async () => {
+    it('[1.8-UNIT-005] @p1 should return athlete_not_found error when athlete does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'non-existent-athlete'
 
@@ -203,7 +203,7 @@ describe('getAthleteInvitation use case', () => {
       expect(mockInvitationRepository.findByAthleteId).not.toHaveBeenCalled()
     })
 
-    it('should return no_invitation error when invitation does not exist', async () => {
+    it('[1.8-UNIT-006] @p1 should return no_invitation error when invitation does not exist', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -239,7 +239,7 @@ describe('getAthleteInvitation use case', () => {
   })
 
   describe('Repository Errors', () => {
-    it('should return repository error when athlete findById fails', async () => {
+    it('[1.8-UNIT-007] @p1 should return repository error when athlete findById fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -272,7 +272,7 @@ describe('getAthleteInvitation use case', () => {
       }
     })
 
-    it('should return repository error when invitation findByAthleteId fails', async () => {
+    it('[1.8-UNIT-008] @p1 should return repository error when invitation findByAthleteId fails', async () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
@@ -313,7 +313,7 @@ describe('getAthleteInvitation use case', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle getting invitations for multiple athletes', async () => {
+    it('[1.8-UNIT-009] @p2 should handle getting invitations for multiple athletes', async () => {
       const ctx = createAdminContext()
       const athleteId1 = 'athlete-1'
       const athleteId2 = 'athlete-2'

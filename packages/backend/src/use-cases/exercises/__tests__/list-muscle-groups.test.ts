@@ -5,31 +5,31 @@ import { createMuscleGroupRepositoryMock } from '../../../__tests__/factories/mu
 import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
 import { makeListMuscleGroups } from '../list-muscle-groups'
 
-describe('listMuscleGroups use case', () => {
+describe('[2.7-UNIT] listMuscleGroups use case', () => {
   let mockMuscleGroupRepository: MuscleGroupRepositoryPort
 
   beforeEach(() => {
     mockMuscleGroupRepository = createMuscleGroupRepositoryMock()
   })
 
-  describe('Happy Path', () => {
-    it('should list muscle groups successfully with member role', async () => {
+  describe('[2.7-UNIT] Happy Path', () => {
+    it('[2.7-UNIT-001] @p0 should list muscle groups successfully with member role', async () => {
       const ctx = createMemberContext() // Member has read permission
 
       const muscleGroups = [
-        { id: 'chest', name: 'chest', displayName: 'Chest', bodyRegion: 'upper' as const },
-        { id: 'back', name: 'back', displayName: 'Back', bodyRegion: 'upper' as const },
-        { id: 'shoulders', name: 'shoulders', displayName: 'Shoulders', bodyRegion: 'upper' as const },
-        { id: 'biceps', name: 'biceps', displayName: 'Biceps', bodyRegion: 'upper' as const },
-        { id: 'triceps', name: 'triceps', displayName: 'Triceps', bodyRegion: 'upper' as const },
-        { id: 'quads', name: 'quads', displayName: 'Quadriceps', bodyRegion: 'lower' as const },
-        { id: 'hamstrings', name: 'hamstrings', displayName: 'Hamstrings', bodyRegion: 'lower' as const },
-        { id: 'glutes', name: 'glutes', displayName: 'Glutes', bodyRegion: 'lower' as const },
-        { id: 'core', name: 'core', displayName: 'Core', bodyRegion: 'core' as const },
-        { id: 'calves', name: 'calves', displayName: 'Calves', bodyRegion: 'lower' as const },
+        { id: 'chest', name: 'chest' as const, displayName: 'Chest', bodyRegion: 'upper' as const },
+        { id: 'back', name: 'back' as const, displayName: 'Back', bodyRegion: 'upper' as const },
+        { id: 'shoulders', name: 'shoulders' as const, displayName: 'Shoulders', bodyRegion: 'upper' as const },
+        { id: 'biceps', name: 'biceps' as const, displayName: 'Biceps', bodyRegion: 'upper' as const },
+        { id: 'triceps', name: 'triceps' as const, displayName: 'Triceps', bodyRegion: 'upper' as const },
+        { id: 'quads', name: 'quads' as const, displayName: 'Quadriceps', bodyRegion: 'lower' as const },
+        { id: 'hamstrings', name: 'hamstrings' as const, displayName: 'Hamstrings', bodyRegion: 'lower' as const },
+        { id: 'glutes', name: 'glutes' as const, displayName: 'Glutes', bodyRegion: 'lower' as const },
+        { id: 'core', name: 'core' as const, displayName: 'Core', bodyRegion: 'core' as const },
+        { id: 'calves', name: 'calves' as const, displayName: 'Calves', bodyRegion: 'lower' as const },
       ]
 
-      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups ))
+      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups))
 
       const listMuscleGroups = makeListMuscleGroups({
         muscleGroupRepository: mockMuscleGroupRepository,
@@ -54,14 +54,14 @@ describe('listMuscleGroups use case', () => {
       expect(mockMuscleGroupRepository.findAll).toHaveBeenCalledTimes(1)
     })
 
-    it('should succeed with admin role', async () => {
+    it('[2.7-UNIT-002] @p0 should succeed with admin role', async () => {
       const ctx = createAdminContext()
 
       const muscleGroups = [
-        { id: 'chest', name: 'chest', displayName: 'Chest', bodyRegion: 'upper' as const },
+        { id: 'chest', name: 'chest' as const, displayName: 'Chest', bodyRegion: 'upper' as const },
       ]
 
-      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups ))
+      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups))
 
       const listMuscleGroups = makeListMuscleGroups({
         muscleGroupRepository: mockMuscleGroupRepository,
@@ -77,8 +77,8 @@ describe('listMuscleGroups use case', () => {
     })
   })
 
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
+  describe('[2.7-UNIT] Repository Errors', () => {
+    it('[2.7-UNIT-003] @p1 should return repository error when database fails', async () => {
       const ctx = createAdminContext()
 
       // Mock repository failure
@@ -107,8 +107,8 @@ describe('listMuscleGroups use case', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should return empty list when no muscle groups exist', async () => {
+  describe('[2.7-UNIT] Edge Cases', () => {
+    it('[2.7-UNIT-004] @p2 should return empty list when no muscle groups exist', async () => {
       const ctx = createAdminContext()
 
       vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync([]))
@@ -126,19 +126,19 @@ describe('listMuscleGroups use case', () => {
       }
     })
 
-    it('should handle muscle groups with all fields populated', async () => {
+    it('[2.7-UNIT-005] @p2 should handle muscle groups with all fields populated', async () => {
       const ctx = createAdminContext()
 
       const muscleGroups = [
         {
           id: 'chest',
-          name: 'chest',
+          name: 'chest' as const,
           displayName: 'Chest',
           bodyRegion: 'upper' as const,
         },
       ]
 
-      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups ))
+      vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups))
 
       const listMuscleGroups = makeListMuscleGroups({
         muscleGroupRepository: mockMuscleGroupRepository,

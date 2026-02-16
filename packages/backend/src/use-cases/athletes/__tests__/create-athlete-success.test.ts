@@ -1,11 +1,11 @@
 import type { AthleteRepositoryPort } from '@strenly/core/ports/athlete-repository.port'
-import { errAsync, okAsync } from 'neverthrow'
+import { okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAthleteEntity, createAthleteInput } from '../../../__tests__/factories/athlete-factory'
-import { createAdminContext, createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext, createTestContext } from '../../../__tests__/helpers/test-context'
 import { makeCreateAthlete } from '../create-athlete'
 
-describe('createAthlete use case', () => {
+describe('[1.11-UNIT] createAthlete use case - Success Cases', () => {
   let mockAthleteRepository: AthleteRepositoryPort
   let mockGenerateId: () => string
 
@@ -25,7 +25,7 @@ describe('createAthlete use case', () => {
   })
 
   describe('Happy Path', () => {
-    it('should create athlete successfully with owner role', async () => {
+    it('[1.11-UNIT-001] @p0 should create athlete successfully with owner role', async () => {
       const ctx = createTestContext({ memberRole: 'owner' })
       const input = createAthleteInput({ name: 'John Doe', email: 'john@example.com' })
 
@@ -75,7 +75,7 @@ describe('createAthlete use case', () => {
       )
     })
 
-    it('should create athlete with minimal required fields', async () => {
+    it('[1.11-UNIT-002] @p0 should create athlete with minimal required fields', async () => {
       const ctx = createAdminContext()
       const input = { name: 'Jane Doe' } // Only required field
 
@@ -108,143 +108,8 @@ describe('createAthlete use case', () => {
     })
   })
 
-  describe('Authorization', () => {
-    it('should return forbidden error when user lacks athletes:write permission', async () => {
-      const ctx = createMemberContext() // Viewer role lacks write permission
-      const input = createAthleteInput()
-
-      const createAthlete = makeCreateAthlete({
-        athleteRepository: mockAthleteRepository,
-        generateId: mockGenerateId,
-      })
-
-      const result = await createAthlete({ ...ctx, ...input })
-
-      // Assert authorization failure
-      expect(result.isErr()).toBe(true)
-
-      if (result.isErr()) {
-        const error = result.error
-        expect(error.type).toBe('forbidden')
-        if (error.type === 'forbidden') {
-          expect(error.message).toContain('No permission')
-        }
-      }
-
-      // Repository should NOT be called
-      expect(mockAthleteRepository.create).not.toHaveBeenCalled()
-    })
-
-    it('should succeed when user has coach role (has athletes:write)', async () => {
-      const ctx = createAdminContext() // Coach role has write permission
-      const input = createAthleteInput()
-
-      const athlete = createAthleteEntity({
-        id: 'test-athlete-id',
-        organizationId: ctx.organizationId,
-        name: input.name,
-        email: input.email,
-        phone: input.phone,
-        birthdate: input.birthdate,
-        gender: input.gender,
-        notes: input.notes,
-      })
-      vi.mocked(mockAthleteRepository.create).mockReturnValue(okAsync(athlete))
-
-      const createAthlete = makeCreateAthlete({
-        athleteRepository: mockAthleteRepository,
-        generateId: mockGenerateId,
-      })
-
-      const result = await createAthlete({ ...ctx, ...input })
-
-      expect(result.isOk()).toBe(true)
-    })
-  })
-
-  describe('Validation Errors', () => {
-    it('should return validation error when name is empty', async () => {
-      const ctx = createAdminContext()
-      const input = createAthleteInput({ name: '' }) // Invalid: empty name
-
-      const createAthlete = makeCreateAthlete({
-        athleteRepository: mockAthleteRepository,
-        generateId: mockGenerateId,
-      })
-
-      const result = await createAthlete({ ...ctx, ...input })
-
-      expect(result.isErr()).toBe(true)
-
-      if (result.isErr()) {
-        const error = result.error
-        expect(error.type).toBe('validation_error')
-        if (error.type === 'validation_error') {
-          expect(error.message).toContain('Name')
-        }
-      }
-
-      // Repository should NOT be called for invalid input
-      expect(mockAthleteRepository.create).not.toHaveBeenCalled()
-    })
-
-    it('should return validation error for malformed email', async () => {
-      const ctx = createAdminContext()
-      const input = createAthleteInput({ email: 'invalid-email' })
-
-      const createAthlete = makeCreateAthlete({
-        athleteRepository: mockAthleteRepository,
-        generateId: mockGenerateId,
-      })
-
-      const result = await createAthlete({ ...ctx, ...input })
-
-      expect(result.isErr()).toBe(true)
-
-      if (result.isErr()) {
-        const error = result.error
-        expect(error.type).toBe('validation_error')
-        if (error.type === 'validation_error') {
-          expect(error.message.toLowerCase()).toContain('email')
-        }
-      }
-    })
-  })
-
-  describe('Repository Errors', () => {
-    it('should return repository error when database fails', async () => {
-      const ctx = createAdminContext()
-      const input = createAthleteInput()
-
-      // Mock repository failure
-      vi.mocked(mockAthleteRepository.create).mockReturnValue(
-        errAsync({
-          type: 'DATABASE_ERROR',
-          message: 'Connection failed',
-        }),
-      )
-
-      const createAthlete = makeCreateAthlete({
-        athleteRepository: mockAthleteRepository,
-        generateId: mockGenerateId,
-      })
-
-      const result = await createAthlete({ ...ctx, ...input })
-
-      expect(result.isErr()).toBe(true)
-
-      if (result.isErr()) {
-        const error = result.error
-        expect(error.type).toBe('repository_error')
-        if (error.type === 'repository_error') {
-          expect(error.message).toContain('Connection failed')
-        }
-      }
-    })
-  })
-
   describe('Edge Cases', () => {
-    it('should handle null optional fields correctly', async () => {
+    it('[1.11-UNIT-003] @p2 should handle null optional fields correctly', async () => {
       const ctx = createAdminContext()
       const input = createAthleteInput({
         email: null,
@@ -283,7 +148,7 @@ describe('createAthlete use case', () => {
       }
     })
 
-    it('should create multiple athletes with unique IDs in parallel', async () => {
+    it('[1.11-UNIT-004] @p2 should create multiple athletes with unique IDs in parallel', async () => {
       const ctx = createAdminContext()
       let idCounter = 0
       const generateUniqueId = vi.fn(() => `athlete-${++idCounter}`)
