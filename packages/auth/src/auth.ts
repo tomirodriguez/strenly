@@ -10,13 +10,13 @@ import { organization } from 'better-auth/plugins'
 
 /**
  * Environment bindings required for Better Auth
- * These come from Cloudflare Workers environment
+ * These come from environment variables (Workers or Node.js)
  */
 export type AuthEnv = {
   BETTER_AUTH_SECRET: string
   BETTER_AUTH_URL: string
-  GOOGLE_CLIENT_ID: string
-  GOOGLE_CLIENT_SECRET: string
+  GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_SECRET?: string
   ENVIRONMENT?: 'development' | 'production' | 'test'
 }
 
@@ -55,13 +55,13 @@ export function createAuth(env: AuthEnv, db: DB) {
       // Note: On Cloudflare Workers free tier, scrypt may exceed CPU limit
       // Consider paid tier or Email OTP alternative
     },
-    socialProviders: {
+    socialProviders: env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
         prompt: 'select_account', // Always show account picker
       },
-    },
+    } : undefined,
     session: {
       cookieCache: {
         enabled: true,

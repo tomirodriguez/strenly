@@ -13,9 +13,7 @@
     "format": "pnpm biome format --write src",
     "lint": "pnpm biome check --write src",
     "lint:fix": "pnpm biome check --write --unsafe src",
-    "typecheck": "tsc --noEmit",
-    "dev": "wrangler dev --env local",
-    "deploy": "wrangler deploy"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@orpc/server": "^1.4.3",
@@ -23,6 +21,7 @@
     "@strenly/contracts": "workspace:^",
     "@strenly/core": "workspace:^",
     "@strenly/database": "workspace:^",
+    "@t3-oss/env-core": "^0.11.1",
     "drizzle-orm": "^0.44.7",
     "hono": "^4.7.5",
     "neverthrow": "^8.2.0",

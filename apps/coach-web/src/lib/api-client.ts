@@ -2,9 +2,10 @@ import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
 import { createORPCReactQueryUtils } from '@orpc/react-query'
 import type { Router, RouterClient } from '@strenly/backend'
+import { env } from '../env'
 
-// API base URL from environment variable
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8787'
+// API base URL from validated environment variable
+const API_URL = env.VITE_API_URL
 
 /**
  * Store for the current organization slug.

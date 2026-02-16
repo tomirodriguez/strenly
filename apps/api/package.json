@@ -2,14 +2,18 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "dev": "dotenv -e .env -- tsx watch src/server.ts",
+    "build": "tsc --project tsconfig.railway.json",
+    "start": "node dist/server.js"
   },
   "dependencies": {
-    "@strenly/backend": "workspace:^"
+    "@strenly/backend": "workspace:^",
+    "@hono/node-server": "^1.14.0"
   },
   "devDependencies": {
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.8.3",
+    "dotenv-cli": "^8.0.0"
   }
 }
