@@ -3,8 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "dotenv -e .env -- tsx watch src/server.ts",
-    "build": "tsc --project tsconfig.railway.json",
-    "start": "node dist/server.js"
+    "build": "echo 'No build needed - using tsx in production'",
+    "start": "dotenv -e .env -- tsx src/server.ts"
   },
   "dependencies": {
     "@strenly/backend": "workspace:^",
