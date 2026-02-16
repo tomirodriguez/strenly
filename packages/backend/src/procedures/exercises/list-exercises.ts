@@ -1,4 +1,4 @@
-import { listExercisesInputSchema, listExercisesOutputSchema } from '@strenly/contracts/exercises/exercise'
+import { listExercisesOutputSchema, listExercisesQuerySchema } from '@strenly/contracts/exercises/exercise'
 import { createExerciseRepository } from '../../infrastructure/repositories/exercise.repository'
 import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
@@ -13,7 +13,7 @@ export const listExercises = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to list exercises' },
   })
-  .input(listExercisesInputSchema)
+  .input(listExercisesQuerySchema)
   .output(listExercisesOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const listExercisesUseCase = makeListExercises({

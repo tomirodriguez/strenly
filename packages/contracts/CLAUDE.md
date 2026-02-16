@@ -36,7 +36,9 @@ src/
 // Input schemas (what procedures receive)
 export const createAthleteInputSchema = z.object({ ... })
 export const updateAthleteInputSchema = z.object({ ... })
-export const listAthletesInputSchema = z.object({ ... })
+
+// Query schemas (list/filter parameters)
+export const listAthletesQuerySchema = z.object({ ... })
 
 // Output schemas (what procedures return)
 export const athleteOutputSchema = z.object({ ... })

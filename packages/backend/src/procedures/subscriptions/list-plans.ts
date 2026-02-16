@@ -1,4 +1,4 @@
-import { listPlansInputSchema, listPlansOutputSchema } from '@strenly/contracts/subscriptions/plan'
+import { listPlansOutputSchema, listPlansQuerySchema } from '@strenly/contracts/subscriptions/plan'
 import { createPlanRepository } from '../../infrastructure/repositories/plan.repository'
 import { logger } from '../../lib/logger'
 import { publicProcedure } from '../../lib/orpc'
@@ -13,7 +13,7 @@ export const listPlans = publicProcedure
   .errors({
     INTERNAL_ERROR: { message: 'Failed to load subscription plans' },
   })
-  .input(listPlansInputSchema)
+  .input(listPlansQuerySchema)
   .output(listPlansOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const listPlansUseCase = makeListPlans({

@@ -370,7 +370,7 @@ export type GetProgramInput = z.infer<typeof getProgramInputSchema>
  * List programs input schema
  * Uses common pagination with domain-specific filters
  */
-export const listProgramsInputSchema = paginationQuerySchema
+export const listProgramsQuerySchema = paginationQuerySchema
   .extend({
     athleteId: z.string().optional(),
     isTemplate: z.boolean().optional(),
@@ -379,7 +379,7 @@ export const listProgramsInputSchema = paginationQuerySchema
   })
   .partial()
 
-export type ListProgramsInput = z.infer<typeof listProgramsInputSchema>
+export type ListProgramsQuery = z.infer<typeof listProgramsQuerySchema>
 
 /**
  * List programs output schema

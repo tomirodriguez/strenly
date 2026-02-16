@@ -111,14 +111,14 @@ export { successOutputSchema as archiveAthleteOutputSchema } from '../common/suc
  * List athletes input schema
  * Uses common pagination schema with domain-specific filters
  */
-export const listAthletesInputSchema = paginationQuerySchema
+export const listAthletesQuerySchema = paginationQuerySchema
   .extend({
     status: athleteStatusSchema.optional(),
     search: z.string().optional(),
   })
   .partial() // Make limit/offset optional (use defaults)
 
-export type ListAthletesInput = z.infer<typeof listAthletesInputSchema>
+export type ListAthletesQuery = z.infer<typeof listAthletesQuerySchema>
 
 /**
  * List athletes output schema

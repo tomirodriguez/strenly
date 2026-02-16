@@ -1,4 +1,4 @@
-import type { ListAthletesInput } from '@strenly/contracts/athletes/athlete'
+import type { ListAthletesQuery } from '@strenly/contracts/athletes/athlete'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
@@ -7,6 +7,6 @@ import { orpc } from '@/lib/api-client'
  * @param input - Filter and pagination parameters
  * @returns Query result with athletes list and total count
  */
-export function useAthletes(input: ListAthletesInput) {
+export function useAthletes(input: ListAthletesQuery) {
   return useQuery(orpc.athletes.list.queryOptions({ input }))
 }

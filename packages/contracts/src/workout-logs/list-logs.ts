@@ -16,7 +16,7 @@ import { logStatusSchema, workoutLogAggregateSchema } from './workout-log'
  * Input for listing workout logs by athlete with filters and pagination.
  * Uses common pagination schema with domain-specific filters.
  */
-export const listAthleteLogsInputSchema = paginationQuerySchema
+export const listAthleteLogsQuerySchema = paginationQuerySchema
   .extend({
     athleteId: z.string().min(1, 'ID de atleta requerido'),
     status: logStatusSchema.optional(),
@@ -26,7 +26,7 @@ export const listAthleteLogsInputSchema = paginationQuerySchema
   .partial()
   .required({ athleteId: true }) // athleteId is required
 
-export type ListAthleteLogsInput = z.infer<typeof listAthleteLogsInputSchema>
+export type ListAthleteLogsQuery = z.infer<typeof listAthleteLogsQuerySchema>
 
 /**
  * Output for listing workout logs - paginated list.
@@ -67,9 +67,9 @@ export type PendingWorkout = z.infer<typeof pendingWorkoutSchema>
  * Input for listing pending workouts with pagination.
  * Uses common pagination schema.
  */
-export const listPendingWorkoutsInputSchema = paginationQuerySchema.partial()
+export const listPendingWorkoutsQuerySchema = paginationQuerySchema.partial()
 
-export type ListPendingWorkoutsInput = z.infer<typeof listPendingWorkoutsInputSchema>
+export type ListPendingWorkoutsQuery = z.infer<typeof listPendingWorkoutsQuerySchema>
 
 /**
  * Output for listing pending workouts - paginated list.

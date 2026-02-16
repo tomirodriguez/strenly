@@ -1,4 +1,4 @@
-import type { ListProgramsInput } from '@strenly/contracts/programs/program'
+import type { ListProgramsQuery } from '@strenly/contracts/programs/program'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
@@ -7,6 +7,6 @@ import { orpc } from '@/lib/api-client'
  * @param input - Filter and pagination parameters
  * @returns Query result with programs list and total count
  */
-export function usePrograms(input?: ListProgramsInput) {
+export function usePrograms(input?: ListProgramsQuery) {
   return useQuery(orpc.programs.list.queryOptions({ input: input ?? {} }))
 }

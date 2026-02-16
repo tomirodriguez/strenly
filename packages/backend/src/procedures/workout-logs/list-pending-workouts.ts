@@ -1,6 +1,6 @@
 import {
-  listPendingWorkoutsInputSchema,
   listPendingWorkoutsOutputSchema,
+  listPendingWorkoutsQuerySchema,
 } from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
 import { logger } from '../../lib/logger'
@@ -16,7 +16,7 @@ export const listPendingWorkouts = authProcedure
     FORBIDDEN: { message: 'No permission to view workout logs' },
     INTERNAL_ERROR: { message: 'Internal server error' },
   })
-  .input(listPendingWorkoutsInputSchema)
+  .input(listPendingWorkoutsQuerySchema)
   .output(listPendingWorkoutsOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeListPendingWorkouts({

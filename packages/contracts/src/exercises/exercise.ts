@@ -67,7 +67,7 @@ export type UpdateExerciseInput = z.infer<typeof updateExerciseInputSchema>
  * List exercises input schema
  * Uses common pagination with domain-specific filters
  */
-export const listExercisesInputSchema = paginationQuerySchema
+export const listExercisesQuerySchema = paginationQuerySchema
   .extend({
     movementPattern: movementPatternSchema.optional(),
     muscleGroup: muscleGroupSchema.optional(),
@@ -76,7 +76,7 @@ export const listExercisesInputSchema = paginationQuerySchema
   })
   .partial()
 
-export type ListExercisesInput = z.infer<typeof listExercisesInputSchema>
+export type ListExercisesQuery = z.infer<typeof listExercisesQuerySchema>
 
 /**
  * List exercises output schema - paginated response

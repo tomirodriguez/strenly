@@ -1,8 +1,8 @@
 import { programAggregateSchema } from '@strenly/contracts/programs/program'
 import {
   createFromTemplateInputSchema,
-  listTemplatesInputSchema,
   listTemplatesOutputSchema,
+  listTemplatesQuerySchema,
   saveAsTemplateInputSchema,
 } from '@strenly/contracts/programs/template'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
@@ -132,7 +132,7 @@ export const listTemplatesProcedure = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to list templates' },
   })
-  .input(listTemplatesInputSchema)
+  .input(listTemplatesQuerySchema)
   .output(listTemplatesOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const listProgramsUseCase = makeListPrograms({

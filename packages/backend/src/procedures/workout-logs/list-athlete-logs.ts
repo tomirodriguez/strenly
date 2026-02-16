@@ -1,4 +1,4 @@
-import { listAthleteLogsInputSchema, listAthleteLogsOutputSchema } from '@strenly/contracts/workout-logs/list-logs'
+import { listAthleteLogsOutputSchema, listAthleteLogsQuerySchema } from '@strenly/contracts/workout-logs/list-logs'
 import { createWorkoutLogRepository } from '../../infrastructure/repositories/workout-log.repository'
 import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
@@ -13,7 +13,7 @@ export const listAthleteLogs = authProcedure
     FORBIDDEN: { message: 'No permission to view workout logs' },
     INTERNAL_ERROR: { message: 'Internal server error' },
   })
-  .input(listAthleteLogsInputSchema)
+  .input(listAthleteLogsQuerySchema)
   .output(listAthleteLogsOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const useCase = makeListAthleteLogs({

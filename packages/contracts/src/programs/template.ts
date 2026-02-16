@@ -37,13 +37,13 @@ export type CreateFromTemplateInput = z.infer<typeof createFromTemplateInputSche
  * List templates input schema - filters for templates only
  * Uses common pagination schema
  */
-export const listTemplatesInputSchema = paginationQuerySchema
+export const listTemplatesQuerySchema = paginationQuerySchema
   .extend({
     search: z.string().optional(),
   })
   .partial()
 
-export type ListTemplatesInput = z.infer<typeof listTemplatesInputSchema>
+export type ListTemplatesQuery = z.infer<typeof listTemplatesQuerySchema>
 
 // ============================================================================
 // Template Output Schemas

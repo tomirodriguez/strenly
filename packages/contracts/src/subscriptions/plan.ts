@@ -47,13 +47,13 @@ export type Plan = z.infer<typeof planSchema>
  * List plans input schema
  * Public endpoint - optional organization type filter
  */
-export const listPlansInputSchema = z
+export const listPlansQuerySchema = z
   .object({
     organizationType: organizationTypeSchema.optional(),
   })
   .optional()
 
-export type ListPlansInput = z.infer<typeof listPlansInputSchema>
+export type ListPlansQuery = z.infer<typeof listPlansQuerySchema>
 
 /**
  * List plans output schema

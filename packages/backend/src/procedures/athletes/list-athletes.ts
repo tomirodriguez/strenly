@@ -1,4 +1,4 @@
-import { listAthletesInputSchema, listAthletesOutputSchema } from '@strenly/contracts/athletes/athlete'
+import { listAthletesOutputSchema, listAthletesQuerySchema } from '@strenly/contracts/athletes/athlete'
 import { createAthleteRepository } from '../../infrastructure/repositories/athlete.repository'
 import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
@@ -11,7 +11,7 @@ import { mapAthleteToOutput } from './map-athlete-to-output'
  * Supports filtering by status, search, and pagination
  */
 export const listAthletes = authProcedure
-  .input(listAthletesInputSchema)
+  .input(listAthletesQuerySchema)
   .output(listAthletesOutputSchema)
   .errors({
     FORBIDDEN: { message: 'No permission to view athletes' },

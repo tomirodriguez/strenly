@@ -1,4 +1,4 @@
-import type { ListTemplatesInput } from '@strenly/contracts/programs/template'
+import type { ListTemplatesQuery } from '@strenly/contracts/programs/template'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '@/lib/api-client'
 
@@ -7,6 +7,6 @@ import { orpc } from '@/lib/api-client'
  * @param input - Filter and pagination parameters
  * @returns Query result with templates list and total count
  */
-export function useTemplates(input?: ListTemplatesInput) {
+export function useTemplates(input?: ListTemplatesQuery) {
   return useQuery(orpc.programs.templates.list.queryOptions({ input: input ?? {} }))
 }

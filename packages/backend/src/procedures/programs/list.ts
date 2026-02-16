@@ -1,4 +1,4 @@
-import { listProgramsInputSchema, listProgramsOutputSchema } from '@strenly/contracts/programs/program'
+import { listProgramsOutputSchema, listProgramsQuerySchema } from '@strenly/contracts/programs/program'
 import { createProgramRepository } from '../../infrastructure/repositories/program.repository'
 import { logger } from '../../lib/logger'
 import { authProcedure } from '../../lib/orpc'
@@ -13,7 +13,7 @@ export const listPrograms = authProcedure
   .errors({
     FORBIDDEN: { message: 'No permission to list programs' },
   })
-  .input(listProgramsInputSchema)
+  .input(listProgramsQuerySchema)
   .output(listProgramsOutputSchema)
   .handler(async ({ input, context, errors }) => {
     const listProgramsUseCase = makeListPrograms({
