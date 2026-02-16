@@ -2,14 +2,10 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { FieldSeparator } from '@/components/ui/field'
-import { authClient, isGoogleOAuthEnabled } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client'
 
 export function OAuthButtons() {
   const [isLoading, setIsLoading] = useState(false)
-
-  if (!isGoogleOAuthEnabled) {
-    return null
-  }
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
