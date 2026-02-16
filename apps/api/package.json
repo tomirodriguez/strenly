@@ -3,8 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "dotenv -e .env -- tsx watch src/server.ts",
-    "build": "echo 'No build needed - using tsx in production'",
-    "start": "dotenv -e .env -- tsx src/server.ts"
+    "build": "tsup",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@strenly/backend": "workspace:^",
@@ -14,6 +14,7 @@
     "wrangler": "^4.4.0",
     "tsx": "^4.19.2",
     "typescript": "~5.8.3",
-    "dotenv-cli": "^8.0.0"
+    "dotenv-cli": "^8.0.0",
+    "tsup": "^8.5.1"
   }
 }
