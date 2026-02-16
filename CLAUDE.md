@@ -154,7 +154,7 @@ Run `/orpc-query` skill for API hooks, `/form` skill for forms, `/data-table` sk
 9. **Maintain 90%+ test coverage on `packages/core`** — domain entities must have comprehensive tests
 
 ### MUST NOT
-1. No `as` type casting - fix the actual type issue. Only allowed in tests.
+1. **No `as` type casting** - fix the actual type issue, use Zod validation. Exceptions: `as const` is allowed, and `as T` is allowed when calling `Array<T>.includes(value as T)` where `value` is a `string` being checked against a typed array (TypeScript requires the cast even though `.includes()` handles the comparison safely)
 2. No `!` non-null assertion - use optional chaining or guards
 3. No barrel files (`index.ts` re-exports) - exceptions:
    - `procedures/router.ts` (main router aggregation)
