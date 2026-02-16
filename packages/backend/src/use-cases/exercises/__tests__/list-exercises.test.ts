@@ -1,0 +1,201 @@
+import type { ExerciseRepositoryPort } from '@strenly/core/ports/exercise-repository.port'
+import { errAsync, okAsync } from 'neverthrow'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createExerciseEntity } from '../../../__tests__/factories/exercise-factory'
+import { createExerciseRepositoryMock } from '../../../__tests__/factories/exercise-repository-mock'
+import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { makeListExercises } from '../list-exercises'
+
+describe('listExercises use case', () => {
+  let mockExerciseRepository: ExerciseRepositoryPort
+
+  beforeEach(() => {
+    mockExerciseRepository = createExerciseRepositoryMock()
+  })
+
+  describe('Happy Path', () => {
+    it('should list exercises successfully', async () => {
+      const ctx = createAdminContext()
+
+      const exercises = [
+        createExerciseEntity({ id: 'exercise-1', organizationId: ctx.organizationId }),
+        createExerciseEntity({ id: 'exercise-2', organizationId: ctx.organizationId }),
+      ]
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: exercises, totalCount: 2 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      const result = await listExercises(ctx)
+
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.items).toHaveLength(2)
+        expect(result.value.totalCount).toBe(2)
+      }
+
+      expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId: ctx.organizationId,
+        }),
+        expect.objectContaining({
+          limit: 10,
+          offset: 0,
+        }),
+      )
+    })
+
+    it('should filter by movement pattern', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: [], totalCount: 0 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      await listExercises({
+        ...ctx,
+        movementPattern: 'squat',
+      })
+
+      expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          movementPattern: 'squat',
+        }),
+      )
+    })
+
+    it('should filter by muscle group', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: [], totalCount: 0 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      await listExercises({
+        ...ctx,
+        muscleGroup: 'quads',
+      })
+
+      expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          muscleGroup: 'quads',
+        }),
+      )
+    })
+
+    it('should apply search filter', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: [], totalCount: 0 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      await listExercises({
+        ...ctx,
+        search: 'squat',
+      })
+
+      expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          search: 'squat',
+        }),
+      )
+    })
+
+    it('should apply pagination', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: [], totalCount: 0 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      await listExercises({
+        ...ctx,
+        limit: 20,
+        offset: 10,
+      })
+
+      expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          limit: 20,
+          offset: 10,
+        }),
+      )
+    })
+  })
+
+  describe('Repository Errors', () => {
+    it('should return repository error when findAll fails', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        errAsync({
+          type: 'DATABASE_ERROR',
+          message: 'Query failed',
+        }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      const result = await listExercises(ctx)
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        const error = result.error
+        expect(error.type).toBe('repository_error')
+        if (error.type === 'repository_error') {
+          expect(error.message).toContain('Query failed')
+        }
+      }
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should return empty list when no exercises exist', async () => {
+      const ctx = createAdminContext()
+
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
+        okAsync({ items: [], totalCount: 0 }),
+      )
+
+      const listExercises = makeListExercises({
+        exerciseRepository: mockExerciseRepository,
+      })
+
+      const result = await listExercises(ctx)
+
+      expect(result.isOk()).toBe(true)
+      if (result.isOk()) {
+        expect(result.value.items).toHaveLength(0)
+        expect(result.value.totalCount).toBe(0)
+      }
+    })
+  })
+})
