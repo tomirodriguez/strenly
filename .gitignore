@@ -27,4 +27,9 @@ drizzle/
 coverage/
 .playwright-mcp/
 
+# Playwright E2E
+playwright-storage/
+playwright-report/
+test-results/
+
 templates

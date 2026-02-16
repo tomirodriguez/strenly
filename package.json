@@ -22,7 +22,17 @@
     "db:seed": "npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:seed",
     "db:start": "docker-compose up",
     "db:down": "docker-compose down",
-    "db:reset": "docker-compose down -v && docker-compose up -d && sleep 3 && npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:push"
+    "db:reset": "docker-compose down -v && docker-compose up -d && sleep 3 && npx dotenv-cli -e .env -- pnpm --filter @strenly/database db:push",
+    "test:dev": "./scripts/dev-test.sh",
+    "test:db:start": "docker-compose -f docker-compose.test.yml up",
+    "test:db:down": "docker-compose -f docker-compose.test.yml down",
+    "test:db:push": "npx dotenv-cli -e .env.test -- pnpm --filter @strenly/database db:push",
+    "test:db:seed": "npx dotenv-cli -e .env.test -- pnpm --filter @strenly/database db:seed",
+    "test:db:reset": "docker-compose -f docker-compose.test.yml down -v && docker-compose -f docker-compose.test.yml up -d && sleep 3 && npx dotenv-cli -e .env.test -- pnpm --filter @strenly/database db:push",
+    "test:e2e": "pnpm --filter coach-web test:e2e",
+    "test:e2e:ui": "pnpm --filter coach-web test:e2e:ui",
+    "test:grid": "./scripts/test-e2e.sh",
+    "test:grid:ui": "./scripts/test-e2e.sh --ui"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.12",
