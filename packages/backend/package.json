@@ -14,7 +14,10 @@
     "format": "pnpm biome format --write src",
     "lint": "pnpm biome check --write src",
     "lint:fix": "pnpm biome check --write --unsafe src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@orpc/server": "^1.4.3",
@@ -30,9 +33,13 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250120.0",
+    "@faker-js/faker": "^9.3.0",
     "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
     "tsup": "^8.5.1",
     "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
     "wrangler": "^4.1.0"
   }
 }
