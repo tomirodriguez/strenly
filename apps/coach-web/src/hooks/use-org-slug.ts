@@ -1,13 +1,23 @@
-import { useOrganization } from '@/contexts/organization-context'
+import { useLocation } from '@tanstack/react-router'
+import { useOptionalOrganization } from '@/contexts/organization-context'
 
 /**
- * Returns the current organization slug from OrganizationContext.
- * Must be used within a route that is a descendant of `/$orgSlug` (OrganizationProvider).
+ * Returns the current organization slug.
  *
- * Eliminates the need for `(params as { orgSlug?: string }).orgSlug` casts
- * across components that need the org slug for navigation.
+ * Tries OrganizationContext first (available within $orgSlug routes).
+ * Falls back to extracting the slug from the URL path for components
+ * that render above the OrganizationProvider (e.g., sidebar in _authenticated layout).
  */
 export function useOrgSlug(): string {
-  const org = useOrganization()
-  return org.slug
+  const org = useOptionalOrganization()
+  const location = useLocation()
+
+  if (org) return org.slug
+
+  // Fallback: extract from URL path (/{orgSlug}/...)
+  const firstSegment = location.pathname.split('/')[1]
+  if (!firstSegment) {
+    throw new Error('useOrgSlug must be used within an org-scoped route (/$orgSlug/...)')
+  }
+  return firstSegment
 }

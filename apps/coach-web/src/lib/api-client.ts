@@ -30,16 +30,19 @@ export function getCurrentOrgSlug(): string | null {
 // Create RPC link for HTTP communication with organization context header
 const link = new RPCLink({
   url: `${API_URL}/rpc`,
-  fetch: (input, init) => {
-    const organizationSlug = currentOrgSlug
-    const headers = new Headers()
+  fetch: (request, init) => {
+    // oRPC passes a Request object with headers already set (Content-Type, etc.)
+    const headers = new Headers(request.headers)
 
-    // Add organization context header if we have an active organization
+    // Use module-level slug first; fall back to extracting from URL path (/{orgSlug}/...)
+    // The fallback covers the initial page load where beforeLoad hasn't set the slug yet
+    const organizationSlug = currentOrgSlug ?? window.location.pathname.split('/')[1]
+
     if (organizationSlug) {
       headers.set('X-Organization-Slug', organizationSlug)
     }
 
-    return fetch(input, { ...init, headers, credentials: 'include' })
+    return fetch(request, { ...init, headers, credentials: 'include' })
   },
 })
 

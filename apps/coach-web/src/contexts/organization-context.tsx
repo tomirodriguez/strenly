@@ -41,3 +41,12 @@ export function useOrganization(): OrganizationContextValue {
   }
   return context
 }
+
+/**
+ * Hook to access organization context without throwing.
+ * Returns null when used outside OrganizationProvider.
+ * Useful for components that render above the provider (e.g., sidebar in _authenticated layout).
+ */
+export function useOptionalOrganization(): OrganizationContextValue | null {
+  return useContext(OrganizationContext)
+}
