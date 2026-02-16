@@ -1,7 +1,4 @@
-import path from 'node:path'
 import { defineConfig, devices } from '@playwright/test'
-
-const monorepoRoot = path.resolve(import.meta.dirname, '../..')
 
 export default defineConfig({
   testDir: './e2e/specs',
@@ -22,30 +19,17 @@ export default defineConfig({
   },
 
   projects: [
-    // Auth setup - runs once before all tests
-    {
-      name: 'setup',
-      testMatch: /global-setup\.ts/,
-      testDir: './e2e/fixtures',
-    },
-
-    // Chromium only for now - add firefox/webkit later once grid behavior is stable
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: './playwright-storage/auth-state.json',
-      },
-      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 
   webServer: {
-    command: './scripts/dev-test.sh',
+    command: 'npx vite --port 5174',
     url: 'http://localhost:5174',
     reuseExistingServer: !process.env.CI,
-    cwd: monorepoRoot,
-    timeout: 120_000,
+    timeout: 30_000,
     stdout: 'pipe',
   },
 })
