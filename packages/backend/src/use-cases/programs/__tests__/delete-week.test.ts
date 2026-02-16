@@ -1,0 +1,326 @@
+import type { ProgramRepositoryPort } from '@strenly/core/ports/program-repository.port'
+import { errAsync, okAsync } from 'neverthrow'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createMemberContext, createTestContext } from '../../../__tests__/helpers/test-context'
+import { makeDeleteWeek } from '../delete-week'
+
+describe('deleteWeek use case', () => {
+  let mockProgramRepository: ProgramRepositoryPort
+  const programId = 'program-123'
+  const weekId = 'week-456'
+  const orgId = 'org-789'
+
+  beforeEach(() => {
+    mockProgramRepository = {
+      findById: vi.fn(),
+      findWithDetails: vi.fn(),
+      update: vi.fn(),
+      saveProgramAggregate: vi.fn(),
+      deleteWeek: vi.fn(),
+    } as unknown as ProgramRepositoryPort
+  })
+
+  describe('Happy Path', () => {
+    it('should delete week successfully', async () => {
+      const programWithWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: weekId, name: 'Week 2', orderIndex: 1 },
+          { id: 'week-3', name: 'Week 3', orderIndex: 2 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
+      vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isOk()).toBe(true)
+
+      expect(mockProgramRepository.deleteWeek).toHaveBeenCalledWith(ctx, weekId)
+    })
+
+    it('should delete last week when more than one week exists', async () => {
+      const programWithWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: weekId, name: 'Week 2', orderIndex: 1 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
+      vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isOk()).toBe(true)
+    })
+  })
+
+  describe('Authorization', () => {
+    it('should return forbidden error when user lacks programs:write permission', async () => {
+      const ctx = createMemberContext()
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('forbidden')
+        if (result.error.type === 'forbidden') {
+          expect(result.error.message).toContain('No permission')
+        }
+      }
+
+      // Repository should not be called
+      expect(mockProgramRepository.findWithDetails).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Not Found Errors', () => {
+    it('should return program_not_found when program does not exist', async () => {
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(null))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId: 'non-existent-program',
+        weekId,
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('program_not_found')
+        if (result.error.type === 'program_not_found') {
+          expect(result.error.programId).toBe('non-existent-program')
+        }
+      }
+
+      // Delete should not be called
+      expect(mockProgramRepository.deleteWeek).not.toHaveBeenCalled()
+    })
+
+    it('should return not_found when week does not exist in program', async () => {
+      const programWithWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: 'week-2', name: 'Week 2', orderIndex: 1 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId: 'non-existent-week',
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('not_found')
+        if (result.error.type === 'not_found') {
+          expect(result.error.weekId).toBe('non-existent-week')
+        }
+      }
+
+      // Delete should not be called
+      expect(mockProgramRepository.deleteWeek).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Validation Errors', () => {
+    it('should return last_week error when trying to delete the only week', async () => {
+      const programWithOneWeek = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [{ id: weekId, name: 'Only Week', orderIndex: 0 }],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithOneWeek))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('last_week')
+        if (result.error.type === 'last_week') {
+          expect(result.error.message).toContain('Cannot delete the last week')
+        }
+      }
+
+      // Delete should not be called
+      expect(mockProgramRepository.deleteWeek).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Repository Errors', () => {
+    it('should return repository error when findWithDetails fails', async () => {
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(
+        errAsync({
+          type: 'DATABASE_ERROR',
+          message: 'Connection lost',
+        }),
+      )
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('repository_error')
+      }
+    })
+
+    it('should return repository error when deleteWeek fails', async () => {
+      const programWithWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: weekId, name: 'Week 2', orderIndex: 1 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
+      vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(
+        errAsync({
+          type: 'DATABASE_ERROR',
+          message: 'Delete failed',
+        }),
+      )
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isErr()).toBe(true)
+
+      if (result.isErr()) {
+        expect(result.error.type).toBe('repository_error')
+      }
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should allow deletion when exactly 2 weeks exist', async () => {
+      const programWithTwoWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: weekId, name: 'Week 2', orderIndex: 1 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithTwoWeeks))
+      vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isOk()).toBe(true)
+
+      expect(mockProgramRepository.deleteWeek).toHaveBeenCalledWith(ctx, weekId)
+    })
+
+    it('should handle deletion from middle of week list', async () => {
+      const programWithWeeks = {
+        id: programId,
+        organizationId: orgId,
+        name: 'Test Program',
+        weeks: [
+          { id: 'week-1', name: 'Week 1', orderIndex: 0 },
+          { id: weekId, name: 'Week 2', orderIndex: 1 },
+          { id: 'week-3', name: 'Week 3', orderIndex: 2 },
+          { id: 'week-4', name: 'Week 4', orderIndex: 3 },
+        ],
+        sessions: [],
+      }
+
+      vi.mocked(mockProgramRepository.findWithDetails).mockReturnValue(okAsync(programWithWeeks))
+      vi.mocked(mockProgramRepository.deleteWeek).mockReturnValue(okAsync(undefined))
+
+      const ctx = createTestContext({ organizationId: orgId })
+      const deleteWeek = makeDeleteWeek({ programRepository: mockProgramRepository })
+
+      const result = await deleteWeek({
+        ...ctx,
+        programId,
+        weekId,
+      })
+
+      expect(result.isOk()).toBe(true)
+    })
+  })
+})
