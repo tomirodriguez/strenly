@@ -19,7 +19,7 @@ type Env = {
 const app = new Hono<{ Bindings: Env }>()
 
 // Trusted origins for CORS
-const TRUSTED_ORIGINS = ['http://localhost:5173', 'http://localhost:5174']
+const TRUSTED_ORIGINS = ['http://localhost:5173', 'http://localhost:5174', 'https://strenly-coach-web.vercel.app']
 
 // Single CORS middleware for all routes
 app.use(
