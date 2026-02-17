@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { AuthLayout } from '../components/auth-layout'
 import { OAuthButtons } from '../components/oauth-buttons'
 import { SignupForm } from '../components/signup-form'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
 export function SignupView() {
@@ -37,22 +36,23 @@ export function SignupView() {
 
   return (
     <AuthLayout>
-      <Card>
-        <CardHeader>
-          <CardTitle>Crear una cuenta</CardTitle>
-          <CardDescription>Comienza con Strenly hoy.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <OAuthButtons />
-          <SignupForm onSubmit={handleSignup} isSubmitting={isLoading} />
-          <div className="text-center text-muted-foreground text-sm">
-            Ya tienes cuenta?{' '}
-            <Link to="/login" className="text-primary hover:underline">
-              Iniciar sesion
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="font-bold text-2xl text-foreground">Crea tu cuenta</h2>
+          <p className="text-muted-foreground text-sm">Comienza con Strenly hoy.</p>
+        </div>
+
+        <OAuthButtons />
+
+        <SignupForm onSubmit={handleSignup} isSubmitting={isLoading} />
+
+        <p className="text-center text-muted-foreground text-sm">
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/login" className="font-medium text-primary hover:underline">
+            Inicia sesión
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }

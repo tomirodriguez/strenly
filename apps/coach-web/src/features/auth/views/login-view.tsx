@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { AuthLayout } from '../components/auth-layout'
 import { LoginForm } from '../components/login-form'
 import { OAuthButtons } from '../components/oauth-buttons'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
 export function LoginView() {
@@ -27,7 +26,6 @@ export function LoginView() {
         return
       }
 
-      // Check if user has organizations
       const orgs = await authClient.organization.list()
       if (orgs.data?.length) {
         const firstOrg = orgs.data[0]
@@ -47,22 +45,23 @@ export function LoginView() {
 
   return (
     <AuthLayout>
-      <Card>
-        <CardHeader>
-          <CardTitle>Inicia sesion en tu cuenta</CardTitle>
-          <CardDescription>Bienvenido de vuelta! Por favor ingresa tus credenciales.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <OAuthButtons />
-          <LoginForm onSubmit={handleLogin} isSubmitting={isLoading} />
-          <div className="text-center text-muted-foreground text-sm">
-            No tienes cuenta?{' '}
-            <Link to="/signup" className="text-primary hover:underline">
-              Registrarse
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="font-bold text-2xl text-foreground">Inicia sesión</h2>
+          <p className="text-muted-foreground text-sm">Bienvenido de vuelta. Ingresa tus credenciales.</p>
+        </div>
+
+        <OAuthButtons />
+
+        <LoginForm onSubmit={handleLogin} isSubmitting={isLoading} />
+
+        <p className="text-center text-muted-foreground text-sm">
+          ¿No tienes cuenta?{' '}
+          <Link to="/signup" className="font-medium text-primary hover:underline">
+            Regístrate
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }
