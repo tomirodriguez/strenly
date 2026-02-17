@@ -14,15 +14,17 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     await gridPage.expectActiveCellAt(0, 0)
 
     // Verify initial order
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
+    expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
+    expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
 
     // WHEN: User presses Alt+ArrowDown
     await gridPage.pressKey('Alt+ArrowDown')
 
     // THEN: Back Squat moves to index 1, Leg Press moves to index 0
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    await expect(async () => {
+      expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
+      expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    }).toPass({ timeout: 3_000 })
 
     // THEN: Active cell follows the moved exercise (now at index 1)
     await gridPage.expectActiveCellAt(1, 0)
@@ -37,8 +39,10 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     await gridPage.pressKey('Alt+ArrowUp')
 
     // THEN: Leg Press moves to index 0, Back Squat moves to index 1
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    await expect(async () => {
+      expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
+      expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    }).toPass({ timeout: 3_000 })
 
     // THEN: Active cell follows the moved exercise (now at index 0)
     await gridPage.expectActiveCellAt(0, 0)
@@ -53,8 +57,8 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     await gridPage.pressKey('Alt+ArrowUp')
 
     // THEN: Order remains unchanged
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
+    expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
+    expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
 
     // THEN: Active cell stays in place
     await gridPage.expectActiveCellAt(0, 0)
@@ -71,11 +75,11 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     await gridPage.pressKey('Alt+ArrowDown')
 
     // THEN: Order in session 1 remains unchanged
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
+    expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
+    expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
 
     // THEN: Session 2 is also unchanged
-    await expect(await gridPage.getExerciseName(2)).toBe(EXERCISES.session2[0])
+    expect(await gridPage.getExerciseName(2)).toBe(EXERCISES.session2[0])
 
     // THEN: Active cell stays in place
     await gridPage.expectActiveCellAt(1, 0)
@@ -90,8 +94,10 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     await gridPage.pressKey('Alt+ArrowDown')
 
     // THEN: Exercise names swap
-    await expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
-    await expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    await expect(async () => {
+      expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[1])
+      expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[0])
+    }).toPass({ timeout: 3_000 })
 
     // THEN: Active cell follows the moved exercise (now at index 1, same column 1)
     await gridPage.expectActiveCellAt(1, 1)

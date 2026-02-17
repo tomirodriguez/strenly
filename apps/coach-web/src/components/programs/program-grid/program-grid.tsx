@@ -275,12 +275,12 @@ export function ProgramGrid({
       const direction = e.key === 'ArrowUp' ? 'up' : 'down'
       useGridStore.getState().moveExercise(row.id, row.sessionId, direction)
 
-      // After move, find the row's new position in updated grid data and follow it
+      // After move, re-set active cell so it follows the moved exercise
       requestAnimationFrame(() => {
         const updatedData = useGridStore.getState().data
         if (!updatedData) return
-        const newRowIndex = updatedData.rows.findIndex((r) => r.id === activeCell.rowId)
-        if (newRowIndex >= 0) {
+        const rowStillExists = updatedData.rows.some((r) => r.id === activeCell.rowId)
+        if (rowStillExists) {
           setActiveCell(activeCell.rowId, activeCell.colId)
         }
       })
