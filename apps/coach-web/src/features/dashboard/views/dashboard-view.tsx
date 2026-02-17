@@ -15,7 +15,7 @@ export function DashboardView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-bold text-2xl">Bienvenido a {org.name}</h1>
+        <h1 className="font-bold text-3xl tracking-tight">Bienvenido, {org.name}</h1>
         <p className="text-muted-foreground">Aqui tienes un resumen de tu organizacion</p>
       </div>
 

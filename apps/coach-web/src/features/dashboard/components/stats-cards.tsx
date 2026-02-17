@@ -21,7 +21,7 @@ function StatCard({ icon: Icon, label, value, description, isLoading }: StatCard
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="font-medium text-muted-foreground text-sm">{label}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <Icon className="h-4 w-4 text-primary" />
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -31,7 +31,7 @@ function StatCard({ icon: Icon, label, value, description, isLoading }: StatCard
           </>
         ) : (
           <>
-            <div className="font-bold text-2xl">{value}</div>
+            <div className="font-bold text-3xl tabular-nums">{value}</div>
             <p className="text-muted-foreground text-xs">{description}</p>
           </>
         )}

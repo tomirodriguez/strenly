@@ -21,7 +21,7 @@ export function QuickActions() {
         <Link
           to="/$orgSlug/athletes"
           params={{ orgSlug }}
-          className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-start')}
+          className={cn(buttonVariants({ variant: 'default' }), 'w-full justify-start')}
         >
           <Users className="mr-2 h-4 w-4" />
           Gestionar atletas
