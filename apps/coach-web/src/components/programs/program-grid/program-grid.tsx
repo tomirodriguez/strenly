@@ -337,6 +337,30 @@ export function ProgramGrid({
       return
     }
 
+    // Ctrl+C: Copy prescription
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.shiftKey && !editingCell) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      const col = columns[activeCell.colIndex]
+      if (!row || row.type !== 'exercise' || !col || col.type !== 'week') return
+      useGridStore.getState().copyPrescription(row.id, col.id)
+      return
+    }
+
+    // Ctrl+V: Paste prescription
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !e.shiftKey && !editingCell) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      const col = columns[activeCell.colIndex]
+      if (!row || row.type !== 'exercise' || !col || col.type !== 'week') return
+      const clipboard = useGridStore.getState().clipboard
+      if (!clipboard?.notation) return
+      useGridStore.getState().updatePrescription(row.id, col.id, clipboard.notation)
+      return
+    }
+
     // Ctrl+Delete / Ctrl+Backspace: Remove exercise row (with confirmation)
     if ((e.key === 'Delete' || e.key === 'Backspace') && e.ctrlKey && !editingCell) {
       e.preventDefault()

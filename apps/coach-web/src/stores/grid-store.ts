@@ -51,6 +51,9 @@ interface GridState {
   // Undo/redo history stacks
   undoStack: HistorySnapshot[]
   redoStack: HistorySnapshot[]
+
+  // Internal clipboard for copy-paste
+  clipboard: { notation: string } | null
 }
 
 /**
@@ -110,6 +113,9 @@ interface GridActions {
 
   // Redo last undone mutation
   redo: () => void
+
+  // Copy a prescription's notation to the internal clipboard (no undo push)
+  copyPrescription: (itemId: string, weekId: string) => void
 
   // Mark as saved (clear dirty flag)
   markSaved: () => void
@@ -308,6 +314,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
   exercisesMap: new Map(),
   undoStack: [],
   redoStack: [],
+  clipboard: null,
 
   // Initialize store with program aggregate
   initialize: (programId, aggregate, exercisesMap) => {
@@ -1086,6 +1093,17 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Copy a prescription's notation to the internal clipboard (read-only, no undo push)
+  copyPrescription: (itemId, weekId) =>
+    set((state) => {
+      if (!state.data) return state
+      const row = state.data.rows.find((r) => r.id === itemId && r.type === 'exercise')
+      if (!row) return state
+      const notation = row.prescriptions[weekId] ?? ''
+      if (!notation) return state // Don't copy empty cells
+      return { clipboard: { notation } }
+    }),
+
   // Mark as saved
   markSaved: () => set({ isDirty: false }),
 
@@ -1162,6 +1180,7 @@ export const useGridActions = () =>
       reorderExerciseGroups: state.reorderExerciseGroups,
       clearPrescription: state.clearPrescription,
       removeExerciseRow: state.removeExerciseRow,
+      copyPrescription: state.copyPrescription,
       undo: state.undo,
       redo: state.redo,
       reset: state.reset,
