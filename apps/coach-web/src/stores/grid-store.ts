@@ -22,6 +22,14 @@ import type { GridColumn, GridData, GridRow } from '@/components/programs/progra
  * Maintains the program aggregate and grid display data.
  * The aggregate is the source of truth - grid data is derived from it.
  */
+/**
+ * Snapshot of aggregate + grid data for undo/redo history
+ */
+interface HistorySnapshot {
+  aggregate: ProgramAggregate
+  data: GridData
+}
+
 interface GridState {
   // Program aggregate (source of truth for save operations)
   aggregate: ProgramAggregate | null
@@ -39,6 +47,10 @@ interface GridState {
 
   // Exercises map for display (exerciseId -> exerciseName)
   exercisesMap: Map<string, string>
+
+  // Undo/redo history stacks
+  undoStack: HistorySnapshot[]
+  redoStack: HistorySnapshot[]
 }
 
 /**
@@ -92,6 +104,12 @@ interface GridActions {
 
   // Reset to server state (e.g., after refetch)
   reset: (aggregate: ProgramAggregate, exercisesMap: Map<string, string>) => void
+
+  // Undo last mutation
+  undo: () => void
+
+  // Redo last undone mutation
+  redo: () => void
 
   // Mark as saved (clear dirty flag)
   markSaved: () => void
@@ -254,6 +272,24 @@ function generateId(): string {
   return `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
+const HISTORY_LIMIT = 50
+
+/**
+ * Push current state onto the undo stack before a mutation.
+ * Clears the redo stack (new mutation invalidates redo history).
+ */
+function pushToUndoStack(state: GridState): { undoStack: HistorySnapshot[]; redoStack: HistorySnapshot[] } {
+  if (!state.aggregate || !state.data) {
+    return { undoStack: state.undoStack, redoStack: state.redoStack }
+  }
+  const snapshot: HistorySnapshot = {
+    aggregate: deepClone(state.aggregate),
+    data: deepClone(state.data),
+  }
+  const newStack = [...state.undoStack, snapshot].slice(-HISTORY_LIMIT)
+  return { undoStack: newStack, redoStack: [] }
+}
+
 /**
  * Zustand store for program grid state
  *
@@ -270,6 +306,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   lastLoadedAt: null,
   lastAddedItemId: null,
   exercisesMap: new Map(),
+  undoStack: [],
+  redoStack: [],
 
   // Initialize store with program aggregate
   initialize: (programId, aggregate, exercisesMap) => {
@@ -281,6 +319,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
       exercisesMap,
       isDirty: false,
       lastLoadedAt: new Date(),
+      undoStack: [],
+      redoStack: [],
     })
   },
 
@@ -297,6 +337,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
         // Invalid notation, don't update
         return state
       }
+
+      const historyUpdate = pushToUndoStack(state)
 
       // Convert to SeriesInput format for aggregate
       const seriesInput: SeriesInput[] = parsedSeries.map((s) => ({
@@ -351,6 +393,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       })
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: { ...state.data, rows: updatedRows },
         isDirty: true,
@@ -361,6 +404,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   updateExercise: (itemId, exerciseId, exerciseName) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       // Deep clone aggregate for immutable update
       const newAggregate = deepClone(state.aggregate)
@@ -397,6 +442,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       newExercisesMap.set(exerciseId, exerciseName)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: { ...state.data, rows: updatedRows },
         exercisesMap: newExercisesMap,
@@ -408,6 +454,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   addExercise: (sessionId, exerciseId, exerciseName) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
       const itemId = generateId()
@@ -445,6 +493,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, newExercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         exercisesMap: newExercisesMap,
@@ -460,6 +509,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   addWeek: () =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
       const weekId = generateId()
@@ -498,6 +549,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -508,6 +560,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   addSession: (name: string) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
       const sessionId = generateId()
@@ -531,6 +585,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -541,6 +596,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   updateSupersetGroup: (itemId, targetGroupId) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       // For now, just update grid display for visual feedback
       // Full superset management is a more complex feature for later
@@ -570,6 +627,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       })
 
       return {
+        ...historyUpdate,
         data: { ...state.data, rows: updatedRows },
         isDirty: true,
       }
@@ -579,6 +637,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   groupWithAbove: (itemId, sessionId) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
 
@@ -664,6 +724,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -674,6 +735,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   ungroupExercise: (itemId, sessionId) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
 
@@ -744,6 +807,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -754,6 +818,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   moveExercise: (itemId, sessionId, direction) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
 
@@ -812,6 +878,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -822,6 +889,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   reorderExerciseGroups: (sessionId, orderedGroupIds) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
 
@@ -848,6 +917,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -858,6 +928,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   clearPrescription: (itemId, weekId) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       // Deep clone aggregate for immutable update
       const newAggregate = deepClone(state.aggregate)
@@ -891,6 +963,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       })
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: { ...state.data, rows: updatedRows },
         isDirty: true,
@@ -901,6 +974,8 @@ export const useGridStore = create<GridStore>((set, get) => ({
   removeExerciseRow: (itemId) =>
     set((state) => {
       if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
 
       const newAggregate = deepClone(state.aggregate)
 
@@ -942,6 +1017,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
       return {
+        ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
         isDirty: true,
@@ -957,8 +1033,58 @@ export const useGridStore = create<GridStore>((set, get) => ({
       exercisesMap,
       isDirty: false,
       lastLoadedAt: new Date(),
+      undoStack: [],
+      redoStack: [],
     })
   },
+
+  // Undo last mutation
+  undo: () =>
+    set((state) => {
+      if (state.undoStack.length === 0 || !state.aggregate || !state.data) return state
+
+      const newUndoStack = [...state.undoStack]
+      const previous = newUndoStack.pop()
+      if (!previous) return state
+
+      const currentSnapshot: HistorySnapshot = {
+        aggregate: deepClone(state.aggregate),
+        data: deepClone(state.data),
+      }
+      const newRedoStack = [...state.redoStack, currentSnapshot]
+
+      return {
+        aggregate: previous.aggregate,
+        data: previous.data,
+        undoStack: newUndoStack,
+        redoStack: newRedoStack,
+        isDirty: true,
+      }
+    }),
+
+  // Redo last undone mutation
+  redo: () =>
+    set((state) => {
+      if (state.redoStack.length === 0 || !state.aggregate || !state.data) return state
+
+      const newRedoStack = [...state.redoStack]
+      const next = newRedoStack.pop()
+      if (!next) return state
+
+      const currentSnapshot: HistorySnapshot = {
+        aggregate: deepClone(state.aggregate),
+        data: deepClone(state.data),
+      }
+      const newUndoStack = [...state.undoStack, currentSnapshot]
+
+      return {
+        aggregate: next.aggregate,
+        data: next.data,
+        undoStack: newUndoStack,
+        redoStack: newRedoStack,
+        isDirty: true,
+      }
+    }),
 
   // Mark as saved
   markSaved: () => set({ isDirty: false }),
@@ -1036,6 +1162,8 @@ export const useGridActions = () =>
       reorderExerciseGroups: state.reorderExerciseGroups,
       clearPrescription: state.clearPrescription,
       removeExerciseRow: state.removeExerciseRow,
+      undo: state.undo,
+      redo: state.redo,
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,

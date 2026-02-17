@@ -277,6 +277,23 @@ export function ProgramGrid({
 
   // Handle global keyboard shortcuts
   const handleTableKeyDown = (e: React.KeyboardEvent) => {
+    // Ctrl+Z / Cmd+Z: Undo
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault()
+      useGridStore.getState().undo()
+      return
+    }
+
+    // Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y: Redo
+    if (
+      ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'Z' || e.key === 'z')) ||
+      ((e.ctrlKey || e.metaKey) && e.key === 'y' && !e.shiftKey)
+    ) {
+      e.preventDefault()
+      useGridStore.getState().redo()
+      return
+    }
+
     // Intercept Alt+ArrowUp / Alt+ArrowDown for exercise reorder
     if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
       e.preventDefault()
