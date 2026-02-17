@@ -108,7 +108,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                       render={<Link to={to} />}
                       isActive={Boolean(isActive)}
                       size="lg"
-                      className="gap-3 px-4 text-muted-foreground"
+                      className="gap-3 px-4 text-muted-foreground data-[active=true]:font-semibold data-[active=true]:text-primary"
                     >
                       <item.icon className="size-5" />
                       <span>{item.label}</span>
@@ -135,7 +135,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                       render={<Link to={to} />}
                       isActive={Boolean(isActive)}
                       size="lg"
-                      className="gap-3 px-4 text-muted-foreground"
+                      className="gap-3 px-4 text-muted-foreground data-[active=true]:font-semibold data-[active=true]:text-primary"
                     >
                       <item.icon className="size-5" />
                       <span>{item.label}</span>
