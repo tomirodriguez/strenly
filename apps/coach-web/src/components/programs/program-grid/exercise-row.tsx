@@ -1,4 +1,3 @@
-import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ExerciseCell } from './exercise-cell'
@@ -114,5 +113,3 @@ export function ExerciseRow({
     </tr>
   )
 }
-
-export type { SyntheticListenerMap }

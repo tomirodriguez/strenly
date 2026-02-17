@@ -470,7 +470,7 @@ export function ProgramGrid({
           <AlertDialogHeader>
             <AlertDialogTitle>Eliminar ejercicio</AlertDialogTitle>
             <AlertDialogDescription>
-              {`¿Eliminar "${pendingDeleteExerciseName}" de todas las semanas? Esta acción no se puede deshacer.`}
+              {`¿Eliminar "${pendingDeleteExerciseName}" de todas las semanas?`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

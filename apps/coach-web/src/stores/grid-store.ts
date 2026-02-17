@@ -275,7 +275,8 @@ function aggregateToGridData(aggregate: ProgramAggregate, exercisesMap: Map<stri
 }
 
 /**
- * Deep clone an object (simple JSON approach for aggregate data)
+ * Deep clone an object (simple JSON approach for aggregate data).
+ * Only works for JSON-serializable data — Map, Set, Date, etc. are NOT preserved.
  */
 function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj))
@@ -285,7 +286,7 @@ function deepClone<T>(obj: T): T {
  * Generate a unique ID for new entities
  */
 function generateId(): string {
-  return `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  return `temp-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 }
 
 const HISTORY_LIMIT = 50
@@ -1064,6 +1065,14 @@ export const useGridStore = create<GridStore>((set, get) => ({
         }
       }
 
+      // Clean up invalidCells for the removed item
+      const newInvalidCells = new Map(state.invalidCells)
+      for (const key of newInvalidCells.keys()) {
+        if (key.startsWith(`${itemId}:`)) {
+          newInvalidCells.delete(key)
+        }
+      }
+
       // Regenerate grid data
       const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
 
@@ -1071,6 +1080,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
         ...historyUpdate,
         aggregate: newAggregate,
         data: gridData,
+        invalidCells: newInvalidCells,
         isDirty: true,
       }
     }),

@@ -1,4 +1,4 @@
-import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
+import type { useSortable } from '@dnd-kit/sortable'
 import { GripVertical } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { ExerciseRowActions } from '../exercise-row-actions'
@@ -21,7 +21,7 @@ interface ExerciseCellProps {
   sessionRowIds: string[]
   isActive: boolean
   isEditing: boolean
-  dragListeners?: SyntheticListenerMap
+  dragListeners?: ReturnType<typeof useSortable>['listeners']
   onSelect: () => void
   onStartEdit: () => void
   onCommit: (exerciseId: string, exerciseName: string) => void
