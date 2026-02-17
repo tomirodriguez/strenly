@@ -1,4 +1,8 @@
-import type { ProgramRepositoryPort, ProgramWeek, ProgramWithDetails } from '@strenly/core/ports/program-repository.port'
+import type {
+  ProgramRepositoryPort,
+  ProgramWeek,
+  ProgramWithDetails,
+} from '@strenly/core/ports/program-repository.port'
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createProgramWithStructure } from '../../../__tests__/factories/program-structure-factory'

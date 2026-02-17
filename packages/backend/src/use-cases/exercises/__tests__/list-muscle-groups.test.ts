@@ -57,9 +57,7 @@ describe('[2.7-UNIT] listMuscleGroups use case', () => {
     it('[2.7-UNIT-002] @p0 should succeed with admin role', async () => {
       const ctx = createAdminContext()
 
-      const muscleGroups = [
-        { id: 'chest', name: 'chest' as const, displayName: 'Chest', bodyRegion: 'upper' as const },
-      ]
+      const muscleGroups = [{ id: 'chest', name: 'chest' as const, displayName: 'Chest', bodyRegion: 'upper' as const }]
 
       vi.mocked(mockMuscleGroupRepository.findAll).mockReturnValue(okAsync(muscleGroups))
 

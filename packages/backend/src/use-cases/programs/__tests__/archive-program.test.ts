@@ -2,7 +2,6 @@ import type { ProgramRepositoryPort } from '@strenly/core/ports/program-reposito
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  createEmptyProgram,
   createProgramWithStructure,
   createTemplateProgram,
 } from '../../../__tests__/factories/program-structure-factory'

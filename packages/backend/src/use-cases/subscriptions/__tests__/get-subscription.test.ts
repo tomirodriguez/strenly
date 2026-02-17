@@ -9,7 +9,7 @@ import { makeGetSubscription } from '../get-subscription'
 
 // Helper to create plan entity
 function createPlan(overrides: Partial<Plan> = {}): Plan {
-  return ({
+  return {
     id: 'plan-456',
     name: 'Pro Plan',
     slug: 'pro',
@@ -28,7 +28,7 @@ function createPlan(overrides: Partial<Plan> = {}): Plan {
     isActive: true,
     createdAt: new Date(),
     ...overrides,
-  }) as Plan
+  } as Plan
 }
 
 // Helper to create subscription entity
@@ -367,7 +367,7 @@ describe('getSubscription use case', () => {
       expect(fetchResult.isOk()).toBe(true)
 
       if (fetchResult.isOk()) {
-        expect(fetchResult.value.subscription.status).toBe("canceled")
+        expect(fetchResult.value.subscription.status).toBe('canceled')
       }
     })
 

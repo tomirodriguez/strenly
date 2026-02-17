@@ -102,7 +102,9 @@ test.describe('Arrow Key Navigation', () => {
 
   // ── Session boundary crossing ──
 
-  test('[GRID.3-E2E-009] @p1 ArrowDown from last exercise in session 1 reaches add-exercise then session 2', async ({ gridPage }) => {
+  test('[GRID.3-E2E-009] @p1 ArrowDown from last exercise in session 1 reaches add-exercise then session 2', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has selected the last exercise in session 1 (Leg Press, index 1)
     await gridPage.clickCell(1, 1)
 
@@ -120,7 +122,9 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.expectActiveCellAt(2, 1)
   })
 
-  test('[GRID.3-E2E-010] @p1 ArrowUp from first exercise in session 2 skips to session 1 last exercise', async ({ gridPage }) => {
+  test('[GRID.3-E2E-010] @p1 ArrowUp from first exercise in session 2 skips to session 1 last exercise', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has selected the first exercise in session 2 (Barbell Bench Press, index 2)
     await gridPage.clickCell(2, 1)
 

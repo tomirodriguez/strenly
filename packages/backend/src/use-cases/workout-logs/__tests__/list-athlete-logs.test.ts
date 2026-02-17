@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createWorkoutLogEntity } from '../../../__tests__/factories/workout-log-factory'
 import { createWorkoutLogRepositoryMock } from '../../../__tests__/factories/workout-log-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeListAthleteLogs } from '../list-athlete-logs'
 
 describe('listAthleteLogs use case', () => {
@@ -23,9 +23,7 @@ describe('listAthleteLogs use case', () => {
         createWorkoutLogEntity({ id: 'log-2', organizationId: ctx.organizationId }),
       ]
 
-      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(
-        okAsync({ items: logs, totalCount: 2 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(okAsync({ items: logs, totalCount: 2 }))
 
       const listAthleteLogs = makeListAthleteLogs({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -58,9 +56,7 @@ describe('listAthleteLogs use case', () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
-      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthleteLogs = makeListAthleteLogs({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -85,9 +81,7 @@ describe('listAthleteLogs use case', () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
-      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthleteLogs = makeListAthleteLogs({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -149,9 +143,7 @@ describe('listAthleteLogs use case', () => {
       const ctx = createAdminContext()
       const athleteId = 'athlete-1'
 
-      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listByAthlete).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthleteLogs = makeListAthleteLogs({
         workoutLogRepository: mockWorkoutLogRepository,

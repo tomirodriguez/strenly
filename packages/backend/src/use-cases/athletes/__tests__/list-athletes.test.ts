@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAthleteEntity } from '../../../__tests__/factories/athlete-factory'
 import { createAthleteRepositoryMock } from '../../../__tests__/factories/athlete-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeListAthletes } from '../list-athletes'
 
 describe('[1.3-UNIT] listAthletes use case', () => {
@@ -22,9 +22,7 @@ describe('[1.3-UNIT] listAthletes use case', () => {
         createAthleteEntity({ id: 'athlete-2', organizationId: ctx.organizationId }),
       ]
 
-      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
-        okAsync({ items: athletes, totalCount: 2 }),
-      )
+      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(okAsync({ items: athletes, totalCount: 2 }))
 
       const listAthletes = makeListAthletes({
         athleteRepository: mockAthleteRepository,
@@ -52,9 +50,7 @@ describe('[1.3-UNIT] listAthletes use case', () => {
     it('[1.3-UNIT-002] @p2 should filter by status', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthletes = makeListAthletes({
         athleteRepository: mockAthleteRepository,
@@ -76,9 +72,7 @@ describe('[1.3-UNIT] listAthletes use case', () => {
     it('[1.3-UNIT-003] @p2 should apply search filter', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthletes = makeListAthletes({
         athleteRepository: mockAthleteRepository,
@@ -100,9 +94,7 @@ describe('[1.3-UNIT] listAthletes use case', () => {
     it('[1.3-UNIT-004] @p2 should apply pagination', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthletes = makeListAthletes({
         athleteRepository: mockAthleteRepository,
@@ -157,9 +149,7 @@ describe('[1.3-UNIT] listAthletes use case', () => {
     it('[1.3-UNIT-006] @p2 should return empty list when no athletes exist', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockAthleteRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listAthletes = makeListAthletes({
         athleteRepository: mockAthleteRepository,

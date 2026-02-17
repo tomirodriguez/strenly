@@ -56,7 +56,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
       // No existing invitation
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(null))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,
@@ -125,7 +125,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(existingInvitation))
       vi.mocked(mockInvitationRepository.revoke).mockReturnValue(okAsync(undefined))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,
@@ -143,7 +143,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
       expect(result.isOk()).toBe(true)
 
       if (result.isOk()) {
-        const { invitation, invitationUrl } = result.value
+        const { invitation } = result.value
         // Should create NEW invitation, not reuse old one
         expect(invitation.id).toBe('test-id-1')
         expect(invitation.token).toBe('test-token-1')
@@ -177,7 +177,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
         .mockReturnValueOnce(okAsync(athlete2))
 
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(null))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,
@@ -254,7 +254,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
 
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(null))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,
@@ -545,7 +545,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
 
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(null))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,
@@ -582,7 +582,7 @@ describe('[1.7-UNIT] generateInvitation use case', () => {
 
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
       vi.mocked(mockInvitationRepository.findByAthleteId).mockReturnValue(okAsync(null))
-      vi.mocked(mockInvitationRepository.create).mockImplementation((ctx, invitation) => okAsync(invitation))
+      vi.mocked(mockInvitationRepository.create).mockImplementation((_ctx, invitation) => okAsync(invitation))
 
       const generateInvitation = makeGenerateInvitation({
         athleteRepository: mockAthleteRepository,

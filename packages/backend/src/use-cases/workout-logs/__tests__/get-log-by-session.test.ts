@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createWorkoutLogEntity } from '../../../__tests__/factories/workout-log-factory'
 import { createWorkoutLogRepositoryMock } from '../../../__tests__/factories/workout-log-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeGetLogBySession } from '../get-log-by-session'
 
 describe('getLogBySession use case', () => {

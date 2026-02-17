@@ -7,7 +7,6 @@ test.describe('Exercise Editing', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   test('[GRID.8-E2E-001] @p0 Enter opens combobox with search input focused', async ({ gridPage }) => {
     // GIVEN: User has selected an exercise cell
     await gridPage.clickCell(0, 0) // Back Squat
@@ -80,7 +79,9 @@ test.describe('Exercise Editing', () => {
 
   // ── Direct typing ──
 
-  test('[GRID.8-E2E-005] @p1 typing letter on exercise cell opens combobox with search pre-filled', async ({ gridPage }) => {
+  test('[GRID.8-E2E-005] @p1 typing letter on exercise cell opens combobox with search pre-filled', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has selected an exercise cell
     await gridPage.clickCell(0, 0)
 
@@ -171,5 +172,19 @@ test.describe('Exercise Editing', () => {
     // THEN: Exercise name persists
     const name = await gridPage.getExerciseName(0)
     expect(name).toBe(selectedText)
+  })
+
+  test('[GRID.8-E2E-010] @p2 shows empty state when exercise search has no matches', async ({ gridPage }) => {
+    // GIVEN: User opens exercise combobox
+    await gridPage.clickCell(0, 0)
+    await gridPage.pressKey('Enter')
+
+    // WHEN: User searches for non-existent exercise
+    await gridPage.exerciseComboboxInput.fill('zzzznonexistent')
+
+    // THEN: Empty state message is shown
+    await expect(gridPage.comboboxItems).toHaveCount(0)
+    await expect(gridPage.page.locator('[data-slot="combobox-empty"]')).toBeVisible()
+    await expect(gridPage.page.locator('[data-slot="combobox-empty"]')).toContainText('Sin resultados')
   })
 })

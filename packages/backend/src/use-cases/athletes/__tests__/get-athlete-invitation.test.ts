@@ -11,7 +11,7 @@ import {
   createInvitationData,
   createRevokedInvitation,
 } from '../../../__tests__/factories/invitation-factory'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeGetAthleteInvitation } from '../get-athlete-invitation'
 
 describe('[1.8-UNIT] getAthleteInvitation use case', () => {

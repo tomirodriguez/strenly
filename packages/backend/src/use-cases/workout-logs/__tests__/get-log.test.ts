@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createWorkoutLogEntity } from '../../../__tests__/factories/workout-log-factory'
 import { createWorkoutLogRepositoryMock } from '../../../__tests__/factories/workout-log-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeGetLog } from '../get-log'
 
 describe('getLog use case', () => {
@@ -147,9 +147,7 @@ describe('getLog use case', () => {
       const log1 = createWorkoutLogEntity({ id: logId1, organizationId: ctx.organizationId })
       const log2 = createWorkoutLogEntity({ id: logId2, organizationId: ctx.organizationId })
 
-      vi.mocked(mockWorkoutLogRepository.findById)
-        .mockReturnValueOnce(okAsync(log1))
-        .mockReturnValueOnce(okAsync(log2))
+      vi.mocked(mockWorkoutLogRepository.findById).mockReturnValueOnce(okAsync(log1)).mockReturnValueOnce(okAsync(log2))
 
       const getLog = makeGetLog({
         workoutLogRepository: mockWorkoutLogRepository,

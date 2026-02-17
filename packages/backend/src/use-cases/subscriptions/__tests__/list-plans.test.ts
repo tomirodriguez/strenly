@@ -358,14 +358,26 @@ describe('listPlans use case', () => {
           name: 'Solo',
           organizationType: 'coach_solo',
           coachLimit: 1,
-          features: { templates: true, analytics: true, exportData: true, customExercises: true, multipleCoaches: false },
+          features: {
+            templates: true,
+            analytics: true,
+            exportData: true,
+            customExercises: true,
+            multipleCoaches: false,
+          },
         }),
         createPlan({
           id: 'plan-2',
           name: 'Team',
           organizationType: 'gym',
           coachLimit: 10,
-          features: { templates: true, analytics: true, exportData: true, customExercises: true, multipleCoaches: true },
+          features: {
+            templates: true,
+            analytics: true,
+            exportData: true,
+            customExercises: true,
+            multipleCoaches: true,
+          },
         }),
       ]
 

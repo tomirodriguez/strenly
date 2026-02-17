@@ -2,7 +2,7 @@ import type { PendingWorkout, WorkoutLogRepositoryPort } from '@strenly/core/por
 import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createWorkoutLogRepositoryMock } from '../../../__tests__/factories/workout-log-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeListPendingWorkouts } from '../list-pending-workouts'
 
 // Helper to create pending workout data
@@ -66,9 +66,7 @@ describe('listPendingWorkouts use case', () => {
     it('[5.1-UNIT-002] @p2 should apply default pagination', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listPendingWorkouts = makeListPendingWorkouts({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -88,9 +86,7 @@ describe('listPendingWorkouts use case', () => {
     it('[5.1-UNIT-003] @p2 should apply custom pagination', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listPendingWorkouts = makeListPendingWorkouts({
         workoutLogRepository: mockWorkoutLogRepository,
@@ -141,9 +137,7 @@ describe('listPendingWorkouts use case', () => {
     it('[5.3-UNIT-001] @p2 should return empty list when no pending workouts exist', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockWorkoutLogRepository.listPendingWorkouts).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listPendingWorkouts = makeListPendingWorkouts({
         workoutLogRepository: mockWorkoutLogRepository,

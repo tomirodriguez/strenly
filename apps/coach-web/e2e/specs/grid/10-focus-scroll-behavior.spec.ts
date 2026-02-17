@@ -8,7 +8,6 @@ test.describe('Focus & Scroll Behavior', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   // ── Initial focus on load ──
 
   test('[GRID.10-E2E-001] @p1 opening program places focus on the first exercise cell', async ({ gridPage }) => {
@@ -31,8 +30,9 @@ test.describe('Focus & Scroll Behavior', () => {
       el.scrollLeft = 300
     })
 
-    // Wait for scroll to settle
-    await page.waitForTimeout(100)
+    // Wait for scroll completion using viewport check
+    const activeCell = gridPage.activeCell
+    await expect(activeCell).toBeInViewport()
 
     // THEN: Session header cell remains visible on screen (sticky column)
     await expect(sessionTd).toBeVisible()
@@ -41,7 +41,10 @@ test.describe('Focus & Scroll Behavior', () => {
 
   // ── Focused cell scrolls into view ──
 
-  test('[GRID.10-E2E-003] @p1 navigating to a partially visible cell scrolls it fully into view', async ({ gridPage, page }) => {
+  test('[GRID.10-E2E-003] @p1 navigating to a partially visible cell scrolls it fully into view', async ({
+    gridPage,
+    page,
+  }) => {
     // GIVEN: User starts on a cell in the first week column
     await gridPage.clickCell(0, 1)
 
@@ -77,7 +80,9 @@ test.describe('Focus & Scroll Behavior', () => {
   // This test verifies the general behavior: ArrowDown from add-exercise goes through
   // sessions correctly. When a session has no exercises, it should go to its add-exercise row.
 
-  test('[GRID.10-E2E-004] @p2 ArrowDown from add-exercise row navigates to next session first exercise', async ({ gridPage }) => {
+  test('[GRID.10-E2E-004] @p2 ArrowDown from add-exercise row navigates to next session first exercise', async ({
+    gridPage,
+  }) => {
     // GIVEN: User navigates to add-exercise row for session 1
     // Start from Leg Press (last exercise in session 1, index 1)
     await gridPage.clickCell(1, 0)
@@ -96,7 +101,9 @@ test.describe('Focus & Scroll Behavior', () => {
 
   // ── Column persistence when moving between days through add-exercise rows ──
 
-  test('[GRID.10-E2E-005] @p2 column index persists when navigating down through add-exercise row', async ({ gridPage }) => {
+  test('[GRID.10-E2E-005] @p2 column index persists when navigating down through add-exercise row', async ({
+    gridPage,
+  }) => {
     // GIVEN: User starts on Back Squat, week 2 (exercise 0, col 2)
     await gridPage.clickCell(0, 2)
     await gridPage.expectActiveCellAt(0, 2)
@@ -114,7 +121,9 @@ test.describe('Focus & Scroll Behavior', () => {
     await gridPage.expectActiveCellAt(2, 2)
   })
 
-  test('[GRID.10-E2E-006] @p2 column index persists across multiple session boundaries through add-exercise', async ({ gridPage }) => {
+  test('[GRID.10-E2E-006] @p2 column index persists across multiple session boundaries through add-exercise', async ({
+    gridPage,
+  }) => {
     // GIVEN: User starts on Back Squat, week 3 (exercise 0, col 3)
     await gridPage.clickCell(0, 3)
     await gridPage.expectActiveCellAt(0, 3)

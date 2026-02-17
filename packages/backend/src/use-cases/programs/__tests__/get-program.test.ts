@@ -203,7 +203,6 @@ describe('[3.7-UNIT] getProgram use case', () => {
     })
   })
 
-
   describe('[3.8-UNIT] @p1 Not Found Errors', () => {
     it('[3.8-UNIT-001] @p1 should return not_found error when program does not exist', async () => {
       const ctx = createAdminContext()

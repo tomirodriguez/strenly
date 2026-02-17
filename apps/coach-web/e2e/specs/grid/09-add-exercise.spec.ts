@@ -7,10 +7,11 @@ test.describe('Add Exercise Row', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   // ── Navigation to add-exercise row ──
 
-  test('[GRID.9-E2E-001] @p1 ArrowDown from last exercise in session reaches add-exercise row', async ({ gridPage }) => {
+  test('[GRID.9-E2E-001] @p1 ArrowDown from last exercise in session reaches add-exercise row', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has selected the last exercise in session 1 (Leg Press, exerciseIndex 1)
     await gridPage.clickCell(1, 0)
 
@@ -22,7 +23,9 @@ test.describe('Add Exercise Row', () => {
     await expect(addExInput).toBeFocused({ timeout: 3_000 })
   })
 
-  test('[GRID.9-E2E-002] @p1 ArrowUp from add-exercise row returns to last exercise in session', async ({ gridPage }) => {
+  test('[GRID.9-E2E-002] @p1 ArrowUp from add-exercise row returns to last exercise in session', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has focused the add-exercise combobox for session 1
     const addExInput = gridPage.addExerciseInput(0)
     await addExInput.click()
@@ -53,5 +56,19 @@ test.describe('Add Exercise Row', () => {
 
     // THEN: Active cell is on the newly added exercise (last in session 1 = index 2)
     await gridPage.expectActiveCellAt(2, 0)
+  })
+
+  test('[GRID.9-E2E-004] @p2 pressing Escape in add-exercise combobox cancels without adding', async ({ gridPage }) => {
+    // GIVEN: User opens add-exercise combobox
+    const initialCount = await gridPage.exerciseRows.count()
+    await gridPage.addExerciseInput(0).click()
+    await gridPage.addExerciseInput(0).fill('deadlift')
+
+    // WHEN: User presses Escape
+    await gridPage.pressKey('Escape')
+
+    // THEN: No exercise is added
+    await expect(gridPage.exerciseRows).toHaveCount(initialCount)
+    await expect(gridPage.addExerciseInput(0)).toHaveValue('')
   })
 })

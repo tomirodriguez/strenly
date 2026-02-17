@@ -123,6 +123,7 @@ export function ExerciseCell({
 
   // View mode
   return (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-selected required by test infrastructure
     <td
       className={cn(
         'sticky left-0 z-10 border-border border-r border-b p-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]',

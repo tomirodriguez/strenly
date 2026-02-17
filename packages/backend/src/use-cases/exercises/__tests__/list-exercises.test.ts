@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createExerciseEntity } from '../../../__tests__/factories/exercise-factory'
 import { createExerciseRepositoryMock } from '../../../__tests__/factories/exercise-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeListExercises } from '../list-exercises'
 
 describe('[2.6-UNIT] listExercises use case', () => {
@@ -22,9 +22,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
         createExerciseEntity({ id: 'exercise-2', organizationId: ctx.organizationId }),
       ]
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: exercises, totalCount: 2 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: exercises, totalCount: 2 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,
@@ -52,9 +50,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
     it('[2.6-UNIT-002] @p1 should filter by movement pattern', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,
@@ -76,9 +72,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
     it('[2.6-UNIT-003] @p1 should filter by muscle group', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,
@@ -100,9 +94,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
     it('[2.6-UNIT-004] @p1 should apply search filter', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,
@@ -124,9 +116,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
     it('[2.6-UNIT-005] @p2 should apply pagination', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,
@@ -181,9 +171,7 @@ describe('[2.6-UNIT] listExercises use case', () => {
     it('[2.6-UNIT-007] @p2 should return empty list when no exercises exist', async () => {
       const ctx = createAdminContext()
 
-      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(
-        okAsync({ items: [], totalCount: 0 }),
-      )
+      vi.mocked(mockExerciseRepository.findAll).mockReturnValue(okAsync({ items: [], totalCount: 0 }))
 
       const listExercises = makeListExercises({
         exerciseRepository: mockExerciseRepository,

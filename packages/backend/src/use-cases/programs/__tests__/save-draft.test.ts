@@ -239,9 +239,7 @@ describe('[3.28-UNIT] @p2 saveDraft use case', () => {
       const programId = 'program-1'
       const programData = createProgramDataInput()
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const saveDraft = makeSaveDraft({
         programRepository: mockProgramRepository,
@@ -445,9 +443,7 @@ describe('[3.28-UNIT] @p2 saveDraft use case', () => {
       const programId = 'program-1'
       const programData = createProgramDataInput({ weeks: [] })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const saveDraft = makeSaveDraft({
         programRepository: mockProgramRepository,
@@ -470,9 +466,7 @@ describe('[3.28-UNIT] @p2 saveDraft use case', () => {
         athleteId: null,
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const saveDraft = makeSaveDraft({
         programRepository: mockProgramRepository,
@@ -539,9 +533,7 @@ describe('[3.28-UNIT] @p2 saveDraft use case', () => {
         ],
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const saveDraft = makeSaveDraft({
         programRepository: mockProgramRepository,

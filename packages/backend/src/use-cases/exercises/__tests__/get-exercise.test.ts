@@ -3,7 +3,7 @@ import { errAsync, okAsync } from 'neverthrow'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createExerciseEntity } from '../../../__tests__/factories/exercise-factory'
 import { createExerciseRepositoryMock } from '../../../__tests__/factories/exercise-repository-mock'
-import { createAdminContext, createMemberContext } from '../../../__tests__/helpers/test-context'
+import { createAdminContext } from '../../../__tests__/helpers/test-context'
 import { makeGetExercise } from '../get-exercise'
 
 describe('[2.5-UNIT] getExercise use case', () => {

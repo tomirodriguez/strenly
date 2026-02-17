@@ -258,9 +258,7 @@ describe('deleteLog use case', () => {
       const log1 = createWorkoutLogEntity({ id: logId1, organizationId: ctx.organizationId })
       const log2 = createWorkoutLogEntity({ id: logId2, organizationId: ctx.organizationId })
 
-      vi.mocked(mockWorkoutLogRepository.findById)
-        .mockReturnValueOnce(okAsync(log1))
-        .mockReturnValueOnce(okAsync(log2))
+      vi.mocked(mockWorkoutLogRepository.findById).mockReturnValueOnce(okAsync(log1)).mockReturnValueOnce(okAsync(log2))
 
       vi.mocked(mockWorkoutLogRepository.delete).mockReturnValue(okAsync(undefined))
 

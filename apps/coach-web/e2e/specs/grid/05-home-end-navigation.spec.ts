@@ -8,7 +8,6 @@ test.describe('Home/End Navigation', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   test('[GRID.5-E2E-001] @p0 Home moves to first column in current row', async ({ gridPage }) => {
     // GIVEN: User has selected a cell in the middle of a row (Bench Press, third week)
     await gridPage.clickCell(2, 3)

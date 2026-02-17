@@ -7,7 +7,6 @@ test.describe('Edit Mode Entry', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   test('[GRID.6-E2E-001] @p0 Enter on active prescription cell enters edit mode', async ({ gridPage }) => {
     // GIVEN: User has selected a prescription cell (Back Squat, first week)
     await gridPage.clickCell(0, 1)
@@ -43,7 +42,9 @@ test.describe('Edit Mode Entry', () => {
     await expect(gridPage.editInput).toBeFocused()
   })
 
-  test('[GRID.6-E2E-004] @p1 typing digit on prescription cell enters edit with digit pre-filled', async ({ gridPage }) => {
+  test('[GRID.6-E2E-004] @p1 typing digit on prescription cell enters edit with digit pre-filled', async ({
+    gridPage,
+  }) => {
     // GIVEN: User has selected a prescription cell
     await gridPage.clickCell(0, 1)
 

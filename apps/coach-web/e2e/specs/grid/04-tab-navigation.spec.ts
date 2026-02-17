@@ -8,7 +8,6 @@ test.describe('Tab Navigation', () => {
     await gridPage.waitForGridLoad()
   })
 
-
   test('[GRID.4-E2E-001] @p0 Tab moves right one column', async ({ gridPage }) => {
     // GIVEN: User has selected the first cell in a row
     await gridPage.clickCell(0, 0)

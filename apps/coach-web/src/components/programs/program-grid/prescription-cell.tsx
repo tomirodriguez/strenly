@@ -170,6 +170,7 @@ export function PrescriptionCell({
 
   // View mode
   return (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-selected required by test infrastructure
     <td
       className={cn(
         'cursor-text border-border border-r border-b p-0',

@@ -45,9 +45,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
       vi.mocked(mockAthleteRepository.findById).mockReturnValue(okAsync(athlete))
 
       // Mock successful program save
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -90,9 +88,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
       // Omit weeksCount and sessionsCount to use defaults
       const input = { name: 'Default Program', athleteId: null }
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -120,9 +116,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
         sessionsCount: 5,
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -145,9 +139,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
       const ctx = createAdminContext()
       const input = createTemplateProgramInput({ name: 'Template Program' })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -202,9 +194,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
       const ctx = createAdminContext()
       const input = createProgramInput({ athleteId: null })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -353,9 +343,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
         sessionsCount: 2,
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -390,9 +378,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
         sessionsCount: 4,
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
@@ -430,9 +416,7 @@ describe('[3.1-UNIT] createProgram use case', () => {
         sessionsCount: 2,
       })
 
-      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(
-        okAsync({ updatedAt: new Date() }),
-      )
+      vi.mocked(mockProgramRepository.saveProgramAggregate).mockReturnValue(okAsync({ updatedAt: new Date() }))
 
       const createProgram = makeCreateProgram({
         programRepository: mockProgramRepository,
