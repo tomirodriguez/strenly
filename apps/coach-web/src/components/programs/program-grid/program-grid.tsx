@@ -1,10 +1,20 @@
 import type { ProgramAggregate } from '@strenly/contracts/programs/program'
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { GridBody } from './grid-body'
 import { GridHeader } from './grid-header'
 import type { GridData } from './types'
 import { useCellEditing } from './use-cell-editing'
 import { useGridNavigation } from './use-grid-navigation'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   useAddExerciseRow,
@@ -93,6 +103,9 @@ export function ProgramGrid({
   const { editingCell, startEditing, stopEditing } = useCellEditing({
     onEditStop: restoreFocus,
   })
+
+  // Delete confirmation state
+  const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
 
   // Mutation hooks
   const updatePrescription = useUpdatePrescription(program.id)
@@ -307,6 +320,35 @@ export function ProgramGrid({
       return
     }
 
+    // Ctrl+Delete / Ctrl+Backspace: Remove exercise row (with confirmation)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && e.ctrlKey && !editingCell) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      if (!row || row.type !== 'exercise') return
+      setPendingDeleteItemId(row.id)
+      return
+    }
+
+    // Delete/Backspace: Clear cell content (when NOT in edit mode)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !e.ctrlKey && !editingCell) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      if (!row || row.type !== 'exercise') return
+      const col = columns[activeCell.colIndex]
+      if (!col) return
+
+      if (col.type === 'week') {
+        // Clear prescription for this cell
+        useGridStore.getState().clearPrescription(row.id, col.id)
+      } else if (col.type === 'exercise') {
+        // Open edit mode on exercise cell (to re-select)
+        handleStartEdit(row.id, col.id)
+      }
+      return
+    }
+
     // Pass to navigation handler
     handleKeyDown(e)
   }
@@ -318,6 +360,22 @@ export function ProgramGrid({
         <Skeleton className="h-64 w-full" />
       </div>
     )
+  }
+
+  // Get exercise name for deletion confirmation dialog
+  const pendingDeleteRow = pendingDeleteItemId ? rows.find((r) => r.id === pendingDeleteItemId) : null
+  const pendingDeleteExerciseName =
+    pendingDeleteRow?.type === 'exercise' ? (pendingDeleteRow.exercise?.exerciseName ?? 'este ejercicio') : ''
+
+  const handleConfirmDelete = () => {
+    if (pendingDeleteItemId) {
+      useGridStore.getState().removeExerciseRow(pendingDeleteItemId)
+    }
+    setPendingDeleteItemId(null)
+  }
+
+  const handleCancelDelete = () => {
+    setPendingDeleteItemId(null)
   }
 
   return (
@@ -348,6 +406,24 @@ export function ProgramGrid({
           />
         </table>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={pendingDeleteItemId !== null} onOpenChange={(open) => !open && handleCancelDelete()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar ejercicio</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`¿Eliminar "${pendingDeleteExerciseName}" de todas las semanas? Esta acción no se puede deshacer.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleConfirmDelete}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

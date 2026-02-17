@@ -84,6 +84,12 @@ interface GridActions {
   // Reorder exercise groups within a session by providing the final ordered group IDs
   reorderExerciseGroups: (sessionId: string, orderedGroupIds: string[]) => void
 
+  // Clear prescription (series) for a specific item/week
+  clearPrescription: (itemId: string, weekId: string) => void
+
+  // Remove an exercise row from all weeks (deletes item from its group)
+  removeExerciseRow: (itemId: string) => void
+
   // Reset to server state (e.g., after refetch)
   reset: (aggregate: ProgramAggregate, exercisesMap: Map<string, string>) => void
 
@@ -848,6 +854,100 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Clear prescription (series) for a specific item/week
+  clearPrescription: (itemId, weekId) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      // Deep clone aggregate for immutable update
+      const newAggregate = deepClone(state.aggregate)
+
+      // Find and clear the item's series in the specified week
+      const week = newAggregate.weeks.find((w) => w.id === weekId)
+      if (week) {
+        for (const session of week.sessions) {
+          for (const group of session.exerciseGroups) {
+            const item = group.items.find((i) => i.id === itemId)
+            if (item) {
+              item.series = []
+              break
+            }
+          }
+        }
+      }
+
+      // Update grid display row's prescriptions map
+      const updatedRows = state.data.rows.map((row) => {
+        if (row.type === 'exercise' && row.id === itemId) {
+          return {
+            ...row,
+            prescriptions: {
+              ...row.prescriptions,
+              [weekId]: '',
+            },
+          }
+        }
+        return row
+      })
+
+      return {
+        aggregate: newAggregate,
+        data: { ...state.data, rows: updatedRows },
+        isDirty: true,
+      }
+    }),
+
+  // Remove an exercise row from all weeks
+  removeExerciseRow: (itemId) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const newAggregate = deepClone(state.aggregate)
+
+      // Remove item from its group in ALL weeks
+      for (const week of newAggregate.weeks) {
+        for (const session of week.sessions) {
+          for (let gi = session.exerciseGroups.length - 1; gi >= 0; gi--) {
+            const group = session.exerciseGroups[gi]
+            if (!group) continue
+
+            const itemIndex = group.items.findIndex((i) => i.id === itemId)
+            if (itemIndex === -1) continue
+
+            // Remove the item
+            group.items.splice(itemIndex, 1)
+
+            // Recalculate orderIndex for remaining items
+            group.items.forEach((item, idx) => {
+              item.orderIndex = idx
+            })
+
+            // If group is now empty, remove it
+            if (group.items.length === 0) {
+              session.exerciseGroups.splice(gi, 1)
+
+              // Recalculate orderIndex for remaining groups
+              const sortedGroups = [...session.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+              sortedGroups.forEach((g, idx) => {
+                g.orderIndex = idx
+              })
+            }
+
+            break // Item found in this session, no need to check more groups
+          }
+        }
+      }
+
+      // Regenerate grid data
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+
+      return {
+        aggregate: newAggregate,
+        data: gridData,
+        isDirty: true,
+      }
+    }),
+
   // Reset to server state
   reset: (aggregate, exercisesMap) => {
     const gridData = aggregateToGridData(aggregate, exercisesMap)
@@ -934,6 +1034,8 @@ export const useGridActions = () =>
       ungroupExercise: state.ungroupExercise,
       moveExercise: state.moveExercise,
       reorderExerciseGroups: state.reorderExerciseGroups,
+      clearPrescription: state.clearPrescription,
+      removeExerciseRow: state.removeExerciseRow,
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,
