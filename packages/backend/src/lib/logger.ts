@@ -1,5 +1,5 @@
 /**
- * Structured logger for Cloudflare Workers.
+ * Structured logger for Railway.
  * Outputs JSON for machine-readable log aggregation.
  */
 export const logger = {

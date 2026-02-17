@@ -1,5 +1,5 @@
 /**
- * Better-Auth configuration for Cloudflare Workers
+ * Better-Auth configuration for Railway
  * Factory function that creates Better Auth instances on-demand
  */
 
@@ -21,13 +21,13 @@ export type AuthEnv = {
 }
 
 /**
- * Creates a Better Auth instance with proper Cloudflare Workers configuration
+ * Creates a Better Auth instance with proper Railway configuration
  *
  * This factory function accepts environment bindings and a database client,
  * allowing proper initialization in serverless/edge environments where
- * environment variables are provided per-request via Cloudflare bindings.
+ * environment variables are provided per-request via Railway.
  *
- * @param env - Environment bindings from Cloudflare Workers
+ * @param env - Environment bindings from Railway
  * @param db - Database client instance
  * @returns Configured Better Auth instance
  */
@@ -52,7 +52,6 @@ export function createAuth(env: AuthEnv, db: DB) {
       enabled: true,
       minPasswordLength: 8,
       maxPasswordLength: 128,
-      // Note: On Cloudflare Workers free tier, scrypt may exceed CPU limit
       // Consider paid tier or Email OTP alternative
     },
     socialProviders:

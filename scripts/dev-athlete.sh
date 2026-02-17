@@ -9,7 +9,7 @@ if [ -f ".env" ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
-# Copy env vars to .dev.vars for Cloudflare apps
+# Copy env vars to .dev.vars for Railway apps
 if [ -f ".env" ]; then
   cp .env apps/api/.dev.vars 2>/dev/null || true
 fi

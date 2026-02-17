@@ -1,6 +1,6 @@
 /**
  * @strenly/database - Drizzle ORM schemas and client
- * Exports factory functions for Cloudflare Workers compatibility
+ * Exports factory functions for Railway compatibility
  */
 
 /**

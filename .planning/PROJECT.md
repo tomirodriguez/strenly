@@ -76,7 +76,7 @@ Strenly is a training planning and management platform for strength training coa
 
 ## Constraints
 
-- **Tech stack**: React 19 + Vite (coach SPA, athlete PWA), Hono + oRPC on Cloudflare Workers, Neon PostgreSQL, Drizzle ORM, Better-Auth
+- **Tech stack**: React 19 + Vite (coach SPA, athlete PWA), Hono + oRPC on Railway, Neon PostgreSQL, Drizzle ORM, Better-Auth
 - **Code conventions**: kebab-case files, neverthrow for errors, no `as` casting, no `!` assertions, no barrel files
 - **Monorepo**: pnpm workspaces + Turbo, packages for contracts/core/backend/apps
 - **Multi-tenancy**: Application-level filtering + RLS safety net

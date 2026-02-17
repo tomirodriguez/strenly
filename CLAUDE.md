@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Strenly is a training planning platform for strength coaches: Coach Web App (desktop SPA, Excel-like editing), Athlete PWA (mobile), API (Hono + oRPC on Cloudflare Workers), Neon PostgreSQL with Drizzle ORM.
+Strenly is a training planning platform for strength coaches: Coach Web App (desktop SPA, Excel-like editing), Athlete PWA (mobile), API (Hono + oRPC on Railway), Neon PostgreSQL with Drizzle ORM.
 
 ## Tech Stack
 
@@ -21,7 +21,7 @@ Strenly is a training planning platform for strength coaches: Coach Web App (des
 apps/
   coach-web/          # React + Vite (Desktop SPA, keyboard-first)
   athlete-pwa/        # React + Vite + PWA (Mobile, touch-friendly)
-  server/             # Hono entry point (Cloudflare Workers)
+  server/             # Hono entry point (Railway)
   marketing/          # Next.js (Landing page)
 packages/
   core/               # Domain entities + ports (no dependencies)
