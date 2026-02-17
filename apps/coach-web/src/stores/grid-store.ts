@@ -75,6 +75,9 @@ interface GridActions {
   // Group exercise with the one above it (aggregate-level superset manipulation)
   groupWithAbove: (itemId: string, sessionId: string) => void
 
+  // Move an exercise group up or down within its session (applies to all weeks)
+  moveExercise: (itemId: string, sessionId: string, direction: 'up' | 'down') => void
+
   // Reset to server state (e.g., after refetch)
   reset: (aggregate: ProgramAggregate, exercisesMap: Map<string, string>) => void
 
@@ -654,6 +657,74 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Move exercise group up or down within its session (applies to all weeks)
+  moveExercise: (itemId, sessionId, direction) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const newAggregate = deepClone(state.aggregate)
+
+      // Find the item's group in first week (canonical structure)
+      const firstWeek = newAggregate.weeks[0]
+      if (!firstWeek) return state
+
+      const session = firstWeek.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      // Sort groups by orderIndex to find the item's group and its neighbor
+      const sortedGroups = [...session.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+
+      // Find which group contains this item
+      let currentGroupIndex = -1
+      for (let gi = 0; gi < sortedGroups.length; gi++) {
+        const group = sortedGroups[gi]
+        if (!group) continue
+        if (group.items.some((i) => i.id === itemId)) {
+          currentGroupIndex = gi
+          break
+        }
+      }
+
+      if (currentGroupIndex === -1) return state
+
+      // Determine the adjacent group index
+      const adjacentIndex = direction === 'up' ? currentGroupIndex - 1 : currentGroupIndex + 1
+
+      // Boundary check: if already first/last, return unchanged
+      if (adjacentIndex < 0 || adjacentIndex >= sortedGroups.length) return state
+
+      const currentGroup = sortedGroups[currentGroupIndex]
+      const adjacentGroup = sortedGroups[adjacentIndex]
+      if (!currentGroup || !adjacentGroup) return state
+
+      const currentGroupId = currentGroup.id
+      const adjacentGroupId = adjacentGroup.id
+
+      // Swap orderIndex in ALL weeks
+      for (const week of newAggregate.weeks) {
+        const weekSession = week.sessions.find((s) => s.id === sessionId)
+        if (!weekSession) continue
+
+        const weekCurrentGroup = weekSession.exerciseGroups.find((g) => g.id === currentGroupId)
+        const weekAdjacentGroup = weekSession.exerciseGroups.find((g) => g.id === adjacentGroupId)
+        if (!weekCurrentGroup || !weekAdjacentGroup) continue
+
+        // Swap orderIndex values
+        const tempOrder = weekCurrentGroup.orderIndex
+        weekCurrentGroup.orderIndex = weekAdjacentGroup.orderIndex
+        weekAdjacentGroup.orderIndex = tempOrder
+      }
+
+      // Regenerate grid data
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+
+      return {
+        aggregate: newAggregate,
+        data: gridData,
+        isDirty: true,
+      }
+    }),
+
   // Reset to server state
   reset: (aggregate, exercisesMap) => {
     const gridData = aggregateToGridData(aggregate, exercisesMap)
@@ -737,6 +808,7 @@ export const useGridActions = () =>
       addSession: state.addSession,
       updateSupersetGroup: state.updateSupersetGroup,
       groupWithAbove: state.groupWithAbove,
+      moveExercise: state.moveExercise,
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,

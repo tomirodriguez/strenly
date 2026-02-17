@@ -11,6 +11,7 @@ import {
   useUpdateExerciseRow,
   useUpdatePrescription,
 } from '@/features/programs/hooks/mutations/use-grid-mutations'
+import { useGridStore } from '@/stores/grid-store'
 
 interface ProgramGridProps {
   program: ProgramAggregate
@@ -263,6 +264,29 @@ export function ProgramGrid({
 
   // Handle global keyboard shortcuts
   const handleTableKeyDown = (e: React.KeyboardEvent) => {
+    // Intercept Alt+ArrowUp / Alt+ArrowDown for exercise reorder
+    if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      e.preventDefault()
+      if (!activeCell) return
+
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      if (!row || row.type !== 'exercise') return
+
+      const direction = e.key === 'ArrowUp' ? 'up' : 'down'
+      useGridStore.getState().moveExercise(row.id, row.sessionId, direction)
+
+      // After move, find the row's new position in updated grid data and follow it
+      requestAnimationFrame(() => {
+        const updatedData = useGridStore.getState().data
+        if (!updatedData) return
+        const newRowIndex = updatedData.rows.findIndex((r) => r.id === activeCell.rowId)
+        if (newRowIndex >= 0) {
+          setActiveCell(activeCell.rowId, activeCell.colId)
+        }
+      })
+      return
+    }
+
     // Pass to navigation handler
     handleKeyDown(e)
   }
