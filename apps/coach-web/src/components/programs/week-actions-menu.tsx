@@ -1,4 +1,4 @@
-import { CopyIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react'
+import { ArrowRightIcon, CopyIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -21,12 +21,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { useDeleteWeek, useDuplicateWeek, useUpdateWeek } from '@/features/programs/hooks/mutations/use-grid-mutations'
 import { toast } from '@/lib/toast'
+import { useGridStore } from '@/stores/grid-store'
 
 interface WeekActionsMenuProps {
   programId: string
   weekId: string
   weekName: string
   isLastWeek: boolean
+  nextWeekId?: string
   onClose?: () => void
 }
 
@@ -34,7 +36,14 @@ interface WeekActionsMenuProps {
  * Dropdown menu for week column actions: rename, duplicate, delete.
  * Integrates into week column headers in the program grid.
  */
-export function WeekActionsMenu({ programId, weekId, weekName, isLastWeek, onClose }: WeekActionsMenuProps) {
+export function WeekActionsMenu({
+  programId,
+  weekId,
+  weekName,
+  isLastWeek,
+  nextWeekId,
+  onClose,
+}: WeekActionsMenuProps) {
   const [open, setOpen] = useState(false)
   const [renameOpen, setRenameOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -68,6 +77,14 @@ export function WeekActionsMenu({ programId, weekId, weekName, isLastWeek, onClo
         },
       },
     )
+    setOpen(false)
+  }
+
+  const handleCopyToNextWeek = () => {
+    if (nextWeekId) {
+      useGridStore.getState().copyWeekPrescriptions(weekId, nextWeekId)
+      toast.success('Prescripciones copiadas a la siguiente semana')
+    }
     setOpen(false)
   }
 
@@ -112,6 +129,10 @@ export function WeekActionsMenu({ programId, weekId, weekName, isLastWeek, onClo
             <DropdownMenuItem onClick={handleDuplicate} disabled={duplicateWeek.isPending}>
               <CopyIcon className="size-4" />
               Duplicar semana
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleCopyToNextWeek} disabled={!nextWeekId}>
+              <ArrowRightIcon className="size-4" />
+              Copiar a semana siguiente
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

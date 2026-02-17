@@ -337,6 +337,22 @@ export function ProgramGrid({
       return
     }
 
+    // Ctrl+Shift+ArrowRight: Copy week prescriptions to next week
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'ArrowRight') {
+      e.preventDefault()
+      if (!activeCell) return
+      const col = columns[activeCell.colIndex]
+      if (!col || col.type !== 'week') return
+
+      // Find next week column
+      const nextColIndex = activeCell.colIndex + 1
+      const nextCol = columns[nextColIndex]
+      if (!nextCol || nextCol.type !== 'week') return
+
+      useGridStore.getState().copyWeekPrescriptions(col.id, nextCol.id)
+      return
+    }
+
     // Ctrl+C: Copy prescription
     if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.shiftKey && !editingCell) {
       e.preventDefault()

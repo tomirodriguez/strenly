@@ -42,6 +42,7 @@ export function GridHeader({ columns, programId, weeksCount }: GridHeaderProps) 
                     weekId={col.weekId}
                     weekName={col.name}
                     isLastWeek={isLastWeek}
+                    nextWeekId={columns[index + 1]?.type === 'week' ? columns[index + 1]?.weekId : undefined}
                   />
                 )}
               </div>

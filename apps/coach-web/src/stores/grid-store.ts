@@ -114,6 +114,9 @@ interface GridActions {
   // Redo last undone mutation
   redo: () => void
 
+  // Copy all prescriptions from one week to the next
+  copyWeekPrescriptions: (fromWeekId: string, toWeekId: string) => void
+
   // Copy a prescription's notation to the internal clipboard (no undo push)
   copyPrescription: (itemId: string, weekId: string) => void
 
@@ -1093,6 +1096,39 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Copy all prescriptions from one week to the next
+  copyWeekPrescriptions: (fromWeekId, toWeekId) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const historyUpdate = pushToUndoStack(state)
+      const newAggregate = deepClone(state.aggregate)
+
+      const fromWeek = newAggregate.weeks.find((w) => w.id === fromWeekId)
+      const toWeek = newAggregate.weeks.find((w) => w.id === toWeekId)
+      if (!fromWeek || !toWeek) return state
+
+      for (const fromSession of fromWeek.sessions) {
+        const toSession = toWeek.sessions.find((s) => s.id === fromSession.id)
+        if (!toSession) continue
+
+        for (const fromGroup of fromSession.exerciseGroups) {
+          const toGroup = toSession.exerciseGroups.find((g) => g.id === fromGroup.id)
+          if (!toGroup) continue
+
+          for (const fromItem of fromGroup.items) {
+            const toItem = toGroup.items.find((i) => i.id === fromItem.id)
+            if (toItem) {
+              toItem.series = deepClone(fromItem.series)
+            }
+          }
+        }
+      }
+
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+      return { ...historyUpdate, aggregate: newAggregate, data: gridData, isDirty: true }
+    }),
+
   // Copy a prescription's notation to the internal clipboard (read-only, no undo push)
   copyPrescription: (itemId, weekId) =>
     set((state) => {
@@ -1180,6 +1216,7 @@ export const useGridActions = () =>
       reorderExerciseGroups: state.reorderExerciseGroups,
       clearPrescription: state.clearPrescription,
       removeExerciseRow: state.removeExerciseRow,
+      copyWeekPrescriptions: state.copyWeekPrescriptions,
       copyPrescription: state.copyPrescription,
       undo: state.undo,
       redo: state.redo,
