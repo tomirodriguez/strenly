@@ -1,6 +1,6 @@
 import type { OrganizationType } from '@strenly/contracts/subscriptions/plan'
 import { useNavigate } from '@tanstack/react-router'
-import { Check, Dumbbell, LogOut } from 'lucide-react'
+import { Check, LogOut, ZapIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { CoachTypeStep } from '../components/coach-type-step'
@@ -152,7 +152,7 @@ export function OnboardingView() {
       {/* Header */}
       <header className="flex items-center justify-between border-b bg-background px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
-          <Dumbbell className="size-5 text-primary" />
+          <ZapIcon className="size-5 text-primary" />
           <span className="font-semibold">Strenly</span>
         </div>
 
@@ -172,7 +172,7 @@ export function OnboardingView() {
                 Hola, <span className="font-medium text-foreground">{userName}</span>
               </p>
             )}
-            <h1 className="font-semibold text-2xl tracking-tight">Configura tu cuenta</h1>
+            <h1 className="font-bold text-2xl tracking-tight">Configura tu cuenta</h1>
             <StepIndicator currentIndex={stepIndex} />
           </div>
         </div>
