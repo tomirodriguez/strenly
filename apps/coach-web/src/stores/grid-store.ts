@@ -75,6 +75,9 @@ interface GridActions {
   // Group exercise with the one above it (aggregate-level superset manipulation)
   groupWithAbove: (itemId: string, sessionId: string) => void
 
+  // Ungroup an exercise from its superset (move to standalone group)
+  ungroupExercise: (itemId: string, sessionId: string) => void
+
   // Move an exercise group up or down within its session (applies to all weeks)
   moveExercise: (itemId: string, sessionId: string, direction: 'up' | 'down') => void
 
@@ -657,6 +660,86 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Ungroup an exercise from its superset (move to standalone group)
+  ungroupExercise: (itemId, sessionId) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const newAggregate = deepClone(state.aggregate)
+
+      // Find the item and its current group in first week (canonical structure)
+      const firstWeek = newAggregate.weeks[0]
+      if (!firstWeek) return state
+
+      const session = firstWeek.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      // Sort groups by orderIndex to find the item's group
+      const sortedGroups = [...session.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+
+      // Find current item's group
+      let currentGroupId = ''
+      let isAlreadyStandalone = false
+      for (const group of sortedGroups) {
+        const itemIdx = group.items.findIndex((i) => i.id === itemId)
+        if (itemIdx >= 0) {
+          currentGroupId = group.id
+          // If the group has only 1 item, it's already standalone
+          isAlreadyStandalone = group.items.length <= 1
+          break
+        }
+      }
+
+      if (!currentGroupId || isAlreadyStandalone) return state
+
+      // Generate a new group ID for the standalone group
+      const newGroupId = generateId()
+
+      // Apply the change to ALL weeks
+      for (const week of newAggregate.weeks) {
+        const weekSession = week.sessions.find((s) => s.id === sessionId)
+        if (!weekSession) continue
+
+        const weekCurrentGroup = weekSession.exerciseGroups.find((g) => g.id === currentGroupId)
+        if (!weekCurrentGroup) continue
+
+        // Find and remove the item from its current group
+        const weekItemIndex = weekCurrentGroup.items.findIndex((i) => i.id === itemId)
+        if (weekItemIndex === -1) continue
+
+        const [movedItem] = weekCurrentGroup.items.splice(weekItemIndex, 1)
+        if (!movedItem) continue
+
+        // Recalculate orderIndex for remaining items in source group
+        weekCurrentGroup.items.forEach((item, idx) => {
+          item.orderIndex = idx
+        })
+
+        // Create a new standalone group right after the source group
+        const newGroup: ExerciseGroupAggregate = {
+          id: newGroupId,
+          orderIndex: weekCurrentGroup.orderIndex + 1,
+          items: [{ ...movedItem, orderIndex: 0 }],
+        }
+        weekSession.exerciseGroups.push(newGroup)
+
+        // Normalize orderIndex for all groups in the session
+        const weekSortedGroups = [...weekSession.exerciseGroups].sort((a, b) => a.orderIndex - b.orderIndex)
+        weekSortedGroups.forEach((g, idx) => {
+          g.orderIndex = idx
+        })
+      }
+
+      // Regenerate grid data
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+
+      return {
+        aggregate: newAggregate,
+        data: gridData,
+        isDirty: true,
+      }
+    }),
+
   // Move exercise group up or down within its session (applies to all weeks)
   moveExercise: (itemId, sessionId, direction) =>
     set((state) => {
@@ -808,6 +891,7 @@ export const useGridActions = () =>
       addSession: state.addSession,
       updateSupersetGroup: state.updateSupersetGroup,
       groupWithAbove: state.groupWithAbove,
+      ungroupExercise: state.ungroupExercise,
       moveExercise: state.moveExercise,
       reset: state.reset,
       markSaved: state.markSaved,

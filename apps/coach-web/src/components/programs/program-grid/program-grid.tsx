@@ -287,6 +287,26 @@ export function ProgramGrid({
       return
     }
 
+    // Ctrl+G: Group with above
+    if (e.ctrlKey && e.key === 'g' && !e.shiftKey) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      if (!row || row.type !== 'exercise') return
+      useGridStore.getState().groupWithAbove(row.id, row.sessionId)
+      return
+    }
+
+    // Ctrl+Shift+G: Ungroup
+    if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
+      e.preventDefault()
+      if (!activeCell) return
+      const row = rows.find((r) => r.id === activeCell.rowId)
+      if (!row || row.type !== 'exercise') return
+      useGridStore.getState().ungroupExercise(row.id, row.sessionId)
+      return
+    }
+
     // Pass to navigation handler
     handleKeyDown(e)
   }
