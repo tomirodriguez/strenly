@@ -138,7 +138,7 @@ export function AthletesListView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-2xl">Atletas</h1>
+          <h1 className="font-bold text-3xl tracking-tight">Atletas</h1>
           <p className="text-muted-foreground text-sm">Gestiona tus atletas y envia invitaciones</p>
         </div>
         <Button onClick={handleAddAthlete}>

@@ -151,7 +151,7 @@ export function ProgramsListView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-2xl">Programas</h1>
+          <h1 className="font-bold text-3xl tracking-tight">Programas</h1>
           <p className="text-muted-foreground text-sm">Crea y gestiona los programas de entrenamiento</p>
         </div>
         <Button onClick={handleCreateProgram}>
