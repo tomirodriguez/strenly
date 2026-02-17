@@ -17,14 +17,14 @@ export function GridHeader({ columns, programId, weeksCount }: GridHeaderProps) 
 
   return (
     <thead className="sticky top-0 z-40">
-      <tr className="bg-zinc-900">
+      <tr className="bg-muted">
         {columns.map((col, index) => (
           <th
             key={col.id}
             className={cn(
-              'border-border border-r border-b-2 bg-zinc-900 px-4 py-3',
-              index === 0 && 'sticky left-0 z-30 w-[320px] bg-zinc-900',
-              index > 0 && 'w-56 bg-zinc-900/50',
+              'border-border border-r border-b-2 bg-muted px-4 py-3',
+              index === 0 && 'sticky left-0 z-30 w-[320px] bg-muted',
+              index > 0 && 'w-56 bg-muted',
             )}
           >
             {col.type === 'exercise' ? (

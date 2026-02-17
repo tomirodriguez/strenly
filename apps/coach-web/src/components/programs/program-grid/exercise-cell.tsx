@@ -132,7 +132,7 @@ export function ExerciseCell({
     <td
       className={cn(
         'sticky left-0 z-10 border-border border-r border-b p-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]',
-        row.isSubRow ? 'bg-zinc-950/20' : 'bg-background',
+        row.isSubRow ? 'bg-muted/20' : 'bg-background',
         isActive && 'ring-1 ring-primary ring-inset',
       )}
       data-row-id={row.id}

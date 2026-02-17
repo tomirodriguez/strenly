@@ -67,7 +67,7 @@ export function AddExerciseRow({
       data-row-type="add-exercise"
       data-session-id={sessionId}
     >
-      <td className="sticky left-0 z-10 border-border border-r border-b bg-zinc-900/10 p-0">
+      <td className="sticky left-0 z-10 border-border border-r border-b bg-muted/10 p-0">
         <div className="flex h-10 items-center" onKeyDownCapture={handleKeyDownCapture}>
           <span className="flex h-full w-10 items-center justify-center border-border border-r">
             <PlusIcon className="size-4 text-muted-foreground" />
