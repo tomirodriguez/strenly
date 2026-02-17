@@ -16,7 +16,7 @@ import { intensityTypeSchema } from '../programs/prescription'
 // ============================================================================
 
 export const logStatusSchema = z.enum(['completed', 'partial', 'skipped'], {
-  errorMap: () => ({ message: 'Estado de registro inválido' }),
+  error: 'Estado de registro inválido',
 })
 export type LogStatus = z.infer<typeof logStatusSchema>
 

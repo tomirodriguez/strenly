@@ -21,7 +21,7 @@ export { mapIntensityTypeToUnit } from '@strenly/core/domain/entities/program/ty
  * - rir: Reps in Reserve (e.g., @RIR2)
  */
 export const intensityTypeSchema = z.enum(['absolute', 'percentage', 'rpe', 'rir'], {
-  errorMap: () => ({ message: 'Tipo de intensidad inválido' }),
+  error: 'Tipo de intensidad inválido',
 })
 
 export type IntensityType = z.infer<typeof intensityTypeSchema>
@@ -30,7 +30,7 @@ export type IntensityType = z.infer<typeof intensityTypeSchema>
  * Units for intensity values
  */
 export const intensityUnitSchema = z.enum(['kg', 'lb', '%', 'rpe', 'rir'], {
-  errorMap: () => ({ message: 'Unidad de intensidad inválida' }),
+  error: 'Unidad de intensidad inválida',
 })
 
 export type IntensityUnit = z.infer<typeof intensityUnitSchema>
@@ -39,7 +39,7 @@ export type IntensityUnit = z.infer<typeof intensityUnitSchema>
  * Units for unilateral exercises
  */
 export const unilateralUnitSchema = z.enum(['leg', 'arm', 'side'], {
-  errorMap: () => ({ message: 'Unidad unilateral invalida' }),
+  error: 'Unidad unilateral invalida',
 })
 
 export type UnilateralUnit = z.infer<typeof unilateralUnitSchema>

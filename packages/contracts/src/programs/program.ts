@@ -11,7 +11,7 @@ import { intensityTypeSchema, prescriptionSeriesInputSchema } from './prescripti
  * archived - no longer active
  */
 export const programStatusSchema = z.enum(['draft', 'active', 'archived'], {
-  errorMap: () => ({ message: 'Estado de programa inválido' }),
+  error: 'Estado de programa inválido',
 })
 
 export type ProgramStatus = z.infer<typeof programStatusSchema>

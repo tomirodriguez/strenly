@@ -6,7 +6,7 @@ import { z } from 'zod'
  * Defined here since organizations module was removed in favor of Better-Auth
  */
 export const organizationTypeSchema = z.enum(['coach_solo', 'gym'], {
-  errorMap: () => ({ message: 'Tipo de organización inválido' }),
+  error: 'Tipo de organización inválido',
 })
 export type OrganizationType = z.infer<typeof organizationTypeSchema>
 

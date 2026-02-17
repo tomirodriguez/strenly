@@ -6,7 +6,7 @@ import { planSchema } from './plan'
  * Tracks the state of an organization's subscription
  */
 export const subscriptionStatusSchema = z.enum(['active', 'canceled', 'past_due'], {
-  errorMap: () => ({ message: 'Estado de suscripción inválido' }),
+  error: 'Estado de suscripción inválido',
 })
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>

@@ -9,7 +9,7 @@ import { paginationQuerySchema } from '../common/pagination'
  * inactive - archived/paused
  */
 export const athleteStatusSchema = z.enum(['active', 'inactive'], {
-  errorMap: () => ({ message: 'Estado de atleta inválido' }),
+  error: 'Estado de atleta inválido',
 })
 
 export type AthleteStatus = z.infer<typeof athleteStatusSchema>
@@ -18,7 +18,7 @@ export type AthleteStatus = z.infer<typeof athleteStatusSchema>
  * Athlete gender schema
  */
 export const genderSchema = z.enum(['male', 'female', 'other'], {
-  errorMap: () => ({ message: 'Género inválido' }),
+  error: 'Género inválido',
 })
 
 export type AthleteGender = z.infer<typeof genderSchema>

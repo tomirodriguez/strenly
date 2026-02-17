@@ -6,7 +6,7 @@ import { z } from 'zod'
 export const muscleGroupSchema = z.enum(
   ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'quads', 'hamstrings', 'glutes', 'core', 'calves'],
   {
-    errorMap: () => ({ message: 'Grupo muscular inválido' }),
+    error: 'Grupo muscular inválido',
   },
 )
 
@@ -16,7 +16,7 @@ export type MuscleGroup = z.infer<typeof muscleGroupSchema>
  * Body region schema - groups muscle groups by anatomical region
  */
 export const bodyRegionSchema = z.enum(['upper', 'lower', 'core'], {
-  errorMap: () => ({ message: 'Región corporal inválida' }),
+  error: 'Región corporal inválida',
 })
 
 export type BodyRegion = z.infer<typeof bodyRegionSchema>
@@ -44,7 +44,7 @@ export type ListMuscleGroupsOutput = z.infer<typeof listMuscleGroupsOutputSchema
  * Movement pattern schema - categorizes exercises by movement type
  */
 export const movementPatternSchema = z.enum(['push', 'pull', 'hinge', 'squat', 'carry', 'core'], {
-  errorMap: () => ({ message: 'Patrón de movimiento inválido' }),
+  error: 'Patrón de movimiento inválido',
 })
 
 export type MovementPattern = z.infer<typeof movementPatternSchema>
