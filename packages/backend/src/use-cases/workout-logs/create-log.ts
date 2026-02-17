@@ -7,7 +7,7 @@ import type { ProgramRepositoryPort } from '@strenly/core/ports/program-reposito
 import type { WorkoutLogRepositoryPort } from '@strenly/core/ports/workout-log-repository.port'
 import { hasPermission } from '@strenly/core/services/authorization'
 import type { OrganizationContext } from '@strenly/core/types/organization-context'
-import { errAsync, okAsync, type ResultAsync } from 'neverthrow'
+import { errAsync, okAsync, ResultAsync } from 'neverthrow'
 
 export type CreateLogInput = OrganizationContext & {
   athleteId: string
@@ -173,8 +173,11 @@ export const makeCreateLog =
             return okAsync(athlete)
           })
 
-        // Combine results
-        return programResult.andThen((program) => athleteResult.map((athlete) => ({ program, athlete })))
+        // Combine results in parallel
+        return ResultAsync.combine([programResult, athleteResult]).map(([program, athlete]) => ({
+          program,
+          athlete,
+        }))
       })
       .andThen(({ program, athlete }) => {
         // 4. Find week and session
