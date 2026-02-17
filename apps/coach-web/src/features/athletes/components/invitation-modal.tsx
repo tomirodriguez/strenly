@@ -129,7 +129,7 @@ export function InvitationModal({ athlete, open, onOpenChange }: InvitationModal
               <div className="flex items-center gap-2 rounded-md bg-muted p-2">
                 <code className="flex-1 text-xs">{truncateUrl(invitation.invitationUrl)}</code>
                 <Button size="sm" variant="ghost" onClick={handleCopy}>
-                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             </div>

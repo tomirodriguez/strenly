@@ -92,7 +92,7 @@ export function NewProgramView() {
           <span className="sr-only">Volver</span>
         </Button>
         <div>
-          <h1 className="font-bold text-2xl">Crear Programa</h1>
+          <h1 className="font-bold text-3xl tracking-tight">Crear Programa</h1>
           <p className="text-muted-foreground text-sm">Crea un nuevo programa de entrenamiento</p>
         </div>
       </div>
