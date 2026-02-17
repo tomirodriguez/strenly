@@ -177,11 +177,11 @@ function ProgramEditorSkeleton() {
       </div>
 
       {/* Footer skeleton */}
-      <div className="flex h-16 shrink-0 items-center justify-between border-border border-t px-6">
-        <Skeleton className="h-4 w-64" />
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-28" />
-          <Skeleton className="h-9 w-32" />
+      <div className="flex shrink-0 items-center justify-between border-border border-t px-4 py-1.5">
+        <Skeleton className="hidden h-3 w-64 lg:block" />
+        <div className="ml-auto flex items-center gap-2">
+          <Skeleton className="h-7 w-24" />
+          <Skeleton className="h-7 w-28" />
         </div>
       </div>
     </div>
@@ -203,6 +203,19 @@ function ProgramNotFound({ orgSlug }: { orgSlug: string }) {
   )
 }
 
+function ShortcutHint({ keys, label }: { keys: string[]; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {keys.map((key) => (
+        <kbd key={key} className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+          {key}
+        </kbd>
+      ))}
+      <span>{label}</span>
+    </div>
+  )
+}
+
 interface ProgramFooterProps {
   isDirty: boolean
   isPending: boolean
@@ -214,23 +227,20 @@ interface ProgramFooterProps {
  */
 function ProgramFooter({ isDirty, isPending, onSave }: ProgramFooterProps) {
   return (
-    <footer className="flex h-16 shrink-0 items-center justify-between border-border border-t bg-background px-6">
-      {/* Keyboard shortcuts */}
-      <div className="flex items-center gap-6 text-muted-foreground text-xs">
-        <div className="flex items-center gap-2">
-          <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">Shift + Enter</kbd>
-          <span>Agregar sub-fila (Split)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">S</kbd>
-          <span>Toggle Superserie</span>
-        </div>
+    <footer className="flex shrink-0 items-center justify-between border-border border-t bg-background px-4 py-1.5">
+      {/* Keyboard shortcuts — hidden on narrow screens */}
+      <div className="hidden items-center gap-4 text-muted-foreground text-[11px] lg:flex">
+        <ShortcutHint keys={['Ctrl', 'G']} label="Superserie" />
+        <ShortcutHint keys={['Alt', '↑↓']} label="Reordenar" />
+        <ShortcutHint keys={['Ctrl', 'C/V']} label="Copiar / Pegar" />
+        <ShortcutHint keys={['Ctrl', 'Z']} label="Deshacer" />
+        <ShortcutHint keys={['Ctrl', 'Del']} label="Eliminar fila" />
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center gap-3">
-        <Button variant="outline" disabled>
-          <FileDownIcon className="size-4" />
+      <div className="flex items-center gap-2 ml-auto">
+        <Button variant="outline" size="sm" disabled>
+          <FileDownIcon className="size-3.5" />
           Exportar PDF
         </Button>
         <SaveButton isDirty={isDirty} isPending={isPending} onSave={onSave} />

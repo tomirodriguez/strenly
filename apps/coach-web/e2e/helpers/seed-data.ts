@@ -30,11 +30,11 @@ export const EXERCISES = {
   session3: ['Conventional Deadlift', 'Barbell Row'],
 } as const
 
-/** All exercises in grid order (excluding session headers and add-exercise rows) */
+/** All exercises in grid order (excluding session headers and empty rows) */
 export const ALL_EXERCISES = [...EXERCISES.session1, ...EXERCISES.session2, ...EXERCISES.session3] as const
 
-/** Total exercise rows across all sessions */
-export const TOTAL_EXERCISE_ROWS = ALL_EXERCISES.length // 7
+/** Total exercise rows across all sessions (includes empty placeholder rows, one per session) */
+export const TOTAL_EXERCISE_ROWS = ALL_EXERCISES.length + SESSIONS.length // 10
 
 /**
  * Superset in session 2: Incline Dumbbell Press + Tricep Pushdown

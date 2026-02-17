@@ -255,10 +255,10 @@ function aggregateToGridData(aggregate: ProgramAggregate, exercisesMap: Map<stri
       })
     }
 
-    // Add "add exercise" row for this session
+    // Add empty exercise row for this session (auto-append placeholder)
     rows.push({
-      id: `add-exercise-${session.id}`,
-      type: 'add-exercise',
+      id: `empty-${session.id}`,
+      type: 'exercise',
       sessionId: session.id,
       sessionName: session.name,
       supersetGroup: null,

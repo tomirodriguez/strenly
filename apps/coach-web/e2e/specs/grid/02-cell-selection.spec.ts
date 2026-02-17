@@ -66,12 +66,12 @@ test.describe('Cell Selection', () => {
     await expect(gridPage.activeCell).toHaveCount(1)
 
     // WHEN: User clicks another cell
-    await gridPage.clickCell(2, 1)
+    await gridPage.clickCell(3, 1)
     // THEN: Still only one active cell
     await expect(gridPage.activeCell).toHaveCount(1)
 
     // WHEN: User clicks yet another cell
-    await gridPage.clickCell(4, 3)
+    await gridPage.clickCell(5, 3)
     // THEN: Still only one active cell
     await expect(gridPage.activeCell).toHaveCount(1)
   })

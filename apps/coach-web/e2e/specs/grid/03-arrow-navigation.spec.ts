@@ -1,4 +1,4 @@
-import { expect, test } from '../../fixtures/test'
+import { test } from '../../fixtures/test'
 
 test.describe('Arrow Key Navigation', () => {
   test.beforeEach(async ({ gridPage }) => {
@@ -77,16 +77,15 @@ test.describe('Arrow Key Navigation', () => {
     await gridPage.expectActiveCellAt(0, 0)
   })
 
-  test('[GRID.3-E2E-007] @p1 ArrowDown at last exercise row reaches add-exercise row', async ({ gridPage }) => {
-    // GIVEN: User has selected the last exercise row (Barbell Row)
-    await gridPage.clickCell(6, 1)
+  test('[GRID.3-E2E-007] @p1 ArrowDown at last exercise row reaches empty row', async ({ gridPage }) => {
+    // GIVEN: User has selected the last real exercise row (Barbell Row, index 8)
+    await gridPage.clickCell(8, 1)
 
     // WHEN: User presses ArrowDown
     await gridPage.pressKey('ArrowDown')
 
-    // THEN: Focus moves to the add-exercise row for session 3 (last session)
-    const addExInput = gridPage.addExerciseInput(2)
-    await expect(addExInput).toBeFocused({ timeout: 3_000 })
+    // THEN: Focus moves to the empty row for session 3 (index 9)
+    await gridPage.expectActiveCellAt(9, 1)
   })
 
   test('[GRID.3-E2E-008] @p1 ArrowUp at first exercise row stays put', async ({ gridPage }) => {
@@ -102,7 +101,7 @@ test.describe('Arrow Key Navigation', () => {
 
   // ── Session boundary crossing ──
 
-  test('[GRID.3-E2E-009] @p1 ArrowDown from last exercise in session 1 reaches add-exercise then session 2', async ({
+  test('[GRID.3-E2E-009] @p1 ArrowDown from last exercise in session 1 reaches empty row then session 2', async ({
     gridPage,
   }) => {
     // GIVEN: User has selected the last exercise in session 1 (Leg Press, index 1)
@@ -111,28 +110,27 @@ test.describe('Arrow Key Navigation', () => {
     // WHEN: User presses ArrowDown once
     await gridPage.pressKey('ArrowDown')
 
-    // THEN: Focus reaches add-exercise row
-    const addExInput = gridPage.addExerciseInput(0)
-    await expect(addExInput).toBeFocused({ timeout: 3_000 })
+    // THEN: Focus reaches empty row for session 1 (index 2)
+    await gridPage.expectActiveCellAt(2, 1)
 
     // WHEN: User presses ArrowDown again
     await gridPage.pressKey('ArrowDown')
 
-    // THEN: Focus reaches first exercise in session 2 (Barbell Bench Press, index 2)
-    await gridPage.expectActiveCellAt(2, 1)
+    // THEN: Focus reaches first exercise in session 2 (Barbell Bench Press, index 3)
+    await gridPage.expectActiveCellAt(3, 1)
   })
 
-  test('[GRID.3-E2E-010] @p1 ArrowUp from first exercise in session 2 skips to session 1 last exercise', async ({
+  test('[GRID.3-E2E-010] @p1 ArrowUp from first exercise in session 2 reaches empty row of session 1', async ({
     gridPage,
   }) => {
-    // GIVEN: User has selected the first exercise in session 2 (Barbell Bench Press, index 2)
-    await gridPage.clickCell(2, 1)
+    // GIVEN: User has selected the first exercise in session 2 (Barbell Bench Press, index 3)
+    await gridPage.clickCell(3, 1)
 
     // WHEN: User presses ArrowUp
     await gridPage.pressKey('ArrowUp')
 
-    // THEN: Selection skips session header and add-exercise row, moves to last exercise in session 1 (Leg Press, index 1)
-    await gridPage.expectActiveCellAt(1, 1)
+    // THEN: Selection moves to empty row of session 1 (index 2)
+    await gridPage.expectActiveCellAt(2, 1)
   })
 
   // ── Multiple consecutive arrow presses ──
@@ -141,40 +139,38 @@ test.describe('Arrow Key Navigation', () => {
     // GIVEN: User has selected Back Squat in first row, first week
     await gridPage.clickCell(0, 1)
 
-    // WHEN: User presses ArrowDown multiple times
-    // THEN: Traverses through Session 1
-    await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(1, 1) // LegPress(1)
-
-    // THEN: Crosses session boundary to add-exercise (session 1)
-    await gridPage.pressKey('ArrowDown')
-    await expect(gridPage.addExerciseInput(0)).toBeFocused({ timeout: 3_000 })
-
-    // THEN: Moves to first exercise in Session 2
-    await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(2, 1) // BenchPress(2)
-
-    // THEN: Traverses through Session 2
-    await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(3, 1) // InclineDB(3)
+    // Linear traversal through all 10 rows:
+    // 0=BackSquat, 1=LegPress, 2=empty(S1), 3=BenchPress, 4=InclineDB, 5=Tricep, 6=empty(S2), 7=Deadlift, 8=BarbellRow, 9=empty(S3)
 
     await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(4, 1) // Tricep(4)
+    await gridPage.expectActiveCellAt(1, 1) // Leg Press
 
-    // THEN: Crosses session boundary to add-exercise (session 2)
     await gridPage.pressKey('ArrowDown')
-    await expect(gridPage.addExerciseInput(1)).toBeFocused({ timeout: 3_000 })
+    await gridPage.expectActiveCellAt(2, 1) // empty row S1
 
-    // THEN: Moves to first exercise in Session 3
     await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(5, 1) // Deadlift(5)
+    await gridPage.expectActiveCellAt(3, 1) // Barbell Bench Press
 
-    // THEN: Traverses through Session 3
     await gridPage.pressKey('ArrowDown')
-    await gridPage.expectActiveCellAt(6, 1) // BarbellRow(6)
+    await gridPage.expectActiveCellAt(4, 1) // Incline DB Press
 
-    // THEN: Reaches final add-exercise row (session 3)
     await gridPage.pressKey('ArrowDown')
-    await expect(gridPage.addExerciseInput(2)).toBeFocused({ timeout: 3_000 })
+    await gridPage.expectActiveCellAt(5, 1) // Tricep Pushdown
+
+    await gridPage.pressKey('ArrowDown')
+    await gridPage.expectActiveCellAt(6, 1) // empty row S2
+
+    await gridPage.pressKey('ArrowDown')
+    await gridPage.expectActiveCellAt(7, 1) // Conventional Deadlift
+
+    await gridPage.pressKey('ArrowDown')
+    await gridPage.expectActiveCellAt(8, 1) // Barbell Row
+
+    await gridPage.pressKey('ArrowDown')
+    await gridPage.expectActiveCellAt(9, 1) // empty row S3
+
+    // Boundary clamp: ArrowDown at last row stays put
+    await gridPage.pressKey('ArrowDown')
+    await gridPage.expectActiveCellAt(9, 1)
   })
 })

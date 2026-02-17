@@ -75,53 +75,48 @@ test.describe('Focus & Scroll Behavior', () => {
     }
   })
 
-  // ── ArrowDown from add-exercise to add-exercise (when no exercises in next day) ──
-  // Note: With current seed data, all sessions have exercises.
-  // This test verifies the general behavior: ArrowDown from add-exercise goes through
-  // sessions correctly. When a session has no exercises, it should go to its add-exercise row.
+  // ── ArrowDown navigates through empty rows uniformly ──
 
-  test('[GRID.10-E2E-004] @p2 ArrowDown from add-exercise row navigates to next session first exercise', async ({
+  test('[GRID.10-E2E-004] @p2 ArrowDown from last exercise navigates through empty row to next session', async ({
     gridPage,
   }) => {
-    // GIVEN: User navigates to add-exercise row for session 1
-    // Start from Leg Press (last exercise in session 1, index 1)
+    // GIVEN: User starts from Leg Press (last exercise in session 1, index 1)
     await gridPage.clickCell(1, 0)
-    await gridPage.pressKey('ArrowDown')
-
-    // THEN: User is on add-exercise for session 1
-    const addExInput1 = gridPage.addExerciseInput(0)
-    await expect(addExInput1).toBeFocused({ timeout: 3_000 })
 
     // WHEN: User presses ArrowDown
     await gridPage.pressKey('ArrowDown')
 
-    // THEN: Focus moves to first exercise in session 2 (Barbell Bench Press, index 2)
+    // THEN: Focus moves to empty row S1 (index 2)
     await gridPage.expectActiveCellAt(2, 0)
+
+    // WHEN: User presses ArrowDown again
+    await gridPage.pressKey('ArrowDown')
+
+    // THEN: Focus moves to first exercise in session 2 (Bench Press, index 3)
+    await gridPage.expectActiveCellAt(3, 0)
   })
 
-  // ── Column persistence when moving between days through add-exercise rows ──
+  // ── Column persistence when moving between days through empty rows ──
 
-  test('[GRID.10-E2E-005] @p2 column index persists when navigating down through add-exercise row', async ({
-    gridPage,
-  }) => {
+  test('[GRID.10-E2E-005] @p2 column index persists when navigating down through empty row', async ({ gridPage }) => {
     // GIVEN: User starts on Back Squat, week 2 (exercise 0, col 2)
     await gridPage.clickCell(0, 2)
     await gridPage.expectActiveCellAt(0, 2)
 
-    // WHEN: User navigates down through exercises and add-exercise row
-    await gridPage.pressKey('ArrowDown') // Leg Press week 2 (exercise 1, col 2)
+    // WHEN: User navigates down through exercises and empty row
+    await gridPage.pressKey('ArrowDown') // Leg Press (1, 2)
     await gridPage.expectActiveCellAt(1, 2)
 
-    await gridPage.pressKey('ArrowDown') // add-exercise row (session 1)
-    await expect(gridPage.addExerciseInput(0)).toBeFocused({ timeout: 3_000 })
-
-    await gridPage.pressKey('ArrowDown') // Barbell Bench Press
-
-    // THEN: Column index is preserved (lands on col 2 (week 2), NOT col 0 (exercise))
+    await gridPage.pressKey('ArrowDown') // empty row S1 (2, 2)
     await gridPage.expectActiveCellAt(2, 2)
+
+    await gridPage.pressKey('ArrowDown') // Barbell Bench Press (3, 2)
+
+    // THEN: Column index is preserved (lands on col 2)
+    await gridPage.expectActiveCellAt(3, 2)
   })
 
-  test('[GRID.10-E2E-006] @p2 column index persists across multiple session boundaries through add-exercise', async ({
+  test('[GRID.10-E2E-006] @p2 column index persists across multiple session boundaries through empty rows', async ({
     gridPage,
   }) => {
     // GIVEN: User starts on Back Squat, week 3 (exercise 0, col 3)
@@ -133,24 +128,24 @@ test.describe('Focus & Scroll Behavior', () => {
     await gridPage.pressKey('ArrowDown') // Leg Press (1, 3)
     await gridPage.expectActiveCellAt(1, 3)
 
-    // Through add-exercise row to session 2
-    await gridPage.pressKey('ArrowDown') // add-exercise (session 1)
-    await expect(gridPage.addExerciseInput(0)).toBeFocused({ timeout: 3_000 })
-    await gridPage.pressKey('ArrowDown') // Barbell Bench Press (2, 3)
+    // Through empty row to session 2
+    await gridPage.pressKey('ArrowDown') // empty row S1 (2, 3)
     await gridPage.expectActiveCellAt(2, 3)
+    await gridPage.pressKey('ArrowDown') // Barbell Bench Press (3, 3)
+    await gridPage.expectActiveCellAt(3, 3)
 
     // Continue through session 2
-    await gridPage.pressKey('ArrowDown') // Incline DB Press (3, 3)
-    await gridPage.expectActiveCellAt(3, 3)
-    await gridPage.pressKey('ArrowDown') // Tricep Pushdown (4, 3)
+    await gridPage.pressKey('ArrowDown') // Incline DB Press (4, 3)
     await gridPage.expectActiveCellAt(4, 3)
+    await gridPage.pressKey('ArrowDown') // Tricep Pushdown (5, 3)
+    await gridPage.expectActiveCellAt(5, 3)
 
-    // Through add-exercise row to session 3
-    await gridPage.pressKey('ArrowDown') // add-exercise (session 2)
-    await expect(gridPage.addExerciseInput(1)).toBeFocused({ timeout: 3_000 })
-    await gridPage.pressKey('ArrowDown') // Conventional Deadlift (5, 3)
+    // Through empty row to session 3
+    await gridPage.pressKey('ArrowDown') // empty row S2 (6, 3)
+    await gridPage.expectActiveCellAt(6, 3)
+    await gridPage.pressKey('ArrowDown') // Conventional Deadlift (7, 3)
 
     // THEN: Column index (col 3) is preserved throughout the entire navigation
-    await gridPage.expectActiveCellAt(5, 3)
+    await gridPage.expectActiveCellAt(7, 3)
   })
 })

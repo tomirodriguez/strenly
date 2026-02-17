@@ -63,9 +63,9 @@ export class ProgramGridPage {
     return this.page.locator('tr[data-row-type="session-header"]')
   }
 
-  /** Add-exercise rows */
-  get addExerciseRows() {
-    return this.page.locator('tr[data-row-type="add-exercise"]')
+  /** Empty exercise rows (placeholder for adding new exercises) */
+  get emptyRows() {
+    return this.page.locator('tr[data-row-type="exercise"][data-empty]')
   }
 
   // ─── Cell Locators ───────────────────────────────────
@@ -199,15 +199,6 @@ export class ProgramGridPage {
 
   async typeText(text: string) {
     await this.page.keyboard.type(text)
-  }
-
-  // ─── Add Exercise Row Helpers ────────────────────────
-
-  /**
-   * Get the add-exercise combobox input for a specific session (0-indexed).
-   */
-  addExerciseInput(sessionIndex: number): Locator {
-    return this.addExerciseRows.nth(sessionIndex).getByPlaceholder('Agregar ejercicio...')
   }
 
   // ─── Content Helpers ─────────────────────────────────

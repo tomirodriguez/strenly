@@ -15,7 +15,7 @@ export interface GridColumn {
 }
 
 // Row types
-export type GridRowType = 'session-header' | 'exercise' | 'add-exercise'
+export type GridRowType = 'session-header' | 'exercise'
 
 // Superset line position for visual indicator
 export type SupersetPosition = 'start' | 'middle' | 'end' | null

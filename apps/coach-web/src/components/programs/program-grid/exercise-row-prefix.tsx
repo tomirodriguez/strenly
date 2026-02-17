@@ -20,6 +20,15 @@ interface ExerciseRowPrefixProps {
  * - Font: 10px, bold
  */
 export function ExerciseRowPrefix({ row }: ExerciseRowPrefixProps) {
+  // Empty rows (no exercise assigned) show an empty prefix slot
+  if (!row.exercise) {
+    return (
+      <div className="relative flex h-full items-center">
+        <span className="z-30 flex h-full w-10 items-center justify-center border-border border-r bg-muted/20" />
+      </div>
+    )
+  }
+
   // Unified format: always letter + number
   // Standalone exercises are groups of 1 (A1, B1)
   // Supersets are groups of N (C1, C2, C3)

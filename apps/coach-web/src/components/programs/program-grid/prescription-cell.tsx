@@ -10,6 +10,7 @@ interface PrescriptionCellProps {
   isActive: boolean
   isEditing: boolean
   isSubRow: boolean
+  disabled?: boolean
   onSelect: () => void
   onStartEdit: () => void
   onCommit: (value: string) => void
@@ -38,6 +39,7 @@ export function PrescriptionCell({
   isActive,
   isEditing,
   isSubRow,
+  disabled,
   onSelect,
   onStartEdit,
   onCommit,
@@ -115,6 +117,7 @@ export function PrescriptionCell({
   }
 
   const handleCellKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return // Let navigation keys bubble to grid
     // Only handle edit mode triggers - let navigation keys bubble to grid
     switch (e.key) {
       case 'Enter':
@@ -181,7 +184,7 @@ export function PrescriptionCell({
         isInvalid && !isActive && 'ring-2 ring-amber-400/60',
       )}
       onClick={onSelect}
-      onDoubleClick={onStartEdit}
+      onDoubleClick={disabled ? undefined : onStartEdit}
       onKeyDown={handleCellKeyDown}
       tabIndex={isActive ? 0 : -1}
       data-row-id={rowId}
@@ -195,7 +198,7 @@ export function PrescriptionCell({
           isSubRow ? 'text-muted-foreground' : 'text-foreground',
         )}
       >
-        {value ? renderPrescriptionDisplay(value) : '\u2014'} {/* Em dash for empty cells */}
+        {disabled ? '' : value ? renderPrescriptionDisplay(value) : '\u2014'}
       </div>
     </td>
   )

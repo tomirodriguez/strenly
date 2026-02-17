@@ -30,15 +30,15 @@ test.describe('Tab Navigation', () => {
     await gridPage.expectActiveCellAt(1, 0)
   })
 
-  test('[GRID.4-E2E-003] @p1 Tab wrapping skips session headers and add-exercise rows', async ({ gridPage }) => {
-    // GIVEN: User has selected last column in Leg Press (last exercise in session 1)
+  test('[GRID.4-E2E-003] @p1 Tab wrapping from Leg Press last col goes to empty row S1', async ({ gridPage }) => {
+    // GIVEN: User has selected last column in Leg Press (last real exercise in session 1)
     await gridPage.clickCell(1, WEEKS_COUNT)
 
     // WHEN: User presses Tab
     await gridPage.pressKey('Tab')
 
-    // THEN: Selection wraps to first exercise in session 2, skipping add-row and session header
-    await gridPage.expectActiveCellAt(2, 0) // Barbell Bench Press
+    // THEN: Selection wraps to empty row of session 1 (index 2, col 0)
+    await gridPage.expectActiveCellAt(2, 0)
   })
 
   test('[GRID.4-E2E-004] @p0 Shift+Tab moves left one column', async ({ gridPage }) => {
@@ -53,14 +53,14 @@ test.describe('Tab Navigation', () => {
   })
 
   test('[GRID.4-E2E-005] @p1 Shift+Tab at first column wraps to last column of previous row', async ({ gridPage }) => {
-    // GIVEN: User has selected the first column in Bench Press row
-    await gridPage.clickCell(2, 0)
+    // GIVEN: User has selected the first column in Bench Press row (index 3)
+    await gridPage.clickCell(3, 0)
 
     // WHEN: User presses Shift+Tab
     await gridPage.pressKey('Shift+Tab')
 
-    // THEN: Selection wraps to last column of previous row (Leg Press)
-    await gridPage.expectActiveCellAt(1, WEEKS_COUNT)
+    // THEN: Selection wraps to last column of empty row S1 (index 2)
+    await gridPage.expectActiveCellAt(2, WEEKS_COUNT)
   })
 
   test('[GRID.4-E2E-006] @p2 Tab traverses entire row then wraps', async ({ gridPage }) => {

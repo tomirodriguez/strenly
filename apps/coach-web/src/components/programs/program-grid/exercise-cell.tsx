@@ -161,8 +161,10 @@ export function ExerciseCell({
           <span
             data-testid="exercise-name"
             className={cn(
-              'truncate font-semibold text-[13px]',
-              row.isSubRow ? 'text-foreground/50' : 'text-foreground',
+              'truncate text-[13px]',
+              row.exercise
+                ? cn('font-semibold', row.isSubRow ? 'text-foreground/50' : 'text-foreground')
+                : 'font-medium text-muted-foreground/60',
             )}
           >
             {row.exercise?.exerciseName ?? 'Seleccionar ejercicio'}

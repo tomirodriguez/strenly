@@ -1,5 +1,5 @@
 import { expect, test } from '../../fixtures/test'
-import { ALL_EXERCISES, SESSIONS, SUPERSET, WEEKS_COUNT } from '../../helpers/seed-data'
+import { ALL_EXERCISES, SESSIONS, TOTAL_EXERCISE_ROWS, WEEKS_COUNT } from '../../helpers/seed-data'
 
 test.describe('Grid Loading & Rendering', () => {
   test.beforeEach(async ({ gridPage }) => {
@@ -42,25 +42,28 @@ test.describe('Grid Loading & Rendering', () => {
   })
 
   test('[GRID.1-E2E-004] @p1 shows all exercise rows with correct names', async ({ gridPage }) => {
-    // GIVEN: Grid is loaded with program data
+    // GIVEN: Grid is loaded with program data (includes empty rows)
 
-    // THEN: Exercise row count matches expected
-    await expect(gridPage.exerciseRows).toHaveCount(ALL_EXERCISES.length)
+    // THEN: Total exercise row count includes empty placeholder rows
+    await expect(gridPage.exerciseRows).toHaveCount(TOTAL_EXERCISE_ROWS)
 
-    // THEN: Each exercise name is displayed correctly
+    // THEN: Each real exercise name is displayed correctly
+    // New index map: 0=BackSquat, 1=LegPress, 2=empty, 3=BenchPress, 4=InclineDB, 5=Tricep, 6=empty, 7=Deadlift, 8=BarbellRow, 9=empty
+    const exerciseIndices = [0, 1, 3, 4, 5, 7, 8]
     for (let i = 0; i < ALL_EXERCISES.length; i++) {
-      const name = await gridPage.getExerciseName(i)
+      const rowIndex = exerciseIndices[i] ?? 0
+      const name = await gridPage.getExerciseName(rowIndex)
       expect(name).toBe(ALL_EXERCISES[i])
     }
   })
 
   test('[GRID.1-E2E-005] @p2 shows superset indicator for Incline DB + Tricep Pushdown', async ({ gridPage }) => {
     // GIVEN: Grid is loaded with program data containing a superset
-    // Superset exercises are at indices 3 and 4 (0-based in all exercise rows)
-    // Session 1: [0] Back Squat, [1] Leg Press
-    // Session 2: [2] Barbell Bench Press, [3] Incline Dumbbell Press, [4] Tricep Pushdown
-    const inclineDbIndex = ALL_EXERCISES.indexOf(SUPERSET.exercises[0])
-    const tricepIndex = ALL_EXERCISES.indexOf(SUPERSET.exercises[1])
+    // New index map with empty rows:
+    // Session 1: [0] Back Squat, [1] Leg Press, [2] empty
+    // Session 2: [3] Barbell Bench Press, [4] Incline Dumbbell Press, [5] Tricep Pushdown, [6] empty
+    const inclineDbIndex = 4
+    const tricepIndex = 5
 
     // THEN: Superset exercises show the indicator
     expect(await gridPage.hasSupersetIndicator(inclineDbIndex)).toBe(true)
@@ -68,6 +71,6 @@ test.describe('Grid Loading & Rendering', () => {
 
     // THEN: Non-superset exercises do NOT show the indicator
     expect(await gridPage.hasSupersetIndicator(0)).toBe(false) // Back Squat
-    expect(await gridPage.hasSupersetIndicator(2)).toBe(false) // Barbell Bench Press
+    expect(await gridPage.hasSupersetIndicator(3)).toBe(false) // Barbell Bench Press
   })
 })

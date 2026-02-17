@@ -37,17 +37,17 @@ test.describe('Superset Group/Ungroup Shortcuts', () => {
   })
 
   test('[GRID.13-E2E-003] @p0 Ctrl+Shift+G ungroups exercise from superset', async ({ gridPage }) => {
-    // GIVEN: Tricep Pushdown (index 4) is in a superset with Incline DB Press
-    const hasSupersetBefore = await gridPage.hasSupersetIndicator(4)
+    // GIVEN: Tricep Pushdown (index 5) is in a superset with Incline DB Press
+    const hasSupersetBefore = await gridPage.hasSupersetIndicator(5)
     expect(hasSupersetBefore).toBe(true)
 
     // WHEN: Select Tricep Pushdown and press Ctrl+Shift+G
-    await gridPage.clickCell(4, 0)
+    await gridPage.clickCell(5, 0)
     await gridPage.pressKey('Control+Shift+g')
 
     // THEN: Tricep Pushdown is now standalone
     await expect(async () => {
-      const hasSuperset = await gridPage.hasSupersetIndicator(4)
+      const hasSuperset = await gridPage.hasSupersetIndicator(5)
       expect(hasSuperset).toBe(false)
     }).toPass({ timeout: 3_000 })
   })

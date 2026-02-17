@@ -93,12 +93,11 @@ export function ProgramGrid({
   const { rows, columns } = gridData ?? emptyData
 
   // Grid state hooks - pass tableRef for DOM focus management
-  const { activeCell, setActiveCell, handleKeyDown, restoreFocus, focusAddExerciseRow, lastColumnRef } =
-    useGridNavigation({
-      rows,
-      columns,
-      tableRef,
-    })
+  const { activeCell, setActiveCell, handleKeyDown, restoreFocus } = useGridNavigation({
+    rows,
+    columns,
+    tableRef,
+  })
   // Cell editing state - restoreFocus re-focuses active cell after edit stops
   const { editingCell, startEditing, stopEditing } = useCellEditing({
     onEditStop: restoreFocus,
@@ -131,6 +130,10 @@ export function ProgramGrid({
   // Passes notation string to parent handler or calls server mutation
   const handleCommitPrescription = useCallback(
     (rowId: string, weekId: string, value: string) => {
+      // Prevent prescription edits on empty rows (no exercise assigned)
+      const row = rows.find((r) => r.id === rowId)
+      if (row?.type === 'exercise' && !row.exercise) return
+
       if (onPrescriptionChange) {
         // Local state mode: pass notation string to parent
         // The grid store handles parsing internally
@@ -144,12 +147,23 @@ export function ProgramGrid({
         })
       }
     },
-    [onPrescriptionChange, updatePrescription],
+    [onPrescriptionChange, updatePrescription, rows],
   )
 
   // Handle exercise commit
   const handleCommitExercise = useCallback(
     (rowId: string, exerciseId: string, exerciseName: string) => {
+      // Check if this is an empty row (no exercise assigned) — treat as "add exercise"
+      const row = rows.find((r) => r.id === rowId)
+      if (row?.type === 'exercise' && !row.exercise) {
+        if (onAddExercise) {
+          onAddExercise(row.sessionId, exerciseId, exerciseName)
+        } else {
+          addExerciseRow.mutate({ sessionId: row.sessionId, exerciseId })
+        }
+        return
+      }
+
       if (onExerciseChange) {
         // Local state mode
         onExerciseChange(rowId, exerciseId, exerciseName)
@@ -161,58 +175,7 @@ export function ProgramGrid({
         })
       }
     },
-    [onExerciseChange, updateExerciseRow],
-  )
-
-  // Handle add exercise
-  const handleAddExercise = (sessionId: string, exerciseId: string, exerciseName: string) => {
-    if (onAddExercise) {
-      // Local state mode - use store action
-      onAddExercise(sessionId, exerciseId, exerciseName)
-    } else {
-      // Server mutation mode (legacy fallback)
-      addExerciseRow.mutate({
-        sessionId,
-        exerciseId,
-      })
-    }
-  }
-
-  // Handle navigation from add-exercise row (ArrowUp/ArrowDown)
-  const handleNavigateFromAddRow = useCallback(
-    (sessionId: string, direction: 'up' | 'down') => {
-      const targetCol = lastColumnRef.current ?? columns[0]?.id ?? 'exercise'
-
-      if (direction === 'up') {
-        // Find the last exercise row in this session
-        for (let i = rows.length - 1; i >= 0; i--) {
-          const row = rows[i]
-          if (row && row.type === 'exercise' && row.sessionId === sessionId) {
-            setActiveCell(row.id, targetCol)
-            return
-          }
-        }
-      } else {
-        // Find the first exercise row in the next session
-        const addExRow = rows.find((r) => r.type === 'add-exercise' && r.sessionId === sessionId)
-        if (addExRow) {
-          const addExIdx = rows.indexOf(addExRow)
-          for (let i = addExIdx + 1; i < rows.length; i++) {
-            const row = rows[i]
-            if (row && row.type === 'exercise') {
-              setActiveCell(row.id, targetCol)
-              return
-            }
-            // If we hit another add-exercise row (empty session), focus it
-            if (row && row.type === 'add-exercise') {
-              focusAddExerciseRow(row.sessionId)
-              return
-            }
-          }
-        }
-      }
-    },
-    [rows, columns, setActiveCell, lastColumnRef, focusAddExerciseRow],
+    [onExerciseChange, onAddExercise, updateExerciseRow, addExerciseRow, rows],
   )
 
   // Auto-focus first exercise cell on initial load (ref-based, no useEffect).
@@ -224,12 +187,6 @@ export function ProgramGrid({
     if (firstExercise) {
       const colId = columns[0]?.id ?? 'exercise'
       setActiveCell(firstExercise.id, colId)
-    } else {
-      // No exercises — focus first add-exercise input
-      const firstAddEx = rows.find((r) => r.type === 'add-exercise')
-      if (firstAddEx) {
-        focusAddExerciseRow(firstAddEx.sessionId)
-      }
     }
   }
 
@@ -458,8 +415,6 @@ export function ProgramGrid({
             onCommitExercise={handleCommitExercise}
             onCommitPrescription={handleCommitPrescription}
             onNavigate={handleNavigate}
-            onAddExercise={handleAddExercise}
-            onNavigateFromAddRow={handleNavigateFromAddRow}
           />
         </table>
       </div>

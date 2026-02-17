@@ -78,8 +78,8 @@ test.describe('Keyboard Reorder (Alt+Arrow)', () => {
     expect(await gridPage.getExerciseName(0)).toBe(EXERCISES.session1[0])
     expect(await gridPage.getExerciseName(1)).toBe(EXERCISES.session1[1])
 
-    // THEN: Session 2 is also unchanged
-    expect(await gridPage.getExerciseName(2)).toBe(EXERCISES.session2[0])
+    // THEN: Session 2 is also unchanged (index 3 = first exercise in session 2)
+    expect(await gridPage.getExerciseName(3)).toBe(EXERCISES.session2[0])
 
     // THEN: Active cell stays in place
     await gridPage.expectActiveCellAt(1, 0)

@@ -57,7 +57,15 @@ export function ExerciseRow({
   }
 
   return (
-    <tr ref={setNodeRef} className="group" data-row-id={row.id} data-row-type="exercise" style={style} {...attributes}>
+    <tr
+      ref={setNodeRef}
+      className="group"
+      data-row-id={row.id}
+      data-row-type="exercise"
+      data-empty={!row.exercise || undefined}
+      style={style}
+      {...attributes}
+    >
       {columns.map((col) => {
         const isActiveCell = isActiveRow && activeCell?.colId === col.id
         const isEditingCell = isEditingRow && editingCell?.colId === col.id
@@ -99,6 +107,7 @@ export function ExerciseRow({
             isActive={isActiveCell}
             isEditing={isEditingCell}
             isSubRow={row.isSubRow}
+            disabled={!row.exercise}
             onSelect={() => onCellClick(row.id, col.id)}
             onStartEdit={() => onStartEdit(row.id, col.id)}
             onCommit={(value) => {
