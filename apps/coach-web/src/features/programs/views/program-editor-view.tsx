@@ -229,7 +229,7 @@ function ProgramFooter({ isDirty, isPending, onSave }: ProgramFooterProps) {
   return (
     <footer className="flex shrink-0 items-center justify-between border-border border-t bg-background px-4 py-1.5">
       {/* Keyboard shortcuts — hidden on narrow screens */}
-      <div className="hidden items-center gap-4 text-muted-foreground text-[11px] lg:flex">
+      <div className="hidden items-center gap-4 text-[11px] text-muted-foreground lg:flex">
         <ShortcutHint keys={['Ctrl', 'G']} label="Superserie" />
         <ShortcutHint keys={['Alt', '↑↓']} label="Reordenar" />
         <ShortcutHint keys={['Ctrl', 'C/V']} label="Copiar / Pegar" />
@@ -238,7 +238,7 @@ function ProgramFooter({ isDirty, isPending, onSave }: ProgramFooterProps) {
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="ml-auto flex items-center gap-2">
         <Button variant="outline" size="sm" disabled>
           <FileDownIcon className="size-3.5" />
           Exportar PDF
