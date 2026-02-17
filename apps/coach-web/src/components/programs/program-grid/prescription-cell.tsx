@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { useGridInvalidCells } from '@/stores/grid-store'
 
 interface PrescriptionCellProps {
   value: string
@@ -45,6 +46,8 @@ export function PrescriptionCell({
 }: PrescriptionCellProps) {
   const [editValue, setEditValue] = useState(value)
   const inputRef = useRef<HTMLInputElement>(null)
+  const invalidCells = useGridInvalidCells()
+  const isInvalid = invalidCells.has(`${rowId}:${weekId}`)
 
   // Reset edit value when cell value changes externally (derived state)
   if (!isEditing && editValue !== value) {
@@ -175,6 +178,7 @@ export function PrescriptionCell({
       className={cn(
         'cursor-text border-border border-r border-b p-0',
         isActive && 'bg-primary/5 ring-1 ring-primary ring-inset',
+        isInvalid && !isActive && 'ring-2 ring-amber-400/60',
       )}
       onClick={onSelect}
       onDoubleClick={onStartEdit}
@@ -182,6 +186,7 @@ export function PrescriptionCell({
       tabIndex={isActive ? 0 : -1}
       data-row-id={rowId}
       data-week-id={weekId}
+      data-invalid={isInvalid ? 'true' : undefined}
       aria-selected={isActive || undefined}
     >
       <div

@@ -28,6 +28,7 @@ import type { GridColumn, GridData, GridRow } from '@/components/programs/progra
 interface HistorySnapshot {
   aggregate: ProgramAggregate
   data: GridData
+  invalidCells: Map<string, string>
 }
 
 interface GridState {
@@ -54,6 +55,9 @@ interface GridState {
 
   // Internal clipboard for copy-paste
   clipboard: { notation: string } | null
+
+  // Cells with invalid (unparseable) notation — key: `${itemId}:${weekId}`, value: raw text
+  invalidCells: Map<string, string>
 }
 
 /**
@@ -128,6 +132,9 @@ interface GridActions {
     program: ProgramDataInput
     lastLoadedAt: Date | null
   } | null
+
+  // Get the count of cells with invalid notation
+  getInvalidCellsCount: () => number
 }
 
 type GridStore = GridState & GridActions
@@ -287,13 +294,17 @@ const HISTORY_LIMIT = 50
  * Push current state onto the undo stack before a mutation.
  * Clears the redo stack (new mutation invalidates redo history).
  */
-function pushToUndoStack(state: GridState): { undoStack: HistorySnapshot[]; redoStack: HistorySnapshot[] } {
+function pushToUndoStack(state: GridState): {
+  undoStack: HistorySnapshot[]
+  redoStack: HistorySnapshot[]
+} {
   if (!state.aggregate || !state.data) {
     return { undoStack: state.undoStack, redoStack: state.redoStack }
   }
   const snapshot: HistorySnapshot = {
     aggregate: deepClone(state.aggregate),
     data: deepClone(state.data),
+    invalidCells: new Map(state.invalidCells),
   }
   const newStack = [...state.undoStack, snapshot].slice(-HISTORY_LIMIT)
   return { undoStack: newStack, redoStack: [] }
@@ -318,6 +329,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
   undoStack: [],
   redoStack: [],
   clipboard: null,
+  invalidCells: new Map(),
 
   // Initialize store with program aggregate
   initialize: (programId, aggregate, exercisesMap) => {
@@ -331,6 +343,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       lastLoadedAt: new Date(),
       undoStack: [],
       redoStack: [],
+      invalidCells: new Map(),
     })
   },
 
@@ -341,17 +354,39 @@ export const useGridStore = create<GridStore>((set, get) => ({
     set((state) => {
       if (!state.aggregate || !state.data) return state
 
-      // Parse notation to series
+      const historyUpdate = pushToUndoStack(state)
       const parsedSeries = parsePrescriptionToSeries(notation)
-      if (parsedSeries === null) {
-        // Invalid notation, don't update
-        return state
+      const newInvalidCells = new Map(state.invalidCells)
+      const cellKey = `${itemId}:${weekId}`
+
+      if (parsedSeries === null && notation.trim() !== '') {
+        // Invalid notation — keep raw text in display, mark as invalid, don't update aggregate
+        newInvalidCells.set(cellKey, notation)
+
+        const updatedRows = state.data.rows.map((row) => {
+          if (row.type === 'exercise' && row.id === itemId) {
+            return {
+              ...row,
+              prescriptions: { ...row.prescriptions, [weekId]: notation },
+            }
+          }
+          return row
+        })
+
+        return {
+          ...historyUpdate,
+          data: { ...state.data, rows: updatedRows },
+          invalidCells: newInvalidCells,
+          isDirty: true,
+        }
       }
 
-      const historyUpdate = pushToUndoStack(state)
+      // Valid notation (or empty) — remove from invalid map
+      newInvalidCells.delete(cellKey)
 
       // Convert to SeriesInput format for aggregate
-      const seriesInput: SeriesInput[] = parsedSeries.map((s) => ({
+      const validSeries = parsedSeries ?? []
+      const seriesInput: SeriesInput[] = validSeries.map((s) => ({
         reps: s.reps,
         repsMax: s.repsMax ?? undefined,
         isAmrap: s.isAmrap,
@@ -388,7 +423,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
 
       // Update grid display data — empty series should store '' not em dash
-      const notationDisplay = parsedSeries.length > 0 ? formatSeriesToNotation(parsedSeries) : ''
+      const notationDisplay = validSeries.length > 0 ? formatSeriesToNotation(validSeries) : ''
       const updatedRows = state.data.rows.map((row) => {
         if (row.type === 'exercise' && row.id === itemId) {
           return {
@@ -406,6 +441,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
         ...historyUpdate,
         aggregate: newAggregate,
         data: { ...state.data, rows: updatedRows },
+        invalidCells: newInvalidCells,
         isDirty: true,
       }
     }),
@@ -972,10 +1008,15 @@ export const useGridStore = create<GridStore>((set, get) => ({
         return row
       })
 
+      // Also clear from invalid cells if it was marked invalid
+      const newInvalidCells = new Map(state.invalidCells)
+      newInvalidCells.delete(`${itemId}:${weekId}`)
+
       return {
         ...historyUpdate,
         aggregate: newAggregate,
         data: { ...state.data, rows: updatedRows },
+        invalidCells: newInvalidCells,
         isDirty: true,
       }
     }),
@@ -1045,6 +1086,7 @@ export const useGridStore = create<GridStore>((set, get) => ({
       lastLoadedAt: new Date(),
       undoStack: [],
       redoStack: [],
+      invalidCells: new Map(),
     })
   },
 
@@ -1060,12 +1102,14 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const currentSnapshot: HistorySnapshot = {
         aggregate: deepClone(state.aggregate),
         data: deepClone(state.data),
+        invalidCells: new Map(state.invalidCells),
       }
       const newRedoStack = [...state.redoStack, currentSnapshot]
 
       return {
         aggregate: previous.aggregate,
         data: previous.data,
+        invalidCells: previous.invalidCells,
         undoStack: newUndoStack,
         redoStack: newRedoStack,
         isDirty: true,
@@ -1084,12 +1128,14 @@ export const useGridStore = create<GridStore>((set, get) => ({
       const currentSnapshot: HistorySnapshot = {
         aggregate: deepClone(state.aggregate),
         data: deepClone(state.data),
+        invalidCells: new Map(state.invalidCells),
       }
       const newUndoStack = [...state.undoStack, currentSnapshot]
 
       return {
         aggregate: next.aggregate,
         data: next.data,
+        invalidCells: next.invalidCells,
         undoStack: newUndoStack,
         redoStack: newRedoStack,
         isDirty: true,
@@ -1139,6 +1185,9 @@ export const useGridStore = create<GridStore>((set, get) => ({
       if (!notation) return state // Don't copy empty cells
       return { clipboard: { notation } }
     }),
+
+  // Get count of invalid cells
+  getInvalidCellsCount: () => get().invalidCells.size,
 
   // Mark as saved
   markSaved: () => set({ isDirty: false }),
@@ -1199,6 +1248,7 @@ export const useGridProgramId = () => useGridStore((state) => state.programId)
 export const useGridData = () => useGridStore((state) => state.data)
 export const useGridIsDirty = () => useGridStore((state) => state.isDirty)
 export const useGridLastAddedItemId = () => useGridStore((state) => state.lastAddedItemId)
+export const useGridInvalidCells = () => useGridStore((state) => state.invalidCells)
 export const useGridActions = () =>
   useGridStore(
     useShallow((state) => ({
@@ -1223,5 +1273,6 @@ export const useGridActions = () =>
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,
+      getInvalidCellsCount: state.getInvalidCellsCount,
     })),
   )

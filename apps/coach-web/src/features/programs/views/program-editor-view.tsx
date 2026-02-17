@@ -1,9 +1,20 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowLeftIcon, FileDownIcon } from 'lucide-react'
-import { useCallback, useRef } from 'react'
+import { AlertTriangleIcon, ArrowLeftIcon, FileDownIcon } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
 import { ProgramGrid } from '@/components/programs/program-grid/program-grid'
 import { SaveButton } from '@/components/programs/program-grid/save-button'
 import { ProgramHeader } from '@/components/programs/program-header'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSaveDraft } from '@/features/programs/hooks/mutations/use-save-draft'
@@ -48,13 +59,16 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
   // Navigation guard - warn before leaving with unsaved changes
   useUnsavedChanges(isDirty)
 
+  // Invalid cells warning dialog
+  const [showInvalidWarning, setShowInvalidWarning] = useState(false)
+
   // Save mutation
   const saveMutation = useSaveDraft(programId, () => {
     toast.success('Programa guardado')
     actions.markSaved()
   })
 
-  const handleSave = useCallback(() => {
+  const executeSave = useCallback(() => {
     const aggregateData = actions.getAggregateForSave()
     if (!aggregateData) return
 
@@ -64,6 +78,20 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
       lastLoadedAt: aggregateData.lastLoadedAt ?? undefined,
     })
   }, [programId, actions, saveMutation])
+
+  const handleSave = useCallback(() => {
+    const invalidCount = actions.getInvalidCellsCount()
+    if (invalidCount > 0) {
+      setShowInvalidWarning(true)
+      return
+    }
+    executeSave()
+  }, [actions, executeSave])
+
+  const handleConfirmSaveWithInvalid = useCallback(() => {
+    setShowInvalidWarning(false)
+    executeSave()
+  }, [executeSave])
 
   // Loading state - wait for both program and exercises
   if (programLoading || exercisesLoading) {
@@ -99,6 +127,27 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
 
       {/* Footer with keyboard shortcuts help and save button */}
       <ProgramFooter isDirty={isDirty} isPending={saveMutation.isPending} onSave={handleSave} />
+
+      {/* Invalid cells warning dialog */}
+      <AlertDialog open={showInvalidWarning} onOpenChange={setShowInvalidWarning}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400">
+              <AlertTriangleIcon />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Campos con formato invalido</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hay campos con formato de prescripcion invalido. Se guardaran vacios si no se corrigen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="default" onClick={handleConfirmSaveWithInvalid}>
+              Guardar de todos modos
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
