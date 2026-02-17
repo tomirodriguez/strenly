@@ -81,6 +81,9 @@ interface GridActions {
   // Move an exercise group up or down within its session (applies to all weeks)
   moveExercise: (itemId: string, sessionId: string, direction: 'up' | 'down') => void
 
+  // Reorder exercise groups within a session by providing the final ordered group IDs
+  reorderExerciseGroups: (sessionId: string, orderedGroupIds: string[]) => void
+
   // Reset to server state (e.g., after refetch)
   reset: (aggregate: ProgramAggregate, exercisesMap: Map<string, string>) => void
 
@@ -198,6 +201,7 @@ function aggregateToGridData(aggregate: ProgramAggregate, exercisesMap: Map<stri
             exerciseName,
             position: item.orderIndex,
           },
+          groupId: group.id,
           supersetGroup: isSuperset ? group.id : null,
           supersetOrder: isSuperset ? itemIndex + 1 : null,
           supersetPosition,
@@ -808,6 +812,42 @@ export const useGridStore = create<GridStore>((set, get) => ({
       }
     }),
 
+  // Reorder exercise groups within a session by providing the final ordered group IDs
+  reorderExerciseGroups: (sessionId, orderedGroupIds) =>
+    set((state) => {
+      if (!state.aggregate || !state.data) return state
+
+      const newAggregate = deepClone(state.aggregate)
+
+      // Apply new order to ALL weeks
+      for (const week of newAggregate.weeks) {
+        const weekSession = week.sessions.find((s) => s.id === sessionId)
+        if (!weekSession) continue
+
+        // Build a map from groupId to group for quick lookup
+        const groupMap = new Map(weekSession.exerciseGroups.map((g) => [g.id, g]))
+
+        // Set orderIndex based on the provided order
+        for (let i = 0; i < orderedGroupIds.length; i++) {
+          const groupId = orderedGroupIds[i]
+          if (!groupId) continue
+          const group = groupMap.get(groupId)
+          if (group) {
+            group.orderIndex = i
+          }
+        }
+      }
+
+      // Regenerate grid data
+      const gridData = aggregateToGridData(newAggregate, state.exercisesMap)
+
+      return {
+        aggregate: newAggregate,
+        data: gridData,
+        isDirty: true,
+      }
+    }),
+
   // Reset to server state
   reset: (aggregate, exercisesMap) => {
     const gridData = aggregateToGridData(aggregate, exercisesMap)
@@ -893,6 +933,7 @@ export const useGridActions = () =>
       groupWithAbove: state.groupWithAbove,
       ungroupExercise: state.ungroupExercise,
       moveExercise: state.moveExercise,
+      reorderExerciseGroups: state.reorderExerciseGroups,
       reset: state.reset,
       markSaved: state.markSaved,
       getAggregateForSave: state.getAggregateForSave,

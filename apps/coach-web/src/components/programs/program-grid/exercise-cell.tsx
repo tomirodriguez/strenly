@@ -1,3 +1,5 @@
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
+import { GripVertical } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { ExerciseRowActions } from '../exercise-row-actions'
 import { ExerciseRowPrefix } from './exercise-row-prefix'
@@ -19,6 +21,7 @@ interface ExerciseCellProps {
   sessionRowIds: string[]
   isActive: boolean
   isEditing: boolean
+  dragListeners?: SyntheticListenerMap
   onSelect: () => void
   onStartEdit: () => void
   onCommit: (exerciseId: string, exerciseName: string) => void
@@ -33,6 +36,7 @@ interface ExerciseCellProps {
  * - Shows set type badge for special row types
  * - Row prefix with group indicator (A1, B2)
  * - Row actions menu on hover (delete, move)
+ * - Drag handle on hover for drag-drop reordering
  * - Single click selects cell, double-click enters edit mode
  * - Sticky first column behavior (parent handles this via CSS)
  */
@@ -43,6 +47,7 @@ export function ExerciseCell({
   sessionRowIds,
   isActive,
   isEditing,
+  dragListeners,
   onSelect,
   onStartEdit,
   onCommit,
@@ -138,7 +143,18 @@ export function ExerciseCell({
       onKeyDown={handleCellKeyDown}
       tabIndex={isActive ? 0 : -1}
     >
-      <div className="group flex h-10 items-center">
+      <div className="group/cell flex h-10 items-center">
+        {/* Drag handle - visible on hover */}
+        <button
+          type="button"
+          data-testid="drag-handle"
+          className="flex h-full w-5 shrink-0 cursor-grab items-center justify-center opacity-0 transition-opacity active:cursor-grabbing group-hover/cell:opacity-100"
+          tabIndex={-1}
+          {...dragListeners}
+        >
+          <GripVertical className="size-3.5 text-muted-foreground" />
+        </button>
+
         <ExerciseRowPrefix row={row} />
 
         <div className="flex min-w-0 flex-1 items-center justify-between px-3">
@@ -161,7 +177,7 @@ export function ExerciseCell({
         </div>
 
         {/* Row actions menu - visible on hover */}
-        <div className="pr-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="pr-2 opacity-0 transition-opacity group-hover/cell:opacity-100">
           <ExerciseRowActions
             programId={programId}
             sessionId={row.sessionId}

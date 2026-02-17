@@ -34,6 +34,9 @@ export interface GridRow {
     position: number
   }
 
+  // Group ID (exercise group this item belongs to)
+  groupId?: string
+
   // Superset fields
   supersetGroup: string | null
   supersetOrder: number | null

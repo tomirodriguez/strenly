@@ -1,3 +1,6 @@
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { ExerciseCell } from './exercise-cell'
 import { PrescriptionCell } from './prescription-cell'
 import type { GridCell, GridColumn, GridRow } from './types'
@@ -25,6 +28,7 @@ interface ExerciseRowProps {
  * - Remaining columns are editable PrescriptionCells for each week
  * - Passes active/editing state to child cells
  * - Supports keyboard navigation between cells
+ * - Sortable via @dnd-kit for drag-drop reordering
  */
 export function ExerciseRow({
   row,
@@ -43,8 +47,18 @@ export function ExerciseRow({
   const isActiveRow = activeCell?.rowId === row.id
   const isEditingRow = editingCell?.rowId === row.id
 
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: row.id,
+  })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  }
+
   return (
-    <tr className="group" data-row-id={row.id} data-row-type="exercise">
+    <tr ref={setNodeRef} className="group" data-row-id={row.id} data-row-type="exercise" style={style} {...attributes}>
       {columns.map((col) => {
         const isActiveCell = isActiveRow && activeCell?.colId === col.id
         const isEditingCell = isEditingRow && editingCell?.colId === col.id
@@ -59,6 +73,7 @@ export function ExerciseRow({
               sessionRowIds={sessionRowIds}
               isActive={isActiveCell}
               isEditing={isEditingCell}
+              dragListeners={listeners}
               onSelect={() => onCellClick(row.id, col.id)}
               onStartEdit={() => onStartEdit(row.id, col.id)}
               onCommit={(exerciseId, exerciseName) => {
@@ -99,3 +114,5 @@ export function ExerciseRow({
     </tr>
   )
 }
+
+export type { SyntheticListenerMap }
