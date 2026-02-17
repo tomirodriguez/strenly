@@ -26,3 +26,8 @@ catalog:
   # Build tools (shared across vite-based apps and server)
   vite: ^7.1.2
   "@vitejs/plugin-react": ^5.0.0
+
+  # Testing
+  vitest: ^3.0.0
+  "@vitest/coverage-v8": ^3.0.0
+  "@vitest/ui": ^3.0.0

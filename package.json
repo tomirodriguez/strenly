@@ -10,6 +10,8 @@
     "dev:server": "./scripts/dev-server.sh",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "quality": "turbo run typecheck && turbo run lint:fix",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "check": "pnpm biome check .",
