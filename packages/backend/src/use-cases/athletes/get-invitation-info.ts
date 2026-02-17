@@ -67,30 +67,26 @@ export const makeGetInvitationInfo =
         const valid = isValid(invitation)
 
         // 3. Lookup display info in parallel (org name, coach name, athlete name)
-        const orgName$ = deps.organizationLookup
+        const orgName = deps.organizationLookup
           .getOrganizationName(invitation.organizationId)
           .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
 
-        const coachName$ = (
-          invitation.createdByUserId
-            ? deps.organizationLookup
-                .getUserName(invitation.createdByUserId)
-                .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
-            : okAsync<string | null, GetInvitationInfoError>(null)
-        )
+        const coachName = invitation.createdByUserId
+          ? deps.organizationLookup
+              .getUserName(invitation.createdByUserId)
+              .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
+          : okAsync<string | null, GetInvitationInfoError>(null)
 
-        const athleteName$ = deps.organizationLookup
+        const athleteName = deps.organizationLookup
           .getAthleteName(invitation.athleteId, invitation.organizationId)
           .mapErr((e): GetInvitationInfoError => ({ type: 'repository_error', message: e.message }))
 
-        return ResultAsync.combine([orgName$, coachName$, athleteName$]).map(
-          ([orgName, coachName, athleteName]) => ({
-            athleteName: athleteName ?? 'Unknown',
-            organizationName: orgName ?? 'Unknown',
-            coachName: coachName ?? 'Unknown',
-            expiresAt: invitation.expiresAt,
-            isValid: valid,
-          }),
-        )
+        return ResultAsync.combine([orgName, coachName, athleteName]).map(([orgName, coachName, athleteName]) => ({
+          athleteName: athleteName ?? 'Unknown',
+          organizationName: orgName ?? 'Unknown',
+          coachName: coachName ?? 'Unknown',
+          expiresAt: invitation.expiresAt,
+          isValid: valid,
+        }))
       })
   }
