@@ -31,3 +31,6 @@ coverage/
 playwright-storage/
 playwright-report/
 test-results/
+
+# Git worktrees
+.worktrees/
