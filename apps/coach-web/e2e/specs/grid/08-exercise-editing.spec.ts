@@ -174,8 +174,7 @@ test.describe('Exercise Editing', () => {
     expect(name).toBe(selectedText)
   })
 
-  // TODO: combobox empty state [data-slot="combobox-empty"] not rendering — unrelated to grid changes
-  test.skip('[GRID.8-E2E-010] @p2 shows empty state when exercise search has no matches', async ({ gridPage }) => {
+  test('[GRID.8-E2E-010] @p2 shows empty state when exercise search has no matches', async ({ gridPage }) => {
     // GIVEN: User opens exercise combobox
     await gridPage.clickCell(0, 0)
     await gridPage.pressKey('Enter')

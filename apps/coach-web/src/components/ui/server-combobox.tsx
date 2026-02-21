@@ -38,6 +38,10 @@ interface ServerComboboxProps<T> {
   renderItem?: (item: T) => React.ReactNode
   /** Whether data is being fetched */
   loading?: boolean
+  /** Whether the data source has errored */
+  error?: boolean
+  /** Message to show when error is true */
+  errorMessage?: string
   /** Message when no items match */
   emptyMessage?: string
   /** Message while loading */
@@ -74,6 +78,8 @@ export function ServerCombobox<T>({
   itemToStringLabel,
   itemToKey,
   renderItem,
+  error = false,
+  errorMessage = 'Error al cargar datos',
   loading = false,
   emptyMessage = 'Sin resultados.',
   loadingMessage = 'Buscando...',
@@ -88,9 +94,10 @@ export function ServerCombobox<T>({
   defaultInputValue,
   className,
 }: ServerComboboxProps<T>) {
-  // Merge selected item into items to prevent deselection when search results change
+  // Merge selected item into items to prevent deselection when search results change.
+  // When items is empty (no results / error), don't merge so Combobox.Empty renders.
   const mergedItems = useMemo(() => {
-    if (!selectedItem) return items
+    if (!selectedItem || items.length === 0) return items
     const alreadyIncluded = items.some((item) => isItemEqualToValue(item, selectedItem))
     if (alreadyIncluded) return items
     return [selectedItem, ...items]
@@ -198,9 +205,15 @@ export function ServerCombobox<T>({
                 </Combobox.Item>
               ))}
             </Combobox.List>
-            <Combobox.Empty data-slot="combobox-empty" className="py-2 text-center text-muted-foreground text-sm">
-              {loading ? loadingMessage : emptyMessage}
-            </Combobox.Empty>
+            {error ? (
+              <div role="alert" data-slot="combobox-error" className="py-2 text-center text-destructive text-sm">
+                {errorMessage}
+              </div>
+            ) : (
+              <Combobox.Empty data-slot="combobox-empty" className="py-2 text-center text-muted-foreground text-sm">
+                {loading ? loadingMessage : emptyMessage}
+              </Combobox.Empty>
+            )}
           </Combobox.Popup>
         </Combobox.Positioner>
       </Combobox.Portal>

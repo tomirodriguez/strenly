@@ -38,7 +38,7 @@ interface ProgramEditorViewProps {
  */
 export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps) {
   // Fetch program aggregate
-  const { data: program, isLoading: programLoading, error: programError } = useProgram(programId)
+  const { data: program, isLoading: programLoading, error: programError, refetch } = useProgram(programId)
 
   // Fetch exercises for name lookup
   const { exercisesMap, isLoading: exercisesLoading } = useExercisesMap()
@@ -98,7 +98,11 @@ export function ProgramEditorView({ orgSlug, programId }: ProgramEditorViewProps
     return <ProgramEditorSkeleton />
   }
 
-  if (programError || !program) {
+  if (programError) {
+    return <ProgramLoadError orgSlug={orgSlug} onRetry={refetch} />
+  }
+
+  if (!program) {
     return <ProgramNotFound orgSlug={orgSlug} />
   }
 
@@ -183,6 +187,27 @@ function ProgramEditorSkeleton() {
           <Skeleton className="h-7 w-24" />
           <Skeleton className="h-7 w-28" />
         </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Error state when program fails to load (API error)
+ */
+function ProgramLoadError({ orgSlug, onRetry }: { orgSlug: string; onRetry: () => void }) {
+  return (
+    <div role="alert" className="flex h-[50vh] flex-col items-center justify-center gap-4">
+      <AlertTriangleIcon className="size-10 text-destructive" />
+      <p className="text-muted-foreground">Error al cargar el programa</p>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={onRetry}>
+          Reintentar
+        </Button>
+        <Button render={<Link to="/$orgSlug/programs" params={{ orgSlug }} />}>
+          <ArrowLeftIcon className="h-4 w-4" />
+          Volver a programas
+        </Button>
       </div>
     </div>
   )

@@ -57,7 +57,11 @@ export function ExerciseCell({
   const initialSearchRef = useRef('')
   const debouncedSearch = useDebounce(searchValue, 300)
 
-  const { data: exercisesData, isLoading } = useExercises({
+  const {
+    data: exercisesData,
+    isLoading,
+    isError,
+  } = useExercises({
     search: debouncedSearch || undefined,
     limit: 10,
   })
@@ -105,6 +109,7 @@ export function ExerciseCell({
               isItemEqualToValue={(a, b) => a.id === b.id}
               itemToStringLabel={(item) => item.name}
               itemToKey={(item) => item.id}
+              error={isError}
               loading={isLoading}
               placeholder="Buscar ejercicio..."
               open

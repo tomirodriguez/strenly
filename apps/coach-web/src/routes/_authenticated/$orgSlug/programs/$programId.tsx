@@ -16,7 +16,7 @@ function ProgramErrorComponent({ error, reset }: ErrorComponentProps) {
   const { orgSlug } = useParams({ from: '/_authenticated/$orgSlug' })
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-4">
+    <div role="alert" className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-4">
       <h2 className="font-bold text-xl">Error al cargar el programa</h2>
       <p className="max-w-md text-center text-muted-foreground">
         {error instanceof Error ? error.message : 'Ocurrio un error inesperado al cargar el programa.'}
